@@ -1,0 +1,33 @@
+@CHARSET "UTF-8";
+@media print {
+	.noprint {display:none}
+}
+@page{
+	width: 210mm;
+	height: 280mm;
+}
+* {
+    box-sizing: border-box;
+    font-size: 9px;
+    font-style: normal;
+    font-weight: normal;
+}
+body{
+	position: relative;
+}
+#print-page{
+	position: relative;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+}
+table, thead, tbody, tr, td, th{
+	border: 1px solid #000;
+    border-collapse: collapse;
+    text-align: center;
+}
+table{
+	width: 100%;
+	table-layout: fixed;
+}
