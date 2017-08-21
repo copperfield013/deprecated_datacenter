@@ -1,4 +1,4 @@
-package cn.sowell.datacenter.model.demo;
+package cn.sowell.datacenter.model.demo.criteria;
 
 import cn.sowell.datacenter.model.demo.pojo.PlainDemo;
 

@@ -15,7 +15,7 @@ import cn.sowell.copframe.dao.utils.QueryUtils;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
-import cn.sowell.datacenter.model.demo.DemoCriteria;
+import cn.sowell.datacenter.model.demo.criteria.DemoCriteria;
 import cn.sowell.datacenter.model.demo.dao.DemoDao;
 import cn.sowell.datacenter.model.demo.pojo.PlainDemo;
 

@@ -3,7 +3,7 @@ package cn.sowell.datacenter.model.demo.dao;
 import java.util.List;
 
 import cn.sowell.copframe.dto.page.PageInfo;
-import cn.sowell.datacenter.model.demo.DemoCriteria;
+import cn.sowell.datacenter.model.demo.criteria.DemoCriteria;
 import cn.sowell.datacenter.model.demo.pojo.PlainDemo;
 
 public interface DemoDao {

@@ -7,7 +7,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import cn.sowell.copframe.dto.page.PageInfo;
-import cn.sowell.datacenter.model.demo.DemoCriteria;
+import cn.sowell.datacenter.model.demo.criteria.DemoCriteria;
 import cn.sowell.datacenter.model.demo.dao.DemoDao;
 import cn.sowell.datacenter.model.demo.pojo.PlainDemo;
 import cn.sowell.datacenter.model.demo.service.DemoService;

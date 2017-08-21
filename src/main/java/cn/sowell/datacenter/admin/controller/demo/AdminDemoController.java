@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.model.demo.DemoCriteria;
+import cn.sowell.datacenter.model.demo.criteria.DemoCriteria;
 import cn.sowell.datacenter.model.demo.pojo.PlainDemo;
 import cn.sowell.datacenter.model.demo.service.DemoService;
 
