@@ -11,5 +11,10 @@
 	   			<span class="menu-text">列表</span>
 	   		</a>
 	   	</li>
+	   	<li>
+	   		<a class="tab" href="admin/people/list" target="people_list" title="列表">
+	   			<span class="menu-text">列表2</span>
+	   		</a>
+	   	</li>
 	</ul>
 </li>
