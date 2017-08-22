@@ -30,4 +30,22 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 		basePeopleDao.delete(p);
 	}
 
+	@Override
+	public void create(People people) {
+		basePeopleDao.insert(people);
+		
+	}
+
+	@Override
+	public People getPeople(Long id) {
+		// TODO Auto-generated method stub
+		return basePeopleDao.get(People.class, id);
+	}
+
+	@Override
+	public void update(People people) {
+		basePeopleDao.update(people);
+		
+	}
+
 }

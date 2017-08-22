@@ -17,6 +17,20 @@ public interface BasePeopleService {
 	List<People> queryList(BasePeopleCriteria criteria, PageInfo pageInfo);
 	
 	/**
+	 * 创建一个人口对象
+	 * @param people
+	 */
+	void create(People people);
+	
+	People getPeople(Long id);
+	
+	/**
+	 * 更新一个人口对象
+	 * @param people
+	 */
+	void update(People people);
+	
+	/**
 	 * 从数据库中删除一个demo对象
 	 * @param id
 	 */

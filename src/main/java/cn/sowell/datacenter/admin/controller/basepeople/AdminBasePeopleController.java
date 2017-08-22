@@ -42,9 +42,36 @@ public class AdminBasePeopleController {
 		return AdminConstants.JSP_PEOPLE + "/people_add.jsp";
 	}
 	
+	@ResponseBody
 	@RequestMapping("/do_add")
-	public String doAdd(People p){
-		return AdminConstants.JSP_PEOPLE + "/people_add.jsp";
+	public AjaxPageResponse doAdd(People p){
+		try {
+			basePeopleService.create(p);
+			return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("添加成功", "people_list");
+		} catch (Exception e) {
+			logger.error("添加失败", e);
+			return AjaxPageResponse.FAILD("添加失败");
+		}
+	}
+	
+	
+	@RequestMapping("/update/{id}")
+	public String update(@PathVariable Long id, Model model){
+		People people = basePeopleService.getPeople(id);
+		model.addAttribute("people", people);
+		return AdminConstants.JSP_PEOPLE + "/people_update.jsp";
+	}
+	
+	@ResponseBody
+	@RequestMapping("/do_update")
+	public AjaxPageResponse doUpdate(People people){
+		try {
+			basePeopleService.update(people);
+			return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改成功", "people_list");
+		} catch (Exception e) {
+			logger.error("修改失败", e);
+			return AjaxPageResponse.FAILD("修改失败");
+		}
 	}
 	
 	@ResponseBody
@@ -57,5 +84,12 @@ public class AdminBasePeopleController {
 			logger.error("删除失败", e);
 			return AjaxPageResponse.FAILD("删除失败");
 		}
+	}
+	
+	@RequestMapping("/detail/{id}")
+	public String detail(@PathVariable Long id, Model model){
+		People people = basePeopleService.getPeople(id);
+		model.addAttribute("people", people);
+		return AdminConstants.JSP_PEOPLE + "/people_detail.jsp";
 	}
 }
