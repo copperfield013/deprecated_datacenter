@@ -13,7 +13,7 @@ public interface AdminConstants {
 	};
 	
 	/**
-	 * 管理端的访问基本路径
+	 * 管理端的访问基本路径222dd
 	 */
 	final String URI_BASE = "/admin";
 	
