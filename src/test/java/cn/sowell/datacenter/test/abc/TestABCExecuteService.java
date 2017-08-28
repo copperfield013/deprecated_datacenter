@@ -31,7 +31,7 @@ public class TestABCExecuteService {
 		
 		data.put("name", "张三");
 		data.put("idcode", "350581199108203536");
-		data.put("birthday", "1992-8-20");
+		//data.put("birthday", "1991-08-20");
 		data.put("contact1", "15657198552");
 		
 		People people = abcService.editPeople(data);

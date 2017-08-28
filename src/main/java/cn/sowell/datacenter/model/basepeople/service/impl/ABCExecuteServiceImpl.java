@@ -65,9 +65,6 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		People people = new People();
 		people.addMapping(abcNode);
 		people.addEntity(socialEntity);
-		people.getPeopleRecord().putAttribute(AttributeFactory.newInstance(
-				AttributeMatedata.ABC_PEOPLECODE,
-				"a526bd2fa93b4375a5b76506b8651a37"));
 		logger.debug(people.getJson(mapperName));
 		return people;
 	}

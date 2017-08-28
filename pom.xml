@@ -10,6 +10,7 @@
 	
 	<properties>
 		<version.kie>6.5.0.Final</version.kie>
+		<version.abc>1.1</version.abc>
 	</properties>
 	
 	<dependencies>
@@ -22,7 +23,7 @@
 		<dependency>
 			<groupId>com.abc</groupId>
 			<artifactId>it</artifactId>
-			<version>1.0</version>
+			<version>${version.abc}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -115,6 +116,13 @@
 		</dependency>
 		
 	</dependencies>
+	<repositories>
+		<repository>
+			<id>nexus</id>
+			<name>nexus</name>
+			<url>http://106.14.249.51:32108/repository/nexus-group/</url>
+		</repository>
+	</repositories>
 	<build>
 		<finalName>datacenter</finalName>
 		<plugins>
