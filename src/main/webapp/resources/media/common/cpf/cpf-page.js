@@ -88,7 +88,20 @@ define(function(require, exports, module){
 				}
 			}
 		}
-		targetPage.loadContent(href, title);
+		var formData = {};
+		if($(dom).is('.cpf-batch-checked')){
+			var batchRange = $(dom).attr('batch-range') || '';
+			$('.cpf-checkbox[name]' + batchRange, $(dom).getLocatePage().getContent()).each(function(){
+				var $checkbox = $(this),
+					name = $checkbox.attr('name');
+				var l = formData[name];
+				if(!l){
+					formData[name] = l = [];
+				}
+				l.push($checkbox.attr('value'));
+			});
+		}
+		targetPage.loadContent(href, title, formData);
 		var tPageType = targetPage.getType();
 		if(tPageType === 'dialog'){
 			targetPage.getPageObj().show();

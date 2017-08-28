@@ -147,7 +147,11 @@ define(function(require, exports, module){
 		var fData = new FormData();
 		if($.isPlainObject(formData)){
 			for(var key in formData){
-				fData.append(key, formData[key]);
+				var name = key;
+				if($.isArray(formData[key])){
+					name = key + '[]';
+				}
+				fData.append(name, formData[key]);
 			}
 		}else if(formData instanceof FormData){
 			fData = formData;

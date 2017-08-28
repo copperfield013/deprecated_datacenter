@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ABC name="baseinfoImport" class="" xmlns="http://www.w3school.com.cn"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<attribute name="address" alias="地址" abcattr="地址" />
+	<attribute name="name" alias="姓名" abcattr="姓名" />
+	<attribute name="idcode" alias="证件号码" abcattr="证件号码" />
+	<attribute name="gender" alias="性别" abcattr="性别" />
+	<attribute name="birthday" alias="出生日期" datatype="DATE" abcattr="出生日期" />
+	<attribute name="contact1" alias="联系号码1" abcattr="联系号码" />
+	<attribute name="contact2" alias="联系号码2" attrsubtype="103004"
+		abcattr="联系号码" />
+	<attribute name="nation" alias="民族" abcattr="民族" />
+	<attribute name="nativePlace" alias="籍贯" abcattr="籍贯" />
+	<attribute name="formerName" alias="曾用名" abcattr="曾用名" />
+	<attribute name="householdPlace" alias="户籍地址" abcattr="地址"
+		attrsubtype="101002" />
+		<!-- 
+	 <attribute name="国籍" alias="国籍" abcattr="国籍" /> 
+	  -->
+	<attribute name="politicalStatus" alias="政治面貌" abcattr="政治面貌" />
+	<attribute name="maritalStatus" alias="婚姻状况" abcattr="婚姻状况" />
+	<attribute name="bloodType" alias="血型" abcattr="血型" />
+	<attribute name="healthCondition" alias="健康状况" abcattr="健康状况" />
+	<attribute name="religion" alias="宗教信仰" abcattr="宗教信仰" />
+	<attribute name="militaryStatus" alias="兵役" abcattr="兵役状况" /> 
+	<attribute name="统战人士类型" alias="统战人士类型" abcattr="统战人士类别" />
+	<label name="是否本区机关干部" alias="是否本区机关干部" 
+		subdomain="本区机关干部" />
+	<label name="劳模" alias="劳模"  subdomain="劳模" />
+	<label name="军转干部" alias="军转干部"  subdomain="军转干部" />
+	<label name="离退休干部" alias="离退休干部"  subdomain="离退休干部" />
+	<label name="三无老人" alias="三无老人"  subdomain="三无老人" />
+	<label name="是否有车" alias="是否有车"  subdomain="有车" />
+	<label name="人口类型" alias="人口类型"   subdomain="户籍人口,流动人口" />
+	<record class="" name="education history" alias="教育经历" abcattr="教育经历">
+		<attribute name="school name" alias="院校名称" abcattr="院校名称" />
+		<attribute name="enter date" alias="入职日期" datatype="DATE"
+			abcattr="入学日期" />
+	</record>
+	<relation name="家庭医生信息" >
+		<label subdomain="家庭医生"  />
+		<ABC name="familydoctor">
+			<attribute name="家庭医生" alias="家庭医生" abcattr="姓名" />
+		</ABC>
+	</relation>
+</ABC>

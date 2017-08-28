@@ -128,7 +128,7 @@ define(function(require, exports, module){
 				formData = _formData;
 				$CPF.showLoading();
 				//根据url打开弹出框页面
-				Ajax.ajax(url, formData, {
+				Ajax.ajax(dUrl, formData, {
 					page	: page,
 					whenSuc	: function(data, dataType){
 						if(dataType === 'html'){
@@ -283,11 +283,16 @@ define(function(require, exports, module){
 			var $this = $(this),
 				title = $this.attr('title'),
 				url = $this.attr('href'),
-				target = $this.attr('target')
+				target = $this.attr('target'),
+				width = $this.attr('width'),
+				height = $this.attr('height')
 				;
 			$(this).click(function(e){
 				e.preventDefault();
-				Dialog.openDialog(url, title, target);
+				Dialog.openDialog(url, title, target,{
+					width	: width,
+					height	: height
+				});
 				/*var dialog = new Dialog({
 					title	: title,
 					url		: url

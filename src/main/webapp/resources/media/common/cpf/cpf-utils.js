@@ -1,5 +1,6 @@
 define(function(require, exports){
 	var CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
+	var SEQUENCE_MAP = {}
 	$.extend(exports, {
 		/**
 		 * 判断一个是否是整数
@@ -260,6 +261,20 @@ define(function(require, exports){
 			}
 			return this;
 		},
+		/**
+		 * 自增序列
+		 * @param key 表示序列的键
+		 * @param key 序列的起始值，默认为0
+		 */
+		getNextSequence	: function(key, start){
+			key = key || 'DEFAULT_KEY';
+			var currentSeq = SEQUENCE_MAP[key];
+			if(!currentSql){
+				currentSeq = exports.isInteger(start)? parseInt(start): 0;
+			}
+			SEQUENCE_MAP[key] = currentSeq + 1;
+			return currentSeq;
+		},
 		datepicker		: function($dom){
 			return $($dom).datepicker({
 				format		: 'yyyy-mm-dd',
@@ -269,7 +284,6 @@ define(function(require, exports){
                         '七月', '八月', '九月', '十月', '十一月', '十二月' ]
 			});
 		}
-		
 	});
 	
 	function returnTrue(){return true;}
