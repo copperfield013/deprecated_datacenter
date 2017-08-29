@@ -156,9 +156,9 @@
                 " <i class=\"btn-label glyphicon glyphicon-remove\"></i>取消</button>");
         });
 		$("#clone").on('click',"[id='check']",function(){
-
 			var result =$(this).parent().find(".form-control").val();
-			alert(result);
+			$("input[name='name']").last().val(result);
+            $("#clone").html("");
 		});
 
         $("#clone").on('click',"[id='remove']",function(){
