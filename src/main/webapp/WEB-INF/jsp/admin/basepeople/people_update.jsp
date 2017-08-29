@@ -1,11 +1,29 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
+
 <div id="people-update">
 	<div class="page-header">
 		<div class="header-title">
 			<h1>修改人口</h1>
 		</div>
 	</div>
+
+	<!--  这里加入一个搜索框 下面加入个区间选择克隆对象？-->
+	<nav>
+		<form class="form-inline" action="admin/people/list">
+			<div class="form-group">
+				<label for="name">填报字段</label>
+				<input type="text" class="form-control" name="name"  />
+			</div>
+			<button type="button" class="btn btn-default" id="smartSubmit">查询</button>
+		</form>
+	</nav>
+
+
+  <div id="clone">
+
+  </div>
+
 	<div class="page-body">
 		<div class="row">
 			<div class="col-lg-12">
@@ -14,7 +32,7 @@
 					<div class="form-group">
 						<label class="col-lg-2 control-label" for="name" >姓名</label>
 						<div class="col-lg-5">
-							<input type="text" class="form-control" name="name" value="${people.name }" />
+							<input type="text" class="form-control" name="name" value="${people.name }"  id="姓名"/>
 						</div>
 					</div>
 					<div class="form-group">
@@ -124,6 +142,29 @@
 				return false;
 				}
 		});
+
+		$("#smartSubmit").click(function(){
+		    //simple demo clone one option;
+            $("#姓名").parent().parent().clone(true).appendTo($("#clone"));
+            $("#clone").append("<button class=\"btn btn-labeled btn-palegreen\" id='check'>\n" +
+                "<i class=\"btn-label glyphicon glyphicon-ok\"></i>确认</button>" +
+				"<button class=\"btn btn-labeled btn-darkorange\" id='remove'>  \n" +
+                " <i class=\"btn-label glyphicon glyphicon-remove\"></i>取消</button>");
+        });
+		$("#clone").on('click',"[id='check']",function(){
+			alert(1);
+				});
+
+		$("#check").click(function () {
+			alert(1);
+        });
+
+        $("#remove").click(function () {
+            alert(2);
+        });
+        /**
+		 * clone function
+         */
 	});
 	
 	
