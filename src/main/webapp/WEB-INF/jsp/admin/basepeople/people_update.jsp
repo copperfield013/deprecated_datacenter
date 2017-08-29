@@ -16,7 +16,7 @@
 		<div class="form-inline" >
 			<div class="form-group">
 				<label for="search">填报字段</label>
-				<input type="text" class="form-control" id="0" name="search"  />
+				<input type="text" class="form-control search" id="0" name="search"  />
 			</div>
 			<button type="button" class="btn btn-default" id="smartSubmit">查询</button>
 		</div>
@@ -173,13 +173,13 @@
 	
 	 var k=null;
 	 //监听查询内容
-	    $("#search").keyup(function(event){
+	    $(".search").keyup(function(event){
 	    	if(event.which>"40"||event.which=="13"||event.which=="32"||event.which=="8"
 	    			&&$(this).val()!=""&&$(this).val()!=null){
 	    		$.ajax({  
 	    	        url: 'admin/people/titleSearch',
 	    	        data: {
-	    	        	txt:$('#search').val()
+	    	        	txt:$('.search').val()
 	    	        },
 	    	        dataType: "html",  
 	    	        type: "POST",  
@@ -188,7 +188,7 @@
 	    	        success: function (data) {  
 	    	            // your logic  
 	    	            var a=JSON.parse(data);
-	    	            $('#search').bigAutocomplete({
+	    	            $('.search').bigAutocomplete({
 	    	        		width:190,
 	    	        		data:a
 	    	        		
@@ -207,7 +207,7 @@
 				hideContent();
 	    });
 	    
-	    $("#search").keydown(function(event) {
+	    $(".search").keydown(function(event) {
 			switch (event.keyCode) {
 			case 40://向下键
 				if($("#bigAutocompleteContent").css("display") == "none")return;
