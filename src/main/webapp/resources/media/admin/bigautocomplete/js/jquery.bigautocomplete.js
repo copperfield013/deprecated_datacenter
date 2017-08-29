@@ -1,6 +1,6 @@
 (function($){
 	var bigAutocomplete = new function(){
-		this.currentInputText = null;//目前获得光标的输入框（解决一个页面多个输入框绑定自动补全功能）
+		this.currentInputText = $(".search");//目前获得光标的输入框（解决一个页面多个输入框绑定自动补全功能）
 		this.functionalKeyArray = [9,20,13,16,17,18,91,92,93,45,36,33,34,35,37,39,112,113,114,115,116,117,118,119,120,121,122,123,144,19,145,40,38,27];//键盘上功能键键值数组
 		this.holdText = null;//输入框中原始输入的内容
 		
@@ -103,6 +103,7 @@
 			
 			//输入框focus事件
 			$this.focus(function(){
+				console.log($this)
 				bigAutocomplete.currentInputText = $this;
 			});
 			

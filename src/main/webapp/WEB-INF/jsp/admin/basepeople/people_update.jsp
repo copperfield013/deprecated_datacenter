@@ -173,7 +173,7 @@
 	 var k=null;
 	 //监听查询内容
 	    $(".search").keyup(function(event){
-	    	if(event.which>"40"||event.which=="13"||event.which=="32"||event.which=="8"
+	    	if(event.which>"40"||event.which=="32"||event.which=="8"
 	    			&&$(this).val()!=""&&$(this).val()!=null){
 	    		$.ajax({  
 	    	        url: 'admin/people/titleSearch',
@@ -255,6 +255,9 @@
 					$(this).attr('id',"0");//id为0时，添加无效
 				}
 				
+				break;
+			case 13://回车键隐藏下拉框
+				hideContent();
 				break;
 			case 27://ESC键隐藏下拉框
 				hideContent();
