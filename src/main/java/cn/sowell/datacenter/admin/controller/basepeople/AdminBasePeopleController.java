@@ -1,14 +1,30 @@
 package cn.sowell.datacenter.admin.controller.basepeople;
+import java.net.InetAddress;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSONArray;
 
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
@@ -24,6 +40,8 @@ public class AdminBasePeopleController {
 	
 	@Resource
 	BasePeopleService basePeopleService;
+	
+	private TransportClient client;
 	
 	Logger logger = Logger.getLogger(AdminBasePeopleController.class);
 	
@@ -91,4 +109,21 @@ public class AdminBasePeopleController {
 		model.addAttribute("people", people);
 		return AdminConstants.JSP_PEOPLE + "/people_detail.jsp";
 	}
+	
+	@ResponseBody
+    @RequestMapping(value="titleSearch",method=RequestMethod.POST)
+    public JSONArray  esearch(String txt, HttpServletResponse response) {
+    	JSONArray tSearch = null;
+    	try{	    	    
+    		tSearch=basePeopleService.titleSearchByEs(txt.trim());
+    		return tSearch;
+    	}
+		catch(Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            return  null;
+		}
+    	
+    }
+	
 }

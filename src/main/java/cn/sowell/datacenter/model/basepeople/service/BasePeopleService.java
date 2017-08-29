@@ -2,6 +2,8 @@ package cn.sowell.datacenter.model.basepeople.service;
 
 import java.util.List;
 
+import com.alibaba.fastjson.JSONArray;
+
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
 import cn.sowell.datacenter.model.basepeople.pojo.People;
@@ -35,4 +37,6 @@ public interface BasePeopleService {
 	 * @param id
 	 */
 	void delete(Long id);
+	
+	JSONArray titleSearchByEs(String title);
 }

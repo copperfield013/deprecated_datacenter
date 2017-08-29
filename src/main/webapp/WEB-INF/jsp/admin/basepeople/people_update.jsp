@@ -1,5 +1,8 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
+<link rel="stylesheet" href="media/admin/bigautocomplete/css/jquery.bigautocomplete.css" type="text/css" />
+<script type="text/javascript" src="media/admin/bigautocomplete/js/jquery.bigautocomplete.js"></script>
+
 
 <div id="people-update">
 	<div class="page-header">
@@ -10,13 +13,13 @@
 
 	<!--  这里加入一个搜索框 下面加入个区间选择克隆对象？-->
 	<nav>
-		<form class="form-inline" action="admin/people/list">
+		<div class="form-inline" >
 			<div class="form-group">
-				<label for="name">填报字段</label>
-				<input type="text" class="form-control" name="name"  />
+				<label for="search">填报字段</label>
+				<input type="text" class="form-control" id="0" name="search"  />
 			</div>
 			<button type="button" class="btn btn-default" id="smartSubmit">查询</button>
-		</form>
+		</div>
 	</nav>
 
 
@@ -166,6 +169,105 @@
 		 * clone function
          */
 	});
+	
+	
+	 var k=null;
+	 //监听查询内容
+	    $("#search").keyup(function(event){
+	    	if(event.which>"40"||event.which=="13"||event.which=="32"||event.which=="8"
+	    			&&$(this).val()!=""&&$(this).val()!=null){
+	    		$.ajax({  
+	    	        url: 'admin/people/titleSearch',
+	    	        data: {
+	    	        	txt:$('#search').val()
+	    	        },
+	    	        dataType: "html",  
+	    	        type: "POST",  
+	    	        //async: false,
+	    	        //traditional: true,  
+	    	        success: function (data) {  
+	    	            // your logic  
+	    	            var a=JSON.parse(data);
+	    	            $('#search').bigAutocomplete({
+	    	        		width:190,
+	    	        		data:a
+	    	        		
+	    	        	});
+	    	            
+	    	           
+	    	        },
+	    	        error: function(XMLHttpRequest, textStatus, errorThrown) {
+	                    alert(XMLHttpRequest.status+","+XMLHttpRequest.readyState+","+textStatus);
+	                }
+	    	      
+	    	    });
+	        	k=$(this).val();
+	    	}
+	    	if($(this).val()==""||$(this).val()==null)
+				hideContent();
+	    });
+	    
+	    $("#search").keydown(function(event) {
+			switch (event.keyCode) {
+			case 40://向下键
+				if($("#bigAutocompleteContent").css("display") == "none")return;
+				
+				var $nextSiblingTr = $("#bigAutocompleteContent").find(".ct");
+				if($nextSiblingTr.length <= 0){//没有选中行时，选中第一行
+					$nextSiblingTr = $("#bigAutocompleteContent").find("tr:first");
+				}else{
+					$nextSiblingTr = $nextSiblingTr.next();
+				}
+				$("#bigAutocompleteContent").find("tr").removeClass("ct");
+				
+				if($nextSiblingTr.length > 0){//有下一行时（不是最后一行）
+					$nextSiblingTr.addClass("ct");//选中的行加背景
+					$(this).val($nextSiblingTr.find("div:last").html());//选中行内容设置到输入框中
+					$(this).attr('id',$nextSiblingTr.find("div:last").attr("id"));
+					//div滚动到选中的行,jquery-1.6.1 $nextSiblingTr.offset().top 有bug，数值有问题
+					$("#bigAutocompleteContent").scrollTop($nextSiblingTr[0].offsetTop - $("#bigAutocompleteContent").height() + $nextSiblingTr.height() );
+					
+				}else{
+					$(this).val(k);//输入框显示用户原始输入的值
+					$(this).attr('id',"0");//id为0时，添加无效
+				}
+				
+				
+				break;
+			case 38://向上键
+				if($("#bigAutocompleteContent").css("display") == "none")return;
+				
+				var $previousSiblingTr = $("#bigAutocompleteContent").find(".ct");
+				if($previousSiblingTr.length <= 0){//没有选中行时，选中最后一行行
+					$previousSiblingTr = $("#bigAutocompleteContent").find("tr:last");
+				}else{
+					$previousSiblingTr = $previousSiblingTr.prev();
+				}
+				$("#bigAutocompleteContent").find("tr").removeClass("ct");
+				
+				if($previousSiblingTr.length > 0){//有上一行时（不是第一行）
+					$previousSiblingTr.addClass("ct");//选中的行加背景
+					$(this).val($previousSiblingTr.find("div:last").html());//选中行内容设置到输入框中
+					$(this).attr('id',$nextSiblingTr.find("div:last").attr("id"));
+					//div滚动到选中的行,jquery-1.6.1 $$previousSiblingTr.offset().top 有bug，数值有问题
+					$("#bigAutocompleteContent").scrollTop($previousSiblingTr[0].offsetTop - $("#bigAutocompleteContent").height() + $previousSiblingTr.height());
+				}else{
+					$(this).val(k);//输入框显示用户原始输入的值
+					$(this).attr('id',"0");//id为0时，添加无效
+				}
+				
+				break;
+			case 27://ESC键隐藏下拉框
+				hideContent();
+				break;
+			}
+		});		
+	   function hideContent(){
+		   if($("#bigAutocompleteContent").css("display") != "none"){
+				$("#bigAutocompleteContent").find("tr").removeClass("ct");
+				$("#bigAutocompleteContent").hide();
+			}
+	   }
 	
 	
 </script>
