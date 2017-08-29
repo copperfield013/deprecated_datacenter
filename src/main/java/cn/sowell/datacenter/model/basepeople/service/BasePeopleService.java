@@ -37,6 +37,12 @@ public interface BasePeopleService {
 	 * @param id
 	 */
 	void delete(Long id);
+
+	/**
+	 * 使用ES 返回前端模糊查询字段 返回对象为Json
+	 * @param title
+	 * @return
+	 */
 	
 	JSONArray titleSearchByEs(String title);
 }
