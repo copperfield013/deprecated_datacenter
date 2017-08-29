@@ -148,22 +148,21 @@
 
 		$("#smartSubmit").click(function(){
 		    //simple demo clone one option;
-            $("#姓名").parent().parent().clone(true).appendTo($("#clone"));
+			SearchWord = "姓名";
+            $("#"+SearchWord).parent().parent().clone(true).appendTo($("#clone"));
             $("#clone").append("<button class=\"btn btn-labeled btn-palegreen\" id='check'>\n" +
                 "<i class=\"btn-label glyphicon glyphicon-ok\"></i>确认</button>" +
 				"<button class=\"btn btn-labeled btn-darkorange\" id='remove'>  \n" +
                 " <i class=\"btn-label glyphicon glyphicon-remove\"></i>取消</button>");
         });
 		$("#clone").on('click',"[id='check']",function(){
-			alert(1);
-				});
 
-		$("#check").click(function () {
-			alert(1);
-        });
+			var result =$(this).parent().find(".form-control").val();
+			alert(result);
+		});
 
-        $("#remove").click(function () {
-            alert(2);
+        $("#clone").on('click',"[id='remove']",function(){
+   			$("#clone").html("");
         });
         /**
 		 * clone function
