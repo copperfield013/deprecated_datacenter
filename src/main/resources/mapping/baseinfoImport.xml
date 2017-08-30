@@ -2,14 +2,13 @@
 <ABC name="baseinfoImport" class="" xmlns="http://www.w3school.com.cn"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<attribute name="peoplecode" alias="编码" abcattr="唯一编码" />
-	<attribute name="address" alias="地址" abcattr="地址" />
+	<attribute name="address" alias="地址" abcattr="通用地址" />
 	<attribute name="name" alias="姓名" abcattr="姓名" />
 	<attribute name="idcode" alias="证件号码" abcattr="证件号码" />
 	<attribute name="gender" alias="性别" abcattr="性别" />
 	<attribute name="birthday" alias="出生日期" datatype="DATE" abcattr="出生日期" />
-	<attribute name="contact1" alias="联系号码1" abcattr="联系号码" />
-	<attribute name="contact2" alias="联系号码2" attrsubtype="103004"
-		abcattr="联系号码" />
+	<attribute name="contact1" alias="联系号码1" abcattr="联系电话" />
+	<attribute name="contact2" alias="联系号码2" abcattr="备用电话" />
 	<attribute name="nation" alias="民族" abcattr="民族" />
 	<attribute name="nativePlace" alias="籍贯" abcattr="籍贯" />
 	<attribute name="formerName" alias="曾用名" abcattr="曾用名" />
