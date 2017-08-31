@@ -21,7 +21,8 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.abc.fuse.rule.algorithm.DataSource;
+import com.abc.application.PeopleFusion;
+import com.abc.application.PeopleRelationFusion;
 import com.abc.mapping.MappingNodeAnalysis;
 import com.abc.mapping.entity.Entity;
 import com.abc.mapping.entity.SocialEntity;
@@ -29,31 +30,26 @@ import com.abc.mapping.node.ABCNode;
 import com.abc.people.People;
 import com.abc.people.PeopleRelation;
 import com.abc.people.RelationShip;
-import com.abc.record.AttributeFactory;
-import com.abc.record.constant.AttributeMatedata;
-import com.abc.application.PeopleFusion;
-import com.abc.application.PeopleRelationFusion;
-
 
 @ContextConfiguration(locations = "classpath*:spring-core.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
 public class EditPeopleTest {
 	private static Logger logger = Logger.getLogger(EditPeopleTest.class);
 
-	@Resource
+	@Resource(name="MappingNodeAnalysis")
 	MappingNodeAnalysis analysis;
-	@Resource
+	@Resource(name="PeopleFusion")
 	PeopleFusion peopleFusion;
-	@Resource
+	@Resource(name="PeopleRelationFusion")
 	PeopleRelationFusion relationFusion;
 
 	private String mapperName = "baseinfoImport";
 	private String familyDoctorMapper = "familydoctor";
-	private String filename = "D:\\test艮山门.xlsx";
+	private String filename = "E:\\数据\\test艮山门.xlsx";
 	private String sheetName = "2";
 	private String excelExtName = "xlsx";
-	/*private String mappingfilepath = getClass().getResource("/").getFile()
-			+ "../classes/mapping/baseinfoImport.xml";*/
+	private String mappingfilepath = getClass().getResource("/").getFile()
+			+ "../classes/mapping/baseinfoImport.xml";
 
 	@Test
 	public void editPeople() {
@@ -111,23 +107,24 @@ public class EditPeopleTest {
 				people, socialEntity);
 		people = peopleFusion.edit(people);
 		logger.debug(people.getJson(abcNode.getName()));
-		people = relationFusion.fuse(people,peopleRelations,DataSource.SOURCE_EDIT);
+		people = relationFusion.editFuse(people,peopleRelations);
 		Collection<RelationShip> ships = people.getRelationShip();
-
 		for (RelationShip ship : ships) {
 			logger.debug(ship);
 		}
-
 	}
 
 	private People createPeople(Sheet sheet, Row headerRow, ABCNode abcNode,
 			SocialEntity socialEntity) {
 		People people = new People();
 		people.addMapping(abcNode);
+		socialEntity.setValue("peoplecode", "a526bd2fa93b4375a5b76506b8651a33");
 		people.addEntity(socialEntity);
-		people.getPeopleRecord().putAttribute(AttributeFactory.newInstance(
-				AttributeMatedata.ABC_PEOPLECODE,
-				"a526bd2fa93b4375a5b76506b8651a37"));
+//		Attribute attribute =AttributeFactory.newInstance(
+//				AttributeMatedata.ABC_PEOPLECODE,
+//				"a526bd2fa93b4375a5b76506b8651a37");
+//		people.getPeopleRecord().putAttribute(attribute);
+		
 		logger.debug(people.getJson(mapperName));
 		return people;
 	}

@@ -23,8 +23,9 @@ import com.abc.mapping.node.ABCNode;
 
 @ContextConfiguration(locations = "classpath*:spring-core.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
-public class PerformanceStrangePeopleTest extends StrangePeopleTest{
-	private static Logger logger = Logger.getLogger(PerformanceStrangePeopleTest.class);
+public class PerformanceStrangePeopleTest extends StrangePeopleTest {
+	private static Logger logger = Logger
+			.getLogger(PerformanceStrangePeopleTest.class);
 
 	@Resource
 	MappingNodeAnalysis analysis;
@@ -48,112 +49,14 @@ public class PerformanceStrangePeopleTest extends StrangePeopleTest{
 			Sheet sheet = wb.getSheet(sheetName);
 			Row headerRow = sheet.getRow(1);
 			ABCNode abcNode = analysis.analysis(mappingfilepath);
-
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
-			execute(sheet, headerRow, abcNode);
+			for (int i = 200; i < 300; i++) {
+				execute(sheet, headerRow, abcNode, i);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				if(fis!=null){
+				if (fis != null) {
 					fis.close();
 				}
 			} catch (IOException e) {

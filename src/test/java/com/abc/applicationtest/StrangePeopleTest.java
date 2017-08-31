@@ -21,7 +21,9 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.abc.fuse.rule.algorithm.DataSource;
+import com.abc.application.DataSource;
+import com.abc.application.PeopleFusion;
+import com.abc.application.PeopleRelationFusion;
 import com.abc.mapping.MappingNodeAnalysis;
 import com.abc.mapping.entity.Entity;
 import com.abc.mapping.entity.SocialEntity;
@@ -29,28 +31,28 @@ import com.abc.mapping.node.ABCNode;
 import com.abc.people.People;
 import com.abc.people.PeopleRelation;
 import com.abc.people.RelationShip;
-import com.abc.application.PeopleFusion;
-import com.abc.application.PeopleRelationFusion;
 
 @ContextConfiguration(locations = "classpath*:spring-core.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
 public class StrangePeopleTest {
 	private static Logger logger = Logger.getLogger(StrangePeopleTest.class);
 
-	@Resource
+	@Resource(name="MappingNodeAnalysis")
 	MappingNodeAnalysis analysis;
-	@Resource
+	@Resource(name="PeopleFusion")
 	PeopleFusion peopleFusion;
-	@Resource
+	@Resource(name="PeopleRelationFusion")
 	PeopleRelationFusion relationFusion;
 	
 	protected String mapperName = "baseinfoImport";
-	protected  String familyDoctorMapper = "familydoctor";
-	protected  String filename = "D:\\test艮山门.xlsx";
-	protected  String sheetName = "2";
-	protected  String excelExtName = "xlsx";
-	protected  String mappingfilepath = getClass().getResource("/").getFile()
+	protected String familyDoctorMapper = "familydoctor";
+	protected String filename = "E:\\数据\\test艮山门all.xlsx";
+	protected String sheetName = "2";
+	protected String excelExtName = "xlsx";
+	protected String mappingfilepath = getClass().getResource("/").getFile()
 			+ "../classes/mapping/baseinfoImport.xml";
+	protected String writeMappingName = "goodnode_polic";
+
 
 	@Test
 	public void readData() {
@@ -68,8 +70,8 @@ public class StrangePeopleTest {
 			Row headerRow = sheet.getRow(1);
 			ABCNode abcNode = analysis.analysis(mappingfilepath);
 
-			execute(sheet, headerRow, abcNode);
-			
+			execute(sheet, headerRow, abcNode,1);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -94,15 +96,18 @@ public class StrangePeopleTest {
 		logger.debug((float) (endTime - startTime) / 1000);
 	}
 
-	protected  void execute(Sheet sheet, Row headerRow, ABCNode abcNode) {
-		Row row = sheet.getRow(3);
+	protected void execute(Sheet sheet, Row headerRow, ABCNode abcNode,int number) {
+		if(number<1){
+			number=1;
+		}
+		Row row = sheet.getRow(2+number);
 		SocialEntity socialEntity = createSocialEntity(abcNode, headerRow, row);
 		People people = createPeople(sheet, headerRow, abcNode, socialEntity);
 		List<PeopleRelation> peopleRelations = createPeopleRelation(abcNode,
 				people, socialEntity);
-		people = peopleFusion.fuseStrange(people,DataSource.SOURCE_POLIC);
+		people = peopleFusion.fuseStrange(people,writeMappingName,DataSource.SOURCE_POLIC);
 		logger.debug(people.getPeopleCode()+" : "+people.getJson(abcNode.getName()));
-		people = relationFusion.fuse(people,peopleRelations,DataSource.SOURCE_POLIC);
+		people = relationFusion.fuse(people,peopleRelations,writeMappingName,DataSource.SOURCE_POLIC);
 		if(people!=null&& people.getRelationShip()!=null){
 			Collection<RelationShip> ships = people.getRelationShip();
 			for (RelationShip ship : ships) {
@@ -111,7 +116,7 @@ public class StrangePeopleTest {
 		}
 	}
 
-	protected  People createPeople(Sheet sheet, Row headerRow, ABCNode abcNode,
+	private People createPeople(Sheet sheet, Row headerRow, ABCNode abcNode,
 			SocialEntity socialEntity) {
 		People people = new People();
 		people.addMapping(abcNode);
@@ -120,7 +125,7 @@ public class StrangePeopleTest {
 		return people;
 	}
 
-	protected  List<PeopleRelation> createPeopleRelation(ABCNode abcNode,
+	private List<PeopleRelation> createPeopleRelation(ABCNode abcNode,
 			People people, SocialEntity socialEntity) {
 		List<PeopleRelation> peopleRelations = new ArrayList<PeopleRelation>();
 		for (String key : socialEntity.getRelationKeys()) {
@@ -139,7 +144,7 @@ public class StrangePeopleTest {
 		return peopleRelations;
 	}
 
-	protected  SocialEntity createSocialEntity(ABCNode abcNode, Row headerRow,
+	private SocialEntity createSocialEntity(ABCNode abcNode, Row headerRow,
 			Row row) {
 		SocialEntity entity = new SocialEntity(mapperName);
 		int length = headerRow.getPhysicalNumberOfCells();
