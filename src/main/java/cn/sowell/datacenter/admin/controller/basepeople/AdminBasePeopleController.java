@@ -1,22 +1,11 @@
 package cn.sowell.datacenter.admin.controller.basepeople;
-import java.net.InetAddress;
 import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.QueryStringQueryBuilder;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,14 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSONArray;
-
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
-import cn.sowell.datacenter.model.basepeople.pojo.People;
+import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
 import cn.sowell.datacenter.model.basepeople.service.BasePeopleService;
+
+import com.alibaba.fastjson.JSONArray;
 
 
 @Controller
@@ -47,21 +36,21 @@ public class AdminBasePeopleController {
 	
 	@RequestMapping("/list")
 	public String list(BasePeopleCriteria criteria, Model model, PageInfo pageInfo){
-		List<People> list = basePeopleService.queryList(criteria, pageInfo);
+		List<BasePeople> list = basePeopleService.queryList(criteria, pageInfo);
 		model.addAttribute("list", list);
 		model.addAttribute("pageInfo", pageInfo);
 		model.addAttribute("criteria", criteria);
-		return AdminConstants.JSP_PEOPLE + "/people_list.jsp";
+		return AdminConstants.JSP_PEOPLEDATA + "/people_list.jsp";
 	}
 	
 	@RequestMapping("/add")
-	public String add(People p){
-		return AdminConstants.JSP_PEOPLE + "/people_add.jsp";
+	public String add(BasePeople p){
+		return AdminConstants.JSP_PEOPLEDATA + "/people_add.jsp";
 	}
 	
 	@ResponseBody
 	@RequestMapping("/do_add")
-	public AjaxPageResponse doAdd(People p){
+	public AjaxPageResponse doAdd(BasePeople p){
 		try {
 			basePeopleService.create(p);
 			return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("添加成功", "people_list");
@@ -74,14 +63,14 @@ public class AdminBasePeopleController {
 	
 	@RequestMapping("/update/{id}")
 	public String update(@PathVariable Long id, Model model){
-		People people = basePeopleService.getPeople(id);
+		BasePeople people = basePeopleService.getPeople(id);
 		model.addAttribute("people", people);
-		return AdminConstants.JSP_PEOPLE + "/people_update.jsp";
+		return AdminConstants.JSP_PEOPLEDATA + "/people_update.jsp";
 	}
 	
 	@ResponseBody
 	@RequestMapping("/do_update")
-	public AjaxPageResponse doUpdate(People people){
+	public AjaxPageResponse doUpdate(BasePeople people){
 		try {
 			basePeopleService.update(people);
 			return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改成功", "people_list");
@@ -105,9 +94,9 @@ public class AdminBasePeopleController {
 	
 	@RequestMapping("/detail/{id}")
 	public String detail(@PathVariable Long id, Model model){
-		People people = basePeopleService.getPeople(id);
+		BasePeople people = basePeopleService.getPeople(id);
 		model.addAttribute("people", people);
-		return AdminConstants.JSP_PEOPLE + "/people_detail.jsp";
+		return AdminConstants.JSP_PEOPLEDATA + "/people_detail.jsp";
 	}
 	
 	@ResponseBody
