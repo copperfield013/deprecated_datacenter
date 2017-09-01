@@ -27,8 +27,12 @@ public interface AdminConstants {
 	 */
 	final String JSP_DEMO = JSP_BASE + "/demo";
 	
+	
 	/**
 	 * 
 	 */
-	final String JSP_PEOPLE = JSP_BASE + "/basepeople";
+	final String JSP_BASEPEOPLE = JSP_BASE + "/basepeople";
+
+	final String JSP_PEOPLEDATA = JSP_BASE + "/peopledata";
+	
 }
