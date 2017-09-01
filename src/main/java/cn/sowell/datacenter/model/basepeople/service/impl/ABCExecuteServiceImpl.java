@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.Assert;
 import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.copframe.utils.excel.poi.PoiCellReader;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
 import cn.sowell.datacenter.model.people.status.ImportStatus;
 
@@ -171,7 +172,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 			if(row == null || row.getCell(0) == null || !TextUtils.hasText(row.getCell(0).getStringCellValue())){
 				break;
 			}
-			importStatus.setCurrent(rownum - 1);
+			importStatus.setCurrent(rownum - 2);
 			importStatus.appendMessage("导入第" + importStatus.getCurrent() + "条数据");
 			SocialEntity socialEntity = createSocialEntity(abcNode, headerRow, row);
 			People people = createPeople(sheet, headerRow, abcNode, socialEntity);
@@ -234,25 +235,21 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		int length = headerRow.getPhysicalNumberOfCells();
 		for (int i = 0; i < length; i++) {
 			Cell cell = row.getCell(i);
-			
+			PoiCellReader reader = new PoiCellReader(cell);
+			String value = reader.getString();
 			if (headerRow.getCell(i).getStringCellValue().equals("家庭医生")) {
-				if (cell.getStringCellValue() != null
-						&& !cell.getStringCellValue().equals("")) {
+				if (TextUtils.hasText(value)) {
 					Entity relationentity = new Entity("familydoctor");
 					relationentity.setValue(headerRow.getCell(i)
-							.getStringCellValue(), cell.getStringCellValue());
+							.getStringCellValue(), value);
 					entity.addRelation("家庭医生", relationentity);
 				}
 			} else {
-				if (cell.getCellTypeEnum() == CellType.NUMERIC) {
-					entity.setValue(headerRow.getCell(i).getStringCellValue(),
-							String.valueOf(cell.getNumericCellValue()));
-				} else if (cell.getCellTypeEnum() == CellType.ERROR) {
+				if(cell.getCellTypeEnum() == CellType.ERROR) {
 					logger.warn("ERROR Type row number:" + row.getRowNum()
 							+ " ; cell number:" + i + ";");
-				} else {
-					entity.setValue(headerRow.getCell(i).getStringCellValue(),
-							cell.getStringCellValue());
+				}else{
+					entity.setValue(headerRow.getCell(i).getStringCellValue(), value);
 				}
 			}
 		}

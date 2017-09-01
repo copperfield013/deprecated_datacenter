@@ -27,6 +27,7 @@ import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.Assert;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
+import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
 import cn.sowell.datacenter.model.people.pojo.PeopleData;
 import cn.sowell.datacenter.model.people.pojo.criteria.PeopleDataCriteria;
 import cn.sowell.datacenter.model.people.service.PeopleService;
@@ -137,8 +138,10 @@ public class AdminPeopleDataController {
 					Thread thread = new Thread(()->{
 						try {
 							abcService.importPeople(sheet, importStatus);
+						} catch (ImportBreakException e) {
+							logger.error("导入被用户停止", e);
 						} catch (Exception e) {
-							logger.error("", e);
+							logger.error("导入时发生未知异常", e);
 						}finally{
 							try {
 								workbook.close();
@@ -165,10 +168,16 @@ public class AdminPeopleDataController {
 		JsonResponse jRes = new JsonResponse();
 		ImportStatus importStatus = (ImportStatus) session.getAttribute(KEY_IMPORT_STATUS);
 		if(importStatus != null){
-			System.out.println("AAAAAAA\n\n\n\n\n\n" + importStatus.getCurrentMessage());
 			jRes.put("totalCount", importStatus.getTotal());
 			jRes.put("current", importStatus.getCurrent());
 			jRes.put("message", importStatus.getCurrentMessage());
+			if(importStatus.breaked()){
+				jRes.put("breaked", true);
+			}else if(importStatus.ended()){
+				jRes.put("ended", true);
+			}else{
+				jRes.setStatus("suc");
+			}
 		}else{
 			jRes.setStatus("no found import progress");
 		}
@@ -196,6 +205,7 @@ public class AdminPeopleDataController {
 		return AdminConstants.JSP_PEOPLEDATA + "/peopledata_detail.jsp";
 	}
 	
+	@ResponseBody
 	@RequestMapping("/do_delete/{peopleCode}")
 	public AjaxPageResponse delete(@PathVariable String peopleCode){
 		try {

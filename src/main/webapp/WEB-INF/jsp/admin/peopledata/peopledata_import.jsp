@@ -40,8 +40,11 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<div class="col-lg-offset-3 col-lg-3">
-			        		<input class="btn btn-block btn-primary" id="submit" type="button" value="提交"  />
+						<div class="col-lg-offset-3 col-lg-2">
+			        		<a class="btn btn-block btn-primary" id="submit">开始导入</a>
+				        </div>
+						<div class="col-lg-2">
+			        		<a class="btn btn-block btn-defualt" id="break" css-display="none">停止导入</a>
 				        </div>
 					</div>
 					
@@ -51,30 +54,48 @@
 	</div>
 </div>
 <script>
-	seajs.use(['ajax'], function(Ajax){
+	seajs.use(['ajax', 'dialog'], function(Ajax, Dialog){
 		var $page = $('#peopledata-import');
 		$('#submit', $page).click(function(){
-			var formData = new FormData($('form', $page)[0]);
-			Ajax.ajax('admin/peopledata/do_import', formData, function(){
-				var timer = setInterval(function(){
-					Ajax.ajax('admin/peopledata/status_of_import',{}, function(data){
-						if(data.status === 'no found import progress'){
-							clearInterval(timer);
-						}else{
-							if(typeof data.current === 'number' && typeof data.totalCount === 'number'){
-								var progress = data.current/data.totalCount;
-								var percent = parseFloat(progress * 100).toFixed(0);
-								$('#progress', $page)
-									.find('.progress-bar')
-									.attr('aria-valuenow', percent)
-									.css('width', percent + '%')
-									.find('span')
-										.text(percent + '%');
-							}
-							console.log(data);
-						}
+			Dialog.confirm('确认导入？', function(yes){
+				if(yes){
+					var formData = new FormData($('form', $page)[0]);
+					Ajax.ajax('admin/peopledata/do_import', formData, function(){
+						$('#break', $page).show();
+						var timer = setInterval(function(){
+							Ajax.ajax('admin/peopledata/status_of_import',{}, function(data){
+								if(data.status === 'suc'){
+									if(typeof data.current === 'number' && typeof data.totalCount === 'number'){
+										var progress = data.current/data.totalCount;
+										var percent = parseFloat(progress * 100).toFixed(0);
+										$('#progress', $page)
+											.find('.progress-bar')
+											.attr('aria-valuenow', percent)
+											.css('width', percent + '%')
+											.find('span')
+												.text(percent + '%');
+										console.log(progress);
+										if(progress >= 1){
+											Dialog.notice('导入完成');
+											clearInterval(timer);
+										}
+									}
+								}else{
+									clearInterval(timer);
+								}
+							});
+						}, 1000);
 					});
-				}, 1000);
+				}
+			});
+		});
+		$('#break', $page).click(function(){
+			Dialog.confirm('确认停止当前的导入任务？', function(){
+				Ajax.ajax('admin/peopledata/break_import', {}, function(data){
+					if(data.status === 'suc'){
+						$('#break', $page).hide();
+					}
+				});
 			});
 		});
 	});
