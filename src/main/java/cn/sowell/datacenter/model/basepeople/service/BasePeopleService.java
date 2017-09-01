@@ -2,11 +2,11 @@ package cn.sowell.datacenter.model.basepeople.service;
 
 import java.util.List;
 
-import com.alibaba.fastjson.JSONArray;
-
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
-import cn.sowell.datacenter.model.basepeople.pojo.People;
+import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
+
+import com.alibaba.fastjson.JSONArray;
 
 public interface BasePeopleService {
 	
@@ -16,21 +16,21 @@ public interface BasePeopleService {
 	 * @param pageInfo
 	 * @return
 	 */
-	List<People> queryList(BasePeopleCriteria criteria, PageInfo pageInfo);
+	List<BasePeople> queryList(BasePeopleCriteria criteria, PageInfo pageInfo);
 	
 	/**
 	 * 创建一个人口对象
 	 * @param people
 	 */
-	void create(People people);
+	void create(BasePeople people);
 	
-	People getPeople(Long id);
+	BasePeople getPeople(Long id);
 	
 	/**
 	 * 更新一个人口对象
 	 * @param people
 	 */
-	void update(People people);
+	void update(BasePeople people);
 	
 	/**
 	 * 从数据库中删除一个demo对象

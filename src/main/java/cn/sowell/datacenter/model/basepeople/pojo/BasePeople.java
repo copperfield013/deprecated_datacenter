@@ -1,5 +1,7 @@
 package cn.sowell.datacenter.model.basepeople.pojo;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -8,10 +10,12 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="t_base_people")
-public class People {
+public class BasePeople {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
+	
+	private String code;
 	
 	private String idcode;
 	
@@ -19,7 +23,7 @@ public class People {
 	
 	private Integer gender;
 	
-	private String birthday;
+	private Date birthday;
 	
 	private String address;
 	
@@ -57,14 +61,6 @@ public class People {
 		this.gender = gender;
 	}
 
-	public String getBirthday() {
-		return birthday;
-	}
-
-	public void setBirthday(String birthday) {
-		this.birthday = birthday;
-	}
-
 	public String getAddress() {
 		return address;
 	}
@@ -79,6 +75,22 @@ public class People {
 
 	public void setContact(String contact) {
 		this.contact = contact;
+	}
+
+	public Date getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 	
 	

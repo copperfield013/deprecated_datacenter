@@ -4,7 +4,7 @@ import java.util.List;
 
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
-import cn.sowell.datacenter.model.basepeople.pojo.People;
+import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
 
 public interface BasePeopleDao {
 	/**
@@ -13,7 +13,7 @@ public interface BasePeopleDao {
 	 * @param pageInfo
 	 * @return
 	 */
-	List<People> queryList(BasePeopleCriteria criteria, PageInfo pageInfo);
+	List<BasePeople> queryList(BasePeopleCriteria criteria, PageInfo pageInfo);
 	
 	/**
 	 * 对象插入到数据表中

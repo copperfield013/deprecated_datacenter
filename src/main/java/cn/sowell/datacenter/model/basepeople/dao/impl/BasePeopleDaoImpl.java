@@ -17,7 +17,7 @@ import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
 import cn.sowell.datacenter.model.basepeople.dao.BasePeopleDao;
-import cn.sowell.datacenter.model.basepeople.pojo.People;
+import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
 
 @Repository
 public class BasePeopleDaoImpl implements BasePeopleDao{
@@ -26,7 +26,7 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<People> queryList(BasePeopleCriteria bpCriteria, PageInfo pageInfo) {
+	public List<BasePeople> queryList(BasePeopleCriteria bpCriteria, PageInfo pageInfo) {
 		String hql = "from People p";
 		DeferedParamQuery dQuery = new DeferedParamQuery(hql);
 		if(TextUtils.hasText(bpCriteria.getName())){
@@ -41,7 +41,7 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 			QueryUtils.setPagingParamWithCriteria(query , pageInfo);
 			return query.list();
 		}
-		return new ArrayList<People>();
+		return new ArrayList<BasePeople>();
 	}
 	
 	@Override
@@ -63,4 +63,6 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 	public void delete(Object pojo) {
 		sFactory.getCurrentSession().delete(pojo);
 	}
+	
+	
 }
