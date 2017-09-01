@@ -21,6 +21,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.abc.application.DataSource;
 import com.abc.application.PeopleFusion;
 import com.abc.application.PeopleRelationFusion;
 import com.abc.mapping.MappingNodeAnalysis;
@@ -50,7 +51,7 @@ public class EditPeopleTest {
 	private String excelExtName = "xlsx";
 	private String mappingfilepath = getClass().getResource("/").getFile()
 			+ "../classes/mapping/baseinfoImport.xml";
-
+	protected String writeMappingName = "goodnode_polic";
 	@Test
 	public void editPeople() {
 
@@ -106,8 +107,9 @@ public class EditPeopleTest {
 		List<PeopleRelation> peopleRelations = createPeopleRelation(abcNode,
 				people, socialEntity);
 		people = peopleFusion.edit(people);
-		logger.debug(people.getJson(abcNode.getName()));
-		people = relationFusion.editFuse(people,peopleRelations);
+		logger.debug(people.getJson(abcNode.getTitle()));
+//		people = relationFusion.editFuse(people,peopleRelations);
+		people = peopleFusion.fuseStrange(people, writeMappingName, DataSource.SOURCE_EDIT);
 		Collection<RelationShip> ships = people.getRelationShip();
 		for (RelationShip ship : ships) {
 			logger.debug(ship);
