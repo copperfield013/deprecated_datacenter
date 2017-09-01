@@ -10,16 +10,21 @@
 	
 	<properties>
 		<version.kie>6.5.0.Final</version.kie>
-		<version.abc>1.1</version.abc>
+		<version.cpfweb>0.2.1</version.cpfweb>
+		<version.abc>1.5.3</version.abc>
 	</properties>
 	
 	<dependencies>
 		<dependency>
 			<groupId>cn.sowell.copframe</groupId>
 			<artifactId>cpf-web</artifactId>
-			<version>0.2.0</version>
+			<version>${version.cpfweb}</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>cn.sowell.copframe</groupId>
+			<artifactId>cpf-excel</artifactId>
+			<version>0.1</version>
+		</dependency>
 		<dependency>
 			<groupId>com.abc</groupId>
 			<artifactId>it</artifactId>

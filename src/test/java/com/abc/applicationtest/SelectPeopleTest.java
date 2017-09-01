@@ -74,7 +74,7 @@ public class SelectPeopleTest {
 			ABCNode abcNode = analysis.analysis(mappingfilepath);
 			People people=sortedPagedQuery.visit("06ea193c0e6544b7b8fae685b9abfde5");
 			people.addMapping(abcNode);
-			logger.debug(people.getJson(abcNode.getName()));
+			logger.debug(people.getJson(abcNode.getTitle()));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -95,7 +95,7 @@ public class SelectPeopleTest {
 				logger.debug("第" + i + "页,共" + sortedPagedQuery.getAllCount()
 						+ "条数据,每页" + sortedPagedQuery.getPageSize() + "条");
 				for (People people : sortedPagedQuery.visit(i)) {
-					logger.debug(people.getJson(abcNode.getName()));
+					logger.debug(people.getJson(abcNode.getTitle()));
 				}
 			}
 			long endTime = System.currentTimeMillis();// 记录结束时间

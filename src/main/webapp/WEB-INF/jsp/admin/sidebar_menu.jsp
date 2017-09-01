@@ -16,5 +16,10 @@
 	   			<span class="menu-text">列表2</span>
 	   		</a>
 	   	</li>
+	   	<li>
+	   		<a class="tab" href="admin/peopledata/list" target="peopledata_list" title="人口列表">
+	   			<span class="menu-text">ABC人口</span>
+	   		</a>
+	   	</li>
 	</ul>
 </li>

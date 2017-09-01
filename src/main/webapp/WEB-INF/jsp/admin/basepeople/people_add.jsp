@@ -3,7 +3,7 @@
 <div id="people-add">
 	<div class="page-header">
 		<div class="header-title">
-			<h1>创建人物信息</h1>
+			<h1>创建人口</h1>
 		</div>
 	</div>
 	<div class="page-body">
@@ -28,9 +28,9 @@
 					<div class="form-group">
 						<label class="col-lg-2 control-label" for="gender">性别</label>
 						<div class="col-lg-5">
-							<input name="gender" id="1" type="radio" value="1" style="opacity:1;position: static;height:13px;" checked/> 
+							<input name="gender" id="1" type="radio" value="男" style="opacity:1;position: static;height:13px;" checked/> 
 							<label for="1">男</label> 
-							<input name="gender" id="0" type="radio" value="0" style="opacity:1;position: static;height:13px;"/> 
+							<input name="gender" id="0" type="radio" value="女" style="opacity:1;position: static;height:13px;"/> 
 							<label for="0">女</label>
 						</div>
 					</div>

@@ -48,6 +48,7 @@ define(function(require, exports, module){
 			try{
 				if(!canceled){
 					page.loadContent(url, undefined, formData);
+					$this.trigger('cpf-submitting', [formData, $this, page]);
 				}
 			}catch(e){
 				console.error(e);

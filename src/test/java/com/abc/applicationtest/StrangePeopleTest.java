@@ -106,7 +106,7 @@ public class StrangePeopleTest {
 		List<PeopleRelation> peopleRelations = createPeopleRelation(abcNode,
 				people, socialEntity);
 		people = peopleFusion.fuseStrange(people,writeMappingName,DataSource.SOURCE_POLIC);
-		logger.debug(people.getPeopleCode()+" : "+people.getJson(abcNode.getName()));
+		logger.debug(people.getPeopleCode()+" : "+people.getJson(abcNode.getTitle()));
 		people = relationFusion.fuse(people,peopleRelations,writeMappingName,DataSource.SOURCE_POLIC);
 		if(people!=null&& people.getRelationShip()!=null){
 			Collection<RelationShip> ships = people.getRelationShip();

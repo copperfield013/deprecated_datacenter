@@ -1,18 +1,19 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
-<div id="people-list">
+<div id="peopledata-list">
 	<nav>
-		<form class="form-inline" action="admin/people/list">
+		<form class="form-inline" action="admin/peopledata/list">
 			<div class="form-group">
-				<label for="name">关键字</label>
+				<label for="name">姓名</label>
 				<input type="text" class="form-control" name="name" value="${criteria.name }" />
 			</div>
 			<div class="form-group">
-				<label class="form-control-title" for="date">日期</label>
-				<input type="text" class="form-control" id="date" name="date" readonly="readonly" css-cursor="text"  />
+				<label class="form-control-title" for="address">地址</label>
+				<input type="text" class="form-control" name="address" value="${criteria.address }"/>
 			</div>
 			<button type="submit" class="btn btn-default">查询</button>
-			<a class="btn btn-primary tab" href="admin/people/add" title="创建人口" target="people_add" >创建</a>
+			<a class="btn btn-primary tab" href="admin/peopledata/add" title="创建人口" target="people_add" >创建</a>
+			<a class="btn btn-primary tab" href="admin/peopledata/import" title="导入人口" target="people_import">导入</a>
 		</form>
 	</nav>
 	<div class="row list-area">
@@ -31,13 +32,13 @@
 				<c:forEach items="${list }" var="item" varStatus="i">
 					<tr>
 						<td>${i.index + 1 }</td>
-						<td><a class="tab" href="admin/people/detail/${item.id }" target="people_detail_${item.id }" title="详情">${item.name }</a></td>
+						<td><a class="tab" href="admin/peopledata/detail/${item.peopleCode }" target="people_detail_${item.peopleCode }" title="详情-${item.name }">${item.name }</a></td>
 						<td>${item.idcode }</td>
 						<td>${item.address }</td>
 						<td>${item.contact }</td>
 						<td>
-							<a href="admin/people/update/${item.code }" class="tab" target="people_update_${item.id }" title="修改">修改</a>
-							<a href="admin/people/do_delete/${item.id }" confirm="确认删除？">删除</a>
+							<a href="admin/peopledata/update/${item.peopleCode }" class="tab" target="people_update_${item.peopleCode }" title="修改-${item.name }">修改</a>
+							<a href="admin/peopledata/do_delete/${item.peopleCode }" confirm="确认删除？">删除</a>
 						</td>
 					</tr>
 				</c:forEach>
@@ -48,7 +49,6 @@
 </div>
 <script>
 	seajs.use(['utils'], function(Utils){
-		var $page = $('#people-list');
-		Utils.datepicker($('#date', $page));
+		var $page = $('#peopledata-list');
 	});
 </script>

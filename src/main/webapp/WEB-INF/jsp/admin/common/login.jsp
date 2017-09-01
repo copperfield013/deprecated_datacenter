@@ -5,7 +5,7 @@
 	<head>
 		<base href="${basePath }" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<title>登录点点新意</title>
+		<title>登录易+数据融合工具</title>
 		<meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
 		<script type="text/javascript">
 			if(window.ADMIN_LOADED === true){
@@ -63,8 +63,8 @@
 			}
 			
 			div.Z-loginbox > div.loginbox-logo >img {
-			    width:7.64em;
-			    height:4.71em;
+			    width:25em;
+			    height:5em;
 			}
 			div.warn-warp {
 				width:100%;
@@ -91,7 +91,7 @@
 			    width:100%;
 			    outline: none;
 			    background-clip: padding-box;
-			    border:1px solid #044d22;
+			    border:1px solid #197FC6;
 			    border-radius: 0.21em;
 			    background-color: #fbfbfb;
 			    padding: 0.43em 0.86em;
@@ -106,7 +106,7 @@
 			    display: block;
 			    width:100%;
 			    font-size:18px;
-			    background-color:#044d22;
+			    background-color:#197FC6;
 			    outline: none;
 			    text-align: center;
 			    height:2.6em;
@@ -125,7 +125,7 @@
     			<div class="Z-loginbox">
     	    		
         			<div class="loginbox-logo">
-            			<img src="media/common/ydd/image/ydd-logo.png"/>
+            			<img src="media/admin/main/image/datacenter-login.png"/>
         			</div>
         			<div class="warn-warp">
 	        			<c:if test="${error != null }">

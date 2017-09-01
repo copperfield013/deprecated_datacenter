@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>数据中心管理系统</title>
+		<title>易+数据融合工具</title>
 		<link rel="icon" href="favicon.ico" type="image/x-icon" />
 		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
 		<jsp:include page="/WEB-INF/jsp/admin/common/admin-include.jsp"></jsp:include>
@@ -27,7 +27,7 @@
 	                <div class="navbar-header pull-left">
 	                    <a href="admin/logout" class="navbar-brand">
 	                        <small>
-	                            <img src="media/admin/main/image/ydd-logo.png" alt="" />
+	                            <img src="media/admin/main/image/datacenter-logo.png"/>
 	                        </small>
 	                    </a>
 	                </div>
