@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ABC name="baseinfoImport" class="" xmlns="http://www.w3school.com.cn"
+<ABC name="baseinfoImport" alias="baseinfoImport" class="" xmlns="http://www.w3school.com.cn"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<attribute name="peoplecode" alias="编码" abcattr="唯一编码" />
 	<attribute name="address" alias="地址" abcattr="通用地址" />
@@ -31,7 +31,7 @@
 	<label name="离退休干部" alias="离退休干部"  subdomain="离退休干部" />
 	<label name="三无老人" alias="三无老人"  subdomain="三无老人" />
 	<label name="是否有车" alias="是否有车"  subdomain="有车" />
-	<label name="人口类型" alias="人口类型"   subdomain="户籍人口,流动人口" />
+	<label name="peopleType" alias="人口类型"   subdomain="户籍人口,流动人口" />
 	<record class="" name="education history" alias="教育经历" abcattr="教育经历">
 		<attribute name="school name" alias="院校名称" abcattr="院校名称" />
 		<attribute name="enter date" alias="入职日期" datatype="DATE"
