@@ -89,7 +89,8 @@ define(function(require, exports, module){
 		 * 4.name 勾选框表单的name
 		 * 5.value 勾选框表单的value
 		 * 事件
-		 * 	cpf-toggle-checked事件，用于切换勾选框的勾选状态
+		 * 	cpf-toggle-checked事件，用于触发切换勾选框的勾选状态
+		 * 	cpf-checked-change事件，勾选状态更改时触发，不可手动触发
 		 * 		
 		 */
 		$('span.cpf-checkbox', $page).each(function(){
@@ -112,11 +113,15 @@ define(function(require, exports, module){
 			}
 			$this.on('cpf-toggle-checked', function(e, checked){
 				var hasArg = typeof checked === 'boolean';
+				var toCheckVal;
 				if($checkbox){
-					$checkbox.prop('checked', hasArg? checked: !$checkbox.prop('checked'));
+					toCheckVal = hasArg? checked: !$checkbox.prop('checked');
+					$checkbox.prop('checked', toCheckVal);
 				}else{
 					$this.toggleClass('checked', hasArg? checked: undefined);
+					toCheckVal = $this.is('.checked');
 				}
+				$this.trigger('cpf-checked-change', [toCheckVal]);
 			});
 			$this.click(function(){$this.trigger('cpf-toggle-checked')});
 		});

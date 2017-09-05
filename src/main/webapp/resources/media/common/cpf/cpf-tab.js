@@ -130,15 +130,16 @@ define(function(require, exports, module){
 			var free = this.isFree();
 			if(typeof content === 'string'){
 				var dUrl = content;
-				formData = _formData;
+				var dFormData = _formData;
 				if(!free && this.isActive()){
 					$CPF.showLoading();
 				}
-				Ajax.ajax(dUrl, formData, {
+				Ajax.ajax(dUrl, dFormData, {
 					page		: page,
 					whenSuc		: function(data, dataType){
 						if(dataType === 'html'){
 							url = dUrl;
+							formData = dFormData;
 							_this.loadContent($('<div>').html(data));
 						}
 					},

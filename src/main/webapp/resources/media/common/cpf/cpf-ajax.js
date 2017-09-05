@@ -149,9 +149,12 @@ define(function(require, exports, module){
 			for(var key in formData){
 				var name = key;
 				if($.isArray(formData[key])){
-					name = key + '[]';
+					for(var i in formData[key]){
+						fData.append(name, formData[key][i]);
+					}
+				}else{
+					fData.append(name, formData[key]);
 				}
-				fData.append(name, formData[key]);
 			}
 		}else if(formData instanceof FormData){
 			fData = formData;

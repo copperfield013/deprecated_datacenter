@@ -38,7 +38,7 @@ define(function(require, exports, module){
 					}
 				});
 			}else{
-				$('a[href],button[href]', $page).click(function(){
+				$('a[href],button[href],i[href]', $page).click(function(){
 					var $this = $(this);
 					if(!$this.is('.tab,.dialog')){
 						var href =$this.attr('href');
@@ -94,11 +94,13 @@ define(function(require, exports, module){
 			$('.cpf-checkbox[name]' + batchRange, $(dom).getLocatePage().getContent()).each(function(){
 				var $checkbox = $(this),
 					name = $checkbox.attr('name');
-				var l = formData[name];
-				if(!l){
-					formData[name] = l = [];
+				if($checkbox.is('.checked') || $(':checkbox:checked', $checkbox).length === 1){
+					var l = formData[name];
+					if(!l){
+						formData[name] = l = [];
+					}
+					l.push($checkbox.attr('value'));
 				}
-				l.push($checkbox.attr('value'));
 			});
 		}
 		targetPage.loadContent(href, title, formData);

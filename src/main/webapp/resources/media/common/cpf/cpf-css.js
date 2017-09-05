@@ -9,7 +9,7 @@ define(function(require, exports, module){
 	
 	$CPF.addDefaultParam({
 		styleAttrPrefix	: 'css-',
-		styleAttrNames	: ['width', 'display', 'cursor', 'float']
+		styleAttrNames	: ['width', 'display', 'cursor', 'float', 'color']
 	});
 	/**
 	 * 添加页面初始化

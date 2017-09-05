@@ -122,7 +122,8 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public List<People> queryPeopleList(List<Criteria> criterias, PageInfo pageInfo){
-		SortedPagedQuery sortedPagedQuery = new SortedPagedQuery(criterias, getABCNode(), null);
+		SortedPagedQuery sortedPagedQuery = new SortedPagedQuery(criterias, getABCNode(), "编辑时间");
+		sortedPagedQuery.setSortedDESC();
 		sortedPagedQuery.setPageSize(pageInfo.getPageSize());
 		pageInfo.setCount(sortedPagedQuery.getAllCount());
 		return sortedPagedQuery.visit(pageInfo.getPageNo());

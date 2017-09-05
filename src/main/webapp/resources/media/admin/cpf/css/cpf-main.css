@@ -274,3 +274,55 @@ label.form-control-title {
 nav{
 	padding: 1em 0;
 }
+.cpf-checkbox{
+	cursor: pointer;
+	margin: 5px;
+}
+.cpf-checkbox>span:BEFORE{
+	font-family: fontAwesome;
+    font-weight: bold;
+    font-size: 13px;
+    color: #333;
+    content: " ";
+    background-color: #fafafa;
+    border: 1px solid #c8c8c8;
+    box-shadow: 0 1px 2px rgba(0,0,0,.05);
+    border-radius: 0;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    height: 18px;
+    line-height: 16px;
+    min-width: 18px;
+    margin-right: 5px;
+    margin-bottom: 2px;
+    -webkit-transition: all .3s ease;
+    -moz-transition: all .3s ease;
+    -o-transition: all .3s ease;
+    transition: all .3s ease;
+}
+.cpf-checkbox.checked>span:BEFORE,.cpf-checkbox>input[type="checkbox"]:checked+span:BEFORE {
+	display: inline-block;
+    content: '';
+    background-color: #f5f8fc;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05),inset 0 -15px 10px -12px rgba(0,0,0,.05),inset 15px 10px -12px rgba(255,255,255,.1);
+    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05),inset 0 -15px 10px -12px rgba(0,0,0,.05),inset 15px 10px -12px rgba(255,255,255,.1);
+    box-shadow: 0 1px 2px rgba(0,0,0,.05),inset 0 -15px 10px -12px rgba(0,0,0,.05),inset 15px 10px -12px rgba(255,255,255,.1);
+    border-color: #333;
+}
+.cpf-checkbox.cpf-checkbox-xs{
+	font-size: 13px;
+}
+.cpf-checkbox.cpf-checkbox-xs>span:BEFORE{
+	height: 13px;
+    width: 13px;
+    line-height: 13px;
+    min-width: 13px;
+}
+@media (min-width: 768px){
+	.form-horizontal .form-stat-value {
+	    padding-top: 7px;
+	    margin-bottom: 0;
+	    text-align: left;
+	}
+}
