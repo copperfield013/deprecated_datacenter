@@ -8,21 +8,37 @@
 		</div>
 	</div>
 
+	<nav>
+		<div class="form-inline" >
+			<div class="form-group">
+				<label for="search">智能字段</label>
+				<input type="text" class="form-control search" id="0" name="search"  />
+			</div>
+			<button type="button" class="btn btn-default" id="smartSubmit">查询</button>
+		</div>
+	</nav>
 
+	<div class="page-body" id="clone">
+<div id="cloneInput"></div>
+	</div >
 	<div class="page-body">
 		<div class="row">
 			<div class="col-lg-12">
 				<form class="bv-form form-horizontal validate-form" action="admin/peopledata/do_update">
 					<input type="hidden" name="peopleCode" value="${people.peopleCode }" />
 					<div class="form-group">
+						<div>
 						<label class="col-lg-1 control-label" for="name">姓名</label>
 						<div class="col-lg-4">
 							<input type="text" class="form-control" name="name" value="${people.name }" />
 						</div>
+					</div>
+						<div >
 						<label class="col-lg-1 control-label" for="idcode">身份证号</label>
 						<div class="col-lg-4">
 							<input type="text" class="form-control" name="idcode" id="code" value="${people.idcode }" />
 						</div>
+					</div>
 					</div>
 					<div class="form-group">
 						<label class="col-lg-1 control-label" for="gender">性别</label>
@@ -198,7 +214,7 @@
 <script>
 	seajs.use(['utils'], function(Utils){
 		var $page = $('#people-update');
-		Utils.datepicker($('#date', $page));
+
 		function IdentityCodeValid(code) { 
 	        var city={11:"北京",12:"天津",13:"河北",14:"山西",15:"内蒙古",21:"辽宁",22:"吉林",23:"黑龙江 ",31:"上海",32:"江苏",33:"浙江",34:"安徽",35:"福建",36:"江西",37:"山东",41:"河南",42:"湖北 ",43:"湖南",44:"广东",45:"广西",46:"海南",50:"重庆",51:"四川",52:"贵州",53:"云南",54:"西藏 ",61:"陕西",62:"甘肃",63:"青海",64:"宁夏",65:"新疆",71:"台湾",81:"香港",82:"澳门",91:"国外 "};
 	        var tip = "";
@@ -257,27 +273,26 @@
 		});
 
 		$("#smartSubmit").click(function(){
-		    //simple demo clone one option;
-            $("#姓名").parent().parent().clone(true).appendTo($("#clone"));
+            $("#clone").html('<div id="cloneInput"></div>');
+			debugger;
+			var conetitle ="测试";
+            $("#clone").prepend("<label class=\"col-lg-1 control-label\">"+conetitle+"</label>");
+            $("[name='nation']").parent().clone(true).appendTo($("#cloneInput"));
+//            Utils.datepicker($('#date', $page));
             $("#clone").append("<button class=\"btn btn-labeled btn-palegreen\" id='check'>\n" +
                 "<i class=\"btn-label glyphicon glyphicon-ok\"></i>确认</button>" +
 				"<button class=\"btn btn-labeled btn-darkorange\" id='remove'>  \n" +
                 " <i class=\"btn-label glyphicon glyphicon-remove\"></i>取消</button>");
         });
-		$("#clone").on('click',"[id='check']",function(){
-			alert(1);
-				});
 
-		$("#check").click(function () {
-			alert(1);
+        $("#clone").on('click',"[id='check']",function(){
+            $("#clone").html('<div id="cloneInput"></div>');
         });
 
-        $("#remove").click(function () {
-            alert(2);
+        $("#clone").on('click',"[id='remove']",function(){
+            $("#clone").html('<div id="cloneInput"></div>');
         });
-        /**
-		 * clone function
-         */
+
 	});
 	
 	
