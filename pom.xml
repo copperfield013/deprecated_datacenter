@@ -11,7 +11,7 @@
 	<properties>
 		<version.kie>6.5.0.Final</version.kie>
 		<version.cpfweb>0.2.1</version.cpfweb>
-		<version.abc>1.5.4</version.abc>
+		<version.abc>1.5.5</version.abc>
 	</properties>
 	
 	<dependencies>
@@ -142,7 +142,7 @@
 		<repository>
 			<id>nexus</id>
 			<name>nexus</name>
-			<url>http://106.14.249.51:32108/repository/nexus-group/</url>
+			<url>http://139.196.123.44:32108/repository/nexus-group/</url>
 		</repository>
 	</repositories>
 	<build>
