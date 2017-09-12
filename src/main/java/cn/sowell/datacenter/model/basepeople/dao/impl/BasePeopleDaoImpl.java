@@ -27,7 +27,7 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<BasePeople> queryList(BasePeopleCriteria bpCriteria, PageInfo pageInfo) {
-		String hql = "from People p";
+		String hql = "from BasePeople p";
 		DeferedParamQuery dQuery = new DeferedParamQuery(hql);
 		if(TextUtils.hasText(bpCriteria.getName())){
 			dQuery.appendCondition(" and p.name like :name")

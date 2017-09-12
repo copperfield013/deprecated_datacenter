@@ -13,7 +13,7 @@
 					<div class="form-group">
 						<label class="col-lg-2 control-label" for="name">姓名</label>
 						<div class="col-lg-5">
-							<input type="text" class="form-control" name="name" />
+							<input type="text" class="form-control" name="name"  />
 						</div>
 					</div>
 					<div class="form-group">

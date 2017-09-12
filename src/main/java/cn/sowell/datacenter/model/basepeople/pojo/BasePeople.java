@@ -14,9 +14,7 @@ public class BasePeople {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
-	
-	private String code;
-	
+
 	private String idcode;
 	
 	private String name;
@@ -85,13 +83,6 @@ public class BasePeople {
 		this.birthday = birthday;
 	}
 
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
 	
 	
 

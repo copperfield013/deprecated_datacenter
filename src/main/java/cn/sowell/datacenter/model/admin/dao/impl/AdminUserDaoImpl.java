@@ -21,9 +21,10 @@ public class AdminUserDaoImpl implements AdminUserDao{
 		if(StringUtils.hasText(username)){
 			String hql = "from AdminUser u where u.userName = :userName";
 			Session session = sessionFactory.getCurrentSession();
-			Query query = session.createQuery(hql);
-			query.setString("userName", username);
+			Query query = session.createQuery(hql)
+					.setString("userName", username);
 			return (AdminUser) query.uniqueResult();
+
 		}
 		return null;
 	}

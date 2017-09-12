@@ -36,16 +36,17 @@ public class AdminBasePeopleController {
 	
 	@RequestMapping("/list")
 	public String list(BasePeopleCriteria criteria, Model model, PageInfo pageInfo){
-		List<BasePeople> list = basePeopleService.queryList(criteria, pageInfo);
+		List<
+				BasePeople> list = basePeopleService.queryList(criteria, pageInfo);
 		model.addAttribute("list", list);
 		model.addAttribute("pageInfo", pageInfo);
 		model.addAttribute("criteria", criteria);
-		return AdminConstants.JSP_PEOPLEDATA + "/people_list.jsp";
+		return AdminConstants.JSP_BASEPEOPLE + "/people_list.jsp";
 	}
 	
 	@RequestMapping("/add")
 	public String add(BasePeople p){
-		return AdminConstants.JSP_PEOPLEDATA + "/people_add.jsp";
+		return AdminConstants.JSP_BASEPEOPLE + "/people_add.jsp";
 	}
 	
 	@ResponseBody
@@ -65,7 +66,7 @@ public class AdminBasePeopleController {
 	public String update(@PathVariable Long id, Model model){
 		BasePeople people = basePeopleService.getPeople(id);
 		model.addAttribute("people", people);
-		return AdminConstants.JSP_PEOPLEDATA + "/people_update.jsp";
+		return AdminConstants.JSP_BASEPEOPLE + "/people_update.jsp";
 	}
 	
 	@ResponseBody
@@ -96,7 +97,7 @@ public class AdminBasePeopleController {
 	public String detail(@PathVariable Long id, Model model){
 		BasePeople people = basePeopleService.getPeople(id);
 		model.addAttribute("people", people);
-		return AdminConstants.JSP_PEOPLEDATA + "/people_detail.jsp";
+		return AdminConstants.JSP_BASEPEOPLE + "/people_detail.jsp";
 	}
 	
 	@ResponseBody
@@ -110,7 +111,7 @@ public class AdminBasePeopleController {
 		catch(Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
-            return  null;
+            return null;
 		}
     	
     }

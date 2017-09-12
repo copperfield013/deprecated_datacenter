@@ -2,9 +2,13 @@ package cn.sowell.datacenter.model.basepeople.service.impl;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+
 import java.util.List;
 
 import javax.annotation.Resource;
+
+import com.alibaba.fastjson.JSONArray;
+import org.apache.log4j.Logger;
 
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -25,11 +29,13 @@ import cn.sowell.datacenter.model.basepeople.dao.BasePeopleDao;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
 import cn.sowell.datacenter.model.basepeople.service.BasePeopleService;
 
-import com.alibaba.fastjson.JSONArray;
+
 
 @Service
 public class BasePeopleServiceImpl implements BasePeopleService{
 
+
+	private Logger logger = Logger.getLogger(BasePeopleService.class);
 	@Resource
 	BasePeopleDao basePeopleDao;
 	
@@ -74,32 +80,34 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 	    try {
 			client = new PreBuiltTransportClient(settings)
 			        .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("127.0.0.1"), 9300));
+			SearchRequestBuilder builder =
+					client.prepareSearch("ydd")
+							.setTypes("demo")
+							.setSearchType(SearchType.DEFAULT)
+							.setFrom(0)
+							.setSize(9);
+			BoolQueryBuilder qb ;
+			qb = QueryBuilders.boolQuery()
+					.should(new QueryStringQueryBuilder(title).field("title"));
+			builder.setQuery(qb);
+			SearchResponse response ;
+			response = builder.execute().actionGet();
+			JSONArray  jsonThree = new JSONArray ();
+			for(SearchHit hit:response.getHits()){
+				String source=hit.getSourceAsString();
+				jsonThree.add((hit.getSource()));
+
+			}
+			System.out.println(jsonThree);
+			System.out.println("总数量："+response.getHits().getTotalHits()+" 耗时："+response.getTookInMillis());
+			return jsonThree;
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			logger.warn("naifeitian creat failed");
+			return null;
 		}
-		SearchRequestBuilder builder = 
-				client.prepareSearch("ydd")
-				.setTypes("demo")
-				.setSearchType(SearchType.DEFAULT)
-				.setFrom(0)
-				.setSize(9);  
-	    BoolQueryBuilder qb ;
-	    qb = QueryBuilders.boolQuery()
-	    		.should(new QueryStringQueryBuilder(title).field("title"));
-	    builder.setQuery(qb);  
-	    SearchResponse response ;
-	    response = builder.execute().actionGet();
-	    JSONArray  jsonThree = new JSONArray ();
-	    for(SearchHit hit:response.getHits()){
-	        String source=hit.getSourceAsString();
-		    jsonThree.add((hit.getSource()));
-	        
-	    }
-	    
-	    System.out.println(jsonThree);
-	    System.out.println("总数量："+response.getHits().getTotalHits()+" 耗时："+response.getTookInMillis());
-		return jsonThree;
+
 	}
 
 }

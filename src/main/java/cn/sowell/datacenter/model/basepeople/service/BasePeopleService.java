@@ -38,6 +38,8 @@ public interface BasePeopleService {
 	 */
 	void delete(Long id);
 
+
+
 	/**
 	 * 使用ES 返回前端模糊查询字段 返回对象为Json
 	 * @param title

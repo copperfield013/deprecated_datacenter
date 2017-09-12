@@ -81,6 +81,7 @@
 					</div>
 				</form>
 			</div>
+
 		</div>
 	</div>
 </div>
@@ -146,8 +147,10 @@
 				}
 		});
 
+
 		$("#smartSubmit").click(function(){
 		    //simple demo clone one option;
+
 			SearchWord = "姓名";
             $("#"+SearchWord).parent().parent().clone(true).appendTo($("#clone"));
             $("#clone").append("<button class=\"btn btn-labeled btn-palegreen\" id='check'>\n" +
@@ -164,9 +167,6 @@
         $("#clone").on('click',"[id='remove']",function(){
    			$("#clone").html("");
         });
-        /**
-		 * clone function
-         */
 	});
 	
 	
@@ -190,15 +190,11 @@
 	    	            $('.search').bigAutocomplete({
 	    	        		width:190,
 	    	        		data:a
-	    	        		
 	    	        	});
-	    	            
-	    	           
 	    	        },
 	    	        error: function(XMLHttpRequest, textStatus, errorThrown) {
 	                    alert(XMLHttpRequest.status+","+XMLHttpRequest.readyState+","+textStatus);
 	                }
-	    	      
 	    	    });
 	        	k=$(this).val();
 	    	}
@@ -210,7 +206,6 @@
 			switch (event.keyCode) {
 			case 40://向下键
 				if($("#bigAutocompleteContent").css("display") == "none")return;
-				
 				var $nextSiblingTr = $("#bigAutocompleteContent").find(".ct");
 				if($nextSiblingTr.length <= 0){//没有选中行时，选中第一行
 					$nextSiblingTr = $("#bigAutocompleteContent").find("tr:first");

@@ -36,7 +36,7 @@
 						<td>${item.address }</td>
 						<td>${item.contact }</td>
 						<td>
-							<a href="admin/people/update/${item.code }" class="tab" target="people_update_${item.id }" title="修改">修改</a>
+							<a href="admin/people/update/${item.id }" class="tab" target="people_update_${item.id }" title="修改">修改</a>
 							<a href="admin/people/do_delete/${item.id }" confirm="确认删除？">删除</a>
 						</td>
 					</tr>
@@ -46,6 +46,7 @@
 		<div class="cpf-paginator" pageNo="${pageInfo.pageNo }" pageSize="${pageInfo.pageSize }" count="${pageInfo.count }"></div>
 	</div>
 </div>
+
 <script>
 	seajs.use(['utils'], function(Utils){
 		var $page = $('#people-list');

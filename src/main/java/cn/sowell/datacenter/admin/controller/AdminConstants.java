@@ -11,7 +11,7 @@ public interface AdminConstants {
 			put("2", "");
 		}
 	};
-	
+
 	/**
 	 * 管理端的访问基本路径
 	 */
@@ -29,7 +29,7 @@ public interface AdminConstants {
 	
 	
 	/**
-	 * 
+	 *  管理端人口资源路径
 	 */
 	final String JSP_BASEPEOPLE = JSP_BASE + "/basepeople";
 

@@ -65,9 +65,7 @@ public class AdminPeopleDataController {
 	public AjaxPageResponse doAdd(WebRequest request){
 		try {
 			Map<String, String> data = new HashMap<String, String>();
-			request.getParameterMap().forEach((name, val) -> {
-				data.put(name, val[0]);
-			});
+			request.getParameterMap().forEach((name, val) -> {data.put(name, val[0]);});
 			abcService.mergePeople(data);
 			return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("添加成功", "peopledata_list");
 		} catch (Exception e) {
@@ -88,7 +86,8 @@ public class AdminPeopleDataController {
 	public AjaxPageResponse doUpdate(WebRequest request){
 		try {
 			Map<String, String> data = new HashMap<String, String>();
-			request.getParameterMap().forEach((name, val) -> {
+
+			request.getParameterMap().forEach((name, val)  -> {
 				data.put(name, val[0]);
 			});
 			Assert.notNull(data.get("peopleCode"));

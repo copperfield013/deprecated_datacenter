@@ -71,7 +71,7 @@ div.print-desc.float-right {
     bottom: 0;
     font-size: 0.8em;
     padding-top: 2px;
-    border-top: 1px dashed #000;
+    border-top: 1px dashed #000000;
 	padding-top: 5px;
 }
 .print-addr-area{
