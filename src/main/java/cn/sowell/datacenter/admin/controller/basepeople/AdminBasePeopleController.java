@@ -101,9 +101,10 @@ public class AdminBasePeopleController {
 	}
 	
 	@ResponseBody
-    @RequestMapping(value="titleSearch",method=RequestMethod.POST)
+    @RequestMapping("titleSearch")
     public JSONArray  esearch(String txt, HttpServletResponse response) {
     	JSONArray tSearch = null;
+    	System.out.println("1");
     	try{	    	    
     		tSearch=basePeopleService.titleSearchByEs(txt.trim());
     		return tSearch;
