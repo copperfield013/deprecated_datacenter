@@ -4,6 +4,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
+import cn.sowell.datacenter.model.basepeople.dto.ResultDto;
 import org.apache.log4j.Logger;
 import org.elasticsearch.client.transport.TransportClient;
 import org.springframework.stereotype.Controller;
@@ -36,8 +37,7 @@ public class AdminBasePeopleController {
 	
 	@RequestMapping("/list")
 	public String list(BasePeopleCriteria criteria, Model model, PageInfo pageInfo){
-		List<
-				BasePeople> list = basePeopleService.queryList(criteria, pageInfo);
+		List<BasePeople> list = basePeopleService.queryList(criteria, pageInfo);
 		model.addAttribute("list", list);
 		model.addAttribute("pageInfo", pageInfo);
 		model.addAttribute("criteria", criteria);
@@ -74,7 +74,8 @@ public class AdminBasePeopleController {
 	public AjaxPageResponse doUpdate(BasePeople people){
 		try {
 			basePeopleService.update(people);
-			return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改成功", "people_list");
+			//return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改成功", "people_list");
+			return AjaxPageResponse.REFRESH_LOCAL("123");
 		} catch (Exception e) {
 			logger.error("修改失败", e);
 			return AjaxPageResponse.FAILD("修改失败");
@@ -116,5 +117,24 @@ public class AdminBasePeopleController {
 		}
     	
     }
-	
+
+
+	/**
+	 * 根据字段 返回字段的类型 文本框？时间控件？ 下拉框？ 选择框？
+	 *   默认的值
+	 * @param peopleid
+	 * @param response
+	 * @return
+	 */
+
+	@ResponseBody
+	@RequestMapping(value="smartSearch",method = RequestMethod.POST, headers="Accept=application/json")
+	public ResultDto smartsearch(long peopleid, HttpServletResponse response){
+		BasePeople people = basePeopleService.getPeople(peopleid);
+		ResultDto Res = new ResultDto();
+		Res.setData(people);
+		Res.setType("2");
+		Res.setStatus("success");
+		return Res;
+	}
 }

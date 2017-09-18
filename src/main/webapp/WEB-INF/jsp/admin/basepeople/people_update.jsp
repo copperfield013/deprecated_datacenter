@@ -96,19 +96,19 @@
 </div>
 
 <script>
-seajs.use(['utils'], function(Utils){
+seajs.use(['utils','ajax'], function(Utils,Ajax){
 	var $page = $('#people-update');
 	Utils.datepicker($('#date', $page));
-	function IdentityCodeValid(code) { 
+	function IdentityCodeValid(code) {
         var city={11:"北京",12:"天津",13:"河北",14:"山西",15:"内蒙古",21:"辽宁",22:"吉林",23:"黑龙江 ",31:"上海",32:"江苏",33:"浙江",34:"安徽",35:"福建",36:"江西",37:"山东",41:"河南",42:"湖北 ",43:"湖南",44:"广东",45:"广西",46:"海南",50:"重庆",51:"四川",52:"贵州",53:"云南",54:"西藏 ",61:"陕西",62:"甘肃",63:"青海",64:"宁夏",65:"新疆",71:"台湾",81:"香港",82:"澳门",91:"国外 "};
         var tip = "";
         var pass= true;
-        
+
         if(!code || !/^\d{6}(18|19|20)?\d{2}(0[1-9]|1[12])(0[1-9]|[12]\d|3[01])\d{3}(\d|X)$/i.test(code)){
             tip = "身份证号格式错误";
             pass = false;
         }
-        
+
        else if(!city[code.substr(0,2)]){
             tip = "地址编码错误";
             pass = false;
@@ -142,12 +142,12 @@ seajs.use(['utils'], function(Utils){
         else $("#txt").val("√")
         return pass;
     }
-	
+
 	$("#code").blur(function(){
 		var code = $("#code").val();
 		IdentityCodeValid(code);
 	});
-	
+
 	$("#contact").blur(function(){
 		var contact = $("#contact").val();
 		if(!(/^1[34578]\d{9}$/.test(contact)) ){//手机验证
@@ -157,21 +157,39 @@ seajs.use(['utils'], function(Utils){
 	});
 
 
-	$("#smartSubmit").click(function(){
-	    //simple demo clone one option;
+		$("#smartSubmit").click(function(){
+		    debugger;
+		    var peopleid=1;
+            SearchWord = "姓名222222";
+            var SearchWordEnglish="name";
+            Ajax.ajax('admin/people/smartSearch',{
+                peopleid : peopleid
+            },function(json) {
 
-		SearchWord = "姓名";
-        $("#"+SearchWord).parent().parent().clone(true).appendTo($("#clone"));
-        $("#clone").append("<button class=\"btn btn-labeled btn-palegreen\" id='check'>\n" +
-            "<i class=\"btn-label glyphicon glyphicon-ok\"></i>确认</button>" +
-			"<button class=\"btn btn-labeled btn-darkorange\" id='remove'>  \n" +
-            " <i class=\"btn-label glyphicon glyphicon-remove\"></i>取消</button>");
-    });
-	$("#clone").on('click',"[id='check']",function(){
-		var result =$(this).parent().find(".form-control").val();
-		$("input[name='name']").last().val(result);
-        $("#clone").html("");
-	});
+                $("#clone").append('<form class="bv-form form-horizontal validate-form" action="admin/people/do_update">' +
+                '<input type="hidden" name="id" value="'+peopleid+'" />' +
+                '<div class="form-group">' +
+                '<label class="col-lg-2 control-label" for="name" >'+SearchWord+'</label>' +
+                '<div class="col-lg-5">' +
+                '<input type="text" class="form-control" name="name" value="'+json.status+'"  id="姓名"/>' +
+                '</div>' +
+                '</div>'+
+				"<button class=\"btn btn-labeled btn-palegreen\" id='check'>\n" + "<i class=\"btn-label glyphicon glyphicon-ok\"></i>确认</button>" +
+                "<button class=\"btn btn-labeled btn-darkorange\" id='remove'>  \n" + " <i class=\"btn-label glyphicon glyphicon-remove\"></i>取消</button></form>");
+            });
+
+//			SearchWord = "姓名";
+//            $("#"+SearchWord).parent().parent().clone(true).appendTo($("#clone"));
+//            $("#clone").append("<button class=\"btn btn-labeled btn-palegreen\" id='check'>\n" +
+//                "<i class=\"btn-label glyphicon glyphicon-ok\"></i>确认</button>" +
+//				"<button class=\"btn btn-labeled btn-darkorange\" id='remove'>  \n" +
+//                " <i class=\"btn-label glyphicon glyphicon-remove\"></i>取消</button>");
+        });
+		$("#clone").on('click',"[id='check']",function(){
+			var result =$(this).parent().find(".form-control").val();
+			$("input[name='name']").last().val(result);
+            $("#clone").html("");
+		});
 
     $("#clone").on('click',"[id='remove']",function(){
 			$("#clone").html("");
@@ -180,7 +198,7 @@ seajs.use(['utils'], function(Utils){
 	var k = null;
 	//监听查询内容
 	$(".search${people.id }").keyup(function(event) {
-		if (event.which > "40" || event.which == "32"|| event.which == "8" 
+		if (event.which > "40" || event.which == "32"|| event.which == "8"
 				&& $(this).val() != ""&& $(this).val() != null) {
 			$.ajax({
 				url : 'admin/people/titleSearch',
@@ -200,7 +218,7 @@ seajs.use(['utils'], function(Utils){
 					});
 			k = $(this).val();
 			}
-		if ($(this).val() == "" || $(this).val() == null) 
+		if ($(this).val() == "" || $(this).val() == null)
 			hideContent();
 		});
 
@@ -259,13 +277,13 @@ seajs.use(['utils'], function(Utils){
 			break;
 		}
 	});
-	
+
 	//目前获得光标的输入框
 	var sFocus;
 	$(".search${people.id }").focus(function(){
 		sFocus = $(this);
 	});
-	
+
 	function hideContent() {
 		if ($("#bigAutocompleteContent").css("display") != "none") {
 			$("#bigAutocompleteContent").find("tr").removeClass("ct");

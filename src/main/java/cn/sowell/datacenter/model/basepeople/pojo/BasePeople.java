@@ -27,6 +27,16 @@ public class BasePeople {
 	
 	private String contact;
 
+	private String national;
+
+	public String getNational() {
+		return national;
+	}
+
+	public void setNational(String national) {
+		this.national = national;
+	}
+
 	public Long getId() {
 		return id;
 	}
