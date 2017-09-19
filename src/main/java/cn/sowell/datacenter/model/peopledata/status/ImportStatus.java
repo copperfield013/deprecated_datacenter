@@ -1,4 +1,4 @@
-package cn.sowell.datacenter.model.people.status;
+package cn.sowell.datacenter.model.peopledata.status;
 
 import java.util.Date;
 import java.util.Iterator;

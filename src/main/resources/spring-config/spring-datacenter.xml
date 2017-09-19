@@ -23,6 +23,7 @@
 	<context:component-scan base-package="cn.sowell.datacenter.model.*.service.impl" />
 	<!-- controller自动扫描(自动注入) -->
 	<context:component-scan base-package="cn.sowell.datacenter.*.controller.*" />
+	
 	<import resource="spring-security.xml"/>
 	
 	<mvc:interceptors>

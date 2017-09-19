@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ABC name="baseinfoImport" alias="baseinfoImport" class="" xmlns="http://www.w3school.com.cn"
+<ABC name="baseinfoImport" abcattr="人口信息" alias="baseinfoImport" class="" xmlns="http://www.w3school.com.cn"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<attribute name="peoplecode" alias="编码" abcattr="唯一编码" />
 	<attribute name="address" alias="地址" abcattr="通用地址" />
@@ -27,6 +27,9 @@
 	<attribute name="religion" alias="宗教信仰" abcattr="宗教信仰" />
 	<attribute name="militaryStatus" alias="兵役" abcattr="兵役状况" /> 
 	<attribute name="统战人士类型" alias="统战人士类型" abcattr="统战人士类别" />
+	<attribute name="lowIncomeInsuredCode" alias="低保证号" abcattr="低保证号" />
+	<attribute name="handicappedCode" alias="残疾人号" abcattr="残疾人号" />
+	<label name="lowIncomeInsureType" alias="低保人员类别" subdomain="低保人员,残保人员" />
 	<label name="是否本区机关干部" alias="是否本区机关干部" 
 		subdomain="本区机关干部" />
 	<label name="劳模" alias="劳模"  subdomain="劳模" />

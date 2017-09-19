@@ -1,6 +1,7 @@
 package cn.sowell.datacenter.admin.controller.people;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,13 +26,14 @@ import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JsonResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.Assert;
+import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
 import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
-import cn.sowell.datacenter.model.people.pojo.PeopleData;
-import cn.sowell.datacenter.model.people.pojo.criteria.PeopleDataCriteria;
-import cn.sowell.datacenter.model.people.service.PeopleService;
-import cn.sowell.datacenter.model.people.status.ImportStatus;
+import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
+import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
+import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
+import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
 
 @Controller
 @RequestMapping(AdminConstants.URI_BASE + "/peopledata")
@@ -42,7 +44,10 @@ public class AdminPeopleDataController {
 	ABCExecuteService abcService;
 
 	@Resource
-	PeopleService peopleService;
+	PeopleDataService peopleService;
+	
+	@Resource
+	FrameDateFormat dateFormat;
 	
 	Logger logger = Logger.getLogger(AdminPeopleDataController.class);
 	
@@ -198,11 +203,22 @@ public class AdminPeopleDataController {
 	
 	
 	@RequestMapping("/detail/{peopleCode}")
-	public String detail(@PathVariable String peopleCode, Model model){
-		PeopleData people = peopleService.getPeople(peopleCode);
+	public String detail(@PathVariable String peopleCode, String datetime, Model model){
+		Date date = null;
+		date = dateFormat.parse(datetime);
+		PeopleData people = peopleService.getHistoryPeople(peopleCode, date);
+		//PeopleData people = peopleService.getPeople(peopleCode);
 		model.addAttribute("people", people);
+		model.addAttribute("datetime", datetime);
+		model.addAttribute("peopleCode", peopleCode);
 		return AdminConstants.JSP_PEOPLEDATA + "/peopledata_detail.jsp";
 	}
+	
+	@RequestMapping("/history/{peopleCode}")
+	public String history(@PathVariable String peopleCode){
+		return AdminConstants.JSP_PEOPLEDATA + "/peopledata_history.jsp";
+	}
+	
 	
 	@ResponseBody
 	@RequestMapping("/do_delete/{peopleCode}")

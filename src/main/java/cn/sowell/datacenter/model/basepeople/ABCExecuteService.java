@@ -1,6 +1,7 @@
 package cn.sowell.datacenter.model.basepeople;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -9,12 +10,12 @@ import org.apache.poi.ss.usermodel.Sheet;
 
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
-import cn.sowell.datacenter.model.people.status.ImportStatus;
+import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
 
-import com.abc.mapping.entity.SocialEntity;
+import com.abc.mapping.entity.Entity;
 import com.abc.mapping.node.ABCNode;
 import com.abc.people.People;
-import com.abc.query.querypeople.Criteria;
+import com.abc.query.criteria.Criteria;
 
 public interface ABCExecuteService {
 	/**
@@ -22,7 +23,7 @@ public interface ABCExecuteService {
 	 * @param data
 	 * @return
 	 */
-	SocialEntity createSocialEntity(Map<String, String> data);
+	Entity createSocialEntity(Map<String, String> data);
 	
 	People mergePeople(Map<String, String> data) throws IOException;
 
@@ -64,4 +65,13 @@ public interface ABCExecuteService {
 	 */
 	void deletePeople(String peopleCode);
 
+	/**
+	 * 
+	 * @param peopleCode
+	 * @param date
+	 * @return
+	 */
+	People getHistoryPeople(String peopleCode, Date date);
+
+	
 }

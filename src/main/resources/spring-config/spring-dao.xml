@@ -70,6 +70,17 @@
             <tx:method name="*" propagation="SUPPORTS"/>
         </tx:attributes>
     </tx:advice>
+    
+    <bean id="jedicaConfig" class="cn.sowell.copframe.jedica.JedicaConfig">
+		<constructor-arg value="classpath:jedica.properties" />
+	</bean>
+	<bean class="cn.sowell.copframe.jedica.JedicaFactory" >
+		<property name="config" ref="jedicaConfig"/>
+		<property name="entryGetter" >
+			<bean class="cn.sowell.datacenter.model.redis.service.impl.PeopleEntryGetter" />
+		</property>
+	</bean>
+    
     <!-- 通用事务的AOP配置， -->
 	<aop:config>
 		<aop:pointcut id="interceptorPointCuts"

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,7 +25,7 @@ import cn.sowell.copframe.utils.Assert;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.excel.poi.PoiCellReader;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
-import cn.sowell.datacenter.model.people.status.ImportStatus;
+import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
 
 import com.abc.application.DataSource;
 import com.abc.application.PeopleFusion;
@@ -33,13 +33,14 @@ import com.abc.application.PeopleRelationFusion;
 import com.abc.application.PeopleRemoveFusion;
 import com.abc.mapping.MappingNodeAnalysis;
 import com.abc.mapping.entity.Entity;
-import com.abc.mapping.entity.SocialEntity;
+import com.abc.mapping.entity.RecordEntity;
 import com.abc.mapping.node.ABCNode;
 import com.abc.people.People;
 import com.abc.people.PeopleRelation;
-import com.abc.people.RelationShip;
-import com.abc.query.querypeople.Criteria;
-import com.abc.query.querypeople.impl.SortedPagedQuery;
+import com.abc.people.PeopleTracker;
+import com.abc.query.criteria.Criteria;
+import com.abc.query.criteria.SortedCriteria;
+import com.abc.query.people.impl.PeopleSortedPagedQuery;
 
 @Service
 public class ABCExecuteServiceImpl implements ABCExecuteService{
@@ -94,25 +95,28 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	
 	@Override
-	public SocialEntity createSocialEntity(Map<String, String> data) {
+	public Entity createSocialEntity(Map<String, String> data) {
 		Assert.notNull(data);
-		SocialEntity entity = new SocialEntity(mapperName);
+		Entity entity = new Entity(mapperName);
 		for (Entry<String, String> entry : data.entrySet()) {
-			entity.setValue(entry.getKey(), entry.getValue());
+			entity.putValue(entry.getKey(), entry.getValue());
 		}
 		return entity;
 	}
 	
 	@Override
 	public People mergePeople(Map<String, String> data) throws IOException {
-		SocialEntity socialEntity = createSocialEntity(data);
+		Entity socialEntity = createSocialEntity(data);
 		People people = createPeople(getABCNode(), socialEntity);
-		people = peopleFusion.fuseStrange(people, writeMappingName, DataSource.SOURCE_EDIT);
-		logger.debug(people.getJson(getABCNode().getTitle()));
+		
+		List<PeopleRelation> peopleRelations = createPeopleRelation(getABCNode(), people, socialEntity);
+		people = peopleFusion.fuseStrange(people,writeMappingName, DataSource.SOURCE_POLIC);
+		logger.debug(people.getPeopleCode() + " : " + people.getJson(getABCNode().getTitle()));
+		people = relationFusion.fuse(people, peopleRelations, writeMappingName, DataSource.SOURCE_POLIC);
 		return people;
 	}
 	
-	private People createPeople(ABCNode abcNode, SocialEntity socialEntity) {
+	private People createPeople(ABCNode abcNode, Entity socialEntity) {
 		People people = new People();
 		people.addMapping(abcNode);
 		people.addEntity(socialEntity);
@@ -122,11 +126,11 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public List<People> queryPeopleList(List<Criteria> criterias, PageInfo pageInfo){
-		SortedPagedQuery sortedPagedQuery = new SortedPagedQuery(criterias, getABCNode(), "编辑时间");
-		sortedPagedQuery.setSortedDESC();
+		PeopleSortedPagedQuery sortedPagedQuery = new PeopleSortedPagedQuery(criterias, getABCNode(), "编辑时间", SortedCriteria.TYPE_DESC);
 		sortedPagedQuery.setPageSize(pageInfo.getPageSize());
 		pageInfo.setCount(sortedPagedQuery.getAllCount());
-		return sortedPagedQuery.visit(pageInfo.getPageNo());
+		List<People> peoples = sortedPagedQuery.visit(pageInfo.getPageNo());
+		return peoples;
 	}
 	
 	@Override
@@ -137,7 +141,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public People getPeople(String peopleCode) {
-		SortedPagedQuery sortedPagedQuery = new SortedPagedQuery(null, getABCNode(), null);
+		PeopleSortedPagedQuery sortedPagedQuery = new PeopleSortedPagedQuery(null, getABCNode(), null);
 		People people = sortedPagedQuery.visit(peopleCode);
 		people.addMapping(getABCNode());
 		return people;
@@ -175,18 +179,12 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 			}
 			importStatus.setCurrent(rownum - 2);
 			importStatus.appendMessage("导入第" + importStatus.getCurrent() + "条数据");
-			SocialEntity socialEntity = createSocialEntity(abcNode, headerRow, row);
+			Entity socialEntity = createSocialEntity(abcNode, headerRow, row);
 			People people = createPeople(sheet, headerRow, abcNode, socialEntity);
 			List<PeopleRelation> peopleRelations = createPeopleRelation(abcNode, people, socialEntity);
 			people = peopleFusion.fuseStrange(people, writeMappingName, DataSource.SOURCE_POLIC);
 			logger.debug(people.getPeopleCode() + " : " + people.getJson(abcNode.getTitle()));
 			people = relationFusion.fuse(people,peopleRelations, writeMappingName, DataSource.SOURCE_POLIC);
-			if(people != null && people.getRelationShip() != null){
-				Collection<RelationShip> ships = people.getRelationShip();
-				for (RelationShip ship : ships) {
-					logger.debug(ship);
-				}
-			}
 			importStatus.appendMessage("第" + importStatus.getCurrent() + "条数据导入完成，用时" + numberFormat.format(importStatus.lastInterval()));
 		}
 		importStatus.appendMessage("导入完成");
@@ -203,7 +201,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	}
 
 	protected  People createPeople(Sheet sheet, Row headerRow, ABCNode abcNode,
-			SocialEntity socialEntity) {
+			Entity socialEntity) {
 		People people = new People();
 		people.addMapping(abcNode);
 		people.addEntity(socialEntity);
@@ -212,15 +210,15 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	}
 
 	protected  List<PeopleRelation> createPeopleRelation(ABCNode abcNode,
-			People people, SocialEntity socialEntity) {
+			People people, Entity socialEntity) {
 		List<PeopleRelation> peopleRelations = new ArrayList<PeopleRelation>();
-		for (String key : socialEntity.getRelationKeys()) {
-			List<Entity> entitys = socialEntity.getRelations(key);
+		for (String key : socialEntity.getRelationNames()) {
+			List<RecordEntity> entitys = socialEntity.getRelations(key);
 			PeopleRelation peopleRelation = new PeopleRelation(
 					abcNode.getRelation(key));
 			peopleRelation.setHost(people);
-			for (Entity entity : entitys) {
-				peopleRelation.addRelated(entity);
+			for (RecordEntity entity : entitys) {
+				peopleRelation.addRelated(entity.getEntity());
 			}
 			peopleRelations.add(peopleRelation);
 		}
@@ -230,9 +228,9 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		return peopleRelations;
 	}
 
-	protected  SocialEntity createSocialEntity(ABCNode abcNode, Row headerRow,
+	protected  Entity createSocialEntity(ABCNode abcNode, Row headerRow,
 			Row row) {
-		SocialEntity entity = new SocialEntity(mapperName);
+		Entity entity = new Entity(mapperName);
 		int length = headerRow.getPhysicalNumberOfCells();
 		for (int i = 0; i < length; i++) {
 			Cell cell = row.getCell(i);
@@ -241,16 +239,16 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 			if (headerRow.getCell(i).getStringCellValue().equals("家庭医生")) {
 				if (TextUtils.hasText(value)) {
 					Entity relationentity = new Entity("familydoctor");
-					relationentity.setValue(headerRow.getCell(i)
+					relationentity.putValue(headerRow.getCell(i)
 							.getStringCellValue(), value);
-					entity.addRelation("家庭医生", relationentity);
+					entity.putRelationEntity("家庭医生信息", "家庭医生", relationentity);
 				}
 			} else {
 				if(cell.getCellTypeEnum() == CellType.ERROR) {
 					logger.warn("ERROR Type row number:" + row.getRowNum()
 							+ " ; cell number:" + i + ";");
 				}else{
-					entity.setValue(headerRow.getCell(i).getStringCellValue(), value);
+					entity.putValue(headerRow.getCell(i).getStringCellValue(), value);
 				}
 			}
 		}
@@ -262,6 +260,16 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		if(!peopleRemoveFusion.remove(peopleCode, null, "test")){
 			throw new RuntimeException("删除失败");
 		}
+	}
+	
+	@Override
+	public People getHistoryPeople(String peopleCode, Date date) {
+		PeopleTracker peopleTracker=new PeopleTracker(peopleCode,date);
+		People people=peopleTracker.getPeople();
+		if(people != null){
+			people.addMapping(getABCNode());
+		}
+		return people;
 	}
 	
 	

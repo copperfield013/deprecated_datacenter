@@ -4,7 +4,7 @@ import java.util.List;
 
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
-import cn.sowell.datacenter.model.people.pojo.criteria.PeopleDataCriteria;
+import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 
 public interface ABCPeopleDao {
 

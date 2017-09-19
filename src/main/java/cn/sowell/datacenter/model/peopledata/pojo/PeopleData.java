@@ -1,14 +1,17 @@
-package cn.sowell.datacenter.model.people.pojo;
+package cn.sowell.datacenter.model.peopledata.pojo;
 
+import java.lang.reflect.Field;
 import java.util.Date;
 
-import javax.persistence.Column;
+import cn.sowell.datacenter.model.peopledata.ABCAttribute;
 
 
 public class PeopleData {
 	
+	@ABCAttribute(ignored=true)
 	private Long id;
 	
+	@ABCAttribute("peoplecode")
 	private String peopleCode;
 	
 	private String name;
@@ -21,6 +24,7 @@ public class PeopleData {
 	
 	private String address;
 	
+	@ABCAttribute("contact1")
 	private String contact;
 	
 	private String nativePlace;
@@ -38,6 +42,21 @@ public class PeopleData {
 	private String healthCondition;
 	
 	private String peopleType;
+	
+	@ABCAttribute(value="家庭医生", entityName="familyDoctor")
+	private PeopleDataRelation familyDoctor;
+	
+	private String lowIncomeInsuredCode;
+	
+	//低保人员类别
+	private String lowIncomeInsuredType;
+	
+	private String handicappedCode;
+	
+	private String handicappedType;
+	
+	private String handicappedLevel;
+	
 	
 	public Long getId() {
 		return id;
@@ -168,5 +187,52 @@ public class PeopleData {
 		this.gender = gender;
 	}
 
+	public PeopleDataRelation getFamilyDoctor() {
+		return familyDoctor;
+	}
+
+	public void setFamilyDoctor(PeopleDataRelation familyDoctor) {
+		this.familyDoctor = familyDoctor;
+	}
+
+	public String getLowIncomeInsuredCode() {
+		return lowIncomeInsuredCode;
+	}
+
+	public void setLowIncomeInsuredCode(String lowIncomeInsuredCode) {
+		this.lowIncomeInsuredCode = lowIncomeInsuredCode;
+	}
+
+	public String getHandicappedCode() {
+		return handicappedCode;
+	}
+
+	public void setHandicappedCode(String handicappedCode) {
+		this.handicappedCode = handicappedCode;
+	}
+
+	public String getHandicappedType() {
+		return handicappedType;
+	}
+
+	public void setHandicappedType(String handicappedType) {
+		this.handicappedType = handicappedType;
+	}
+
+	public String getHandicappedLevel() {
+		return handicappedLevel;
+	}
+
+	public void setHandicappedLevel(String handicappedLevel) {
+		this.handicappedLevel = handicappedLevel;
+	}
+
+	public String getLowIncomeInsuredType() {
+		return lowIncomeInsuredType;
+	}
+
+	public void setLowIncomeInsuredType(String lowIncomeInsuredType) {
+		this.lowIncomeInsuredType = lowIncomeInsuredType;
+	}
 
 }

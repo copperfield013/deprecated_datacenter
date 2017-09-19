@@ -16,7 +16,7 @@ import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.datacenter.model.basepeople.dao.ABCPeopleDao;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
-import cn.sowell.datacenter.model.people.pojo.criteria.PeopleDataCriteria;
+import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 
 @Repository
 public class ABCPeopleDaoImpl implements ABCPeopleDao{
