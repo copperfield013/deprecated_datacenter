@@ -26,22 +26,21 @@ import com.abc.application.PeopleFusion;
 import com.abc.application.PeopleRelationFusion;
 import com.abc.mapping.MappingNodeAnalysis;
 import com.abc.mapping.entity.Entity;
-import com.abc.mapping.entity.SocialEntity;
+import com.abc.mapping.entity.RecordEntity;
 import com.abc.mapping.node.ABCNode;
 import com.abc.people.People;
 import com.abc.people.PeopleRelation;
-import com.abc.people.RelationShip;
 
 @ContextConfiguration(locations = "classpath*:spring-core.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
 public class EditPeopleTest {
 	private static Logger logger = Logger.getLogger(EditPeopleTest.class);
 
-	@Resource(name="MappingNodeAnalysis")
+	@Resource(name = "MappingNodeAnalysis")
 	MappingNodeAnalysis analysis;
-	@Resource(name="PeopleFusion")
+	@Resource(name = "PeopleFusion")
 	PeopleFusion peopleFusion;
-	@Resource(name="PeopleRelationFusion")
+	@Resource(name = "PeopleRelationFusion")
 	PeopleRelationFusion relationFusion;
 
 	private String mapperName = "baseinfoImport";
@@ -52,6 +51,7 @@ public class EditPeopleTest {
 	private String mappingfilepath = getClass().getResource("/").getFile()
 			+ "../classes/mapping/baseinfoImport.xml";
 	protected String writeMappingName = "goodnode_polic";
+
 	@Test
 	public void editPeople() {
 
@@ -80,7 +80,7 @@ public class EditPeopleTest {
 			e.printStackTrace();
 		} finally {
 			try {
-				if(fis!=null){
+				if (fis != null) {
 					fis.close();
 				}
 			} catch (IOException e) {
@@ -102,45 +102,42 @@ public class EditPeopleTest {
 
 	private void execute(Sheet sheet, Row headerRow, ABCNode abcNode) {
 		Row row = sheet.getRow(2);
-		SocialEntity socialEntity = createSocialEntity(abcNode, headerRow, row);
-		People people = createPeople(sheet, headerRow, abcNode, socialEntity);
+		Entity entity = createEntity(abcNode, headerRow, row);
+		People people = createPeople(sheet, headerRow, abcNode, entity);
 		List<PeopleRelation> peopleRelations = createPeopleRelation(abcNode,
-				people, socialEntity);
+				people, entity);
 		people = peopleFusion.edit(people);
 		logger.debug(people.getJson(abcNode.getTitle()));
-//		people = relationFusion.editFuse(people,peopleRelations);
-		people = peopleFusion.fuseStrange(people, writeMappingName, DataSource.SOURCE_EDIT);
-		Collection<RelationShip> ships = people.getRelationShip();
-		for (RelationShip ship : ships) {
-			logger.debug(ship);
-		}
+		// people = relationFusion.editFuse(people,peopleRelations);
+		people = peopleFusion.fuseStrange(people, writeMappingName,
+				DataSource.SOURCE_EDIT);
 	}
 
 	private People createPeople(Sheet sheet, Row headerRow, ABCNode abcNode,
-			SocialEntity socialEntity) {
+			Entity entity) {
 		People people = new People();
 		people.addMapping(abcNode);
-		socialEntity.setValue("peoplecode", "a526bd2fa93b4375a5b76506b8651a33");
-		people.addEntity(socialEntity);
-//		Attribute attribute =AttributeFactory.newInstance(
-//				AttributeMatedata.ABC_PEOPLECODE,
-//				"a526bd2fa93b4375a5b76506b8651a37");
-//		people.getPeopleRecord().putAttribute(attribute);
-		
+		entity.putValue("peoplecode", "a526bd2fa93b4375a5b76506b8651a33");
+		people.addEntity(entity);
+		// Attribute attribute =AttributeFactory.newInstance(
+		// AttributeMatedata.ABC_PEOPLECODE,
+		// "a526bd2fa93b4375a5b76506b8651a37");
+		// people.getPeopleRecord().putAttribute(attribute);
+
 		logger.debug(people.getJson(mapperName));
 		return people;
 	}
 
 	private List<PeopleRelation> createPeopleRelation(ABCNode abcNode,
-			People people, SocialEntity socialEntity) {
+			People people, Entity entity) {
 		List<PeopleRelation> peopleRelations = new ArrayList<PeopleRelation>();
-		for (String key : socialEntity.getRelationKeys()) {
-			List<Entity> entitys = socialEntity.getRelations(key);
+		for (String key : entity.getRecordEntityNames()) {
+			List<RecordEntity> entitys = entity.getRelations(key);
 			PeopleRelation peopleRelation = new PeopleRelation(
 					abcNode.getRelation(key));
 			peopleRelation.setHost(people);
-			for (Entity entity : entitys) {
-				peopleRelation.addRelated(entity);
+			for (RecordEntity re : entitys) {
+				peopleRelation.addRelated(re.getEntity());
 			}
 			peopleRelations.add(peopleRelation);
 		}
@@ -150,9 +147,8 @@ public class EditPeopleTest {
 		return peopleRelations;
 	}
 
-	private SocialEntity createSocialEntity(ABCNode abcNode, Row headerRow,
-			Row row) {
-		SocialEntity entity = new SocialEntity(mapperName);
+	private Entity createEntity(ABCNode abcNode, Row headerRow, Row row) {
+		Entity entity = new Entity(mapperName);
 		int length = headerRow.getPhysicalNumberOfCells();
 		for (int i = 0; i < length; i++) {
 			Cell cell = row.getCell(i);
@@ -160,19 +156,18 @@ public class EditPeopleTest {
 				if (cell.getStringCellValue() != null
 						&& !cell.getStringCellValue().equals("")) {
 					Entity relationentity = new Entity(familyDoctorMapper);
-					relationentity.setValue(headerRow.getCell(i)
-							.getStringCellValue(), cell.getStringCellValue());
-					entity.addRelation("家庭医生", relationentity);
+					relationentity.putValue("姓名", cell.getStringCellValue());
+					entity.putRelationEntity("家庭医生信息", "家庭医生", relationentity);
 				}
 			} else {
 				if (cell.getCellTypeEnum() == CellType.NUMERIC) {
-					entity.setValue(headerRow.getCell(i).getStringCellValue(),
+					entity.putValue(headerRow.getCell(i).getStringCellValue(),
 							String.valueOf(cell.getNumericCellValue()));
 				} else if (cell.getCellTypeEnum() == CellType.ERROR) {
 					logger.warn("ERROR Type row number:" + row.getRowNum()
 							+ " ; cell number:" + i + ";");
 				} else {
-					entity.setValue(headerRow.getCell(i).getStringCellValue(),
+					entity.putValue(headerRow.getCell(i).getStringCellValue(),
 							cell.getStringCellValue());
 				}
 			}

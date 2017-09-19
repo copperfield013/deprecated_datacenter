@@ -35,11 +35,16 @@
 	<label name="三无老人" alias="三无老人"  subdomain="三无老人" />
 	<label name="是否有车" alias="是否有车"  subdomain="有车" />
 	<label name="peopleType" alias="人口类型"   subdomain="户籍人口,流动人口" />
-	<record class="" name="education history" alias="教育经历" abcattr="教育经历">
-		<attribute name="school name" alias="院校名称" abcattr="院校名称" />
-		<attribute name="enter date" alias="入职日期" datatype="DATE"
-			abcattr="入学日期" />
+	
+	<record name="教育经历">
+	    <label subdomain="教育经历" />
+		<ABC name="education history" abcattr="教育经历">
+			<attribute name="school name" alias="院校名称" abcattr="院校名称" />
+			<attribute name="enter date" alias="入职日期" datatype="DATE"
+				abcattr="入学日期" />
+		</ABC>
 	</record>
+
 	<relation name="家庭医生信息" >
 		<label subdomain="家庭医生"  />
 		<ABC name="familydoctor">

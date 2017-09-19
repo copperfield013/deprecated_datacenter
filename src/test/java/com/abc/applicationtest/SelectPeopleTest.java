@@ -15,11 +15,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.abc.mapping.MappingNodeAnalysis;
 import com.abc.mapping.node.ABCNode;
 import com.abc.people.People;
-import com.abc.query.querypeople.Criteria;
-import com.abc.query.querypeople.criteria.InequalQueryCriteria;
-import com.abc.query.querypeople.criteria.LikeQueryCriteria;
-import com.abc.query.querypeople.criteria.QueryCriteria;
-import com.abc.query.querypeople.impl.SortedPagedQuery;
+import com.abc.query.criteria.Criteria;
+import com.abc.query.criteria.InequalQueryCriteria;
+import com.abc.query.criteria.LikeQueryCriteria;
+import com.abc.query.criteria.QueryCriteria;
+import com.abc.record.impl.Record;
+import com.abc.query.people.impl.PeopleSortedPagedQuery;
 
 @ContextConfiguration(locations = "classpath*:spring-core.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -68,7 +69,7 @@ public class SelectPeopleTest {
 	
 	@Test
 	public void selectPeopleByPeopleCode() {
-		SortedPagedQuery sortedPagedQuery = new SortedPagedQuery(null,
+		PeopleSortedPagedQuery sortedPagedQuery = new PeopleSortedPagedQuery(null,
 				null, null);
 		try {
 			ABCNode abcNode = analysis.analysis(mappingfilepath);
@@ -87,7 +88,7 @@ public class SelectPeopleTest {
 		long startTime = System.currentTimeMillis();
 		try {
 			abcNode = analysis.analysis(mappingfilepath);
-			SortedPagedQuery sortedPagedQuery = new SortedPagedQuery(criterias,
+			PeopleSortedPagedQuery sortedPagedQuery = new PeopleSortedPagedQuery(criterias,
 					abcNode, "出生日期");
 			// sortedPagedQuery.setSortedASC();//默认为降序
 			sortedPagedQuery.setPageSize(3);
