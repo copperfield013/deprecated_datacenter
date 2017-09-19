@@ -189,18 +189,16 @@ define(function(require, exports, module){
 			}
 			tab = tab || Tab.getLastTab();
 			if(tabMap[tab.getId()]){
-				var warpWidth = parseFloat(tab.getTitleDom().parent().parent().css("width"));
-				var nextWidth = parseFloat(this.getTitleDom().text().length-1)*13+42;
+				this.getTitleDom().insertAfter(tab.getTitleDom());					
+				var warpWidth = parseFloat(tab.getTitleDom().closest(".tab-warp").css("width"));
+				var nextWidth = parseFloat(this.getTitleDom().css("width"));
 				var ulWidth = parseFloat(tab.getTitleDom().parent().css("width"));
-				var totalWidth = nextWidth+ulWidth-1;
-				var moveWidth = totalWidth -warpWidth +34;
-				tab.getTitleDom().parent().css("width",totalWidth);
-				if(totalWidth >= warpWidth){
+				var moveWidth = ulWidth-nextWidth -warpWidth +34;
+				if(ulWidth >= warpWidth){
 					$('a.move').css("display","block");
 					tab.getTitleDom().parent().css("left",-moveWidth);
 				}
-				//前面的标签已经显示
-				this.getTitleDom().insertAfter(tab.getTitleDom());	
+				//前面的标签已经显示				
 				this.getContent().insertAfter(tab.getContent());
 				var origin = tabMap[this.getId()];
 				if(origin){
@@ -222,7 +220,7 @@ define(function(require, exports, module){
 			if($(".move").css("display") === "block"){
 				var ulDom = $("#main-tab-title-container")
 				var ulWidth = parseFloat(ulDom.css("width"));
-				var warpWidth =parseFloat(ulDom.parent().css("width"));
+				var warpWidth =parseFloat(ulDom.closest(".tab-warp").css("width"));
 				var thisWidth =parseFloat(this.getTitleDom().css("width"));
 				var index = this.getTitleDom().index();
 				var excursion = 0;
@@ -232,9 +230,9 @@ define(function(require, exports, module){
 				}
 				if(excursion <-leftLimit){
 					ulDom.css('left',34-excursion);
-					console.log("iam in left");
+					console.log("i am in left");
 				}else if( excursion+thisWidth+leftLimit > warpWidth){
-					ulDom.css('left',-(excursion+2+thisWidth-warpWidth+34));
+					ulDom.css('left',-(excursion+thisWidth-warpWidth+34));
 					console.log("i am in right");
 				}	
 			}
@@ -253,12 +251,12 @@ define(function(require, exports, module){
 		 */
 		this.close = function(activateTabId){
 			var ulDom = $("#main-tab-title-container")
-			var warpWidth = parseFloat(ulDom.parent().css("width"));
+			var warpWidth = parseFloat(ulDom.closest(".tab-warp").css("width"));
 			var result = param.onClose(this);
-			var closeWidth = param.title.length*13+42;
+			var closeWidth = parseFloat(this.getTitleDom().css("width"));
 			var ulWidth = parseFloat(ulDom.css("width"));
 			var ulLeft = parseFloat(ulDom.css("left"));
-			var finalWidth = ulWidth - closeWidth+1;
+			var finalWidth = ulWidth - closeWidth;
 			if(result === false){
 				return this;
 			}
@@ -274,7 +272,9 @@ define(function(require, exports, module){
 				var nextTab = this.getNextTab();
 				if(nextTab){
 					nextTab.activate();
+					console.log("next");
 				}else{
+					console.log("prev")
 					var prevTab = this.getPrevTab();
 					if(!(prevTab instanceof Tab)){
 						$CPF.getParam('defaultTab').activate();
@@ -289,9 +289,10 @@ define(function(require, exports, module){
 			this.getTitleDom().remove();
 			this.getContent().remove();
 			this.destruct();
-			ulDom.css("width",finalWidth);
 			if(finalWidth >= warpWidth){
-				ulDom.css("left",ulLeft-closeWidth)
+				if(ulLeft < 0){
+					ulDom.css("left",ulLeft+closeWidth)
+				}				
 			}
 			if(finalWidth < warpWidth){
 				ulDom.css("left",0);
@@ -333,8 +334,8 @@ define(function(require, exports, module){
 			var ulDom = $("#main-tab-title-container");
 			var ulWidth = parseFloat(ulDom.css("width"));
 			var leftWidth = parseFloat(ulDom.css("left"));
-			var warpWidth = parseFloat(ulDom.parent().css("width"));
-			var moveDistance = parseFloat(ulDom.children().last().css("width"));
+			var warpWidth = parseFloat(ulDom.closest(".tab-warp").css("width"));
+			var moveDistance = parseFloat(ulDom.children().last().css("width"));			
 			if($(this).hasClass("left")){
 				if(-leftWidth<moveDistance){
 					ulDom.css("left",34)

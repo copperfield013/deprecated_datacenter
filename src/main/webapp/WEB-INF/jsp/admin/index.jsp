@@ -57,7 +57,7 @@
 					<div class="tabbable">	
 						<div class="tab-warp">
 							<a href="javascript:;" class="move left">◀</a>	
-								<div>	
+								<div class="nav-tabs-wrap">	
 									<ul class="nav nav-tabs" id="main-tab-title-container">
 										<li class="active main-tab-title">
 										    <a data-toggle="tab" href="#cpf-home-tab">

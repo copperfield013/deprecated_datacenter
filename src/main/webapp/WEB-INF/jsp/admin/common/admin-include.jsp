@@ -10,6 +10,8 @@
 
 <!--Beyond styles-->
 <link id="beyond-link" href="media/admin/plugins/beyond/css/beyond.min.css" rel="stylesheet" type="text/css" />
+
+<link href="media/admin/plugins/beyond/js/datetimepicker/css/bootstrap-datetimepicker.css" rel="stylesheet" />  
 <!--  -->
 <link href="media/admin/cpf/css/cpf-main.css" rel="stylesheet" type="text/css" />
 
@@ -17,5 +19,7 @@
 <script src="${basePath }media/jquery-1.11.3.js"></script>
 <script src="${basePath }media/jquery.fix.clone.js"></script>
 <script src="${basePath }media/common/plugins/jquery.tmpl.js"></script>
+<script src="media/admin/plugins/beyond/js/datetimepicker/js/bootstrap-datetimepicker.js"></script>
+<script type="text/javascript" src="media/admin/plugins/beyond/js/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
 <!-- SeaJS -->
 <script src="${basePath }media/sea-debug.js"></script>
