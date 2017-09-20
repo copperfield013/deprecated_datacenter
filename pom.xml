@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>cn.sowell.copframe</groupId>
 			<artifactId>cpf-jedica</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.2</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework</groupId>
