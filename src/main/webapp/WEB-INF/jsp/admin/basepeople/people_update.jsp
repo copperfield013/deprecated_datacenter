@@ -60,14 +60,7 @@
 								for="0">女</label>
 						</div>
 					</div>
-					<div class="form-group">
-						<label class="col-lg-2 control-label" for="birthday">生日</label>
-						<div class="col-lg-5">
-							<input type="text" class="form-control" id="date" name="birthday"
-								readonly="readonly" css-cursor="text"
-								value="${people.birthday }" />
-						</div>
-					</div>
+
 					<div class="form-group">
 						<label class="col-lg-2 control-label" for="address">居住地址</label>
 						<div class="col-lg-5">
@@ -156,26 +149,74 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
 			}
 	});
 
+/**
+ *  根据传回的type生成相应的输入框
+ *  1.基础文本输入框  input
+ *  2.选择按钮
+ *  3.下拉选择框
+ *  4.date时间控件
+ *  5.other
+ * *
+ * **/
+
+	function addSmartSerarch(json,SearchWord,SearchWordEnglish,peopleid,$page){
+	debugger;
+	var basehtml ='<form class="bv-form form-horizontal validate-form" action="admin/people/do_update">' +
+        '<input type="hidden" name="id" value="'+peopleid+'" />';
+	switch(json.type){
+		case  "1":
+		    $("#clone").append(basehtml +
+                '<div class="form-group">' +
+                '<label class="col-lg-2 control-label" for="'+SearchWordEnglish+'" >'+SearchWord+'</label>' +
+                '<div class="col-lg-5">' +
+                '<input type="text" class="form-control" name="'+SearchWordEnglish+
+				'" value="'+json.data[SearchWordEnglish]+'"  />' +
+                '</div>' +
+                '</div>'+
+				"<button class=\"btn btn-labeled btn-palegreen\" id='check'>\n" +
+				"<i class=\"btn-label glyphicon glyphicon-ok\"></i>确认</button>" +
+                "<button class=\"btn btn-labeled btn-darkorange\" id='remove'>  \n" +
+				" <i class=\"btn-label glyphicon glyphicon-remove\"></i>取消</button></form>");
+				break;
+
+        case  "2": alert("check");break;
+        case  "3": alert("check radio");break;
+        case  "4": alert("dateutil");
+            $("#clone").append(basehtml +
+        '<div class="form-group">' +
+                '<label class="col-lg-2 control-label" for="'+SearchWordEnglish+'">'+SearchWord+'</label>' +
+                '<div class="col-lg-5">' +
+                '<input type="text" class="form-control" id="smartdate" name="'+SearchWord+'"' +
+                'readonly="readonly" css-cursor="text"' +
+                'value='+new Date(json.data[SearchWordEnglish]).toLocaleString()+' />' +
+                '</div>' +
+                '</div>');
+            Utils.datepicker($('#smartdate', $page));
+        break;
+		default: alert("2");
+	}
+    }
 
 		$("#smartSubmit").click(function(){
-		    debugger;
+
 		    var peopleid=1;
-            SearchWord = "姓名222222";
-            var SearchWordEnglish="name";
+            SearchWord = "日期";
+            var SearchWordEnglish="idcode";
             Ajax.ajax('admin/people/smartSearch',{
                 peopleid : peopleid
             },function(json) {
-
-                $("#clone").append('<form class="bv-form form-horizontal validate-form" action="admin/people/do_update">' +
-                '<input type="hidden" name="id" value="'+peopleid+'" />' +
-                '<div class="form-group">' +
-                '<label class="col-lg-2 control-label" for="name" >'+SearchWord+'</label>' +
-                '<div class="col-lg-5">' +
-                '<input type="text" class="form-control" name="name" value="'+json.status+'"  id="姓名"/>' +
-                '</div>' +
-                '</div>'+
-				"<button class=\"btn btn-labeled btn-palegreen\" id='check'>\n" + "<i class=\"btn-label glyphicon glyphicon-ok\"></i>确认</button>" +
-                "<button class=\"btn btn-labeled btn-darkorange\" id='remove'>  \n" + " <i class=\"btn-label glyphicon glyphicon-remove\"></i>取消</button></form>");
+                addSmartSerarch(json,SearchWord,SearchWordEnglish,peopleid,$page);
+//
+//                $("#clone").append('<form class="bv-form form-horizontal validate-form" action="admin/people/do_update">' +
+//                '<input type="hidden" name="id" value="'+peopleid+'" />' +
+//                '<div class="form-group">' +
+//                '<label class="col-lg-2 control-label" for="name" >'+SearchWord+'</label>' +
+//                '<div class="col-lg-5">' +
+//                '<input type="text" class="form-control" name="name" value="'+json.status+'"  id="姓名"/>' +
+//                '</div>' +
+//                '</div>'+
+//				"<button class=\"btn btn-labeled btn-palegreen\" id='check'>\n" + "<i class=\"btn-label glyphicon glyphicon-ok\"></i>确认</button>" +
+//                "<button class=\"btn btn-labeled btn-darkorange\" id='remove'>  \n" + " <i class=\"btn-label glyphicon glyphicon-remove\"></i>取消</button></form>");
             });
 
 //			SearchWord = "姓名";

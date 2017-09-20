@@ -73,7 +73,7 @@ public class AdminBasePeopleController {
 	@RequestMapping("/do_update")
 	public AjaxPageResponse doUpdate(BasePeople people){
 		try {
-			basePeopleService.update(people);
+			//basePeopleService.update(people);
 			//return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改成功", "people_list");
 			return AjaxPageResponse.REFRESH_LOCAL("123");
 		} catch (Exception e) {
@@ -133,7 +133,7 @@ public class AdminBasePeopleController {
 		BasePeople people = basePeopleService.getPeople(peopleid);
 		ResultDto Res = new ResultDto();
 		Res.setData(people);
-		Res.setType("2");
+		Res.setType("1");
 		Res.setStatus("success");
 		return Res;
 	}
