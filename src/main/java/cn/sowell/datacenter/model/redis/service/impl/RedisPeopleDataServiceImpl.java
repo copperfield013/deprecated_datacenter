@@ -6,10 +6,10 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
 import cn.sowell.copframe.jedica.JedicaFactory;
+import cn.sowell.copframe.jedica.RedisEntry;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
 import cn.sowell.datacenter.model.redis.service.RedisPeopleDataService;
 
-import com.abc.people.People;
 import com.abc.record.impl.Record;
 
 @Repository
@@ -27,18 +27,18 @@ public class RedisPeopleDataServiceImpl implements RedisPeopleDataService{
 	
 	
 	@Override
-	public People getPeople(String peopleCode) {
-		jFactory.runWithJedica(jedica->{
-			PeopleEntry entry;
+	public Record getRecord(String peopleCode) {
+		return (Record) jFactory.returnByJedica(jedica->{
 			try {
-				entry = (PeopleEntry) jedica.get(peopleCode);
-				Record record = entry.getValue();
-				logger.debug(record.toJson());
+				RedisEntry<?> entry = jedica.get(peopleCode);
+				if(entry != null){
+					return entry.getValue();
+				}
 			} catch (Exception e) {
-				e.printStackTrace();
 			}
+			return null;
 		}, JedicaFactory.READ);
-		return null;
+		
 	}
 
 }

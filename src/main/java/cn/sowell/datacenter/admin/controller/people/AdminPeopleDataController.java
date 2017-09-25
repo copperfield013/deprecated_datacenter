@@ -117,8 +117,9 @@ public class AdminPeopleDataController {
 	public JsonResponse doImport(MultipartFile file, String sheetName, HttpSession session){
 		JsonResponse jRes = new JsonResponse();
 		jRes.setStatus("error");
-		if(session.getAttribute(KEY_IMPORT_STATUS) != null){
-			jRes.put("msg", "尚有导入任务没有完成。");
+		ImportStatus beforeStatus = (ImportStatus) session.getAttribute(KEY_IMPORT_STATUS);
+		if(beforeStatus != null){
+			beforeStatus.breakImport();
 		}else{
 			String fileName = file.getOriginalFilename();
 			Workbook wk = null;
@@ -175,6 +176,7 @@ public class AdminPeopleDataController {
 			jRes.put("totalCount", importStatus.getTotal());
 			jRes.put("current", importStatus.getCurrent());
 			jRes.put("message", importStatus.getCurrentMessage());
+			jRes.put("lastInterval", importStatus.lastInterval());
 			if(importStatus.breaked()){
 				jRes.put("breaked", true);
 			}else if(importStatus.ended()){

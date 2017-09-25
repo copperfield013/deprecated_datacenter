@@ -11,7 +11,7 @@
 	<properties>
 		<version.kie>6.5.0.Final</version.kie>
 		<version.cpfweb>0.2.2</version.cpfweb>
-		<version.abc>1.6.14</version.abc>
+		<version.abc>1.7.2</version.abc>
 	</properties>
 	
 	<dependencies>
@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>cn.sowell.copframe</groupId>
 			<artifactId>cpf-jedica</artifactId>
-			<version>0.0.2</version>
+			<version>0.0.3</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework</groupId>

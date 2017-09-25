@@ -47,7 +47,11 @@
 			        		<a class="btn btn-block btn-defualt" id="break" css-display="none">停止导入</a>
 				        </div>
 					</div>
-					
+					<div class="form-group">
+						<div class="col-lg-6 col-lg-offset-2" id="feedback-msg">
+							
+						</div>
+					</div>
 				</form>
 			</div>
 		</div>
@@ -56,6 +60,7 @@
 <script>
 	seajs.use(['ajax', 'dialog'], function(Ajax, Dialog){
 		var $page = $('#peopledata-import');
+		var $feedback = $('#feedback-msg', $page);
 		$('#submit', $page).click(function(){
 			Dialog.confirm('确认导入？', function(yes){
 				if(yes){
@@ -74,10 +79,21 @@
 											.css('width', percent + '%')
 											.find('span')
 												.text(percent + '%');
-										console.log(progress);
+										var remain = data.totalCount - data.current;
+										
+										
 										if(progress >= 1){
 											Dialog.notice('导入完成');
 											clearInterval(timer);
+											$feedback.text('');
+										}else{
+											var msg = data.message + ',' 
+														+ '剩余' + remain + '条';
+											if(data.lastInterval && data.lastInterval > 0){
+												msg += '，当前速率' + parseFloat(1000/data.lastInterval).toFixed(2) + '条/秒，'
+												+ '预计剩余时间' + parseFloat(remain * data.lastInterval / 1000).toFixed(0) + '秒'
+											}
+											$feedback.text(msg);
 										}
 									}
 								}else{

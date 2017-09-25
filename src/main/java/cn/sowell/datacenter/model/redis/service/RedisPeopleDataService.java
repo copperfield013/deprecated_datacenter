@@ -1,9 +1,9 @@
 package cn.sowell.datacenter.model.redis.service;
 
-import com.abc.people.People;
+import com.abc.record.impl.Record;
 
 public interface RedisPeopleDataService {
-	People getPeople(String peopleCode);
+	Record getRecord(String peopleCode);
 	
 	
 }

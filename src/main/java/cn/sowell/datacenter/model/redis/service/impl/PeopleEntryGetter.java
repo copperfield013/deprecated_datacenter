@@ -15,8 +15,10 @@ public class PeopleEntryGetter implements EntryGetter<PeopleEntry>{
 	@Override
 	public PeopleEntry get(String key) {
 		People people = abcService.getPeople(key);
-		PeopleEntry entry = new PeopleEntry(key, people.getPeopleRecord());
-		return entry;
+		if(people != null){
+			return new PeopleEntry(key, people.getPeopleRecord());
+		}
+		return null;
 	}
 
 	public void setAbcService(ABCExecuteService abcService) {

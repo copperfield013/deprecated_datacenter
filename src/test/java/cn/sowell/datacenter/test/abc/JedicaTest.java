@@ -10,7 +10,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import cn.sowell.copframe.jedica.JedicaFactory;
 import cn.sowell.datacenter.model.redis.service.RedisPeopleDataService;
 
-import com.abc.people.People;
+import com.abc.record.impl.Record;
 
 
 @ContextConfiguration(locations = "classpath*:spring-config/spring-junit.xml")
@@ -25,8 +25,8 @@ public class JedicaTest{
 	
 	@Test
 	public void getData(){
-		People people = rpService.getPeople("96e3f645220c4f8980a56d978819d693");
-		System.out.println(people);
+		Record record = rpService.getRecord("96e3f645220c4f8980a56d978819d693");
+		System.out.println(record);
 	}
 	
 	@Test

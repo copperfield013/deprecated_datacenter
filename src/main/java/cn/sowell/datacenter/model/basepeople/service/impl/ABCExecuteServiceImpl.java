@@ -1,8 +1,10 @@
 package cn.sowell.datacenter.model.basepeople.service.impl;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,8 +15,11 @@ import java.util.function.Function;
 import javax.annotation.Resource;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.CellValue;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.core.io.ClassPathResource;
@@ -22,13 +27,15 @@ import org.springframework.stereotype.Service;
 
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.Assert;
+import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.copframe.utils.excel.CellTypeUtils;
 import cn.sowell.copframe.utils.excel.poi.PoiCellReader;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
 import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
 
+import com.abc.application.ComplexFusion;
 import com.abc.application.DataSource;
-import com.abc.application.PeopleFusion;
 import com.abc.application.PeopleRelationFusion;
 import com.abc.application.PeopleRemoveFusion;
 import com.abc.mapping.MappingNodeAnalysis;
@@ -48,13 +55,14 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	private String mapperName = "baseinfoImport";
 	private Logger logger = Logger.getLogger(ABCExecuteService.class);
 	@Resource
-	private PeopleFusion peopleFusion;
+	private ComplexFusion cFusion;
 	
 	@Resource
 	MappingNodeAnalysis analysis;
 	
 	@Resource
 	PeopleRelationFusion relationFusion;
+	private DateFormat defaultDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
 	
 	@Deprecated
 	private ABCNode abcNode;
@@ -110,7 +118,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		People people = createPeople(getABCNode(), socialEntity);
 		
 		List<PeopleRelation> peopleRelations = createPeopleRelation(getABCNode(), people, socialEntity);
-		people = peopleFusion.fuseStrange(people,writeMappingName, DataSource.SOURCE_POLIC);
+		people = cFusion.fuse(people,writeMappingName, DataSource.SOURCE_POLIC);
 		logger.debug(people.getPeopleCode() + " : " + people.getJson(getABCNode().getTitle()));
 		people = relationFusion.fuse(people, peopleRelations, writeMappingName, DataSource.SOURCE_POLIC);
 		return people;
@@ -174,18 +182,23 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 				throw new ImportBreakException();
 			}
 			Row row = sheet.getRow(rownum++);
-			if(row == null || row.getCell(0) == null || !TextUtils.hasText(row.getCell(0).getStringCellValue())){
+			if(row == null || row.getCell(0) == null || !TextUtils.hasText(getStringWithBlank(row.getCell(0)))){
 				break;
 			}
 			importStatus.setCurrent(rownum - 2);
-			importStatus.appendMessage("导入第" + importStatus.getCurrent() + "条数据");
-			Entity socialEntity = createSocialEntity(abcNode, headerRow, row);
-			People people = createPeople(sheet, headerRow, abcNode, socialEntity);
-			List<PeopleRelation> peopleRelations = createPeopleRelation(abcNode, people, socialEntity);
-			people = peopleFusion.fuseStrange(people, writeMappingName, DataSource.SOURCE_POLIC);
-			logger.debug(people.getPeopleCode() + " : " + people.getJson(abcNode.getTitle()));
-			people = relationFusion.fuse(people,peopleRelations, writeMappingName, DataSource.SOURCE_POLIC);
-			importStatus.appendMessage("第" + importStatus.getCurrent() + "条数据导入完成，用时" + numberFormat.format(importStatus.lastInterval()));
+			importStatus.startItemTimer().appendMessage("导入第" + importStatus.getCurrent() + "条数据");
+			try {
+				Entity socialEntity = createSocialEntity(abcNode, headerRow, row);
+				People people = createPeople(sheet, headerRow, abcNode, socialEntity);
+				List<PeopleRelation> peopleRelations = createPeopleRelation(abcNode, people, socialEntity);
+				people = cFusion.fuse(people, writeMappingName, DataSource.SOURCE_POLIC);
+				logger.debug(people.getPeopleCode() + " : " + people.getJson(abcNode.getTitle()));
+				people = relationFusion.fuse(people,peopleRelations, writeMappingName, DataSource.SOURCE_POLIC);
+				importStatus.endItemTimer().appendMessage("第" + importStatus.getCurrent() + "条数据导入完成，用时" + numberFormat.format(importStatus.lastInterval()));
+			} catch (Exception e) {
+				logger.error("导入第" + rownum + "行时发生异常", e);
+				importStatus.endItemTimer().appendMessage("第" + importStatus.getCurrent() + "条数据导入异常，用时" + numberFormat.format(importStatus.lastInterval()));
+			}
 		}
 		importStatus.appendMessage("导入完成");
 		importStatus.setEnded();
@@ -196,7 +209,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		Row row;
 		do {
 			row = sheet.getRow(rownum++);
-		} while (row != null && row.getCell(0) != null && TextUtils.hasText(row.getCell(0).getStringCellValue()));
+		} while (row != null && row.getCell(0) != null && TextUtils.hasText(getStringWithBlank(row.getCell(0))));
 		return rownum - 3;
 	}
 
@@ -236,11 +249,10 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 			Cell cell = row.getCell(i);
 			PoiCellReader reader = new PoiCellReader(cell);
 			String value = reader.getString();
-			if (headerRow.getCell(i).getStringCellValue().equals("家庭医生")) {
+			if (getStringWithBlank(headerRow.getCell(i)).equals("家庭医生")) {
 				if (TextUtils.hasText(value)) {
 					Entity relationentity = new Entity("familydoctor");
-					relationentity.putValue(headerRow.getCell(i)
-							.getStringCellValue(), value);
+					relationentity.putValue(getStringWithBlank(headerRow.getCell(i)), value);
 					entity.putRelationEntity("家庭医生信息", "家庭医生", relationentity);
 				}
 			} else {
@@ -248,7 +260,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 					logger.warn("ERROR Type row number:" + row.getRowNum()
 							+ " ; cell number:" + i + ";");
 				}else{
-					entity.putValue(headerRow.getCell(i).getStringCellValue(), value);
+					entity.putValue(getStringWithBlank(headerRow.getCell(i)), value);
 				}
 			}
 		}
@@ -272,5 +284,31 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		return people;
 	}
 	
+	private String getStringWithBlank(Cell cell){
+		//如果有覆盖至
+		if(cell == null){
+			return null;
+		}
+		CellType cellType = cell.getCellTypeEnum();
+		if(cellType == CellType.STRING){
+			return cell.getStringCellValue();
+		}else if(cellType == CellType.NUMERIC){
+			if(CellTypeUtils.isCellDateFormatted(cell)){
+				return defaultDateFormat.format(HSSFDateUtil.getJavaDate(cell.getNumericCellValue()));
+			}
+			return FormatUtils.toString(FormatUtils.toLong(cell.getNumericCellValue()));
+		}else if(cellType == CellType.FORMULA){
+			FormulaEvaluator evaluator = cell.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator();
+			CellValue cellValue = evaluator.evaluate(cell);
+			CellType cellValueType = cellValue.getCellTypeEnum();
+			if(cellValueType == CellType.STRING){
+				return cellValue.getStringValue();
+			}else if(cellValueType == CellType.NUMERIC){
+				return FormatUtils.toString(FormatUtils.toLong(cellValue.getNumberValue()));
+			}
+			return null;
+		}
+		return null;
+	}
 	
 }

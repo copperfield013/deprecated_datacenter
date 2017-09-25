@@ -1,7 +1,6 @@
 package cn.sowell.datacenter.model.peopledata.status;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 public class ImportStatus {
@@ -10,6 +9,14 @@ public class ImportStatus {
 	private boolean breakFlag = false;
 	private LinkedList<Message> messages = new LinkedList<ImportStatus.Message>();
 	private boolean endFlag = false;
+	private long lastVeniTime;
+	private long lastItemStartTime = 0;
+	private long lastItemInterval = 0;
+	
+	public ImportStatus veni(){
+		lastVeniTime = System.currentTimeMillis();
+		return this;
+	}
 	public Integer getTotal() {
 		return total;
 	}
@@ -39,6 +46,16 @@ public class ImportStatus {
 		return endFlag;
 	}
 	
+	public ImportStatus startItemTimer(){
+		lastItemStartTime = System.currentTimeMillis();
+		return this;
+	}
+	
+	public ImportStatus endItemTimer(){
+		lastItemInterval = System.currentTimeMillis() - lastItemStartTime;
+		return this;
+	}
+	
 	public String getCurrentMessage() {
 		Message message = messages.getLast();
 		if(message != null){
@@ -55,15 +72,11 @@ public class ImportStatus {
 	 * @return
 	 */
 	public long lastInterval(){
-		Iterator<Message> iterate = this.messages.descendingIterator();
-		if(iterate.hasNext()){
-			Message last = iterate.next();
-			if(iterate.hasNext()){
-				Message prev = iterate.next();
-				return last.getTime().getTime() - prev.getTime().getTime();
-			}
-		}
-		return 0;
+		return lastItemInterval;
+	}
+	
+	public long lastVeniInterval(){
+		return System.currentTimeMillis() - lastVeniTime;
 	}
 	
 	
