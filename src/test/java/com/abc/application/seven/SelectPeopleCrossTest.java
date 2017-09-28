@@ -3,8 +3,6 @@ package com.abc.application.seven;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.apache.log4j.Logger;
 import org.dom4j.DocumentException;
 import org.junit.Test;
@@ -12,12 +10,11 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.abc.mapping.MappingNodeAnalysis;
 import com.abc.mapping.entity.Entity;
-import com.abc.mapping.node.ABCNode;
 import com.abc.panel.Discoverer;
 import com.abc.panel.PanelFactory;
 import com.abc.query.criteria.Criteria;
+import com.abc.query.criteria.CriteriaFactory;
 import com.abc.query.criteria.InequalQueryCriteria;
 import com.abc.query.criteria.LikeQueryCriteria;
 import com.abc.query.criteria.QueryCriteria;
@@ -28,29 +25,21 @@ import com.abc.query.entity.impl.EntitySortedPagedQuery;
 public class SelectPeopleCrossTest {
 	private static Logger logger = Logger.getLogger(SelectPeopleCrossTest.class);
 
-	@Resource(name = "MappingNodeAnalysis")
-	MappingNodeAnalysis analysis;
-
-	protected String mapperName = "baseinfoImport";
+	protected String mapperName = "example";
 	protected String familyDoctorMapper = "familydoctor";
-	protected String mappingfilepath = getClass().getResource("/").getFile()
-			+ "../classes/mapping/baseinfoImport.xml";
-
 	@Test
 	public void selectPeople() {
-		ABCNode abcNode;
-		try {
-			abcNode = analysis.analysis(mappingfilepath);
+
 			List<Criteria> criterias = new ArrayList<Criteria>();
-			LikeQueryCriteria like = new LikeQueryCriteria(abcNode);
+			LikeQueryCriteria like = CriteriaFactory.createLikeQueryCriteria(mapperName);
 			like.setName("姓名");
 			like.setValue("张");
 			criterias.add(like);
-			QueryCriteria common = new QueryCriteria(abcNode);
+			QueryCriteria common = CriteriaFactory.createQueryCriteria(mapperName);
 			common.setName("性别");
 			common.setValue("男");
 			criterias.add(common);
-			InequalQueryCriteria inequal = new InequalQueryCriteria(abcNode);
+			InequalQueryCriteria inequal = CriteriaFactory.createInequalQueryCriteria(mapperName);
 			inequal.setName("身份证号码");
 			inequal.setValue("");
 			criterias.add(inequal);
@@ -61,15 +50,10 @@ public class SelectPeopleCrossTest {
 //			criterias.add(like);
 			
 			select(criterias,"出生日期");
-		} catch (DocumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 	}
 
 	public void select(List<Criteria> criterias,String colName) {
-		ABCNode abcNode;
 		long startTime = System.currentTimeMillis();
 		try {
 

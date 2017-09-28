@@ -3,8 +3,6 @@ package com.abc.application.seven;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import javax.annotation.Resource;
-
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -19,7 +17,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.abc.application.ApplicationInfo;
-import com.abc.application.ComplexFusion;
 import com.abc.mapping.entity.Entity;
 import com.abc.panel.Discoverer;
 import com.abc.panel.Integration;
@@ -30,10 +27,7 @@ import com.abc.panel.PanelFactory;
 public class RecordRelatedTest {
 	private static Logger logger = Logger.getLogger(RecordRelatedTest.class);
 
-	@Resource(name="ComplexFusion")
-	ComplexFusion complexFusion;
-	
-	protected String mapperName = "baseinfoImport";
+	protected String mapperName = "example";
 	protected String familyDoctorMapper = "familydoctor";
 	protected String educationhistoryMapper = "educationhistory";
 	protected String familyInfomationMapper = "familyInfomation";
@@ -41,9 +35,7 @@ public class RecordRelatedTest {
 	protected String filename = "E:\\数据\\test艮山门all.xlsx";
 	protected String sheetName = "2";
 	protected String excelExtName = "xlsx";
-	protected String mappingfilepath = getClass().getResource("/").getFile()
-			+ "../classes/mapping/baseinfoImport.xml";
-	protected String writeMappingName = "baseinfoImport";
+	protected String writeMappingName = "example";
 
 
 	@Test
