@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ABC name="baseinfoImport" abcattr="人口信息" class=""
+<ABC name="example" abcattr="人口信息" class=""
 	xmlns="http://www.w3school.com.cn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<attribute name="peoplecode" alias="编码a" abcattr="唯一编码" />
 	<attribute name="地址" alias="地址a" abcattr="通用地址" />
