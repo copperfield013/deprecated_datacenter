@@ -57,7 +57,6 @@
 	<attribute name="unemployeeDate" alias="就失业日期" abcattr="就失业日期" datatype="DATE" />
 	<attribute name="unemployeeCode" alias="就失业证号" abcattr="就失业证号" />
 	<attribute name="unemployeeStatus" alias="就失业状态" abcattr="就失业状态" />
-	<attribute name="employeeId" alias="就业标识" abcattr="就业标识" />
 	<attribute name="hardToEmployeeType" alias="就业困难人员类型" abcattr="就业困难人员类型" />
 	<attribute name="employeeType" alias="就业类型" abcattr="就业类型" />
 	<attribute name="employeeCapacity" alias="就业能力" abcattr="就业能力" />
@@ -71,33 +70,26 @@
 	<attribute name="partyPost" alias="党内职务" abcattr="党内职务" />
 	<attribute name="partyOrganization" alias="所在党组织" abcattr="所在党组织" />
 	<attribute name="partySuperior" alias="党组织隶属" abcattr="党组织隶属" />
-	<attribute name="partyOrgContact" alias="党组织联系电话" abcattr="党组织联系电话" />
-	<attribute name="CYOrganization" alias="共青团组织" abcattr="共青团组织" />
+	<attribute name="partyOrgContact" alias="党组织联系电话" abcattr="党组织电话" />
 	
 	<!-- 工作信息 -->
-	<attribute name="companyName" alias="公司名称" abcattr="公司名称" />
-	<attribute name="workUnit" alias="工作单位" abcattr="工作单位" />
-	<attribute name="workAddress" alias="工作地址" abcattr="工作地址" />
-	<attribute name="unitContact" alias="单位电话" abcattr="单位电话" />
-	<attribute name="workDepartment" alias="当前部门" abcattr="当前部门" />
-	<attribute name="unitNature" alias="单位性质" abcattr="单位性质" />
-	<attribute name="salary" alias="工资" abcattr="工资" datatype="FLOAT" />
-	<attribute name="workContent" alias="工作内容" abcattr="工作内容" />
-	<attribute name="workDuty" alias="工作职责" abcattr="工作职责" />
-	<attribute name="workSubject" alias="工作主题" abcattr="工作主题" />
-	<attribute name="workedOccupation" alias="曾从事职业" abcattr="曾从事职业" />
 	
 	
-	<!-- 家庭信息 -->
-	<attribute name="familyAddress" alias="家庭住址" abcattr="家庭住址" />
-	<attribute name="familyCount" alias="家庭成员人数" abcattr="家庭成员人数" datatype="INT" />
-	<attribute name="familyContact" alias="家庭电话" abcattr="家庭电话" />
-	<attribute name="familyFinancialSituation" alias="家庭经济状况" abcattr="家庭经济状况" />
-	<attribute name="familyType" alias="家庭类别" abcattr="家庭类别" />
-	<attribute name="familyYearIncome" alias="家庭年收入" abcattr="家庭年收入" datatype="FLOAT" />
-	<attribute name="familySituation" alias="家庭情况" abcattr="家庭情况" />
-	<attribute name="familyAvgMonthIncome" alias="家庭人均月收入" abcattr="家庭人均月收入" datatype="FLOAT" />
-	<attribute name="familyUnemployeeCount" alias="家庭失业人数" abcattr="家庭失业人数" datatype="INT" />
+	
+	<record name="工作经历">
+		<label subdomain="工作经历" />
+		<ABC name="wordExperience" abcattr="工作经历">
+			<attribute name="companyName" alias="公司名称" abcattr="工作单位名称" />
+			<attribute name="workAddress" alias="工作地址" abcattr="通用地址" />
+			<attribute name="unitContact" alias="单位电话" abcattr="联系电话" />
+			<attribute name="workDepartment" alias="当前部门" abcattr="工作部门" />
+			<attribute name="unitNature" alias="单位性质" abcattr="单位性质" />
+			<attribute name="salary" alias="工资" abcattr="月收入" datatype="FLOAT" />
+			<attribute name="workDuty" alias="工作职责" abcattr="工作职责" />
+			<attribute name="workSubject" alias="工作主题" abcattr="分管工作" />
+			<attribute name="workedOccupation" alias="曾从事职业" abcattr="曾从事职业" />
+		</ABC>
+	</record>
 	
 	<!-- 计生信息 -->
 	<attribute name="childrenCount" alias="子女数" abcattr="子女数" datatype="INT" />
@@ -108,20 +100,59 @@
 	
 	
 	
+	<relation name="医疗信息">
+		<label subdomain="家庭医生" />
+		<ABC name="familydoctor" abcattr="人口信息">
+			<attribute name="姓名" alias="姓名" abcattr="姓名" />
+			<attribute name="身份证号码" alias="证件号码" abcattr="证件号码" />
+		</ABC>
+	</relation>
 	
-	<record name="教育经历">
-	    <label subdomain="教育经历" />
-		<ABC name="education history" abcattr="教育经历">
+	
+
+	
+	<relation name="家庭关系">
+		<label subdomain="夫妻,子女,父母" />
+		<ABC name="familyMember" abcattr="人口信息">
+			<attribute name="姓名" alias="姓名" abcattr="姓名" />
+			<attribute name="性别" alias="性别a" abcattr="性别" />
+			<attribute name="身份证号码" alias="证件号码" abcattr="证件号码" />
+			<attribute name="出生日期" alias="出生日期a" datatype="date"
+				abcattr="出生日期" />
+			
+		</ABC>
+	</relation>
+	<record name="教育信息">
+		<label subdomain="教育经历" />
+		<ABC name="educationhistory" abcattr="教育经历">
 			<attribute name="school name" alias="院校名称" abcattr="院校名称" />
 			<attribute name="enter date" alias="入职日期" datatype="DATE"
 				abcattr="入学日期" />
+
 		</ABC>
 	</record>
-
-	<relation name="家庭医生信息" >
-		<label subdomain="家庭医生"  />
-		<ABC name="familydoctor">
-			<attribute name="家庭医生" alias="家庭医生" abcattr="姓名" />
+	<record name="家庭信息">
+		<label subdomain="家庭信息" />
+		<ABC name="familyInfomation" abcattr="家庭信息">
+			<attribute name="家庭人数" alias="家庭人数" datatype="int" abcattr="家庭人数" />
+			<attribute name="家庭地址" alias="家庭地址" abcattr="家庭地址" />
+			
+			<attribute name="familyContact" alias="家庭电话" abcattr="家庭电话" />
+			<attribute name="familyFinancialSituation" alias="家庭经济状况" abcattr="家庭经济状况" />
+			<attribute name="familyType" alias="家庭类别" abcattr="家庭类别" />
+			<attribute name="familyYearIncome" alias="家庭年收入" abcattr="家庭年收入" datatype="FLOAT" />
+			<attribute name="familySituation" alias="家庭情况" abcattr="家庭情况" />
+			<attribute name="familyAvgMonthIncome" alias="家庭月人均收入" abcattr="家庭月人均收入" datatype="FLOAT" />
+			<attribute name="familyUnemployeeCount" alias="家庭失业人数" abcattr="家庭失业人数" datatype="INT" />
+			
+			<label name="家庭类型" alias="家庭类型" subdomain="户籍家庭,非户籍家庭" />
+			<record name="家庭成员">
+				<label subdomain="户主,成员" />
+				<ABC name="member" abcattr="人口信息">
+					<attribute name="姓名" alias="姓名" abcattr="姓名" />
+					<attribute name="身份证号码" alias="证件号码" abcattr="证件号码" />
+				</ABC>
+			</record>
 		</ABC>
-	</relation>
+	</record>
 </ABC>

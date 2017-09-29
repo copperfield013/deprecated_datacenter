@@ -24,6 +24,7 @@
         <property name="packagesToScan">
             <list>
             	<value>cn.sowell.datacenter.model.*.pojo</value>
+            	<value>com.abc.extface.dto</value>
         	</list>
         </property>
     </bean>
@@ -71,7 +72,7 @@
         </tx:attributes>
     </tx:advice>
     
-    <bean id="jedicaConfig" class="cn.sowell.copframe.jedica.JedicaConfig">
+    <!-- <bean id="jedicaConfig" class="cn.sowell.copframe.jedica.JedicaConfig">
 		<constructor-arg value="classpath:jedica.properties" />
 	</bean>
 	<bean class="cn.sowell.copframe.jedica.JedicaFactory" >
@@ -79,7 +80,7 @@
 		<property name="entryGetter" >
 			<bean class="cn.sowell.datacenter.model.redis.service.impl.PeopleEntryGetter" />
 		</property>
-	</bean>
+	</bean> -->
     
     <!-- 通用事务的AOP配置， -->
 	<aop:config>
