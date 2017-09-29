@@ -13,8 +13,6 @@ import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
 import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
 
 import com.abc.mapping.entity.Entity;
-import com.abc.mapping.node.ABCNode;
-import com.abc.people.People;
 import com.abc.query.criteria.Criteria;
 
 public interface ABCExecuteService {
@@ -23,9 +21,9 @@ public interface ABCExecuteService {
 	 * @param data
 	 * @return
 	 */
-	Entity createSocialEntity(Map<String, String> data);
+	Entity createEntity(Map<String, String> data);
 	
-	People mergePeople(Map<String, String> data) throws IOException;
+	Entity mergePeople(Map<String, String> data) throws IOException;
 
 	/**
 	 * 查询人口数据
@@ -33,16 +31,16 @@ public interface ABCExecuteService {
 	 * @param pageInfo
 	 * @return
 	 */
-	List<People> queryPeopleList(List<Criteria> criterias, PageInfo pageInfo);
+	List<Entity> queryPeopleList(List<Criteria> criterias, PageInfo pageInfo);
 
 	/**
 	 * 根据peopleCode获得人口数据
 	 * @param peopleCode
 	 * @return
 	 */
-	People getPeople(String peopleCode);
+	Entity getPeople(String peopleCode);
 
-	List<People> queryPeopleList(Function<ABCNode, List<Criteria>> handler,
+	List<Entity> queryPeopleList(Function<String, List<Criteria>> handler,
 			PageInfo pageInfo);
 
 	/**
@@ -71,7 +69,9 @@ public interface ABCExecuteService {
 	 * @param date
 	 * @return
 	 */
-	People getHistoryPeople(String peopleCode, Date date);
+	Entity getHistoryPeople(String peopleCode, Date date);
+
+	
 
 	
 }

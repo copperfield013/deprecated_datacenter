@@ -5,14 +5,11 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
-
-import javax.annotation.Resource;
 
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
@@ -22,7 +19,6 @@ import org.apache.poi.ss.usermodel.CellValue;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import cn.sowell.copframe.dto.page.PageInfo;
@@ -30,82 +26,34 @@ import cn.sowell.copframe.utils.Assert;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.excel.CellTypeUtils;
-import cn.sowell.copframe.utils.excel.poi.PoiCellReader;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
 import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
 
-import com.abc.application.ComplexFusion;
-import com.abc.application.DataSource;
-import com.abc.application.PeopleRelationFusion;
-import com.abc.application.PeopleRemoveFusion;
-import com.abc.mapping.MappingNodeAnalysis;
+import com.abc.application.ApplicationInfo;
 import com.abc.mapping.entity.Entity;
-import com.abc.mapping.entity.RecordEntity;
-import com.abc.mapping.node.ABCNode;
-import com.abc.people.People;
-import com.abc.people.PeopleRelation;
-import com.abc.people.PeopleTracker;
+import com.abc.panel.Discoverer;
+import com.abc.panel.Integration;
+import com.abc.panel.PanelFactory;
 import com.abc.query.criteria.Criteria;
-import com.abc.query.criteria.SortedCriteria;
-import com.abc.query.people.impl.PeopleSortedPagedQuery;
+import com.abc.query.entity.impl.EntitySortedPagedQuery;
+import com.abc.record.HistoryTracker;
 
 @Service
 public class ABCExecuteServiceImpl implements ABCExecuteService{
 
-	private String mapperName = "baseinfoImport";
+	private static final String IMPORT_NODE_NAME = "baseinfoImport";
+	private static final String BASE_NODE_NAME = "baseinfoImport";
 	private Logger logger = Logger.getLogger(ABCExecuteService.class);
-	@Resource
-	private ComplexFusion cFusion;
 	
-	@Resource
-	MappingNodeAnalysis analysis;
-	
-	@Resource
-	PeopleRelationFusion relationFusion;
 	private DateFormat defaultDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
 	
-	@Deprecated
-	private ABCNode abcNode;
-	@Deprecated
-	private ABCNode importNode;
-	private String writeMappingName = "baseinfoImport";
 	
-	@Resource
-	private PeopleRemoveFusion peopleRemoveFusion;
-	
-	private ABCNode getABCNode() throws RuntimeException{
-		if(abcNode == null){
-			ClassPathResource resouce = new ClassPathResource("mapping/baseinfoImport.xml");
-			try {
-				abcNode = analysis.analysis(resouce.getInputStream());
-				abcNode.selectNameAsTitle();
-			} catch (Exception e) {
-				logger.error("解析abcNode配置文件时发生异常", e);
-				throw new RuntimeException(e);
-			}
-		}
-		return abcNode;
-	}
-	
-	private ABCNode getImportNode(){
-		if(importNode == null){
-			ClassPathResource resouce = new ClassPathResource("mapping/baseinfoImport.xml");
-			try {
-				importNode = analysis.analysis(resouce.getInputStream());
-				importNode.selectAliasAsTitle();
-			} catch (Exception e) {
-				logger.error("解析abcNode配置文件时发生异常", e);
-				throw new RuntimeException(e);
-			}
-		}
-		return importNode;
-	}
 	
 	
 	@Override
-	public Entity createSocialEntity(Map<String, String> data) {
+	public Entity createEntity(Map<String, String> data) {
 		Assert.notNull(data);
-		Entity entity = new Entity(mapperName);
+		Entity entity = new Entity(BASE_NODE_NAME);
 		for (Entry<String, String> entry : data.entrySet()) {
 			entity.putValue(entry.getKey(), entry.getValue());
 		}
@@ -113,46 +61,41 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	}
 	
 	@Override
-	public People mergePeople(Map<String, String> data) throws IOException {
-		Entity socialEntity = createSocialEntity(data);
-		People people = createPeople(getABCNode(), socialEntity);
+	public Entity mergePeople(Map<String, String> data) throws IOException {
+		Entity entity = createEntity(data);
 		
-		List<PeopleRelation> peopleRelations = createPeopleRelation(getABCNode(), people, socialEntity);
-		people = cFusion.fuse(people,writeMappingName, DataSource.SOURCE_POLIC);
-		logger.debug(people.getPeopleCode() + " : " + people.getJson(getABCNode().getTitle()));
-		people = relationFusion.fuse(people, peopleRelations, writeMappingName, DataSource.SOURCE_POLIC);
-		return people;
-	}
-	
-	private People createPeople(ABCNode abcNode, Entity socialEntity) {
-		People people = new People();
-		people.addMapping(abcNode);
-		people.addEntity(socialEntity);
-		logger.debug(people.getJson(mapperName));
-		return people;
+		ApplicationInfo appInfo=new ApplicationInfo();
+		appInfo.setWriteMappingName(BASE_NODE_NAME);
+		appInfo.setSource(ApplicationInfo.SOURCE_COMMON);
+		Integration integration=PanelFactory.getIntegration();
+		integration.integrate(entity, appInfo);
+		return entity;
+		
 	}
 	
 	@Override
-	public List<People> queryPeopleList(List<Criteria> criterias, PageInfo pageInfo){
-		PeopleSortedPagedQuery sortedPagedQuery = new PeopleSortedPagedQuery(criterias, getABCNode(), "编辑时间", SortedCriteria.TYPE_DESC);
+	public List<Entity> queryPeopleList(List<Criteria> criterias, PageInfo pageInfo){
+		Discoverer discoverer=PanelFactory.getDiscoverer(BASE_NODE_NAME);
+		
+		EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(criterias, null);
+		
 		sortedPagedQuery.setPageSize(pageInfo.getPageSize());
 		pageInfo.setCount(sortedPagedQuery.getAllCount());
-		List<People> peoples = sortedPagedQuery.visit(pageInfo.getPageNo());
+		List<Entity> peoples = sortedPagedQuery.visit(pageInfo.getPageNo());
 		return peoples;
 	}
 	
 	@Override
-	public List<People> queryPeopleList(Function<ABCNode, List<Criteria>> handler, PageInfo pageInfo){
-		return queryPeopleList(handler.apply(getABCNode()), pageInfo);
+	public List<Entity> queryPeopleList(Function<String, List<Criteria>> handler, PageInfo pageInfo){
+		return queryPeopleList(handler.apply(BASE_NODE_NAME), pageInfo);
 	}
 	
 	
 	@Override
-	public People getPeople(String peopleCode) {
-		PeopleSortedPagedQuery sortedPagedQuery = new PeopleSortedPagedQuery(null, getABCNode(), null);
-		People people = sortedPagedQuery.visit(peopleCode);
-		people.addMapping(getABCNode());
-		return people;
+	public Entity getPeople(String peopleCode) {
+		Discoverer discoverer = PanelFactory.getDiscoverer(BASE_NODE_NAME);
+		Entity result=discoverer.discover(peopleCode);
+		return result;
 	}
 	
 	@Override
@@ -166,17 +109,21 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	@Override
 	public void importPeople(Sheet sheet, ImportStatus importStatus) throws ImportBreakException{
 		Row headerRow = sheet.getRow(1);
-		execute(sheet, headerRow, getImportNode(), importStatus);
+		execute(sheet, headerRow, IMPORT_NODE_NAME, importStatus);
 	}
 	
 	private NumberFormat numberFormat = new DecimalFormat("0.000");
 	
 	
-	protected void execute(Sheet sheet, Row headerRow, ABCNode abcNode, ImportStatus importStatus) throws ImportBreakException {
+	protected void execute(Sheet sheet, Row headerRow, String mapperName, ImportStatus importStatus) throws ImportBreakException {
 		importStatus.appendMessage("正在计算总行数");
 		importStatus.setTotal(colculateRowCount(sheet));
 		int rownum = 2;
 		importStatus.appendMessage("开始导入");
+		Integration integration=PanelFactory.getIntegration();
+		ApplicationInfo appInfo=new ApplicationInfo();
+		appInfo.setWriteMappingName(BASE_NODE_NAME);
+		appInfo.setSource(ApplicationInfo.SOURCE_COMMON);
 		while(true){
 			if(importStatus.breaked()){
 				throw new ImportBreakException();
@@ -188,12 +135,8 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 			importStatus.setCurrent(rownum - 2);
 			importStatus.startItemTimer().appendMessage("导入第" + importStatus.getCurrent() + "条数据");
 			try {
-				Entity socialEntity = createSocialEntity(abcNode, headerRow, row);
-				People people = createPeople(sheet, headerRow, abcNode, socialEntity);
-				List<PeopleRelation> peopleRelations = createPeopleRelation(abcNode, people, socialEntity);
-				people = cFusion.fuse(people, writeMappingName, DataSource.SOURCE_POLIC);
-				logger.debug(people.getPeopleCode() + " : " + people.getJson(abcNode.getTitle()));
-				people = relationFusion.fuse(people,peopleRelations, writeMappingName, DataSource.SOURCE_POLIC);
+				Entity entity = createEntity(mapperName, headerRow, row);
+				integration.integrate(entity, appInfo);
 				importStatus.endItemTimer().appendMessage("第" + importStatus.getCurrent() + "条数据导入完成，用时" + numberFormat.format(importStatus.lastInterval()));
 			} catch (Exception e) {
 				logger.error("导入第" + rownum + "行时发生异常", e);
@@ -213,75 +156,53 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		return rownum - 3;
 	}
 
-	protected  People createPeople(Sheet sheet, Row headerRow, ABCNode abcNode,
-			Entity socialEntity) {
-		People people = new People();
-		people.addMapping(abcNode);
-		people.addEntity(socialEntity);
-		logger.debug(people.getJson(mapperName));
-		return people;
-	}
 
-	protected  List<PeopleRelation> createPeopleRelation(ABCNode abcNode,
-			People people, Entity socialEntity) {
-		List<PeopleRelation> peopleRelations = new ArrayList<PeopleRelation>();
-		for (String key : socialEntity.getRelationNames()) {
-			List<RecordEntity> entitys = socialEntity.getRelations(key);
-			PeopleRelation peopleRelation = new PeopleRelation(
-					abcNode.getRelation(key));
-			peopleRelation.setHost(people);
-			for (RecordEntity entity : entitys) {
-				peopleRelation.addRelated(entity.getEntity());
-			}
-			peopleRelations.add(peopleRelation);
-		}
-		for (PeopleRelation relation : peopleRelations) {
-			logger.debug(relation.getJson());
-		}
-		return peopleRelations;
-	}
-
-	protected  Entity createSocialEntity(ABCNode abcNode, Row headerRow,
+	protected String familyDoctorMapper = "familydoctor";
+	private Entity createEntity(String mappingName, Row headerRow,
 			Row row) {
-		Entity entity = new Entity(mapperName);
+		Entity entity = new Entity(mappingName);
 		int length = headerRow.getPhysicalNumberOfCells();
 		for (int i = 0; i < length; i++) {
 			Cell cell = row.getCell(i);
-			PoiCellReader reader = new PoiCellReader(cell);
-			String value = reader.getString();
-			if (getStringWithBlank(headerRow.getCell(i)).equals("家庭医生")) {
-				if (TextUtils.hasText(value)) {
-					Entity relationentity = new Entity("familydoctor");
-					relationentity.putValue(getStringWithBlank(headerRow.getCell(i)), value);
-					entity.putRelationEntity("家庭医生信息", "家庭医生", relationentity);
+			if (headerRow.getCell(i).getStringCellValue().equals("家庭医生")) {
+				if (cell.getStringCellValue() != null
+						&& !cell.getStringCellValue().equals("")) {
+					Entity relationentity = new Entity(familyDoctorMapper);
+					relationentity.putValue("姓名", cell.getStringCellValue());
+					entity.putRelationEntity("医疗信息","家庭医生", relationentity);
 				}
 			} else {
-				if(cell.getCellTypeEnum() == CellType.ERROR) {
+				if (cell.getCellTypeEnum() == CellType.NUMERIC) {
+					entity.putValue(headerRow.getCell(i).getStringCellValue(),
+							String.valueOf(cell.getNumericCellValue()));
+				} else if (cell.getCellTypeEnum() == CellType.ERROR) {
 					logger.warn("ERROR Type row number:" + row.getRowNum()
 							+ " ; cell number:" + i + ";");
-				}else{
-					entity.putValue(getStringWithBlank(headerRow.getCell(i)), value);
+				} else {
+					entity.putValue(headerRow.getCell(i).getStringCellValue(),
+							cell.getStringCellValue());
 				}
 			}
 		}
+		
+		
 		return entity;
 	}
 	
 	@Override
 	public void deletePeople(String peopleCode) {
-		if(!peopleRemoveFusion.remove(peopleCode, null, "test")){
+		ApplicationInfo appInfo=new ApplicationInfo("a526bd2fa93b4375a5b76506b8651a33", null, "test");
+		if(!PanelFactory.getIntegration().remove(appInfo)){
 			throw new RuntimeException("删除失败");
 		}
 	}
 	
 	@Override
-	public People getHistoryPeople(String peopleCode, Date date) {
-		PeopleTracker peopleTracker=new PeopleTracker(peopleCode,date);
-		People people=peopleTracker.getPeople();
-		if(people != null){
-			people.addMapping(getABCNode());
-		}
-		return people;
+	public Entity getHistoryPeople(String peopleCode, Date date) {
+		Discoverer discoverer=PanelFactory.getDiscoverer(BASE_NODE_NAME);
+		
+		HistoryTracker tracker = discoverer.track(peopleCode, date);
+		return tracker.getEntity();
 	}
 	
 	private String getStringWithBlank(Cell cell){
