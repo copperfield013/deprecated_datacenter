@@ -13,9 +13,8 @@ import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.spring.binder.FieldRefectUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
-import cn.sowell.datacenter.model.peopledata.ABCAttribute;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
-import cn.sowell.datacenter.model.peopledata.pojo.PeopleDataRelation;
+import cn.sowell.datacenter.model.peopledata.pojo.WorkExperience;
 import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
 
@@ -34,14 +33,9 @@ public class PeopleDataServiceImpl implements PeopleDataService{
 	
 	Logger logger = Logger.getLogger(PeopleDataServiceImpl.class);
 	
+	EntityTransfer eTransfer = new EntityTransfer();
+	
 	public PeopleDataServiceImpl() {
-		fieldUtils = new FieldRefectUtils<PeopleData>(PeopleData.class, (property)->{
-			ABCAttribute attribute = property.getFieldAnno(ABCAttribute.class);
-			if(attribute != null && TextUtils.hasText(attribute.value())){
-				return attribute.value();
-			}
-			return property.getFieldName();
-		});
 	}
 	
 	
@@ -76,61 +70,9 @@ public class PeopleDataServiceImpl implements PeopleDataService{
 
 
 	private PeopleData transfer(Entity entity) {
-		if(entity != null){
-			PeopleData people = new PeopleData();
-			fieldUtils.iterateField((propName, prop)->{
-				ABCAttribute anno = prop.getFieldAnno(ABCAttribute.class);
-				if(anno != null && anno.ignored()){
-					return;
-				}
-				if(PeopleDataRelation.class.isAssignableFrom(prop.getFieldType())){
-					List<RecordEntity> recordEntities = entity.getRelations(anno.entityName());
-					if(recordEntities != null && recordEntities.size() > 0){
-						PeopleDataRelation relation = new PeopleDataRelation();
-						relation.setName(recordEntities.get(0).getEntity().getStringValue(propName));
-						try {
-							prop.setValue(people, relation);
-						} catch (Exception e) {
-							logger.error("", e);
-						}
-					}
-				}else if(Date.class.isAssignableFrom(prop.getFieldType())){
-					try {
-						prop.setValue(people, entity.getDateValue(propName));
-					} catch (Exception e) {
-						logger.error("", e);
-					}
-				}else{
-					try {
-						prop.setValue(people, entity.getStringValue(propName));
-					} catch (Exception e) {
-						logger.error("", e);
-					}
-				}
-			});
-			/*
-			people.setPeopleCode(entity.getStringValue("peoplecode"));
-			people.setName(entity.getStringValue("name"));
-			people.setIdcode(entity.getStringValue("idcode"));
-			people.setContact(entity.getStringValue("contact1"));
-			people.setAddress(entity.getStringValue("address"));
-			people.setGender(entity.getStringValue("gender"));
-			people.setBirthday(entity.getDateValue("birthday"));
-			people.setNativePlace(entity.getStringValue("nativePlace"));
-			people.setHouseholdPlace(entity.getStringValue("householdPlace"));
-			people.setNation(entity.getStringValue("nation"));
-			people.setPoliticalStatus(entity.getStringValue("politicalStatus"));
-			people.setMaritalStatus(entity.getStringValue("maritalStatus"));
-			people.setReligion(entity.getStringValue("religion"));
-			people.setHealthCondition(entity.getStringValue("healthCondition"));
-			people.setPeopleType(entity.getStringValue("peopleType"));
-			people.setLowIncomeInsuredCode(entity.getStringValue("lowIncomeInsuredCode"));
-			people.setHandicappedCode(entity.getStringValue("handicappedCode"));
-			people.setLowIncomeInsuredType(entity.getStringValue("lowIncomeInsuredType"));*/
-			
-			return people;
-		}
-		return null;
+		PeopleData people = new PeopleData();
+		eTransfer.bind(entity, people);
+		return people;
 	}
 
 

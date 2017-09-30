@@ -57,6 +57,10 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		for (Entry<String, String> entry : data.entrySet()) {
 			entity.putValue(entry.getKey(), entry.getValue());
 		}
+		Entity workExperience = new Entity("workExperience");
+		workExperience.putValue("companyName", data.get("companyName"));
+		
+		entity.putRecordEntity("workExperience", "工作经历", workExperience);
 		return entity;
 	}
 	
@@ -191,7 +195,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public void deletePeople(String peopleCode) {
-		ApplicationInfo appInfo=new ApplicationInfo("a526bd2fa93b4375a5b76506b8651a33", null, "test");
+		ApplicationInfo appInfo=new ApplicationInfo(peopleCode, null, "list-delete" );
 		if(!PanelFactory.getIntegration().remove(appInfo)){
 			throw new RuntimeException("删除失败");
 		}

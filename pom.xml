@@ -11,7 +11,7 @@
 	<properties>
 		<version.kie>6.5.0.Final</version.kie>
 		<version.cpfweb>0.2.2</version.cpfweb>
-		<version.abc>1.7.5</version.abc>
+		<version.abc>1.7.17</version.abc>
 	</properties>
 	
 	<dependencies>

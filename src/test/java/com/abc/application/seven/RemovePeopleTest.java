@@ -1,7 +1,5 @@
 package com.abc.application.seven;
 
-import javax.annotation.Resource;
-
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;

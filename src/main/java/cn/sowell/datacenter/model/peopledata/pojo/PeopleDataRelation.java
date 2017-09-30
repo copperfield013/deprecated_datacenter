@@ -1,6 +1,6 @@
 package cn.sowell.datacenter.model.peopledata.pojo;
 
-public class PeopleDataRelation {
+public class PeopleDataRelation implements RecordData {
 	private String name;
 	private String peopleCode;
 	public String getName() {

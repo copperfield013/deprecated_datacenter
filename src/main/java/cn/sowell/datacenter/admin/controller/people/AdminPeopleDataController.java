@@ -229,6 +229,7 @@ public class AdminPeopleDataController {
 			abcService.deletePeople(peopleCode);
 			return AjaxPageResponse.REFRESH_LOCAL("删除成功");
 		} catch (Exception e) {
+			logger.error("删除失败", e);
 			return AjaxPageResponse.FAILD("删除失败");
 		}
 	}

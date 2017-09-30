@@ -1,16 +1,18 @@
 package cn.sowell.datacenter.model.peopledata.pojo;
 
 import java.util.Date;
+import java.util.List;
 
-import cn.sowell.datacenter.model.peopledata.ABCAttribute;
+import cn.sowell.datacenter.model.peopledata.EntityElement;
+import cn.sowell.datacenter.model.peopledata.EntityRecord;
 
 
-public class PeopleData {
+public class PeopleData implements EntityData{
 	
-	@ABCAttribute(ignored=true)
+	@EntityElement(readIgnored=true)
 	private Long id;
 	
-	@ABCAttribute("peoplecode")
+	@EntityElement("peoplecode")
 	private String peopleCode;
 	
 	private String name;
@@ -23,7 +25,7 @@ public class PeopleData {
 	
 	private String address;
 	
-	@ABCAttribute("contact1")
+	@EntityElement("contact1")
 	private String contact;
 	
 	private String nativePlace;
@@ -39,9 +41,6 @@ public class PeopleData {
 	private String healthCondition;
 	
 	private String peopleType;
-	
-	@ABCAttribute(value="家庭医生", entityName="familyDoctor")
-	private PeopleDataRelation familyDoctor;
 	
 	/*******低保信息******/
 	private String lowIncomeInsuredCode;
@@ -87,30 +86,14 @@ public class PeopleData {
 	
 	
 	/*****工作信息******/
-	private String companyName;
-	private String workUnit;
-	private String workAddress;
-	private String unitContact;
-	private String workDepartment;
-	private String unitNature;
-	private Float salary;
-	private String workContent;
-	private String workDuty;
-	private String workSubject;
-	private String workedOccupation;
+	@EntityElement(value="workExperience")
+	@EntityRecord(elementClass=WorkExperience.class)
+	private List<WorkExperience> workExperiences;
 	
+	@EntityElement("家庭信息")
+	@EntityRecord
+	private FamilyInfo familyInfo;
 	
-	
-	/*****家庭信息******/
-	private String familyAddress;
-	private Integer familyCount;
-	private String familyContact;
-	private String familyFinancialSituation;
-	private String familyType;
-	private Float familyYearIncome;
-	private String familySituation;
-	private Float familyAvgMonthIncome;
-	private Integer familyUnemployeeCount;
 	
 	
 	/*****计生信息******/
@@ -248,14 +231,6 @@ public class PeopleData {
 
 	public void setGender(String gender) {
 		this.gender = gender;
-	}
-
-	public PeopleDataRelation getFamilyDoctor() {
-		return familyDoctor;
-	}
-
-	public void setFamilyDoctor(PeopleDataRelation familyDoctor) {
-		this.familyDoctor = familyDoctor;
 	}
 
 	public String getLowIncomeInsuredCode() {
@@ -426,165 +401,7 @@ public class PeopleData {
 		CYOrganization = cYOrganization;
 	}
 
-	public String getCompanyName() {
-		return companyName;
-	}
 
-	public void setCompanyName(String companyName) {
-		this.companyName = companyName;
-	}
-
-	public String getWorkUnit() {
-		return workUnit;
-	}
-
-	public void setWorkUnit(String workUnit) {
-		this.workUnit = workUnit;
-	}
-
-	public String getWorkAddress() {
-		return workAddress;
-	}
-
-	public void setWorkAddress(String workAddress) {
-		this.workAddress = workAddress;
-	}
-
-	public String getUnitContact() {
-		return unitContact;
-	}
-
-	public void setUnitContact(String unitContact) {
-		this.unitContact = unitContact;
-	}
-
-	public String getWorkDepartment() {
-		return workDepartment;
-	}
-
-	public void setWorkDepartment(String workDepartment) {
-		this.workDepartment = workDepartment;
-	}
-
-	public String getUnitNature() {
-		return unitNature;
-	}
-
-	public void setUnitNature(String unitNature) {
-		this.unitNature = unitNature;
-	}
-
-	public Float getSalary() {
-		return salary;
-	}
-
-	public void setSalary(Float salary) {
-		this.salary = salary;
-	}
-
-	public String getWorkContent() {
-		return workContent;
-	}
-
-	public void setWorkContent(String workContent) {
-		this.workContent = workContent;
-	}
-
-	public String getWorkDuty() {
-		return workDuty;
-	}
-
-	public void setWorkDuty(String workDuty) {
-		this.workDuty = workDuty;
-	}
-
-	public String getWorkSubject() {
-		return workSubject;
-	}
-
-	public void setWorkSubject(String workSubject) {
-		this.workSubject = workSubject;
-	}
-
-	public String getWorkedOccupation() {
-		return workedOccupation;
-	}
-
-	public void setWorkedOccupation(String workedOccupation) {
-		this.workedOccupation = workedOccupation;
-	}
-
-	public String getFamilyAddress() {
-		return familyAddress;
-	}
-
-	public void setFamilyAddress(String familyAddress) {
-		this.familyAddress = familyAddress;
-	}
-
-	public Integer getFamilyCount() {
-		return familyCount;
-	}
-
-	public void setFamilyCount(Integer familyCount) {
-		this.familyCount = familyCount;
-	}
-
-	public String getFamilyContact() {
-		return familyContact;
-	}
-
-	public void setFamilyContact(String familyContact) {
-		this.familyContact = familyContact;
-	}
-
-	public String getFamilyFinancialSituation() {
-		return familyFinancialSituation;
-	}
-
-	public void setFamilyFinancialSituation(String familyFinancialSituation) {
-		this.familyFinancialSituation = familyFinancialSituation;
-	}
-
-	public String getFamilyType() {
-		return familyType;
-	}
-
-	public void setFamilyType(String familyType) {
-		this.familyType = familyType;
-	}
-
-	public Float getFamilyYearIncome() {
-		return familyYearIncome;
-	}
-
-	public void setFamilyYearIncome(Float familyYearIncome) {
-		this.familyYearIncome = familyYearIncome;
-	}
-
-	public String getFamilySituation() {
-		return familySituation;
-	}
-
-	public void setFamilySituation(String familySituation) {
-		this.familySituation = familySituation;
-	}
-
-	public Float getFamilyAvgMonthIncome() {
-		return familyAvgMonthIncome;
-	}
-
-	public void setFamilyAvgMonthIncome(Float familyAvgMonthIncome) {
-		this.familyAvgMonthIncome = familyAvgMonthIncome;
-	}
-
-	public Integer getFamilyUnemployeeCount() {
-		return familyUnemployeeCount;
-	}
-
-	public void setFamilyUnemployeeCount(Integer familyUnemployeeCount) {
-		this.familyUnemployeeCount = familyUnemployeeCount;
-	}
 
 	public String getChildrenCount() {
 		return childrenCount;
@@ -601,7 +418,6 @@ public class PeopleData {
 	public void setContraceptionMeasure(String contraceptionMeasure) {
 		this.contraceptionMeasure = contraceptionMeasure;
 	}
-
 
 	public String getFamilyPlanningCode() {
 		return familyPlanningCode;
@@ -674,6 +490,22 @@ public class PeopleData {
 
 	public void setPartyPost(String partyPost) {
 		this.partyPost = partyPost;
+	}
+
+	public List<WorkExperience> getWorkExperiences() {
+		return workExperiences;
+	}
+
+	public void setWorkExperiences(List<WorkExperience> workExperiences) {
+		this.workExperiences = workExperiences;
+	}
+
+	public FamilyInfo getFamilyInfo() {
+		return familyInfo;
+	}
+
+	public void setFamilyInfo(FamilyInfo familyInfo) {
+		this.familyInfo = familyInfo;
 	}
 
 }

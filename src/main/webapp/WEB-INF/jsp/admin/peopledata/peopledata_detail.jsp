@@ -57,8 +57,8 @@
 			<div class="row">
 				<label class="col-lg-2">健康状况</label>
 				<div class="col-lg-4">${people.healthCondition }</div>
-				<label class="col-lg-2">家庭医生</label>
-				<div class="col-lg-4">${people.familyDoctor.name }</div>
+				<%-- <label class="col-lg-2">家庭医生</label>
+				<div class="col-lg-4">${people.familyDoctor.name }</div> --%>
 			</div>
 			<div class="row">
 				<h4>残疾人信息</h4>
@@ -172,37 +172,37 @@
 			<!-- 工作信息 -->
 			<div class="row">
 				<label class="col-lg-2">公司名称</label>
-				<div class="col-lg-4">${people.companyName }</div>
+				<div class="col-lg-4">${people.workExperiences[0].companyName }</div>
 				<label class="col-lg-2">工作单位</label>
-				<div class="col-lg-4">${people.workUnit }</div>
+				<div class="col-lg-4">${people.workExperiences[0].workUnit }</div>
 			</div>
 			<div class="row">
 				<label class="col-lg-2">工作地址</label>
-				<div class="col-lg-4">${people.workAddress }</div>
+				<div class="col-lg-4">${people.workExperiences[0].workAddress }</div>
 				<label class="col-lg-2">单位电话</label>
-				<div class="col-lg-4">${people.unitContact }</div>
+				<div class="col-lg-4">${people.workExperiences[0].unitContact }</div>
 			</div>
 			<div class="row">
 				<label class="col-lg-2">当前部门</label>
-				<div class="col-lg-4">${people.workDepartment }</div>
+				<div class="col-lg-4">${people.workExperiences[0].workDepartment }</div>
 				<label class="col-lg-2">单位性质</label>
-				<div class="col-lg-4">${people.unitNature }</div>
+				<div class="col-lg-4">${people.workExperiences[0].unitNature }</div>
 			</div>
 			<div class="row">
 				<label class="col-lg-2">工资</label>
-				<div class="col-lg-4">${people.salary }</div>
+				<div class="col-lg-4">${people.workExperiences[0].salary }</div>
 				<label class="col-lg-2">工作内容</label>
-				<div class="col-lg-4">${people.workContent }</div>
+				<div class="col-lg-4">${people.workExperiences[0].workContent }</div>
 			</div>
 			<div class="row">
 				<label class="col-lg-2">工作职责</label>
-				<div class="col-lg-4">${people.workDuty }</div>
+				<div class="col-lg-4">${people.workExperiences[0].workDuty }</div>
 				<label class="col-lg-2">工作主题</label>
-				<div class="col-lg-4">${people.workSubject }</div>
+				<div class="col-lg-4">${people.workExperiences[0].workSubject }</div>
 			</div>
 			<div class="row">
 				<label class="col-lg-2">曾从事职业</label>
-				<div class="col-lg-4">${people.workedOccupation }</div>
+				<div class="col-lg-4">${people.workExperiences[0].workedOccupation }</div>
 			</div>
 			
 			<div class="row">
@@ -213,31 +213,31 @@
 			<!-- 家庭信息 -->
 			<div class="row">
 				<label class="col-lg-2">家庭住址</label>
-				<div class="col-lg-4">${people.familyAddress }</div>
+				<div class="col-lg-4">${people.familyInfo.familyAddress }</div>
 				<label class="col-lg-2">家庭成员人数</label>
-				<div class="col-lg-4">${people.familyCount }</div>
+				<div class="col-lg-4">${people.familyInfo.familyCount }</div>
 			</div>
 			<div class="row">
 				<label class="col-lg-2">家庭电话</label>
-				<div class="col-lg-4">${people.familyContact }</div>
+				<div class="col-lg-4">${people.familyInfo.familyContact }</div>
 				<label class="col-lg-2">家庭经济状况</label>
-				<div class="col-lg-4">${people.familyFinancialSituation }</div>
+				<div class="col-lg-4">${people.familyInfo.familyFinancialSituation }</div>
 			</div>
 			<div class="row">
 				<label class="col-lg-2">家庭类别</label>
-				<div class="col-lg-4">${people.familyType }</div>
+				<div class="col-lg-4">${people.familyInfo.familyType }</div>
 				<label class="col-lg-2">家庭年收入</label>
-				<div class="col-lg-4">${people.familyYearIncome }</div>
+				<div class="col-lg-4">${people.familyInfo.familyYearIncome }</div>
 			</div>
 			<div class="row">
 				<label class="col-lg-2">家庭情况</label>
-				<div class="col-lg-4">${people.familySituation }</div>
+				<div class="col-lg-4">${people.familyInfo.familySituation }</div>
 				<label class="col-lg-2">家庭人均月收入</label>
-				<div class="col-lg-4">${people.familyAvgMonthIncome }</div>
+				<div class="col-lg-4">${people.familyInfo.familyAvgMonthIncome }</div>
 			</div>
 			<div class="row">
 				<label class="col-lg-2">家庭失业人数</label>
-				<div class="col-lg-4">${people.familyUnemployeeCount }</div>
+				<div class="col-lg-4">${people.familyInfo.familyUnemployeeCount }</div>
 			</div>
 			
 			<div class="row">
