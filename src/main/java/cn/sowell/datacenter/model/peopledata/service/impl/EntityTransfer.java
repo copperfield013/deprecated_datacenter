@@ -208,7 +208,7 @@ public class EntityTransfer {
 	 * @param pojo
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
+	/*@SuppressWarnings("unchecked")
 	public void bind(Object pojo, Entity target){
 		if(pojo != null){
 //			EntityNode nodeAnno = pojo.getClass().getDeclaredAnnotation(EntityNode.class);
@@ -257,7 +257,7 @@ public class EntityTransfer {
 				}
 			});
 		}
-	}
+	}*/
 	
 
 }

@@ -91,7 +91,7 @@ public class PeopleData implements EntityData{
 	private List<WorkExperience> workExperiences;
 	
 	@EntityElement("家庭信息")
-	@EntityRecord
+	@EntityRecord()
 	private FamilyInfo familyInfo;
 	
 	
