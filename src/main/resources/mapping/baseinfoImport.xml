@@ -43,7 +43,7 @@
 	<label name="lowIncomeInsureType" alias="低保人员类别" subdomain="低保人员,残保人员" />
 	<attribute name="lowIncomeInsuredReason" alias="低保原因" abcattr="低保原因" />
 	<attribute name="lowIncomeInsuredId" alias="享受低保标识" abcattr="享受低保标识" />
-	<attribute name="lowIncomeInsuredAmount" alias="享受低保金额" abcattr="享受低保金额" />
+	<attribute name="lowIncomeInsuredAmount" alias="享受低保金额" abcattr="享受低保金额" datatype="FLOAT" />
 	<attribute name="lowIncomeInsuredStart" alias="享受开始日期" datatype="DATE"  abcattr="享受开始日期" />
 	<attribute name="lowIncomeInsuredEnd" alias="享受结束日期" datatype="DATE" abcattr="享受结束日期" />
 	
@@ -76,9 +76,9 @@
 	
 	
 	
-	<record name="工作经历">
+	<record name="workExperience">
 		<label subdomain="工作经历" />
-		<ABC name="wordExperience" abcattr="工作经历">
+		<ABC name="workExperience" abcattr="工作经历">
 			<attribute name="companyName" alias="公司名称" abcattr="工作单位名称" />
 			<attribute name="workAddress" alias="工作地址" abcattr="通用地址" />
 			<attribute name="unitContact" alias="单位电话" abcattr="联系电话" />
