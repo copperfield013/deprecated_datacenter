@@ -13,7 +13,7 @@ public class DateParameterConverter implements Converter<String, Date>{
     private static final String[] PATTERNS = {"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd", "HH:mm:ss"};
     @Override
     public Date convert(String s) {
-        if(!StringUtils.hasText(s)) {
+        if(StringUtils.hasText(s)) {
             try {
                 return DateUtils.parseDateStrictly(s, PATTERNS);
             } catch (ParseException e) {

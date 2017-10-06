@@ -11,4 +11,8 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface EntityRelation {
 	Class<?> elementClass() default Object.class;
+
+	String entityName();
+
+	String domainName();
 }

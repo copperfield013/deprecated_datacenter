@@ -1,14 +1,11 @@
 package cn.sowell.datacenter.model.basepeople.service.impl;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Function;
 
 import org.apache.log4j.Logger;
@@ -21,14 +18,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.stereotype.Service;
 
-import cn.sowell.copframe.dto.page.PageInfo;
-import cn.sowell.copframe.utils.Assert;
-import cn.sowell.copframe.utils.FormatUtils;
-import cn.sowell.copframe.utils.TextUtils;
-import cn.sowell.copframe.utils.excel.CellTypeUtils;
-import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
-import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
-
 import com.abc.application.ApplicationInfo;
 import com.abc.mapping.entity.Entity;
 import com.abc.panel.Discoverer;
@@ -37,6 +26,15 @@ import com.abc.panel.PanelFactory;
 import com.abc.query.criteria.Criteria;
 import com.abc.query.entity.impl.EntitySortedPagedQuery;
 import com.abc.record.HistoryTracker;
+
+import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.copframe.utils.FormatUtils;
+import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.copframe.utils.excel.CellTypeUtils;
+import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
+import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
+import cn.sowell.datacenter.model.peopledata.service.impl.EntityTransfer;
+import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
 
 @Service
 public class ABCExecuteServiceImpl implements ABCExecuteService{
@@ -47,10 +45,10 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	private DateFormat defaultDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
 	
+	EntityTransfer eTransfer = new EntityTransfer();
 	
 	
-	
-	@Override
+	/*@Override
 	public Entity createEntity(Map<String, String> data) {
 		Assert.notNull(data);
 		Entity entity = new Entity(BASE_NODE_NAME);
@@ -75,14 +73,13 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		integration.integrate(entity, appInfo);
 		return entity;
 		
-	}
+	}*/
 	
 	@Override
 	public List<Entity> queryPeopleList(List<Criteria> criterias, PageInfo pageInfo){
 		Discoverer discoverer=PanelFactory.getDiscoverer(BASE_NODE_NAME);
 		
-		EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(criterias, null);
-		
+		EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(criterias, "编辑时间");
 		sortedPagedQuery.setPageSize(pageInfo.getPageSize());
 		pageInfo.setCount(sortedPagedQuery.getAllCount());
 		List<Entity> peoples = sortedPagedQuery.visit(pageInfo.getPageNo());
@@ -234,6 +231,19 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 			return null;
 		}
 		return null;
+	}
+	
+	@Override
+	public Entity savePeople(PeopleData people) {
+		Entity entity = new Entity(BASE_NODE_NAME);
+		eTransfer.bind(people, entity);
+		
+		ApplicationInfo appInfo=new ApplicationInfo();
+		appInfo.setWriteMappingName(BASE_NODE_NAME);
+		appInfo.setSource(ApplicationInfo.SOURCE_COMMON);
+		Integration integration=PanelFactory.getIntegration();
+		integration.integrate(entity, appInfo);
+		return entity;
 	}
 	
 }

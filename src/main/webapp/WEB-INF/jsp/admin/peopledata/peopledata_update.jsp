@@ -8,7 +8,7 @@
 		</div>
 	</div>
 
-	<nav>
+	<!-- <nav>
 		<div class="form-inline" >
 			<div class="form-group">
 				<label for="search">智能字段</label>
@@ -16,7 +16,7 @@
 			</div>
 			<button type="button" class="btn btn-default" id="smartSubmit">查询</button>
 		</div>
-	</nav>
+	</nav> -->
 
 	<div class="page-body" id="clone">
 <div id="cloneInput"></div>
@@ -60,7 +60,7 @@
 						</div>
 						<label class="col-lg-1 control-label" for="contact">联系号码</label>
 						<div class="col-lg-4">
-							<input type="text" class="form-control" name="contact1" id="contact" value="${people.contact }" />
+							<input type="text" class="form-control" name="contact" id="contact" value="${people.contact }" />
 						</div>
 					</div>
 					<div class="form-group">
@@ -135,16 +135,6 @@
 								<option value="珞巴族">珞巴族</option>
 								<option value="基诺族">基诺族</option>
 
-							</select>
-						</div>
-						<label class="col-lg-1 control-label" for="politicalStatus">政治面貌</label>
-						<div class="col-lg-4">
-							<select class="form-control" name="politicalStatus" data-value="${people.politicalStatus }">
-								<option value=""> -- 请选择 -- </option>
-								<option value="群众">群众</option>
-								<option value="共青团员">共青团员</option>
-								<option value="中共预备党员">中共预备党员</option>
-								<option value="中共党员">中共党员</option>
 							</select>
 						</div>
 					</div>
@@ -233,9 +223,9 @@
 						<div class="col-lg-4">
 							<input type="text" class="form-control" name="lowIncomeInsuredCode" value="${people.lowIncomeInsuredCode }"/>
 						</div>
-						<label class="col-lg-1 control-label" for="lowIncomeInsuredCode">低保人员类别</label>
+						<label class="col-lg-1 control-label" for="lowIncomeInsuredType">低保人员类别</label>
 						<div class="col-lg-4">
-							<select class="form-control" name="lowIncomeInsuredCode" data-value="${people.lowIncomeInsuredCode }">
+							<select class="form-control" name="lowIncomeInsuredType" data-value="${people.lowIncomeInsuredType }">
 								<option value=""> -- 请选择 -- </option>
 								<option value="在职职工">在职职工</option>
 								<option value="灵活就业人员">灵活就业人员</option>
@@ -297,7 +287,7 @@
 						</div>
 						<label class="col-lg-1 control-label" for="unemployeeCode">就失业证号</label>
 						<div class="col-lg-4">
-							<input type="text" class="form-control" name="unemployeeDate" value="${people.unemployeeDate }"/>
+							<input type="text" class="form-control" name="unemployeeCode" value="${people.unemployeeCode }"/>
 						</div>
 					</div>
 					<div class="form-group">
@@ -430,33 +420,33 @@
 						<h4>工作信息</h4>
 					</div>
 					<div class="form-group">
-						<label class="col-lg-1 control-label" for="companyName">公司名称</label>
+						<label class="col-lg-1 control-label" for="workExperiences[0].companyName">公司名称</label>
 						<div class="col-lg-4">
-							<input type="text" class="form-control" name="companyName" value="${people.companyName }"/>
+							<input type="text" class="form-control" name="workExperiences[0].companyName" value="${people.workExperiences[0].companyName }"/>
 						</div>
-						<label class="col-lg-1 control-label" for="workUnit">工作单位</label>
+						<label class="col-lg-1 control-label" for="workExperiences[0].workUnit">工作单位</label>
 						<div class="col-lg-4">
-							<input type="text" class="form-control" name="workUnit" value="${people.workUnit }"/>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-lg-1 control-label" for="workAddress">工作地址</label>
-						<div class="col-lg-4">
-							<input type="text" class="form-control" name="workAddress" value="${people.workAddress }"/>
-						</div>
-						<label class="col-lg-1 control-label" for="unitContact">单位电话</label>
-						<div class="col-lg-4">
-							<input type="text" class="form-control" name="unitContact" id="unitContact" value="${poeple.unitContact }"/>
+							<input type="text" class="form-control" name="workExperiences[0].workUnit" value="${people.workExperiences[0].workUnit }"/>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-lg-1 control-label" for="workDepartment">当前部门</label>
+						<label class="col-lg-1 control-label" for="workExperiences[0].workAddress">工作地址</label>
 						<div class="col-lg-4">
-							<input type="text" class="form-control" name="workDepartment" value="${poeple.workDepartment }"/>
+							<input type="text" class="form-control" name="workExperiences[0].workAddress" value="${people.workExperiences[0].workAddress }"/>
 						</div>
-						<label class="col-lg-1 control-label" for="unitNature">单位性质</label>
+						<label class="col-lg-1 control-label" for="workExperiences[0].unitContact">单位电话</label>
 						<div class="col-lg-4">
-							<select class="form-control" name="unitNature" data-value="${people.unitNature }">
+							<input type="text" class="form-control" name="workExperiences[0].unitContact" id="unitContact" value="${poeple.workExperiences[0].unitContact }"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="workExperiences[0].workDepartment">当前部门</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="workExperiences[0].workDepartment" value="${poeple.workExperiences[0].workDepartment }"/>
+						</div>
+						<label class="col-lg-1 control-label" for="workExperiences[0].unitNature">单位性质</label>
+						<div class="col-lg-4">
+							<select class="form-control" name="workExperiences[0].unitNature" data-value="${people.workExperiences[0].unitNature }">
 								<option value=""> -- 请选择 --</option>
 								<option value="未填">未填</option>
 								<option value="机关">机关</option>
@@ -470,29 +460,29 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-lg-1 control-label" for="salary">工资</label>
+						<label class="col-lg-1 control-label" for="workExperiences[0].salary">工资</label>
 						<div class="col-lg-4">
-							<input type="text" class="form-control" name="salary" value="${people.salary }"/>
+							<input type="text" class="form-control" name="workExperiences[0].salary" value="${people.workExperiences[0].salary }"/>
 						</div>
-						<label class="col-lg-1 control-label" for="workContent">工作内容</label>
+						<label class="col-lg-1 control-label" for="workExperiences[0].workContent">工作内容</label>
 						<div class="col-lg-4">
-							<input type="text" class="form-control" name="workContent" value="${people.workContent }"/>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-lg-1 control-label" for="workDuty">工作职责</label>
-						<div class="col-lg-4">
-							<input type="text" class="form-control" name="workDuty" value="${people.workDuty }"/>
-						</div>
-						<label class="col-lg-1 control-label" for="workSubject">工作主题</label>
-						<div class="col-lg-4">
-							<input type="text" class="form-control" name="workSubject" value="${people.workSubject }"/>
+							<input type="text" class="form-control" name="workExperiences[0].workContent" value="${people.workExperiences[0].workContent }"/>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-lg-1 control-label" for="workedOccupation">曾从事职业</label>
+						<label class="col-lg-1 control-label" for="workExperiences[0].workDuty">工作职责</label>
 						<div class="col-lg-4">
-							<input type="text" class="form-control" name="workedOccupation" value="${people.workedOccupation }"/>
+							<input type="text" class="form-control" name="workExperiences[0].workDuty" value="${people.workExperiences[0].workDuty }"/>
+						</div>
+						<label class="col-lg-1 control-label" for="workExperiences[0].workSubject">工作主题</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="workExperiences[0].workSubject" value="${people.workExperiences[0].workSubject }"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="workExperiences[0].workedOccupation">曾从事职业</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="workExperiences[0].workedOccupation" value="${people.workExperiences[0].workedOccupation }"/>
 						</div>
 					</div>
 					
@@ -500,23 +490,23 @@
 						<h4>家庭信息</h4>
 					</div>
 					<div class="form-group">
-						<label class="col-lg-1 control-label" for="familyAddress">家庭住址</label>
+						<label class="col-lg-1 control-label" for="familyInfo.familyAddress">家庭住址</label>
 						<div class="col-lg-4">
-							<input type="text" class="form-control" name="familyAddress" value="${people.familyAddress }"/>
+							<input type="text" class="form-control" name="familyInfo.familyAddress" value="${people.familyInfo.familyAddress }"/>
 						</div>
-						<label class="col-lg-1 control-label" for="familyCount">家庭成员人数</label>
+						<label class="col-lg-1 control-label" for="familyInfo.familyCount">家庭成员人数</label>
 						<div class="col-lg-4">
-							<input type="number" class="form-control" name="familyCount" value="${people.familyCount }"/>
+							<input type="number" class="form-control" name="familyInfo.familyCount" value="${people.familyInfo.familyCount }"/>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-lg-1 control-label" for="familyContact">家庭电话</label>
+						<label class="col-lg-1 control-label" for="familyInfo.familyContact">家庭电话</label>
 						<div class="col-lg-4">
-							<input type="text" class="form-control" name="familyContact" value="${people.familyContact }"/>
+							<input type="text" class="form-control" name="familyInfo.familyContact" value="${people.familyInfo.familyContact }"/>
 						</div>
-						<label class="col-lg-1 control-label" for="familyFinancialSituation">家庭经济状况</label>
+						<label class="col-lg-1 control-label" for="familyInfo.familyFinancialSituation">家庭经济状况</label>
 						<div class="col-lg-4">
-							<select class="form-control" name="familyFinancialSituation" data-value="${people.familyFinancialSituation }">
+							<select class="form-control" name="familyInfo.familyFinancialSituation" data-value="${people.familyInfo.familyFinancialSituation }">
 								<option value=""> -- 请选择 -- </option>
 								<option value="无固定经济来源">无固定经济来源</option>
 								<option value="有固定经济来源">有固定经济来源</option>
@@ -527,9 +517,9 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-lg-1 control-label" for="familyType">家庭类别</label>
+						<label class="col-lg-1 control-label" for="familyInfo.familyType">家庭类别</label>
 						<div class="col-lg-4">
-							<select class="form-control" name="familyType" data-value="${people.familyType }">
+							<select class="form-control" name="familyInfo.familyType" data-value="${people.familyInfo.familyType }">
 								<option value=""> -- 请选择 --</option>
 								<option value="低保家庭">低保家庭</option>
 								<option value="纯老家庭">纯老家庭</option>
@@ -543,15 +533,15 @@
 								<option value="其它">其它</option>
 							</select>
 						</div>
-						<label class="col-lg-1 control-label" for="familyYearIncome">家庭年收入</label>
+						<label class="col-lg-1 control-label" for="familyInfo.familyYearIncome">家庭年收入</label>
 						<div class="col-lg-4">
-							<input type="text" class="form-control" name="familyYearIncome" value="${people.familyYearIncome }"/>
+							<input type="text" class="form-control" name="familyInfo.familyYearIncome" value="${people.familyInfo.familyYearIncome }"/>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-lg-1 control-label" for="familySituation">家庭情况</label>
+						<label class="col-lg-1 control-label" for="familyInfo.familySituation">家庭情况</label>
 						<div class="col-lg-4">
-							<select class="form-control" name="familySituation" data-value="${people.familySituation }">
+							<select class="form-control" name="familyInfo.familySituation" data-value="${people.familyInfo.familySituation }">
 								<option value=""> -- 请选择 --</option>
 								<option value="低收入家庭">低收入家庭</option>
 								<option value="单亲家庭">单亲家庭</option>
@@ -562,15 +552,15 @@
 								<option value="其他">其他</option>
 							</select>
 						</div>
-						<label class="col-lg-1 control-label" for="familyAvgMonthIncome">家庭人均月收入</label>
+						<label class="col-lg-1 control-label" for="familyInfo.familyAvgMonthIncome">家庭人均月收入</label>
 						<div class="col-lg-4">
-							<input type="text" class="form-control" name="familyAvgMonthIncome" value="${people.familyAvgMonthIncome }"/>
+							<input type="text" class="form-control" name="familyInfo.familyAvgMonthIncome" value="${people.familyInfo.familyAvgMonthIncome }"/>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-lg-1 control-label" for="familyUnemployeeCount">家庭失业人数</label>
+						<label class="col-lg-1 control-label" for="familyInfo.familyUnemployeeCount">家庭失业人数</label>
 						<div class="col-lg-4">
-							<input type="number" class="form-control" name="familyUnemployeeCount" value="${people.familyUnemployeeCount }"/>
+							<input type="number" class="form-control" name="familyInfo.familyUnemployeeCount" value="${people.familyInfo.familyUnemployeeCount }"/>
 						</div>
 					</div>
 					
@@ -596,7 +586,7 @@
 					<div class="form-group">
 						<label class="col-lg-1 control-label" for="pregnancyWeeks">现孕周</label>
 						<div class="col-lg-4">
-							<input type="number" class="form-control" name="childrenCount" value="${people.pregnancyWeeks }"/>
+							<input type="number" class="form-control" name="pregnancyWeeks" value="${people.pregnancyWeeks }"/>
 						</div>
 						<label class="col-lg-1 control-label" for="familyPlanningCode">计划生育证编号</label>
 						<div class="col-lg-4">

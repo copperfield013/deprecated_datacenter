@@ -1,19 +1,18 @@
 package cn.sowell.datacenter.model.basepeople;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 import org.apache.poi.ss.usermodel.Sheet;
 
-import cn.sowell.copframe.dto.page.PageInfo;
-import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
-import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
-
 import com.abc.mapping.entity.Entity;
 import com.abc.query.criteria.Criteria;
+
+import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
+import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
+import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
 
 public interface ABCExecuteService {
 	/**
@@ -21,9 +20,9 @@ public interface ABCExecuteService {
 	 * @param data
 	 * @return
 	 */
-	Entity createEntity(Map<String, String> data);
+	//Entity createEntity(Map<String, String> data);
 	
-	Entity mergePeople(Map<String, String> data) throws IOException;
+	//Entity mergePeople(Map<String, String> data) throws IOException;
 
 	/**
 	 * 查询人口数据
@@ -70,6 +69,8 @@ public interface ABCExecuteService {
 	 * @return
 	 */
 	Entity getHistoryPeople(String peopleCode, Date date);
+
+	Entity savePeople(PeopleData people);
 
 	
 

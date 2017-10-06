@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 public @interface EntityRecord {
 	Class<?> elementClass() default Object.class;
 
-	String entityName() default "";
+	String entityName();
 
-	String domainName() default "";
+	String domainName();
 }

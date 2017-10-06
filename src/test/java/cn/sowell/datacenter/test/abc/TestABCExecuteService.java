@@ -35,7 +35,7 @@ public class TestABCExecuteService {
 		data.put("birthday", "1991-08-20");
 		data.put("contact1", "15657198552");
 		
-		People people = abcService.mergePeople(data);
-		System.out.println(people);
+		//People people = abcService.mergePeople(data);
+		//System.out.println(people);
 	}
 }

@@ -87,11 +87,11 @@ public class PeopleData implements EntityData{
 	
 	/*****工作信息******/
 	@EntityElement(value="workExperience")
-	@EntityRecord(elementClass=WorkExperience.class)
+	@EntityRecord(elementClass=WorkExperience.class, entityName="workExperience", domainName="工作经历")
 	private List<WorkExperience> workExperiences;
 	
 	@EntityElement("家庭信息")
-	@EntityRecord()
+	@EntityRecord(entityName="familyInfomation", domainName="家庭信息")
 	private FamilyInfo familyInfo;
 	
 	

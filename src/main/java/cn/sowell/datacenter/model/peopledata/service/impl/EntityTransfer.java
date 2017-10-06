@@ -1,8 +1,8 @@
 package cn.sowell.datacenter.model.peopledata.service.impl;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -13,17 +13,17 @@ import java.util.function.Function;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 
+import com.abc.mapping.entity.Entity;
+import com.abc.mapping.entity.RecordEntity;
+
 import cn.sowell.copframe.spring.binder.ClassPropertyComposite;
 import cn.sowell.copframe.spring.binder.FieldRefectUtils;
+import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.model.peopledata.DateType;
 import cn.sowell.datacenter.model.peopledata.EntityElement;
-import cn.sowell.datacenter.model.peopledata.EntityNode;
 import cn.sowell.datacenter.model.peopledata.EntityRecord;
 import cn.sowell.datacenter.model.peopledata.EntityRelation;
-
-import com.abc.mapping.entity.Entity;
-import com.abc.mapping.entity.RecordEntity;
 
 public class EntityTransfer {
 	
@@ -45,7 +45,6 @@ public class EntityTransfer {
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	<T> FieldRefectUtils<T> getFieldRefrectUtils(Class<T> clazz){
 		return getFieldRefrectUtils(clazz, property->{
 			EntityElement anno = property.getFieldAnno(EntityElement.class);
@@ -98,6 +97,7 @@ public class EntityTransfer {
 								}
 								break;
 						}
+						
 						composite.setValue(target, value);
 					} catch (Exception e) {
 						logger.error("", e);
@@ -137,9 +137,9 @@ public class EntityTransfer {
 		Class<?> fieldType = composite.getFieldType();
 		EntityRecord recordAnno = composite.getFieldAnno(EntityRecord.class);
 		EntityRelation relationAnno = composite.getFieldAnno(EntityRelation.class);
-		if(recordAnno != null){
+		if(recordAnno != null && !Object.class.equals(recordAnno.elementClass())){
 			fieldType = recordAnno.elementClass();
-		}else if(relationAnno != null){
+		}else if(relationAnno != null && !Object.class.equals(recordAnno.elementClass())){
 			fieldType = relationAnno.elementClass();
 		}
 		return BeanUtils.instantiate(fieldType);
@@ -203,16 +203,23 @@ public class EntityTransfer {
 	}
 	
 	
+	
+	
+	
 	/**
 	 * 
 	 * @param pojo
 	 * @return
 	 */
-	/*@SuppressWarnings("unchecked")
-	public void bind(Object pojo, Entity target){
+	@SuppressWarnings("unchecked")
+	private Entity bindData(Object pojo, Entity target){
 		if(pojo != null){
-//			EntityNode nodeAnno = pojo.getClass().getDeclaredAnnotation(EntityNode.class);
-//			Entity entity = new Entity(nodeAnno.value());
+			Entity existEntity = getExistEntity(pojo);
+			if(existEntity != null) {
+				return existEntity;
+			}else {
+				putExistsEntity(pojo, target);
+			}
 			getFieldRefrectUtils(pojo.getClass()).iterateField((propName, composite)->{
 				if(!checkIgnored(composite)){
 					try {
@@ -227,37 +234,98 @@ public class EntityTransfer {
 							break;
 						case TYPE_RECORD:
 							EntityRecord annoRecord = composite.getFieldAnno(EntityRecord.class);
-							if(checkCollection(composite) instanceof Collection){
+							//如果是集合的话，那么要对集合的元素进行转换
+							if(value instanceof Collection) {
 								for (Object ele : (Collection<Object>)value) {
-									Entity rEntity = new Entity(annoRecord.entityName());
-									bind(ele, rEntity);
+									//构造集合内的一个元素对应的entity
+									//将pojo的数据绑定到entity
+									Entity rEntity = bindData(ele, new Entity(annoRecord.entityName()));
 									target.putRecordEntity(propName, annoRecord.domainName(), rEntity);
 								}
-							}else{
-								Entity rEntity = new Entity(annoRecord.entityName());
-								bind(value, rEntity);
+							}else {
+								Entity rEntity = bindData(value, new Entity(annoRecord.entityName()));
 								target.putRecordEntity(propName, annoRecord.domainName(), rEntity);
 							}
 							break;
 						case TYPE_RELATION:
 							EntityRelation annoRelation = composite.getFieldAnno(EntityRelation.class);
-							if(annoRecord != null){
-								
+							//如果是集合的话，那么要对集合的元素进行转换
+							if(value instanceof Collection) {
+								for (Object ele : (Collection<Object>)value) {
+									//构造集合内的一个元素对应的entity
+									//将pojo的数据绑定到entity
+									Entity rEntity = bindData(ele, new Entity(annoRelation.entityName()));
+									target.putRecordEntity(propName, annoRelation.domainName(), rEntity);
+								}
+							}else {
+								Entity rEntity = bindData(value, new Entity(annoRelation.entityName()));
+								target.putRelationEntity(propName, annoRelation.domainName(), rEntity);
 							}
-							
 							break;
 						default:
 							break;
 						}
-						
 					} catch (Exception e) {
 						logger.error("", e);
 					}
-					
 				}
 			});
+			return target;
+		}else {
+			return null;
 		}
-	}*/
+	}
+
 	
+	/**
+	 * 将普通字段的值转换成entity对象中可接受的字段值
+	 * @param value
+	 * @param composite
+	 * @return
+	 */
+	private Object transferNormalEntityValue(Object value, ClassPropertyComposite composite) {
+		if(value != null) {
+			Class<?> clazz = value.getClass();
+			EntityElement anno = composite.getFieldAnno(EntityElement.class);
+			if(String.class.equals(clazz)) {
+				return value;
+			}else if(Date.class.isAssignableFrom(clazz)) {
+				if(DateType.NULL.equals(anno.dateType())) {
+					return DateType.DATE.format((Date) value); 
+				}else {
+					return anno.dateType().format((Date) value);
+				}
+			}else {
+				return FormatUtils.toString(value.toString());
+			}
+		}else {
+			return null;
+		}
+	}
+
+
+
+	Map<Thread, Map<Object, Entity>> entityPojoEntityMap = new HashMap<Thread, Map<Object, Entity>>();
+	
+	public void bind(Object pojo, Entity target) {
+		bindData(pojo, target);
+		entityPojoEntityMap.remove(Thread.currentThread());
+	}
+	private Entity getExistEntity(Object pojo) {
+		Map<Object, Entity> peMap = entityPojoEntityMap.get(Thread.currentThread());
+		if(peMap != null) {
+			return peMap.get(pojo);
+		}
+		return null;
+	}
+	
+	private void putExistsEntity(Object pojo, Entity target) {
+		Map<Object, Entity> peMap = entityPojoEntityMap.get(Thread.currentThread());
+		if(peMap == null) {
+			peMap = new HashMap<Object, Entity>();
+			entityPojoEntityMap.put(Thread.currentThread(), peMap);
+		}
+		peMap.put(pojo, target);
+	}
 
 }

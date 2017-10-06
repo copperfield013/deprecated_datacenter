@@ -1,6 +1,9 @@
 package cn.sowell.datacenter.model.peopledata.pojo;
 
+import cn.sowell.datacenter.model.peopledata.EntityElement;
+
 public class FamilyInfo {
+	@EntityElement("家庭地址")
 	private String familyAddress;
 	private Integer familyCount;
 	private String familyContact;

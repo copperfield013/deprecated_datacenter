@@ -19,6 +19,17 @@
 			<groupId>cn.sowell.copframe</groupId>
 			<artifactId>cpf-web</artifactId>
 			<version>${version.cpfweb}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>cn.sowell.copframe</groupId>
+					<artifactId>cpf-spring</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>cn.sowell.copframe</groupId>
+			<artifactId>cpf-spring</artifactId>
+			<version>0.3.2</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.sowell.copframe</groupId>

@@ -1,10 +1,9 @@
 package cn.sowell.datacenter.admin.controller.people;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -14,8 +13,10 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -50,6 +51,13 @@ public class AdminPeopleDataController {
 	FrameDateFormat dateFormat;
 	
 	Logger logger = Logger.getLogger(AdminPeopleDataController.class);
+	@org.springframework.web.bind.annotation.InitBinder
+    public void InitBinder(ServletRequestDataBinder binder) {
+        System.out.println("执行了InitBinder方法");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setLenient(false);
+        binder.registerCustomEditor(Date.class, null, new CustomDateEditor(dateFormat, true));
+    } 
 	
 	@RequestMapping("/list")
 	public String list(PeopleDataCriteria criteria, PageInfo pageInfo, Model model){
@@ -67,11 +75,12 @@ public class AdminPeopleDataController {
 	
 	@ResponseBody
 	@RequestMapping("/do_add")
-	public AjaxPageResponse doAdd(WebRequest request){
+	public AjaxPageResponse doAdd(WebRequest request, PeopleData people){
 		try {
-			Map<String, String> data = new HashMap<String, String>();
+			abcService.savePeople(people);
+			/*Map<String, String> data = new HashMap<String, String>();
 			request.getParameterMap().forEach((name, val) -> {data.put(name, val[0]);});
-			abcService.mergePeople(data);
+			abcService.mergePeople(data);*/
 			return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("添加成功", "peopledata_list");
 		} catch (Exception e) {
 			logger.error("添加失败", e);
@@ -88,15 +97,10 @@ public class AdminPeopleDataController {
 	
 	@ResponseBody
 	@RequestMapping("/do_update")
-	public AjaxPageResponse doUpdate(WebRequest request){
+	public AjaxPageResponse doUpdate(PeopleData people){
 		try {
-			Map<String, String> data = new HashMap<String, String>();
-
-			request.getParameterMap().forEach((name, val)  -> {
-				data.put(name, val[0]);
-			});
-			Assert.notNull(data.get("peopleCode"));
-			abcService.mergePeople(data);
+			Assert.notNull(people.getPeopleCode());
+			abcService.savePeople(people);
 			return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改成功", "peopledata_list");
 		} catch (Exception e) {
 			logger.error("添加失败", e);
