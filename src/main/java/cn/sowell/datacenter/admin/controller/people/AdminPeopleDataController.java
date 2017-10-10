@@ -30,6 +30,7 @@ import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JsonResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.Assert;
+import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
@@ -124,9 +125,11 @@ public class AdminPeopleDataController {
 	public JsonResponse doImport(MultipartFile file, @RequestParam String sheetName, @RequestParam String dataType, HttpSession session){
 		JsonResponse jRes = new JsonResponse();
 		jRes.setStatus("error");
-		ImportStatus beforeStatus = (ImportStatus) session.getAttribute(KEY_IMPORT_STATUS);
+		String uuid = TextUtils.uuid();
+		jRes.put("uuid", uuid);
+		ImportStatus beforeStatus = (ImportStatus) session.getAttribute(KEY_IMPORT_STATUS + uuid);
 		if(beforeStatus != null){
-			beforeStatus.breakImport();
+			jRes.put("msg", "导入仍在进行");
 		}else{
 			String fileName = file.getOriginalFilename();
 			Workbook wk = null;
@@ -146,7 +149,7 @@ public class AdminPeopleDataController {
 				if(sheet != null){
 					final Workbook workbook = wk;
 					ImportStatus importStatus = new ImportStatus();
-					session.setAttribute(KEY_IMPORT_STATUS, importStatus);
+					session.setAttribute(KEY_IMPORT_STATUS + uuid, importStatus);
 					Thread thread = new Thread(()->{
 						try {
 							abcService.importPeople(sheet, importStatus, dataType);
@@ -157,7 +160,6 @@ public class AdminPeopleDataController {
 						}finally{
 							try {
 								workbook.close();
-								session.removeAttribute(KEY_IMPORT_STATUS);
 							} catch (Exception e) {
 								logger.error("关闭workbook时发生错误", e);
 							}
@@ -176,9 +178,9 @@ public class AdminPeopleDataController {
 	
 	@ResponseBody
 	@RequestMapping("/status_of_import")
-	public JsonResponse statusOfImport(HttpSession session){
+	public JsonResponse statusOfImport(HttpSession session, @RequestParam String uuid){
 		JsonResponse jRes = new JsonResponse();
-		ImportStatus importStatus = (ImportStatus) session.getAttribute(KEY_IMPORT_STATUS);
+		ImportStatus importStatus = (ImportStatus) session.getAttribute(KEY_IMPORT_STATUS + uuid);
 		if(importStatus != null){
 			jRes.put("totalCount", importStatus.getTotal());
 			jRes.put("current", importStatus.getCurrent());
@@ -186,11 +188,12 @@ public class AdminPeopleDataController {
 			jRes.put("lastInterval", importStatus.lastInterval());
 			if(importStatus.breaked()){
 				jRes.put("breaked", true);
+				session.removeAttribute(KEY_IMPORT_STATUS + uuid);
 			}else if(importStatus.ended()){
 				jRes.put("ended", true);
-			}else{
-				jRes.setStatus("suc");
+				session.removeAttribute(KEY_IMPORT_STATUS + uuid);
 			}
+			jRes.setStatus("suc");
 		}else{
 			jRes.setStatus("no found import progress");
 		}
@@ -199,9 +202,9 @@ public class AdminPeopleDataController {
 	
 	@ResponseBody
 	@RequestMapping("/break_import")
-	public JsonResponse breakImport(HttpSession session){
+	public JsonResponse breakImport(HttpSession session, @RequestParam String uuid){
 		JsonResponse jRes = new JsonResponse();
-		ImportStatus importStatus = (ImportStatus) session.getAttribute(KEY_IMPORT_STATUS);
+		ImportStatus importStatus = (ImportStatus) session.getAttribute(KEY_IMPORT_STATUS + uuid);
 		if(importStatus != null){
 			importStatus.breakImport();
 			jRes.setStatus("suc");

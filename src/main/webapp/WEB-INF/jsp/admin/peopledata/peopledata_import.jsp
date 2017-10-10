@@ -37,7 +37,7 @@
 						<label class="col-lg-2 control-label">进度</label>
 						<div class="col-lg-6">
 							<div id="progress" class="progress progress-striped active">
-                                <div class="progress-bar progress-bar-orange" 
+                                <div class="progress-bar progress-bar-success" 
                                 	role="progressbar" 
                                 	aria-valuenow="0" 
                                 	aria-valuemin="0" 
@@ -71,59 +71,75 @@
 <script>
 	seajs.use(['ajax', 'dialog'], function(Ajax, Dialog){
 		var $page = $('#peopledata-import');
+		console.log($page);
 		var $feedback = $('#feedback-msg', $page);
+		var uuid = null;
 		$('#submit', $page).click(function(){
 			Dialog.confirm('确认导入？', function(yes){
 				if(yes){
 					var formData = new FormData($('form', $page)[0]);
-					Ajax.ajax('admin/peopledata/do_import', formData, function(){
-						$('#break', $page).show();
-						var timer = setInterval(function(){
-							Ajax.ajax('admin/peopledata/status_of_import',{}, function(data){
-								if(data.status === 'suc'){
-									if(typeof data.current === 'number' && typeof data.totalCount === 'number'){
-										var progress = data.current/data.totalCount;
-										var percent = parseFloat(progress * 100).toFixed(0);
-										$('#progress', $page)
-											.find('.progress-bar')
-											.attr('aria-valuenow', percent)
-											.css('width', percent + '%')
-											.find('span')
-												.text(percent + '%');
-										var remain = data.totalCount - data.current;
-										
-										
-										if(progress >= 1){
-											Dialog.notice('导入完成');
-											clearInterval(timer);
-											$feedback.text('');
-										}else{
-											var msg = data.message + ',' 
-														+ '剩余' + remain + '条';
-											if(data.lastInterval && data.lastInterval > 0){
-												msg += '，当前速率' + parseFloat(1000/data.lastInterval).toFixed(2) + '条/秒，'
-												+ '预计剩余时间' + parseFloat(remain * data.lastInterval / 1000).toFixed(0) + '秒'
+					Ajax.ajax('admin/peopledata/do_import', formData, function(data){
+						if(data.status === 'suc' && data.uuid){
+							$('#break', $page).show();
+							$('#submit', $page).attr('disabled', 'disabled');
+							var timer = setInterval(function(){
+								uuid = data.uuid;
+								Ajax.ajax('admin/peopledata/status_of_import',{uuid: data.uuid}, function(data){
+									if(data.status === 'suc'){
+										if(typeof data.current === 'number' && typeof data.totalCount === 'number'){
+											var progress = data.current/data.totalCount;
+											var percent = parseFloat(progress * 100).toFixed(0);
+											$('#progress', $page)
+												.find('.progress-bar')
+												.attr('aria-valuenow', percent)
+												.css('width', percent + '%')
+												.find('span')
+													.text(percent + '%');
+											var remain = data.totalCount - data.current;
+											
+											if(progress >= 1){
+												Dialog.notice('导入完成', 'success');
+												$('#progress span', $page).text('导入完成');
+												clearInterval(timer);
+												$feedback.text('');
+												$('#submit', $page).removeAttr('disabled').text('重新导入');
+												uuid = null;
+											}else{
+												var msg = data.message + ',' 
+															+ '剩余' + remain + '条';
+												if(data.lastInterval && data.lastInterval > 0){
+													msg += '，当前速率' + parseFloat(1000/data.lastInterval).toFixed(2) + '条/秒，'
+													+ '预计剩余时间' + parseFloat(remain * data.lastInterval / 1000).toFixed(0) + '秒'
+												}
+												$feedback.text(msg);
 											}
-											$feedback.text(msg);
 										}
+									}else{
+										clearInterval(timer);
+										$('#submit', $page).removeAttr('disabled').text('重新导入');
+										uuid = null;
 									}
-								}else{
-									clearInterval(timer);
-								}
-							});
-						}, 1000);
+								});
+							}, 1000);
+						}else{
+							if(data.status === 'error' && data.msg){
+								Dialog.notice(data.msg, 'error');
+							}
+						}
 					});
 				}
 			});
 		});
 		$('#break', $page).click(function(){
-			Dialog.confirm('确认停止当前的导入任务？', function(){
-				Ajax.ajax('admin/peopledata/break_import', {}, function(data){
-					if(data.status === 'suc'){
-						$('#break', $page).hide();
-					}
+			if(uuid){
+				Dialog.confirm('确认停止当前的导入任务？', function(){
+						Ajax.ajax('admin/peopledata/break_import', {uuid: uuid}, function(data){
+							if(data.status === 'suc'){
+								$('#break', $page).hide();
+							}
+						});
 				});
-			});
+			}
 		});
 	});
 </script>

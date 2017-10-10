@@ -11,20 +11,24 @@
 	    height: 40px;
 	    line-height: 40px;
 	}
+	#people-${peopleCode } div#errors {
+	    width: 300px;
+	    height: 200px;
+	    position: absolute;
+	    border: 3px solid #ccc;
+	    top: 30px;
+	    left: 100px;
+	    background: #fff;
+	    padding: 20px 10px;
+	    overflow-x: hidden;
+	    overflow-y: auto;
+	}
 </style>
 	<div class="page-header">
 		<div class="header-title">
 			<h1>${people.name }-详情</h1>
 			<c:if test="${people.errors != null && fn:length(people.errors) > 0 }">
-				<a href="#" 
-					data-container="body" 
-					data-titleclass="bordered-blue" 
-					data-toggle="popover" 
-					data-placement="top" 
-					data-title="PopOver On Click" 
-					data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." >
-					错误信息
-	            </a>
+			    <h1 id="showErrors" class="fa fa-info-circle" style="cursor: pointer;color: #CD5C5C;"></h1>
 			</c:if>
 		</div>
 		<c:if test="${datetime == null}">
@@ -291,6 +295,13 @@
 
 		</c:if>
 	</div>
+	<div id="errors" style="display: none;">
+		<ul>
+			<c:forEach items="${people.errors }" var="error">
+				<li>${error.error_str }</li>
+			</c:forEach>
+		</ul>
+   </div>
 </div>
 <script>
 	seajs.use(['dialog'], function(Dialog){
@@ -315,6 +326,16 @@
 			$page.getLocatePage().loadContent('admin/peopledata/detail/${peopleCode }', undefined, {
 				datetime	: $(this).val()
 			});
+		});
+		var $errors = $('#errors', $page);
+		$('#showErrors', $page).mouseenter(function(e){
+			$errors.show();
+		});
+		$page.click(function(e){
+			var $target = $(e.target);
+			if(!$target.is('#showErrors') && $target.closest('#errors').length == 0){
+				$errors.hide();
+			}
 		});
 	});
 </script>
