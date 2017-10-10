@@ -27,7 +27,7 @@
 						<div class="col-lg-6">
 							<select name="dataType">
 								<option value="base">基本数据</option>
-								<option value="lowIncome">低保数据</option>
+								<option value="lowincome">低保数据</option>
 								<option value="handicapped">残疾人数据</option>
 								<option value="familyPlanning">计生数据</option>
 							</select>

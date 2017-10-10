@@ -45,19 +45,19 @@ public class PeopleDataServiceImpl implements PeopleDataService{
 			if(TextUtils.hasText(criteria.getName())){
 				LikeQueryCriteria like = CriteriaFactory.createLikeQueryCriteria(mapperName);
 				like.setName("name");
-				like.setValue("%" + criteria.getName() + "%");
+				like.setValue(criteria.getName());
 				cs.add(like);
 			}
 			if(TextUtils.hasText(criteria.getAddress())){
 				LikeQueryCriteria like = CriteriaFactory.createLikeQueryCriteria(mapperName);
 				like.setName("address");
-				like.setValue("%" + criteria.getAddress() + "%");
+				like.setValue(criteria.getAddress());
 				cs.add(like);
 			}
 			if(TextUtils.hasText(criteria.getIdcode())){
 				LikeQueryCriteria like = CriteriaFactory.createLikeQueryCriteria(mapperName);
 				like.setName("idcode");
-				like.setValue("%" + criteria.getIdcode() + "%");
+				like.setValue(criteria.getIdcode());
 				cs.add(like);
 			}
 			return cs;
@@ -69,9 +69,12 @@ public class PeopleDataServiceImpl implements PeopleDataService{
 
 
 	private PeopleData transfer(Entity entity) {
-		PeopleData people = new PeopleData();
-		eTransfer.bind(entity, people);
-		return people;
+		if(entity != null){
+			PeopleData people = new PeopleData();
+			eTransfer.bind(entity, people);
+			return people;
+		}
+		return null;
 	}
 
 
@@ -84,13 +87,14 @@ public class PeopleDataServiceImpl implements PeopleDataService{
 	@Override
 	public PeopleData getHistoryPeople(String peopleCode, Date date) {
 		if(date == null){
-			return getPeople(peopleCode);
-		}else{
-			List<ErrorInfomation> errors = new ArrayList<ErrorInfomation>();
-			Entity people = abcService.getHistoryPeople(peopleCode, date, errors);
-			PeopleData peopleData = transfer(people);
-			peopleData.setErrors(errors);
-			return peopleData;
+			date = new Date();
 		}
+		List<ErrorInfomation> errors = new ArrayList<ErrorInfomation>();
+		Entity people = abcService.getHistoryPeople(peopleCode, date, errors);
+		PeopleData peopleData = transfer(people);
+		if(peopleData != null){
+			peopleData.setErrors(errors);
+		}
+		return peopleData;
 	}
 }

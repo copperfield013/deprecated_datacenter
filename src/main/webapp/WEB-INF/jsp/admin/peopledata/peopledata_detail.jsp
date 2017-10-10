@@ -1,12 +1,22 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <div class="detail" id="people-${peopleCode }">
+<style>
+	#people-${peopleCode } .toggle-history{
+	    position: absolute;
+	    right: 2em;
+	    display: inline-block;
+	    top: 0;
+	    vertical-align: middle;
+	    height: 40px;
+	    line-height: 40px;
+	}
+</style>
 	<div class="page-header">
 		<div class="header-title">
 			<h1>${people.name }-详情</h1>
 			<c:if test="${people.errors != null && fn:length(people.errors) > 0 }">
 				<a href="#" 
-					class="btn btn-default" 
 					data-container="body" 
 					data-titleclass="bordered-blue" 
 					data-toggle="popover" 
@@ -17,7 +27,12 @@
 	            </a>
 			</c:if>
 		</div>
-		<div class="header-buttons">
+		<c:if test="${datetime == null}">
+			<div class="toggle-history">
+				<a href="#">查看历史</a>
+			</div>
+		</c:if>
+		<div class="header-buttons" style="${datetime == null?'display:none':''}">
 			<div>
 				<label>数据时间：</label>
 				<input class="form-control" css-width="200px" style="margin-top:3px;display: inline;margin-right: 1em;" type="text" id="datetime" placeholder="选择时间" value="${datetime }" />
@@ -26,13 +41,6 @@
 	</div>
 	<div class="page-body">
 		<c:if test="${people != null }">
-			<div class="row">
-				<div class="col-lg-12">
-					<c:forEach items="${people.errors }" var="error">
-						${error.error_str }<br/>
-					</c:forEach>
-				</div>
-			</div>
 			<div class="row">
 				<label class="col-lg-2">姓名</label>
 				<div class="col-lg-4">${people.name }</div>
@@ -290,7 +298,12 @@
 		var hasRecord = '${people != null}';
 		if(hasRecord != 'true'){
 			Dialog.notice('数据不存在', 'warning');
+			$('.header-title h1').text('数据不存在');
 		}
+		$('.toggle-history a', $page).click(function(){
+			$(this).closest('.toggle-history').hide();
+			$('.header-buttons', $page).show();
+		});
 		
 		$('#datetime', $page).datetimepicker({
 			language	: 'zh-CN',
