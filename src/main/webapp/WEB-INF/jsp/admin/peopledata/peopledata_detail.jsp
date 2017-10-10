@@ -4,6 +4,18 @@
 	<div class="page-header">
 		<div class="header-title">
 			<h1>${people.name }-详情</h1>
+			<c:if test="${people.errors != null && fn:length(people.errors) > 0 }">
+				<a href="#" 
+					class="btn btn-default" 
+					data-container="body" 
+					data-titleclass="bordered-blue" 
+					data-toggle="popover" 
+					data-placement="top" 
+					data-title="PopOver On Click" 
+					data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." >
+					错误信息
+	            </a>
+			</c:if>
 		</div>
 		<div class="header-buttons">
 			<div>
@@ -14,6 +26,13 @@
 	</div>
 	<div class="page-body">
 		<c:if test="${people != null }">
+			<div class="row">
+				<div class="col-lg-12">
+					<c:forEach items="${people.errors }" var="error">
+						${error.error_str }<br/>
+					</c:forEach>
+				</div>
+			</div>
 			<div class="row">
 				<label class="col-lg-2">姓名</label>
 				<div class="col-lg-4">${people.name }</div>
@@ -94,11 +113,11 @@
 				<label class="col-lg-2">享受低保金额</label>
 				<div class="col-lg-4">${people.lowIncomeInsuredAmount }</div>
 				<label class="col-lg-2">享受开始日期</label>
-				<div class="col-lg-4">${people.lowIncomeInsuredStart }</div>
+				<div class="col-lg-4"><fmt:formatDate value="${people.lowIncomeInsuredStart }" pattern="yyyy年MM月dd日" /></div>
 			</div>
 			<div class="row">
 				<label class="col-lg-2">享受结束日期</label>
-				<div class="col-lg-4">${people.lowIncomeInsuredEnd }</div>
+				<div class="col-lg-4"><fmt:formatDate value="${people.lowIncomeInsuredEnd }" pattern="yyyy年MM月dd日" /></div>
 			</div>
 			
 			<div class="row">
@@ -107,7 +126,7 @@
 			
 			<div class="row">
 				<label class="col-lg-2">就失业日期</label>
-				<div class="col-lg-4">${people.unemployeeDate }</div>
+				<div class="col-lg-4"><fmt:formatDate value="${people.unemployeeDate }" pattern="yyyy年MM月dd日" /></div>
 				<label class="col-lg-2">就失业证号</label>
 				<div class="col-lg-4">${people.unemployeeCode }</div>
 			</div>
@@ -146,7 +165,7 @@
 				<label class="col-lg-2">政治面貌</label>
 				<div class="col-lg-4">${people.politicalStatus }</div>
 				<label class="col-lg-2">入党日期</label>
-				<div class="col-lg-4">${people.partyDate }</div>
+				<div class="col-lg-4"><fmt:formatDate value="${people.partyDate }" pattern="yyyy年MM月dd日" /></div>
 			</div>
 			<div class="row">
 				<label class="col-lg-2">党内职务</label>
@@ -189,7 +208,7 @@
 				<div class="col-lg-4">${people.workExperiences[0].unitNature }</div>
 			</div>
 			<div class="row">
-				<label class="col-lg-2">工资</label>
+				<label class="col-lg-2">工资（元）</label>
 				<div class="col-lg-4">${people.workExperiences[0].salary }</div>
 				<label class="col-lg-2">工作内容</label>
 				<div class="col-lg-4">${people.workExperiences[0].workContent }</div>
@@ -226,13 +245,13 @@
 			<div class="row">
 				<label class="col-lg-2">家庭类别</label>
 				<div class="col-lg-4">${people.familyInfo.familyType }</div>
-				<label class="col-lg-2">家庭年收入</label>
+				<label class="col-lg-2">家庭年收入（元）</label>
 				<div class="col-lg-4">${people.familyInfo.familyYearIncome }</div>
 			</div>
 			<div class="row">
 				<label class="col-lg-2">家庭情况</label>
 				<div class="col-lg-4">${people.familyInfo.familySituation }</div>
-				<label class="col-lg-2">家庭人均月收入</label>
+				<label class="col-lg-2">家庭人均月收入（元）</label>
 				<div class="col-lg-4">${people.familyInfo.familyAvgMonthIncome }</div>
 			</div>
 			<div class="row">

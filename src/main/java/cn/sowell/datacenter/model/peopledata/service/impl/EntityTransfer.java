@@ -290,7 +290,7 @@ public class EntityTransfer {
 			if(String.class.equals(clazz)) {
 				return value;
 			}else if(Date.class.isAssignableFrom(clazz)) {
-				if(DateType.NULL.equals(anno.dateType())) {
+				if(anno == null || DateType.NULL.equals(anno.dateType())) {
 					return DateType.DATE.format((Date) value); 
 				}else {
 					return anno.dateType().format((Date) value);

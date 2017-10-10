@@ -3,6 +3,8 @@ package cn.sowell.datacenter.model.peopledata.pojo;
 import java.util.Date;
 import java.util.List;
 
+import com.abc.dto.ErrorInfomation;
+
 import cn.sowell.datacenter.model.peopledata.EntityElement;
 import cn.sowell.datacenter.model.peopledata.EntityRecord;
 
@@ -103,6 +105,7 @@ public class PeopleData implements EntityData{
 	private String familyPlanningCode;
 	private String familyPlanningType;
 	
+	private List<ErrorInfomation> errors;
 	
 	public Long getId() {
 		return id;
@@ -506,6 +509,14 @@ public class PeopleData implements EntityData{
 
 	public void setFamilyInfo(FamilyInfo familyInfo) {
 		this.familyInfo = familyInfo;
+	}
+
+	public List<ErrorInfomation> getErrors() {
+		return errors;
+	}
+
+	public void setErrors(List<ErrorInfomation> errors) {
+		this.errors = errors;
 	}
 
 }

@@ -105,7 +105,17 @@ div.tab-content>.tab-pane{
     font-size: 12px;
     vertical-align: middle;
 }
-
+li.cpf-paginator-total-count>span {
+    border: none;
+    color: #555;
+    padding: 7px 10px;
+    font-size: 1em;
+}
+li.cpf-paginator-total-count>span:HOVER {
+    background-color: inherit;
+    color: inherit;
+    border: inherit;
+}
 /* 标签页模块 */
 .navbar .navbar-inner{
 	background-color: #197FC6;

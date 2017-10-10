@@ -5,7 +5,9 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import org.apache.log4j.Logger;
@@ -19,6 +21,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.stereotype.Service;
 
 import com.abc.application.ApplicationInfo;
+import com.abc.dto.ErrorInfomation;
 import com.abc.mapping.entity.Entity;
 import com.abc.panel.Discoverer;
 import com.abc.panel.Integration;
@@ -100,30 +103,44 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	}
 	
 	@Override
-	public void importPeople(Sheet sheet) {
+	public void importPeople(Sheet sheet, String dataType) {
 		try {
-			importPeople(sheet, new ImportStatus());
+			importPeople(sheet, new ImportStatus(), dataType);
 		} catch (ImportBreakException e) {
 		}
 	}
 	
+	
+	@SuppressWarnings("serial")
+	Map<String, String> dataTypeMap = new HashMap<String, String>(){
+		{
+			put("base", "importBase");
+			put("handicapped", "importHandicapped");
+			put("lowincome", "importLowincome");
+			put("familyPlanning", "importFamilyPlanning");
+		}
+	};
+	
 	@Override
-	public void importPeople(Sheet sheet, ImportStatus importStatus) throws ImportBreakException{
+	public void importPeople(Sheet sheet, ImportStatus importStatus, String dataType) throws ImportBreakException{
 		Row headerRow = sheet.getRow(1);
-		execute(sheet, headerRow, IMPORT_NODE_NAME, importStatus);
+		String writeMapperName = dataTypeMap.get(dataType);
+		if(writeMapperName != null){
+			execute(sheet, headerRow, IMPORT_NODE_NAME, writeMapperName, importStatus);
+		}
 	}
 	
 	private NumberFormat numberFormat = new DecimalFormat("0.000");
 	
 	
-	protected void execute(Sheet sheet, Row headerRow, String mapperName, ImportStatus importStatus) throws ImportBreakException {
+	protected void execute(Sheet sheet, Row headerRow, String mapperName, String writeMapperName, ImportStatus importStatus) throws ImportBreakException {
 		importStatus.appendMessage("正在计算总行数");
 		importStatus.setTotal(colculateRowCount(sheet));
 		int rownum = 2;
 		importStatus.appendMessage("开始导入");
 		Integration integration=PanelFactory.getIntegration();
 		ApplicationInfo appInfo=new ApplicationInfo();
-		appInfo.setWriteMappingName(BASE_NODE_NAME);
+		appInfo.setWriteMappingName(writeMapperName);
 		appInfo.setSource(ApplicationInfo.SOURCE_COMMON);
 		while(true){
 			if(importStatus.breaked()){
@@ -136,7 +153,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 			importStatus.setCurrent(rownum - 2);
 			importStatus.startItemTimer().appendMessage("导入第" + importStatus.getCurrent() + "条数据");
 			try {
-				Entity entity = createEntity(mapperName, headerRow, row);
+				Entity entity = createImportEntity(mapperName, headerRow, row);
 				integration.integrate(entity, appInfo);
 				importStatus.endItemTimer().appendMessage("第" + importStatus.getCurrent() + "条数据导入完成，用时" + numberFormat.format(importStatus.lastInterval()));
 			} catch (Exception e) {
@@ -158,34 +175,14 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	}
 
 
-	protected String familyDoctorMapper = "familydoctor";
-	private Entity createEntity(String mappingName, Row headerRow,
+	private Entity createImportEntity(String mappingName, Row headerRow,
 			Row row) {
-		Entity entity = new Entity(mappingName);
+		Entity entity = new Entity(mappingName, true);
 		int length = headerRow.getPhysicalNumberOfCells();
 		for (int i = 0; i < length; i++) {
 			Cell cell = row.getCell(i);
-			if (headerRow.getCell(i).getStringCellValue().equals("家庭医生")) {
-				if (cell.getStringCellValue() != null
-						&& !cell.getStringCellValue().equals("")) {
-					Entity relationentity = new Entity(familyDoctorMapper);
-					relationentity.putValue("姓名", cell.getStringCellValue());
-					entity.putRelationEntity("医疗信息","家庭医生", relationentity);
-				}
-			} else {
-				if (cell.getCellTypeEnum() == CellType.NUMERIC) {
-					entity.putValue(headerRow.getCell(i).getStringCellValue(),
-							String.valueOf(cell.getNumericCellValue()));
-				} else if (cell.getCellTypeEnum() == CellType.ERROR) {
-					logger.warn("ERROR Type row number:" + row.getRowNum()
-							+ " ; cell number:" + i + ";");
-				} else {
-					entity.putValue(headerRow.getCell(i).getStringCellValue(),
-							cell.getStringCellValue());
-				}
-			}
+			entity.putValue(getStringWithBlank(headerRow.getCell(i)), getStringWithBlank(cell));
 		}
-		
 		
 		return entity;
 	}
@@ -199,10 +196,13 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	}
 	
 	@Override
-	public Entity getHistoryPeople(String peopleCode, Date date) {
+	public Entity getHistoryPeople(String peopleCode, Date date, List<ErrorInfomation> errors) {
 		Discoverer discoverer=PanelFactory.getDiscoverer(BASE_NODE_NAME);
 		
 		HistoryTracker tracker = discoverer.track(peopleCode, date);
+		if(errors != null){
+			errors.addAll(tracker.getErrorInfomations());
+		}
 		return tracker.getEntity();
 	}
 	

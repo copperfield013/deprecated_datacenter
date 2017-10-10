@@ -19,9 +19,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.abc.dto.ErrorInfomation;
 
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JsonResponse;
@@ -118,7 +121,7 @@ public class AdminPeopleDataController {
 	
 	@ResponseBody
 	@RequestMapping("/do_import")
-	public JsonResponse doImport(MultipartFile file, String sheetName, HttpSession session){
+	public JsonResponse doImport(MultipartFile file, @RequestParam String sheetName, @RequestParam String dataType, HttpSession session){
 		JsonResponse jRes = new JsonResponse();
 		jRes.setStatus("error");
 		ImportStatus beforeStatus = (ImportStatus) session.getAttribute(KEY_IMPORT_STATUS);
@@ -146,7 +149,7 @@ public class AdminPeopleDataController {
 					session.setAttribute(KEY_IMPORT_STATUS, importStatus);
 					Thread thread = new Thread(()->{
 						try {
-							abcService.importPeople(sheet, importStatus);
+							abcService.importPeople(sheet, importStatus, dataType);
 						} catch (ImportBreakException e) {
 							logger.error("导入被用户停止", e);
 						} catch (Exception e) {

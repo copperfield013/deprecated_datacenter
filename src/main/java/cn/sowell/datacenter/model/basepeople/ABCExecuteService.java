@@ -6,6 +6,7 @@ import java.util.function.Function;
 
 import org.apache.poi.ss.usermodel.Sheet;
 
+import com.abc.dto.ErrorInfomation;
 import com.abc.mapping.entity.Entity;
 import com.abc.query.criteria.Criteria;
 
@@ -46,15 +47,16 @@ public interface ABCExecuteService {
 	 * 导入人口
 	 * @param sheet
 	 */
-	void importPeople(Sheet sheet);
+	void importPeople(Sheet sheet, String dataType);
 
 	/**
 	 * 导入人口，并传入一个状态对象用于检测和控制导入状态
 	 * @param sheet
 	 * @param importStatus
+	 * @param dataType
 	 * @throws ImportBreakException 
 	 */
-	void importPeople(Sheet sheet, ImportStatus importStatus) throws ImportBreakException;
+	void importPeople(Sheet sheet, ImportStatus importStatus, String dataType) throws ImportBreakException;
 
 	/**
 	 * 删除人口
@@ -68,7 +70,7 @@ public interface ABCExecuteService {
 	 * @param date
 	 * @return
 	 */
-	Entity getHistoryPeople(String peopleCode, Date date);
+	Entity getHistoryPeople(String peopleCode, Date date, List<ErrorInfomation> errors);
 
 	Entity savePeople(PeopleData people);
 

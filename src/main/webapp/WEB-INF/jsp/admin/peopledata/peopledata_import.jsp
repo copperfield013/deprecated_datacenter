@@ -23,6 +23,17 @@
 						</div>
 					</div>
 					<div class="form-group">
+						<label class="col-lg-2 control-label">导入条线</label>
+						<div class="col-lg-6">
+							<select name="dataType">
+								<option value="base">基本数据</option>
+								<option value="lowIncome">低保数据</option>
+								<option value="handicapped">残疾人数据</option>
+								<option value="familyPlanning">计生数据</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
 						<label class="col-lg-2 control-label">进度</label>
 						<div class="col-lg-6">
 							<div id="progress" class="progress progress-striped active">

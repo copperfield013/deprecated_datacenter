@@ -196,7 +196,7 @@ define(function(require, exports, module){
 		pageSizeSelect.val(pageInfo.pageSize);
 		ul.prepend($('<li class="cpf-paginator-pagesize">')
 				.append(pageSizeSelect)
-			);
+			).prepend($('<li class="cpf-paginator-total-count"><span>共' + pageInfo.count + '条</span></li>'));
 		//修改每页条数时，触发跳转
 		pageSizeSelect.change(function(e){
 			e.stopImmediatePropagation();

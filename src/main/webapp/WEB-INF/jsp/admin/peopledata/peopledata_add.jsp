@@ -40,7 +40,7 @@
 						</div>
 						<label class="col-lg-1 control-label" for="contact">联系号码</label>
 						<div class="col-lg-4">
-							<input type="text" class="form-control" name="contact1" id="contact"/>
+							<input type="text" class="form-control" name="contact" id="contact"/>
 						</div>
 					</div>
 					<div class="form-group">
@@ -241,7 +241,7 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-lg-1 control-label" for="lowIncomeInsuredAmount">享受低保金额</label>
+						<label class="col-lg-1 control-label" for="lowIncomeInsuredAmount">享受低保金额（元）</label>
 						<div class="col-lg-4">
 							<input type="text" class="form-control" name="lowIncomeInsuredAmount"/>
 						</div>
@@ -440,7 +440,7 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-lg-1 control-label" for="workExperiences[0].salary">工资</label>
+						<label class="col-lg-1 control-label" for="workExperiences[0].salary">工资（元）</label>
 						<div class="col-lg-4">
 							<input type="text" class="form-control" name="workExperiences[0].salary"/>
 						</div>
@@ -513,7 +513,7 @@
 								<option value="其它">其它</option>
 							</select>
 						</div>
-						<label class="col-lg-1 control-label" for="familyYearIncome">家庭年收入</label>
+						<label class="col-lg-1 control-label" for="familyYearIncome">家庭年收入（元）</label>
 						<div class="col-lg-4">
 							<input type="text" class="form-control" name="familyInfo.familyYearIncome"/>
 						</div>
@@ -532,7 +532,7 @@
 								<option value="其他">其他</option>
 							</select>
 						</div>
-						<label class="col-lg-1 control-label" for="familyAvgMonthIncome">家庭人均月收入</label>
+						<label class="col-lg-1 control-label" for="familyAvgMonthIncome">家庭人均月收入（元）</label>
 						<div class="col-lg-4">
 							<input type="text" class="form-control" name="familyInfo.familyAvgMonthIncome"/>
 						</div>

@@ -2,7 +2,7 @@
 <ABC name="baseinfoImport" abcattr="人口信息" alias="baseinfoImport" class="" xmlns="http://www.w3school.com.cn"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<attribute name="peoplecode" alias="编码" abcattr="唯一编码" />
-	<attribute name="address" alias="地址" abcattr="通用地址" />
+	<attribute name="address" alias="居住地址" abcattr="通用地址" />
 	<attribute name="name" alias="姓名" abcattr="姓名" />
 	<attribute name="idcode" alias="证件号码" abcattr="证件号码" />
 	<attribute name="gender" alias="性别" abcattr="性别" />

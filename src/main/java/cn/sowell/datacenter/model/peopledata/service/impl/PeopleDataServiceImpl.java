@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import com.abc.dto.ErrorInfomation;
 import com.abc.mapping.entity.Entity;
 import com.abc.query.criteria.Criteria;
 import com.abc.query.criteria.CriteriaFactory;
@@ -85,8 +86,11 @@ public class PeopleDataServiceImpl implements PeopleDataService{
 		if(date == null){
 			return getPeople(peopleCode);
 		}else{
-			Entity people = abcService.getHistoryPeople(peopleCode, date);
-			return transfer(people);
+			List<ErrorInfomation> errors = new ArrayList<ErrorInfomation>();
+			Entity people = abcService.getHistoryPeople(peopleCode, date, errors);
+			PeopleData peopleData = transfer(people);
+			peopleData.setErrors(errors);
+			return peopleData;
 		}
 	}
 }
