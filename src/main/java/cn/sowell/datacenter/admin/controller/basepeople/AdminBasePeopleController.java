@@ -20,6 +20,7 @@ import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
 import cn.sowell.datacenter.model.basepeople.service.BasePeopleService;
+import cn.sowell.datacenter.model.basepeople.service.SearchPeopleService;
 
 import com.alibaba.fastjson.JSONArray;
 
@@ -102,11 +103,10 @@ public class AdminBasePeopleController {
 	}
 	
 	@ResponseBody
-    @RequestMapping("titleSearch")
+    @RequestMapping(value="titleSearch",method = RequestMethod.POST, headers="Accept=application/json")
     public JSONArray  esearch(String txt, HttpServletResponse response) {
     	JSONArray tSearch = null;
-    	System.out.println("1");
-    	try{	    	    
+    	try{
     		tSearch=basePeopleService.titleSearchByEs(txt.trim());
     		return tSearch;
     	}

@@ -1,6 +1,7 @@
 define(function(require, exports){
 	var CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
 	var SEQUENCE_MAP = {}
+	var sFocus;
 	$.extend(exports, {
 		/**
 		 * 判断一个是否是整数
@@ -283,7 +284,16 @@ define(function(require, exports){
                 monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月',  
                         '七月', '八月', '九月', '十月', '十一月', '十二月' ]
 			});
-		}
+		},
+		/**
+		 * 获取焦点
+		 */
+		focus		: function($dom){
+			
+			return $($dom).focus(function(){
+				sFocus = $(this);
+			});
+		},
 	});
 	
 	function returnTrue(){return true;}

@@ -17,6 +17,7 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
+import cn.sowell.datacenter.model.basepeople.SearchTransportClient;
 import cn.sowell.datacenter.model.basepeople.dao.BasePeopleDao;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
 import cn.sowell.datacenter.model.basepeople.service.BasePeopleService;
@@ -73,7 +75,7 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 
 	@Override
 	public JSONArray titleSearchByEs(String title) {
-		
+
 		//设置集群名称 5.x
 	    Settings settings = Settings.builder().put("cluster.name", "elasticsearch").build();
 	    //创建client
@@ -86,9 +88,12 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 							.setSearchType(SearchType.DEFAULT)
 							.setFrom(0)
 							.setSize(9);
-			BoolQueryBuilder qb ;
-			qb = QueryBuilders.boolQuery()
-					.should(new QueryStringQueryBuilder(title).field("title"));
+			BoolQueryBuilder qb = QueryBuilders.boolQuery();
+			String titleList[] = title.split(" ");//将多个条件断开
+			for(int i=0;i<titleList.length;i++){
+				qb = qb.should(QueryBuilders.matchPhraseQuery("title", titleList[i]));//进行短语匹配
+			}
+			//QueryBuilder queryBuilder = QueryBuilders.matchPhraseQuery("title", title);
 			builder.setQuery(qb);
 			SearchResponse response ;
 			response = builder.execute().actionGet();
@@ -101,7 +106,7 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 			System.out.println(jsonThree);
 			System.out.println("总数量："+response.getHits().getTotalHits()+" 耗时："+response.getTookInMillis());
 			return jsonThree;
-		} catch (UnknownHostException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			logger.warn("naifeitian creat failed");

@@ -1,10 +1,9 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <link rel="stylesheet" href="media/admin/bigautocomplete/css/jquery.bigautocomplete.css" type="text/css" />
-<script type="text/javascript" src="media/admin/bigautocomplete/js/jquery.bigautocomplete.js"></script>
 
 
-<div id="people-update">
+<div id="people-update${people.id }">
 	<div class="page-header">
 		<div class="header-title">
 			<h1>修改人口</h1>
@@ -90,8 +89,10 @@
 
 <script>
 seajs.use(['utils','ajax'], function(Utils,Ajax){
-	var $page = $('#people-update');
+	var $page = $('#people-update${people.id }');
 	Utils.datepicker($('#date', $page));
+	var sFocus = Utils.focus($('.search${people.id }', $page));
+	
 	function IdentityCodeValid(code) {
         var city={11:"北京",12:"天津",13:"河北",14:"山西",15:"内蒙古",21:"辽宁",22:"吉林",23:"黑龙江 ",31:"上海",32:"江苏",33:"浙江",34:"安徽",35:"福建",36:"江西",37:"山东",41:"河南",42:"湖北 ",43:"湖南",44:"广东",45:"广西",46:"海南",50:"重庆",51:"四川",52:"贵州",53:"云南",54:"西藏 ",61:"陕西",62:"甘肃",63:"青海",64:"宁夏",65:"新疆",71:"台湾",81:"香港",82:"澳门",91:"国外 "};
         var tip = "";
@@ -148,6 +149,8 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
 			return false;
 			}
 	});
+	
+	
 
 /**
  *  根据传回的type生成相应的输入框
@@ -235,35 +238,30 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
     $("#clone").on('click',"[id='remove']",function(){
 			$("#clone").html("");
     });
-});
+    
+    /**
+	 * 字段查询
+	 * *
+	 * **/	
 	var k = null;
-	//监听查询内容
-	$(".search${people.id }").keyup(function(event) {
-		if (event.which > "40" || event.which == "32"|| event.which == "8"
-				&& $(this).val() != ""&& $(this).val() != null) {
-			$.ajax({
-				url : 'admin/people/titleSearch',
-				data : {txt : $('.search${people.id }').val()},
-				dataType : "html",
-				type : "POST",
-				success : function(data) {
-					var a = JSON.parse(data);
-					$('.search${people.id }').bigAutocomplete({
-						width : 190,
-						data : a
-						});
-					},
-				error : function(XMLHttpRequest, textStatus,errorThrown) {
-						alert(XMLHttpRequest.status + ","+ XMLHttpRequest.readyState + ","+ textStatus);
-						}
+	$('.search${people.id }').keyup(function(event) {
+		if (event.keyCode > "40" || event.keyCode == "32"|| event.keyCode == "8"
+			&& $(this).val() != ""&& $(this).val() != null) {
+			Ajax.ajax('admin/people/titleSearch',
+					{txt : $(this).val()},
+					function(json) {							
+						$('.search${people.id }').bigAutocomplete({
+							width : 190,
+							data : json
+							});
 					});
-			k = $(this).val();
-			}
-		if ($(this).val() == "" || $(this).val() == null)
-			hideContent();
-		});
-
-	$(".search${people.id }").keydown(function(event) {
+		
+		k = $(this).val();
+		}
+	if ($(this).val() == "" || $(this).val() == null)
+		hideContent();
+	});
+	$('.search${people.id }').keydown(function(event) {
 		switch (event.keyCode) {
 		case 40://向下键
 			if ($("#bigAutocompleteContent").css("display") == "none") return;
@@ -318,13 +316,6 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
 			break;
 		}
 	});
-
-	//目前获得光标的输入框
-	var sFocus;
-	$(".search${people.id }").focus(function(){
-		sFocus = $(this);
-	});
-
 	function hideContent() {
 		if ($("#bigAutocompleteContent").css("display") != "none") {
 			$("#bigAutocompleteContent").find("tr").removeClass("ct");
@@ -432,5 +423,7 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
 	};
 
 	$.fn.bigAutocomplete = bigAutocomplete.autocomplete;
+});
+	
 
 </script>
