@@ -60,7 +60,7 @@ public class AdminDemoController {
 			return AjaxPageResponse.FAILD("添加失败");
 		}
 	}
-	
+
 	@RequestMapping("/update/{id}")
 	public String update(@PathVariable Long id, Model model){
 		PlainDemo demo = demoService.getDemo(id);

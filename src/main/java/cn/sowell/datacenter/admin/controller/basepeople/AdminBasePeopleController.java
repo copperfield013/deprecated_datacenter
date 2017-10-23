@@ -73,9 +73,9 @@ public class AdminBasePeopleController {
 	@RequestMapping("/do_update")
 	public AjaxPageResponse doUpdate(BasePeople people){
 		try {
-			//basePeopleService.update(people);
-			//return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改成功", "people_list");
-			return AjaxPageResponse.REFRESH_LOCAL("123");
+			basePeopleService.update(people);
+			return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改成功", "people_list");
+			//return AjaxPageResponse.REFRESH_LOCAL("123");
 		} catch (Exception e) {
 			logger.error("修改失败", e);
 			return AjaxPageResponse.FAILD("修改失败");
@@ -137,4 +137,11 @@ public class AdminBasePeopleController {
 		Res.setStatus("success");
 		return Res;
 	}
+
+
+
+
+
+
+
 }
