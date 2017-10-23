@@ -74,6 +74,17 @@
 								id="contact" value="${people.contact }" />
 						</div>
 					</div>
+
+					<div class="form-group">
+						<label class="col-lg-2 control-label">民族</label>
+						<div class="col-lg-5">
+							<select name="nation" class="form-control" data-value="${people.national }">
+								<option value=""> -- 请选择 -- </option>
+								<option value="1">汉族</option>
+								<option value="2">蒙古族</option>
+							</select>
+						</div>
+					</div>
 					<div class="form-group">
 						<div class="col-lg-offset-3 col-lg-3">
 							<input class="btn btn-block btn-darkorange" type="submit"
