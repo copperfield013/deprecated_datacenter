@@ -20,7 +20,6 @@ import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
 import cn.sowell.datacenter.model.basepeople.service.BasePeopleService;
-import cn.sowell.datacenter.model.basepeople.service.SearchPeopleService;
 
 import com.alibaba.fastjson.JSONArray;
 
