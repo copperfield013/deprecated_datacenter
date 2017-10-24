@@ -43,6 +43,7 @@
 					<th>姓名</th>
 					<th>身份证号</th>
 					<th>地址</th>
+					<th>内容</th>
 					<th>操作</th>
 				</tr>
 			</thead>
@@ -78,6 +79,7 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
 										+"<td>" + json[i].name + "</td>"
 										+"<td>" + json[i].idcode + "</td>"
 										+"<td>" + json[i].address + "</td>"
+										+"<td>" + json[i].content + "</td>"
 										+"<td><a href='admin/people/list' class='tab' target='' title='修改'>修改</a>&nbsp;"
 											+"<a  href='admin/people/list' confirm='确认删除？'>删除</a></td></tr>";
 						}
