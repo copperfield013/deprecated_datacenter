@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
+import cn.sowell.datacenter.model.basepeople.SearchTransportClient;
 import cn.sowell.datacenter.model.basepeople.dao.BasePeopleDao;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
 import cn.sowell.datacenter.model.basepeople.service.BasePeopleService;
@@ -40,7 +41,7 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 	@Resource
 	BasePeopleDao basePeopleDao;
 	
-	private TransportClient client;
+	private TransportClient client = SearchTransportClient.getInstance().getTransportClient();
 	
 	@Override
 	public List<BasePeople> queryList(BasePeopleCriteria criteria, PageInfo pageInfo) {
@@ -75,12 +76,7 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 	@Override
 	public JSONArray titleSearchByEs(String title) {
 
-		//设置集群名称 5.x
-	    Settings settings = Settings.builder().put("cluster.name", "elasticsearch").build();
-	    //创建client
 	    try {
-			client = new PreBuiltTransportClient(settings)
-			        .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("127.0.0.1"), 9300));
 			SearchRequestBuilder builder =
 					client.prepareSearch("ydd")
 							.setTypes("demo")

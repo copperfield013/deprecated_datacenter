@@ -35,4 +35,6 @@ public interface AdminConstants {
 
 	final String JSP_PEOPLEDATA = JSP_BASE + "/peopledata";
 	
+	final String JSP_SEARCH = JSP_BASE + "/search";
+	
 }
