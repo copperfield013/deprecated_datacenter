@@ -33,17 +33,12 @@ import cn.sowell.datacenter.model.basepeople.service.SearchPeopleService;
 @Service
 public class SearchPeopleServiceImpl implements SearchPeopleService{	
 	private Logger logger = Logger.getLogger(SearchPeopleService.class);
-	private TransportClient client;
+	private TransportClient client = SearchTransportClient.getInstance().getTransportClient();
 	private String index = "ydd";
 	private String type = "peopleDemo";
 	
 	public JSONArray peopleSearch(String name,String idCode,String address,String content, PageInfo pageInfo){
-		//设置集群名称 5.x
-	    Settings settings = Settings.builder().put("cluster.name", "elasticsearch").build();
-	    //创建client
-	    try {
-			client = new PreBuiltTransportClient(settings)
-			        .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("127.0.0.1"), 9300));
+		try {
 			SearchRequestBuilder builder =
 					client.prepareSearch(index)
 							.setTypes(type)
