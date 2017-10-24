@@ -64,7 +64,7 @@ public class AdminBasePeopleController {
 	
 	@RequestMapping("/update/{id}")
 	public String update(@PathVariable Long id, Model model){
-		BasePeople people = basePeopleService.getPeople(id);
+		BasePeople people = basePeopleService.getPeopleById(id);
 		model.addAttribute("people", people);
 		return AdminConstants.JSP_BASEPEOPLE + "/people_update.jsp";
 	}
@@ -96,7 +96,7 @@ public class AdminBasePeopleController {
 	
 	@RequestMapping("/detail/{id}")
 	public String detail(@PathVariable Long id, Model model){
-		BasePeople people = basePeopleService.getPeople(id);
+		BasePeople people = basePeopleService.getPeopleById(id);
 		model.addAttribute("people", people);
 		return AdminConstants.JSP_BASEPEOPLE + "/people_detail.jsp";
 	}
@@ -128,15 +128,19 @@ public class AdminBasePeopleController {
 
 	@ResponseBody
 	@RequestMapping(value="smartSearch",method = RequestMethod.POST, headers="Accept=application/json")
-	public ResultDto smartsearch(long peopleid, HttpServletResponse response){
-		BasePeople people = basePeopleService.getPeople(peopleid);
+	public ResultDto smartsearch(long peopleid, HttpServletResponse response) {
 		ResultDto Res = new ResultDto();
-		Res.setData(people);
-		Res.setType("1");
-		Res.setStatus("success");
-		return Res;
-	}
+		try {
+			BasePeople people = basePeopleService.getPeopleById(peopleid);
+			Res.setData(people);
+			Res.setType("1");
+			Res.setStatus("success");
 
+		} catch (Exception e){
+			Res.setStatus("failed");
+		}
+		return  Res;
+	}
 
 
 

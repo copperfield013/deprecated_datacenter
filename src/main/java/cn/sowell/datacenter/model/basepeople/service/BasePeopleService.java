@@ -24,7 +24,7 @@ public interface BasePeopleService {
 	 */
 	void create(BasePeople people);
 	
-	BasePeople getPeople(Long id);
+	BasePeople getPeopleById(Long id);
 	
 	/**
 	 * 更新一个人口对象

@@ -62,7 +62,7 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 	}
 
 	@Override
-	public BasePeople getPeople(Long id) {
+	public BasePeople getPeopleById(Long id) {
 		// TODO Auto-generated method stub
 		return basePeopleDao.get(BasePeople.class, id);
 	}
