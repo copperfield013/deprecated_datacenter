@@ -7,8 +7,6 @@ import com.alibaba.fastjson.JSONObject;
 import cn.sowell.copframe.dto.page.PageInfo;
 
 public interface SearchPeopleService {
-
-	public JSONArray eSearchTitle(String title);
 	
 	public JSONArray peopleSearch(String name,String idCode,String address,String content, PageInfo pageInfo);
 	
