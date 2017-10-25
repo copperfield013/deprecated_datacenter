@@ -88,15 +88,13 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 			for(int i=0;i<titleList.length;i++){
 				qb = qb.should(QueryBuilders.matchPhraseQuery("title", titleList[i]));//进行短语匹配
 			}
-			//QueryBuilder queryBuilder = QueryBuilders.matchPhraseQuery("title", title);
+			
 			builder.setQuery(qb);
 			SearchResponse response ;
 			response = builder.execute().actionGet();
 			JSONArray  jsonThree = new JSONArray ();
 			for(SearchHit hit:response.getHits()){
-				String source=hit.getSourceAsString();
-				jsonThree.add((hit.getSource()));
-
+				jsonThree.add(hit.getSource());
 			}
 			System.out.println(jsonThree);
 			System.out.println("总数量："+response.getHits().getTotalHits()+" 耗时："+response.getTookInMillis());
