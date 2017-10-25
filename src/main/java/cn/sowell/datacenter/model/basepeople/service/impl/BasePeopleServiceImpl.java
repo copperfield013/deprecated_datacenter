@@ -3,13 +3,21 @@ package cn.sowell.datacenter.model.basepeople.service.impl;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
+import cn.sowell.datacenter.Test.PeopleDataDto;
+import cn.sowell.datacenter.model.basepeople.dto.FieldDataDto;
 import com.alibaba.fastjson.JSONArray;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jdk.nashorn.internal.ir.ReturnNode;
 import org.apache.log4j.Logger;
 
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -107,5 +115,54 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 		}
 
 	}
+
+	@Override
+	public List<FieldDataDto> queryFieldList(PageInfo pageInfo) {
+		SearchRequestBuilder builder =
+				client.prepareSearch("ydd")
+						.setTypes("demo")
+						.setSearchType(SearchType.DEFAULT)
+						.setFrom(0);
+		QueryBuilder queryBuilder = QueryBuilders.matchAllQuery();
+		builder.setQuery(queryBuilder);
+		SearchResponse response  = builder.execute().actionGet();
+
+		List<FieldDataDto> list = new ArrayList<>();
+		for(SearchHit hit:response.getHits()){
+			list.add(new FieldDataDto(hit.getSource().get("id").toString(),
+					hit.getSource().get("title").toString(),
+					hit.getSource().get("title_en").toString(),
+					hit.getSource().get("type").toString()));
+
+			System.out.println("总数量："+response.getHits().getTotalHits()+" 耗时："+response.getTookInMillis());
+		}
+		return  list;
+	}
+
+	@Override
+	public void addField(FieldDataDto field) {
+		try {
+           long stime = System.currentTimeMillis();
+           boolean flag = false;//设置检查标记
+
+           Map<String, Object> json = new LinkedHashMap<String, Object>();
+           ObjectMapper ob = new ObjectMapper();
+           json.put("id", field.getId());
+           json.put("title", field.getTitle());
+           json.put("title_en", field.getTitle_en());
+           json.put("type", field.getType());
+
+			String json1 = ob.writeValueAsString(json);
+			IndexResponse response = client
+					.prepareIndex("ydd", "demo", field.getId())
+					.setSource(json1).execute().actionGet();
+                long etime = System.currentTimeMillis();
+                System.out.println(etime - stime);
+		} catch (Exception e) {
+			System.out.println(e.getStackTrace());
+
+		}
+	}
+
 
 }

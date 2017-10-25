@@ -418,8 +418,8 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
 				var cont = "<table><tbody>";
 
 				for (var i = 0; i < data_.length; i++) {
-					cont += "<tr><td><div id="+data_[i].title_en+">"
-							+ data_[i].title + "</div></td></tr>"
+					cont += "<tr><td><div.l id="+data_[i].title_en+">"
+							+ data_[i].title + "</div.l></td></tr>"
 				}
 
 				cont += "</tbody></table>";

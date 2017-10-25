@@ -4,6 +4,7 @@ import java.util.List;
 
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
+import cn.sowell.datacenter.model.basepeople.dto.FieldDataDto;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
 
 import com.alibaba.fastjson.JSONArray;
@@ -47,4 +48,9 @@ public interface BasePeopleService {
 	 */
 	
 	JSONArray titleSearchByEs(String title);
+
+
+	List<FieldDataDto> queryFieldList(PageInfo pageInfo);
+
+	void addField(FieldDataDto field);
 }

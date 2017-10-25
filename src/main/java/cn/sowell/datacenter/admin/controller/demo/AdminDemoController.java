@@ -45,6 +45,7 @@ public class AdminDemoController {
 	
 	@RequestMapping("/add")
 	public String add(PlainDemo demo){
+
 		return AdminConstants.JSP_DEMO + "/demo_add.jsp";
 	}
 	
@@ -91,5 +92,9 @@ public class AdminDemoController {
 			return AjaxPageResponse.FAILD("删除失败");
 		}
 	}
-	
+
+
+	/**
+	 * 根据字段类型返回选择字段的List
+	 */
 }
