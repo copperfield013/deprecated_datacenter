@@ -37,7 +37,7 @@ public class SearchPopController {
     public JSONArray  esearch(String name,String idCode,String address,String content, PageInfo pageInfo,HttpServletResponse response) {
     	JSONArray tSearch = null;
     	try{
-    		tSearch=searchPeopleService.peopleSearch(name,idCode,address,content,pageInfo);
+    		tSearch=searchPeopleService.peopleSearch(name.trim(),idCode.trim(),address.trim(),content.trim(),pageInfo);
     		return tSearch;
     	}
 		catch(Exception e) {

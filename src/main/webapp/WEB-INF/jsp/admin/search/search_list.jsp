@@ -77,7 +77,7 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
 						for(i=0;i<json.length;i++){
 							cont += "<tr><td>" + (i+1) + "</td>"
 										+"<td>" + json[i].name + "</td>"
-										+"<td>" + json[i].idcode + "</td>"
+										+"<td>" + json[i].idCode + "</td>"
 										+"<td>" + json[i].address + "</td>"
 										+"<td>" + json[i].content + "</td>"
 										+"<td><a href='admin/people/list' class='tab' target='' title='修改'>修改</a>&nbsp;"

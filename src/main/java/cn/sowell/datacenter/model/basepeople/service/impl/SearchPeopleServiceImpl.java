@@ -1,18 +1,28 @@
 package cn.sowell.datacenter.model.basepeople.service.impl;
 
+import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -50,47 +60,40 @@ public class SearchPeopleServiceImpl implements SearchPeopleService{
 			HighlightBuilder hiBuilder=new HighlightBuilder();
 	        hiBuilder.preTags(" <span style=\"color:red\">");
 	        hiBuilder.postTags("</span>");
-	        hiBuilder.field("name");
-	        hiBuilder.field("address");
+	        hiBuilder.field("name")
+	        	.field("address")
+	        	.field("content");
 	        
 			BoolQueryBuilder qb = QueryBuilders.boolQuery();
 			idCode = "*"+idCode+"*";
 			qb = qb.should(QueryBuilders.matchPhraseQuery("name", name));//进行短语匹配
-			qb = qb.must(new QueryStringQueryBuilder(idCode.trim()).field("idcode"));
-			qb = qb.should(QueryBuilders.matchPhraseQuery("address", address.trim()));
-			qb = qb.should(QueryBuilders.matchPhraseQuery("content", content.trim()));
+			qb = qb.must(new QueryStringQueryBuilder(idCode).field("idCode"));
+			String addressList[] = address.split(" ");//将多个条件断开
+			for(int i=0;i<addressList.length;i++){
+				qb = qb.should(QueryBuilders.matchPhraseQuery("address", addressList[i]));
+			}
+			String contentList[] = content.split(" ");
+			for(int i=0;i<contentList.length;i++){
+				if(isNumeric(contentList[i])){//判断是否为数字
+					String con = "*"+contentList[i]+"*";
+					//qb = qb.must(new QueryStringQueryBuilder(con).field("content"));
+				}				
+				else
+					qb = qb.should(QueryBuilders.matchPhraseQuery("content", contentList[i]));
+			}
 			builder.setQuery(qb);
-			
-			
-	        
 			SearchResponse response ;
 			response = builder.highlighter(hiBuilder).execute().actionGet();
 			JSONArray  jsonThree = new JSONArray ();
 			for(SearchHit hit:response.getHits()){
-				//String source=hit.getSourceAsString();
 				jsonThree.add(hit.getSource());
-				System.out.println(hit.getHighlightFields());
-				System.out.println(hit.getHighlightFields().get("address"));				
-				String sName = "";
-				String sAddress = "";
-				if(hit.getHighlightFields().get("name")!=null){
-					Text[] tName= hit.getHighlightFields().get("name").fragments();
-					for (Text str : tName) {
-						sName+=str.string();
-		            }
-					hit.getSource().put("name", sName);
-				}
-				if(hit.getHighlightFields().get("address")!=null){
-					Text[] tAddress= hit.getHighlightFields().get("address").fragments();
-					for (Text str : tAddress) {
-						sAddress+=str.string();
-		            }
-					hit.getSource().put("address", sAddress);
-				}
+				highLight(hit,"name");
+				highLight(hit,"address");
+				highLight(hit,"content");
 				
-
+				System.out.println(hit.getSource());
 			}
-			System.out.println(jsonThree);
+			
 			System.out.println("总数量："+response.getHits().getTotalHits()+" 耗时："+response.getTookInMillis());
 			return jsonThree;
 		} catch (Exception e) {
@@ -102,41 +105,39 @@ public class SearchPeopleServiceImpl implements SearchPeopleService{
 		
 	}
 	
-	public JSONArray eSearchTitle(String title) {
-
+	public void createIndex(String index) {
 	    try {
-			SearchRequestBuilder builder =
-					client.prepareSearch(index)
-							.setTypes(type)
-							.setSearchType(SearchType.DEFAULT)
-							.setFrom(0)
-							.setSize(9);
-			BoolQueryBuilder qb = QueryBuilders.boolQuery();
-			String titleList[] = title.split(" ");//将多个条件断开
-			for(int i=0;i<titleList.length;i++){
-				qb = qb.should(QueryBuilders.matchPhraseQuery("title", titleList[i]));//进行短语匹配
-			}
-			builder.setQuery(qb);
-			SearchResponse response ;
-			response = builder.execute().actionGet();
-			JSONArray  jsonThree = new JSONArray ();
-			for(SearchHit hit:response.getHits()){
-				String source=hit.getSourceAsString();
-				jsonThree.add((hit.getSource()));
-
-			}
-			System.out.println(jsonThree);
-			System.out.println("总数量："+response.getHits().getTotalHits()+" 耗时："+response.getTookInMillis());
-			return jsonThree;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			logger.warn("Search failed");
-			return null;
-		}
-
+	    	client.admin().indices().prepareCreate(index).execute().actionGet();
+	        
+	    } catch (ElasticsearchException e) {
+	        e.printStackTrace();
+	    }
 	}
-
+	
+	public void addMapping(String index, String type){
+	    try {
+	        // 使用XContentBuilder创建Mapping
+	    	XContentBuilder builder=XContentFactory.jsonBuilder()
+	                .startObject()
+	                	.startObject("_all").field("type", "text").field("analyzer", "ik_smart").endObject()
+	                	.startObject("properties").endObject()
+	                .endObject();
+	        PutMappingRequest mapping = Requests.putMappingRequest(index).type(type).source(builder);
+	        client.admin().indices().putMapping(mapping).actionGet();
+	        
+	    } catch (ElasticsearchException e) {
+	        e.printStackTrace();
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+	}
+	
+	public void closeIndex(){
+		client.close();
+		System.out.println("--索引关闭--");
+	}
+	
+	
 	public void eSearchUpdate(JSONObject json,String id){		 
 	    IndexResponse response = client
 	    		.prepareIndex(index,type,id)
@@ -159,6 +160,23 @@ public class SearchPeopleServiceImpl implements SearchPeopleService{
 				.execute().actionGet();
 		System.out.println("get success");
 	}
+	
+	public void highLight(SearchHit hit,String key){//关键字高亮
+		String con = "";
+		if(hit.getHighlightFields().get(key)!=null){
+			Text[] tContent= hit.getHighlightFields().get(key).fragments();
+			hit.getSource().put(key, StringUtils.join(tContent));
+		}
+	}
+	
+	public boolean isNumeric(String str){ //判断是否为数字
+		   Pattern pattern = Pattern.compile("[0-9]*"); 
+		   Matcher isNum = pattern.matcher(str);
+		   if( !isNum.matches() ){
+		       return false; 
+		   } 
+		   return true; 
+		}
 	
 	
 }
