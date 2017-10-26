@@ -5,6 +5,7 @@ import java.util.List;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 
 public interface BasePeopleDao {
 	/**
@@ -40,4 +41,7 @@ public interface BasePeopleDao {
 	 * @param pojo
 	 */
 	void delete(Object pojo);
+
+
+	List<TBasePeopleItemEntity> fieldList (String field);
 }

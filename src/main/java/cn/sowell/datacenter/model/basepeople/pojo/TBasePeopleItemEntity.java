@@ -1,77 +1,54 @@
 package cn.sowell.datacenter.model.basepeople.pojo;
 
-import javax.persistence.*;
 
-@Entity
-@Table(name = "t_base_people_item", schema = "datacenter_temp", catalog = "")
 public class TBasePeopleItemEntity {
-    private int cId;
-    private String cDictionarycode;
-    private String cEnumCnName;
-    private String cEnumValue;
+    private int c_id;
+    private String c_dictionary_code;
+    private String c_enum_cn_name;
+    private String c_enum_value;
 
-    @Id
-    @Column(name = "c_id")
-    public int getcId() {
-        return cId;
+    public TBasePeopleItemEntity(int c_id, String c_dictionary_code, String c_enum_cn_name, String c_enum_value) {
+        this.c_id = c_id;
+        this.c_dictionary_code = c_dictionary_code;
+        this.c_enum_cn_name = c_enum_cn_name;
+        this.c_enum_value = c_enum_value;
+
     }
 
-    public void setcId(int cId) {
-        this.cId = cId;
+    public TBasePeopleItemEntity() {
     }
 
-    @Basic
-    @Column(name = "c_dictionarycode")
-    public String getcDictionarycode() {
-        return cDictionarycode;
+
+    public int getC_id() {
+        return c_id;
     }
 
-    public void setcDictionarycode(String cDictionarycode) {
-        this.cDictionarycode = cDictionarycode;
+    public void setC_id(int c_id) {
+        this.c_id = c_id;
     }
 
-    @Basic
-    @Column(name = "c_enum_cn_name")
-    public String getcEnumCnName() {
-        return cEnumCnName;
+    public String getC_dictionary_code() {
+        return c_dictionary_code;
     }
 
-    public void setcEnumCnName(String cEnumCnName) {
-        this.cEnumCnName = cEnumCnName;
+    public void setC_dictionary_code(String c_dictionary_code) {
+        this.c_dictionary_code = c_dictionary_code;
     }
 
-    @Basic
-    @Column(name = "c_enum_value")
-    public String getcEnumValue() {
-        return cEnumValue;
+    public String getC_enum_cn_name() {
+        return c_enum_cn_name;
     }
 
-    public void setcEnumValue(String cEnumValue) {
-        this.cEnumValue = cEnumValue;
+    public void setC_enum_cn_name(String c_enum_cn_name) {
+        this.c_enum_cn_name = c_enum_cn_name;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        TBasePeopleItemEntity that = (TBasePeopleItemEntity) o;
-
-        if (cId != that.cId) return false;
-        if (cDictionarycode != null ? !cDictionarycode.equals(that.cDictionarycode) : that.cDictionarycode != null)
-            return false;
-        if (cEnumCnName != null ? !cEnumCnName.equals(that.cEnumCnName) : that.cEnumCnName != null) return false;
-        if (cEnumValue != null ? !cEnumValue.equals(that.cEnumValue) : that.cEnumValue != null) return false;
-
-        return true;
+    public String getC_enum_value() {
+        return c_enum_value;
     }
 
-    @Override
-    public int hashCode() {
-        int result = cId;
-        result = 31 * result + (cDictionarycode != null ? cDictionarycode.hashCode() : 0);
-        result = 31 * result + (cEnumCnName != null ? cEnumCnName.hashCode() : 0);
-        result = 31 * result + (cEnumValue != null ? cEnumValue.hashCode() : 0);
-        return result;
+    public void setC_enum_value(String c_enum_value) {
+        this.c_enum_value = c_enum_value;
     }
 }
+

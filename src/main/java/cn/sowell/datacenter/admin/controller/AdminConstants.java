@@ -38,5 +38,11 @@ public interface AdminConstants {
 	final String JSP_PEOPLEDATA = JSP_BASE + "/peopledata";
 	
 	final String JSP_SEARCH = JSP_BASE + "/search";
-	
+
+
+	/**
+	 * 字段属性类型
+	 */
+	//下拉
+	final String FRELD = "4";
 }

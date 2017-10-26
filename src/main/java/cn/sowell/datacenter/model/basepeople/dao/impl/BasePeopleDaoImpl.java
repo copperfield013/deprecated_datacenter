@@ -5,7 +5,10 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import cn.sowell.copframe.dao.deferedQuery.HibernateRefrectResultTransformer;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 
@@ -63,6 +66,22 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 	public void delete(Object pojo) {
 		sFactory.getCurrentSession().delete(pojo);
 	}
-	
-	
+
+	@Override
+	public List<TBasePeopleItemEntity> fieldList(String field) {
+		String sql ="SELECT" +
+				" i.*" +
+				" FROM" +
+				" t_base_people_dictionary d" +
+				" LEFT JOIN t_base_people_item i ON i.c_dictionarycode = d.c_dictionarycode";
+		DeferedParamQuery dQuery = new DeferedParamQuery(sql);
+		dQuery.appendCondition(" and d.c_cn_english = :field")
+				.setParam("field", field);
+
+		SQLQuery query = dQuery.createSQLQuery(sFactory.getCurrentSession(), true, null);
+		query.setResultTransformer(HibernateRefrectResultTransformer.getInstance(TBasePeopleItemEntity.class));
+		return query.list();
+	}
+
+
 }

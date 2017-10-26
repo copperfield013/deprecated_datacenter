@@ -1,7 +1,6 @@
 package cn.sowell.datacenter.admin.controller.field;
 
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
-import cn.sowell.datacenter.model.demo.pojo.PlainDemo;
 import org.apache.log4j.Logger;
 
 import cn.sowell.copframe.dto.page.PageInfo;

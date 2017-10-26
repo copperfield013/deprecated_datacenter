@@ -1,7 +1,5 @@
 package cn.sowell.datacenter.model.basepeople.service.impl;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -10,11 +8,10 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import cn.sowell.datacenter.Test.PeopleDataDto;
 import cn.sowell.datacenter.model.basepeople.dto.FieldDataDto;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jdk.nashorn.internal.ir.ReturnNode;
 import org.apache.log4j.Logger;
 
 import org.elasticsearch.action.index.IndexResponse;
@@ -22,14 +19,12 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
+
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
+
 import org.springframework.stereotype.Service;
 
 import cn.sowell.copframe.dto.page.PageInfo;
@@ -162,6 +157,11 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 			System.out.println(e.getStackTrace());
 
 		}
+	}
+
+	@Override
+	public List<TBasePeopleItemEntity> FieldList(String field) {
+		return basePeopleDao.fieldList(field);
 	}
 
 

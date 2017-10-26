@@ -2,8 +2,17 @@ package cn.sowell.datacenter.model.basepeople.dto;
 
 public class ResultDto {
         private Object Data ;
+        private Object FieldList;
         private String type ;
         private String Status;
+
+    public Object getFieldList() {
+        return FieldList;
+    }
+
+    public void setFieldList(Object fieldList) {
+        FieldList = fieldList;
+    }
 
     public Object getData() {
         return Data;

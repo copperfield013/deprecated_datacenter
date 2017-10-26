@@ -7,6 +7,7 @@ import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
 import cn.sowell.datacenter.model.basepeople.dto.FieldDataDto;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
 
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 import com.alibaba.fastjson.JSONArray;
 
 public interface BasePeopleService {
@@ -53,4 +54,8 @@ public interface BasePeopleService {
 	List<FieldDataDto> queryFieldList(PageInfo pageInfo);
 
 	void addField(FieldDataDto field);
+
+
+	List<TBasePeopleItemEntity> FieldList(String field);
+
 }

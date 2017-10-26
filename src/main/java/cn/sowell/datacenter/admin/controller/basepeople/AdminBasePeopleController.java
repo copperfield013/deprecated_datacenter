@@ -4,6 +4,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
+import cn.sowell.datacenter.DataCenterConstants;
 import cn.sowell.datacenter.model.basepeople.dto.ResultDto;
 import org.apache.log4j.Logger;
 import org.elasticsearch.client.transport.TransportClient;
@@ -128,21 +129,21 @@ public class AdminBasePeopleController {
 
 	@ResponseBody
 	@RequestMapping(value="smartSearch",method = RequestMethod.POST, headers="Accept=application/json")
-	public ResultDto smartsearch(long peopleid, HttpServletResponse response) {
+	public ResultDto smartsearch(long peopleid,String type,String field, HttpServletResponse response) {
 		ResultDto Res = new ResultDto();
 		try {
 			BasePeople people = basePeopleService.getPeopleById(peopleid);
 			Res.setData(people);
-			Res.setType("1");
+			Res.setType(type);
 			Res.setStatus("success");
-
+			if(type.equals(AdminConstants.FRELD)){
+			Res.setFieldList(basePeopleService.FieldList(field));
+			}
 		} catch (Exception e){
 			Res.setStatus("failed");
 		}
 		return  Res;
 	}
-
-
 
 
 

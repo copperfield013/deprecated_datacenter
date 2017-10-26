@@ -217,7 +217,9 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
             SearchWord = "日期";
             var SearchWordEnglish="idcode";
             Ajax.ajax('admin/people/smartSearch',{
-                peopleid : peopleid
+                peopleid : peopleid,
+                type:"4",
+                field:"national"
             },function(json) {
                 addSmartSerarch(json,SearchWord,SearchWordEnglish,peopleid,$page);
 //
