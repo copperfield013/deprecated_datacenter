@@ -4,7 +4,6 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
-import cn.sowell.datacenter.DataCenterConstants;
 import cn.sowell.datacenter.model.basepeople.dto.ResultDto;
 import org.apache.log4j.Logger;
 import org.elasticsearch.client.transport.TransportClient;

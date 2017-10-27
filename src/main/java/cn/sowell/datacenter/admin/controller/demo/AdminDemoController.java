@@ -93,8 +93,4 @@ public class AdminDemoController {
 		}
 	}
 
-
-	/**
-	 * 根据字段类型返回选择字段的List
-	 */
 }
