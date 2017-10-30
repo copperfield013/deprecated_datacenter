@@ -127,7 +127,8 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 			list.add(new FieldDataDto(hit.getSource().get("id").toString(),
 					hit.getSource().get("title").toString(),
 					hit.getSource().get("title_en").toString(),
-					hit.getSource().get("type").toString()));
+					hit.getSource().get("type").toString(),
+					hit.getSource().get("check_rule").toString()));
 
 			System.out.println("总数量："+response.getHits().getTotalHits()+" 耗时："+response.getTookInMillis());
 		}
@@ -146,6 +147,7 @@ public class BasePeopleServiceImpl implements BasePeopleService{
            json.put("title", field.getTitle());
            json.put("title_en", field.getTitle_en());
            json.put("type", field.getType());
+           json.put("check_rule",field.getCheck_rule());
 
 			String json1 = ob.writeValueAsString(json);
 			IndexResponse response = client

@@ -12,15 +12,17 @@ public class FieldDataDto {
     private  String title;
     private  String title_en;
     private  String type;
+    private  String check_rule;
 
     public FieldDataDto() {
     }
 
-    public FieldDataDto(String id, String title, String title_en, String type) {
+    public FieldDataDto(String id, String title, String title_en, String type,String check_rule) {
         this.id = id;
         this.title = title;
         this.title_en = title_en;
         this.type = type;
+        this.check_rule =check_rule;
     }
 
     @Override
@@ -63,5 +65,38 @@ public class FieldDataDto {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getCheck_rule() {
+        return check_rule;
+    }
+
+    public void setCheck_rule(String check_rule) {
+        this.check_rule = check_rule;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FieldDataDto that = (FieldDataDto) o;
+
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (title != null ? !title.equals(that.title) : that.title != null) return false;
+        if (title_en != null ? !title_en.equals(that.title_en) : that.title_en != null) return false;
+        if (type != null ? !type.equals(that.type) : that.type != null) return false;
+        return check_rule != null ? check_rule.equals(that.check_rule) : that.check_rule == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (title_en != null ? title_en.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (check_rule != null ? check_rule.hashCode() : 0);
+        return result;
     }
 }

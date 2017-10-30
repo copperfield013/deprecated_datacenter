@@ -9,7 +9,8 @@
                 <th>序号</th>
                 <th>字段中文</th>
                 <th>字段英文</th>
-                <th>字段类型</th>>
+                <th>字段类型</th>
+                <th>字段校验规则</th>
             </tr>
             </thead>
             <tbody>
@@ -20,6 +21,7 @@
                     <td>${item.title }</td>
                     <td>${item.title_en }</td>
                     <td>${item.type }</td>
+                        <td>${item.check_rule}</td>
                     <%--<td>--%>
                         <%--<a href="admin/people/update/${item.id }" class="tab" target="people_update_${item.id }" title="修改">修改</a>--%>
                         <%--<a href="admin/people/do_delete/${item.id }" confirm="确认删除？">删除</a>--%>

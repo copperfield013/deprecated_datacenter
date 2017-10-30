@@ -1,4 +1,5 @@
 package cn.sowell.datacenter.admin.controller.basepeople;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -118,13 +119,6 @@ public class AdminBasePeopleController {
     }
 
 
-	/**
-	 * 根据字段 返回字段的类型 文本框？时间控件？ 下拉框？ 选择框？
-	 *   默认的值
-	 * @param peopleid
-	 * @param response
-	 * @return
-	 */
 
 	@ResponseBody
 	@RequestMapping(value="smartSearch",method = RequestMethod.POST, headers="Accept=application/json")
@@ -135,7 +129,7 @@ public class AdminBasePeopleController {
 			Res.setData(people);
 			Res.setType(type);
 			Res.setStatus("success");
-			if(type.equals(AdminConstants.FRELD)){
+			if(Arrays.asList(AdminConstants.FRELD).contains(field)){
 			Res.setFieldList(basePeopleService.FieldList(field));
 			}
 		} catch (Exception e){

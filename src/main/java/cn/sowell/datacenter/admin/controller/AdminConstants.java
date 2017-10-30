@@ -44,5 +44,5 @@ public interface AdminConstants {
 	 * 字段属性类型
 	 */
 	//下拉
-	final String FRELD = "4";
+	final String[] FRELD ={"3","4","5"};;
 }

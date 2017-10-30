@@ -34,6 +34,14 @@
 							<input type="text" class="form-control" name="type" />
 						</div>
 					</div>
+					<div class="form-group">
+						<label class="col-lg-2 control-label" for="check_rule">字段校验规则</label>
+						<div class="col-lg-5">
+							<input type="text" class="form-control" name="check_rule" />
+						</div>
+					</div>
+
+
 
 					<div class="form-group">
 			        	<div class="col-lg-offset-3 col-lg-3">
