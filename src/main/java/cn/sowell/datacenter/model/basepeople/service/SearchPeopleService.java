@@ -1,6 +1,8 @@
 package cn.sowell.datacenter.model.basepeople.service;
 
 
+import java.util.Map;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -27,8 +29,9 @@ public interface SearchPeopleService {
 	/**
 	 * 获得一条索引内容
 	 * @param id 索引ID
+	 * @return 
 	 */
-	public void eSearchGet(String id);
+	public Map<String, Object> eSearchGet(String id);
 	
 	/**
 	 * 创建一个索引

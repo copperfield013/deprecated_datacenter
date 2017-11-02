@@ -3,6 +3,7 @@ package cn.sowell.datacenter.model.basepeople.service.impl;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +22,8 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.common.unit.Fuzziness;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -53,8 +56,8 @@ public class SearchPeopleServiceImpl implements SearchPeopleService{
 					client.prepareSearch(index)
 							.setTypes(type)
 							.setSearchType(SearchType.DEFAULT)
-							.setFrom(0)
-							.setSize(9);
+							.setFrom(pageInfo.getFirstIndex())//从第几条开始查， 默认0
+							.setSize(pageInfo.getPageSize());//每页显示数量 ，默认10
 			
 			
 			HighlightBuilder hiBuilder=new HighlightBuilder();
@@ -63,27 +66,34 @@ public class SearchPeopleServiceImpl implements SearchPeopleService{
 	        hiBuilder.field("name")
 	        	.field("address")
 	        	.field("content");
-	        
 			BoolQueryBuilder qb = QueryBuilders.boolQuery();
-			idCode = "*"+idCode+"*";
-			qb = qb.should(QueryBuilders.matchPhraseQuery("name", name));//进行短语匹配
-			qb = qb.must(new QueryStringQueryBuilder(idCode).field("idCode"));
-			String addressList[] = address.split(" ");//将多个条件断开
-			for(int i=0;i<addressList.length;i++){
-				qb = qb.should(QueryBuilders.matchPhraseQuery("address", addressList[i]));
+			if(!name.equals(""))
+				qb = qb.should(QueryBuilders.matchPhraseQuery("name", name));//进行短语匹配
+			if(!idCode.equals("")){
+				idCode = "*"+idCode+"*";
+				qb = qb.must(new QueryStringQueryBuilder(idCode).field("idCode"));
 			}
-			String contentList[] = content.split(" ");
-			for(int i=0;i<contentList.length;i++){
-				if(isNumeric(contentList[i])){//判断是否为数字
-					String con = "*"+contentList[i]+"*";
-					//qb = qb.must(new QueryStringQueryBuilder(con).field("content"));
-				}				
-				else
-					qb = qb.should(QueryBuilders.matchPhraseQuery("content", contentList[i]));
+			if(!address.equals("")){
+				String addressList[] = address.split(" ");//将多个条件断开
+				for(int i=0;i<addressList.length;i++){
+					qb = qb.should(QueryBuilders.matchPhraseQuery("address", addressList[i]));
+				}
 			}
+			if(!content.equals("")){
+				String contentList[] = content.split(" ");
+				for(int i=0;i<contentList.length;i++){
+					if(isNumeric(contentList[i])){//判断是否为数字
+						String con = "*"+contentList[i]+"*";
+						//qb = qb.must(new QueryStringQueryBuilder(con).field("content"));
+					}				
+					else
+						qb = qb.should(QueryBuilders.matchPhraseQuery("content", contentList[i]));
+				}
+			}
+			
 			builder.setQuery(qb);
-			SearchResponse response ;
-			response = builder.highlighter(hiBuilder).execute().actionGet();
+			SearchResponse response = builder.highlighter(hiBuilder).execute().actionGet();
+			int count = (int) response.getHits().getTotalHits();			
 			JSONArray  jsonThree = new JSONArray ();
 			for(SearchHit hit:response.getHits()){
 				jsonThree.add(hit.getSource());
@@ -93,8 +103,9 @@ public class SearchPeopleServiceImpl implements SearchPeopleService{
 				
 				System.out.println(hit.getSource());
 			}
-			
-			System.out.println("总数量："+response.getHits().getTotalHits()+" 耗时："+response.getTookInMillis());
+			System.out.println(jsonThree);
+			System.out.println("总数量："+count+" 耗时："+response.getTookInMillis());
+			pageInfo.setCount(count);
 			return jsonThree;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -154,11 +165,12 @@ public class SearchPeopleServiceImpl implements SearchPeopleService{
 		
 	}
 	
-	public void eSearchGet(String id){
+	public Map<String, Object> eSearchGet(String id){
 		GetResponse response = client
 				.prepareGet(index,type, id)
 				.execute().actionGet();
-		System.out.println("get success");
+		System.out.println(response.getSource());
+		return response.getSource();		
 	}
 	
 	public void highLight(SearchHit hit,String key){//关键字高亮
