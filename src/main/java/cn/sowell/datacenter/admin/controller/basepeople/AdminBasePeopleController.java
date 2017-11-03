@@ -1,5 +1,7 @@
 package cn.sowell.datacenter.admin.controller.basepeople;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -8,8 +10,10 @@ import javax.servlet.http.HttpServletResponse;
 import cn.sowell.datacenter.model.basepeople.dto.ResultDto;
 import org.apache.log4j.Logger;
 import org.elasticsearch.client.transport.TransportClient;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -35,7 +39,15 @@ public class AdminBasePeopleController {
 	private TransportClient client;
 	
 	Logger logger = Logger.getLogger(AdminBasePeopleController.class);
-	
+
+	@org.springframework.web.bind.annotation.InitBinder
+	public void InitBinder(ServletRequestDataBinder binder) {
+		//System.out.println("执行了InitBinder方法");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		dateFormat.setLenient(false);
+		binder.registerCustomEditor(Date.class, null, new CustomDateEditor(dateFormat, true));
+	}
+
 	@RequestMapping("/list")
 	public String list(BasePeopleCriteria criteria, Model model, PageInfo pageInfo){
 		List<BasePeople> list = basePeopleService.queryList(criteria, pageInfo);

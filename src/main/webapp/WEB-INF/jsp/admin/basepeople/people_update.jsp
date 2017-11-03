@@ -29,60 +29,432 @@
 			<div class="col-lg-12">
 				<form class="bv-form form-horizontal validate-form"
 					action="admin/people/do_update">
+					<div class="form-group">
+						<h4>基本信息</h4>
+					</div>
 					<input type="hidden" name="id" value="${people.id }" />
 					<div class="form-group">
-						<label class="col-lg-2 control-label" for="name">姓名</label>
-						<div class="col-lg-5">
-							<input type="text" class="form-control" name="name"
-								value="${people.name }" id="姓名" />
+						<div>
+							<label class="col-lg-1 control-label" for="name">姓名</label>
+							<div class="col-lg-4">
+								<input type="text" class="form-control" name="name" value="${people.name }" />
+							</div>
+						</div>
+						<div >
+							<label class="col-lg-1 control-label" for="idcode">身份证号</label>
+							<div class="col-lg-4">
+								<input type="text" class="form-control" name="idcode" id="code" value="${people.idcode }" />
+							</div>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-lg-2 control-label" for="idcode">身份证号</label>
-						<div class="col-lg-5">
-							<input type="text" class="form-control" name="idcode" id="code"
-								value="${people.idcode }" />
+						<label class="col-lg-1 control-label" for="gender">性别</label>
+						<div class="col-lg-4">
+							<input name="gender" id="1" type="radio" value="1" style="opacity:1;position: static;height:13px;" ${people.gender=='1'? 'checked':'' }/>
+							<label for="1">男性</label>
+							<input name="gender" id="0" type="radio" value="2" style="opacity:1;position: static;height:13px;" ${people.gender=='2'? 'checked':'' }/>
+							<label for="0">女性</label>
 						</div>
-						<div class="col-lg-3">
-							<input id="txt" readonly="readonly" style="border: 0px" />
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-lg-2 control-label" for="gender">性别</label>
-						<div class="col-lg-5">
-							<input name="gender" id="1" type="radio" value="1"
-								style="opacity: 1; position: static; height: 13px;"
-								<c:if test="${people.gender==1 }"> checked </c:if> /> <label
-								for="1">男</label> <input name="gender" id="0" type="radio"
-								value="0" style="opacity: 1; position: static; height: 13px;"
-								<c:if test="${people.gender==0 }"> checked </c:if> /> <label
-								for="0">女</label>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label class="col-lg-2 control-label" for="address">居住地址</label>
-						<div class="col-lg-5">
-							<input type="text" class="form-control" name="address"
-								value="${people.address }" />
+						<label class="col-lg-1 control-label" for="birthday">生日</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" id="date" name="birthday" readonly="readonly" css-cursor="text" value='<fmt:formatDate value="${people.birthday }" pattern="yyyy-MM-dd" />'  />
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-lg-2 control-label" for="contact">联系号码</label>
-						<div class="col-lg-5">
-							<input type="text" class="form-control" name="contact"
-								id="contact" value="${people.contact }" />
+						<label class="col-lg-1 control-label" for="address">居住地址</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="address" value="${people.address }" />
+						</div>
+						<label class="col-lg-1 control-label" for="contact">联系号码</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="contact" id="contact" value="${people.contact }" />
 						</div>
 					</div>
-
 					<div class="form-group">
-						<label class="col-lg-2 control-label">民族</label>
-						<div class="col-lg-5">
-							<select name="nation" class="form-control" data-value="${people.national }">
+						<label class="col-lg-1 control-label">籍贯</label>
+						<div class="col-lg-4">
+							<input type="text" name="nativePlace" class="form-control" value="${people.nativePlace }"   />
+						</div>
+						<label class="col-lg-1 control-label" for="householdPlace">户籍地址</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="householdPlace" value="${people.householdPlace }"  />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label">民族</label>
+						<div class="col-lg-4">
+							<select name="nation" class="form-control" data-value="${people.nation }">
 								<option value=""> -- 请选择 -- </option>
-								<option value="1">汉族</option>
-								<option value="2">蒙古族</option>
+								<option value="汉族">汉族</option>
+								<option value="蒙古族">蒙古族</option>
+								<option value="回族">回族</option>
+								<option value="藏族">藏族</option>
+								<option value="维吾尔族">维吾尔族</option>
+								<option value="苗族">苗族</option>
+								<option value="彝族">彝族</option>
+								<option value="壮族">壮族</option>
+								<option value="布依族">布依族</option>
+								<option value="朝鲜族">朝鲜族</option>
+								<option value="满族">满族</option>
+								<option value="侗族">侗族</option>
+								<option value="瑶族">瑶族</option>
+								<option value="白族">白族</option>
+								<option value="土家族">土家族</option>
+								<option value="哈尼族">哈尼族</option>
+								<option value="哈萨克族">哈萨克族</option>
+								<option value="傣族">傣族</option>
+								<option value="黎族">黎族</option>
+								<option value="傈僳族">傈僳族</option>
+								<option value="佤族">佤族</option>
+								<option value="畲族">畲族</option>
+								<option value="高山族">高山族</option>
+								<option value="拉祜族">拉祜族</option>
+								<option value="水族">水族</option>
+								<option value="东乡族">东乡族</option>
+								<option value="纳西族">纳西族</option>
+								<option value="景颇族">景颇族</option>
+								<option value="柯尔克孜族">柯尔克孜族</option>
+								<option value="土族">土族</option>
+								<option value="达斡尔族">达斡尔族</option>
+								<option value="仫佬族">仫佬族</option>
+								<option value="羌族">羌族</option>
+								<option value="布朗族">布朗族</option>
+								<option value="撒拉族">撒拉族</option>
+								<option value="毛难族">毛难族</option>
+								<option value="仡佬族">仡佬族</option>
+								<option value="锡伯族">锡伯族</option>
+								<option value="阿昌族">阿昌族</option>
+								<option value="普米族">普米族</option>
+								<option value="塔吉克族">塔吉克族</option>
+								<option value="怒族">怒族</option>
+								<option value="乌孜别克族">乌孜别克族</option>
+								<option value="俄罗斯族">俄罗斯族</option>
+								<option value="鄂温克族">鄂温克族</option>
+								<option value="德昂族">德昂族</option>
+								<option value="保安族">保安族</option>
+								<option value="裕固族">裕固族</option>
+								<option value="京族">京族</option>
+								<option value="塔塔尔族">塔塔尔族</option>
+								<option value="独龙族">独龙族</option>
+								<option value="鄂伦春族">鄂伦春族</option>
+								<option value="赫哲族">赫哲族</option>
+								<option value="门巴族">门巴族</option>
+								<option value="珞巴族">珞巴族</option>
+								<option value="基诺族">基诺族</option>
+
 							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label">婚姻状况</label>
+						<div class="col-lg-4">
+							<select class="form-control" name="maritalStatus"  data-value="${people.maritalStatus }">
+								<option value=""> -- 请选择 -- </option>
+								<option value="未婚">未婚</option>
+								<option value="已婚">已婚</option>
+								<option value="初婚">初婚</option>
+								<option value="再婚">再婚</option>
+								<option value="复婚">复婚</option>
+								<option value="丧偶">丧偶</option>
+								<option value="离异">离异</option>
+								<option value="不详">不详</option>
+							</select>
+						</div>
+						<label class="col-lg-1 control-label">宗教信仰</label>
+						<div class="col-lg-4">
+							<select class="form-control" name="religion" data-value="${people.religion }">
+								<option value=""> -- 请选择 -- </option>
+								<option value="无宗教信仰">无宗教信仰</option>
+								<option value="佛教">佛教</option>
+								<option value="喇嘛教">喇嘛教</option>
+								<option value="道教">道教</option>
+								<option value="天主教">天主教</option>
+								<option value="基督教">基督教</option>
+								<option value="东正教">东正教</option>
+								<option value="伊斯兰教">伊斯兰教</option>
+								<option value="其他">其他</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label">健康状况</label>
+						<div class="col-lg-4">
+							<select class="form-control" name="healthCondition" data-value="${people.healthCondition }">
+								<option value=""> -- 请选择 -- </option>
+								<option value="良好">良好</option>
+								<option value="较好">较好</option>
+								<option value="一般">一般</option>
+								<option value="较差">较差</option>
+								<option value="很差">很差</option>
+							</select>
+						</div>
+						<label class="col-lg-1 control-label">人口类型</label>
+						<div class="col-lg-4">
+							<select class="form-control" name="peopleType" data-value="${people.peopleType }">
+								<option value=""> -- 请选择 -- </option>
+								<option value="户籍人口">户籍人口</option>
+								<option value="流动人口">流动人口</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<h4>残疾人信息</h4>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="handicappedCode">残疾证号</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="handicappedCode" value="${people.handicappedCode }"/>
+						</div>
+						<label class="col-lg-1 control-label" for="handicappedType">残疾类型</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="handicappedType" value="${people.handicappedType }"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="handicappedLevel">残疾级别</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="handicappedLevel" value="${people.handicappedLevel }"/>
+						</div>
+						<label class="col-lg-1 control-label" for="handicappedReason">残疾原因</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="handicappedReason" value="${people.handicappedReason }"/>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<h4>低保信息</h4>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="lowIncomeInsuredCode">低保证号</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="lowIncomeInsuredCode" value="${people.lowIncomeInsuredCode }"/>
+						</div>
+						<label class="col-lg-1 control-label" for="lowIncomeInsuredType">低保人员类别</label>
+						<div class="col-lg-4">
+							<select class="form-control" name="lowIncomeInsuredType" data-value="${people.lowIncomeInsuredType }">
+								<option value=""> -- 请选择 -- </option>
+								<option value="在职职工">在职职工</option>
+								<option value="灵活就业人员">灵活就业人员</option>
+								<option value="登记失业人员">登记失业人员</option>
+								<option value="非登记失业人员">非登记失业人员</option>
+								<option value="离退休人员">离退休人员</option>
+								<option value="务工人员">务工人员</option>
+								<option value="务农人员">务农人员</option>
+								<option value="在校生">在校生</option>
+								<option value="残疾人">残疾人</option>
+								<option value="三无人员">三无人员</option>
+								<option value="农垦企业人员">农垦企业人员</option>
+								<option value="森工企业人员">森工企业人员</option>
+								<option value="两劳释放人员">两劳释放人员</option>
+								<option value="归侨侨眷">归侨侨眷</option>
+								<option value="非农水库移民">非农水库移民</option>
+								<option value="高校毕业生">高校毕业生</option>
+								<option value="优抚对象">优抚对象</option>
+								<option value="退役军人">退役军人</option>
+								<option value="60年代精简退职人员">60年代精简退职人员</option>
+								<option value="其它">其它</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="lowIncomeInsuredReason">低保原因</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="lowIncomeInsuredReason" value="${people.lowIncomeInsuredReason }"/>
+						</div>
+						<label class="col-lg-1 control-label" for="lowIncomeInsuredId">享受低保标识</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="lowIncomeInsuredId" value="${people.lowIncomeInsuredId }"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="lowIncomeInsuredAmount">享受低保金额（元）</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="lowIncomeInsuredAmount" value="${people.lowIncomeInsuredAmount }"/>
+						</div>
+						<label class="col-lg-1 control-label" for="lowIncomeInsuredStart">享受开始日期</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" id="lowIncomeInsuredStart" name="lowIncomeInsuredStart" readonly="readonly" css-cursor="text" value='<fmt:formatDate value="${people.lowIncomeInsuredStart }" pattern="yyyy-MM-dd"/>' />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="lowIncomeInsuredEnd">享受结束日期</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" id="lowIncomeInsuredEnd" name="lowIncomeInsuredEnd" readonly="readonly" css-cursor="text" value='<fmt:formatDate value="${people.lowIncomeInsuredEnd }" pattern="yyyy-MM-dd"/>'/>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<h4>失业信息</h4>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="unemployeeDate">就失业日期</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" id="unemployeeDate" name="unemployeeDate" readonly="readonly" css-cursor="text" value='<fmt:formatDate value="${people.unemployeeDate }" pattern="yyyy-MM-dd"/>'/>
+						</div>
+						<label class="col-lg-1 control-label" for="unemployeeCode">就失业证号</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="unemployeeCode" value="${people.unemployeeCode }"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="unemployeeStatus">就失业状态</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control"name="unemployeeStatus" value="${people.unemployeeStatus }"/>
+						</div>
+						<label class="col-lg-1 control-label" for="employeeId">就业标识</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="employeeId" value="${people.employeeId }"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="hardToEmployeeType">就业困难人员类型</label>
+						<div class="col-lg-4">
+							<select class="form-control" name="hardToEmployeeType" data-value="${people.hardToEmployeeType }">
+								<option value=""> -- 请选择 -- </option>
+								<option value="双失业">双失业</option>
+								<option value="单亲有子女上学">单亲有子女上学</option>
+								<option value="低保">低保</option>
+								<option value="4045大龄人员">4045大龄人员</option>
+								<option value="纯农户">纯农户</option>
+								<option value="失地农民">失地农民</option>
+								<option value="其它">其它</option>
+							</select>
+						</div>
+						<label class="col-lg-1 control-label" for="employeeType">就业类型</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="employeeType" value="${people.employeeType }"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="employeeCapacity">就业能力</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="employeeCapacity" value="${people.employeeCapacity }"/>
+						</div>
+						<label class="col-lg-1 control-label" for="employeeSituation">就业情况</label>
+						<div class="col-lg-4">
+							<select class="form-control" name="employeeSituation" data-value="${people.employeeSituation }">
+								<option value=""> -- 请选择 -- </option>
+								<option value="未填">未填</option>
+								<option value="在职">在职</option>
+								<option value="学生">学生</option>
+								<option value="失业">失业</option>
+								<option value="无业">无业</option>
+								<option value="离休">离休</option>
+								<option value="下岗">下岗</option>
+								<option value="其他">其他</option>
+								<option value="内退">内退</option>
+								<option value="其他">其他</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="employeeDestination">就业去向</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="employeeDestination" value="${people.employeeDestination }"/>
+						</div>
+						<label class="col-lg-1 control-label" for="employeeWay">就业途径</label>
+						<div class="col-lg-4">
+							<select class="form-control" name="employeeWay" data-value="${people.employeeWay }">
+								<option value=""> -- 请选择 -- </option>
+								<option value="未填">未填</option>
+								<option value="工职介绍">工职介绍</option>
+								<option value="劳务中介">劳务中介</option>
+								<option value="亲友推荐">亲友推荐</option>
+								<option value="企业招工">企业招工</option>
+								<option value="国家分配">国家分配</option>
+								<option value="部队转业">部队转业</option>
+								<option value="自由职业">自由职业</option>
+								<option value="残疾人">残疾人</option>
+								<option value="其他">其他</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<h4>党员信息</h4>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="politicalStatus">政治面貌</label>
+						<div class="col-lg-4">
+							<select class="form-control" name="politicalStatus" data-value="${people.politicalStatus }">
+								<option value=""> -- 请选择 --</option>
+								<option value="群众">群众</option>
+								<option value="共青团员">共青团员</option>
+								<option value="中共预备党员">中共预备党员</option>
+								<option value="中共党员">中共党员</option>
+							</select>
+						</div>
+						<label class="col-lg-1 control-label" for="partyDate">入党日期</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" id="partyDate" name="partyDate" readonly="readonly" css-cursor="text" value='<fmt:formatDate value="${people.partyDate }" pattern="yyyy-MM-dd"/>'/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="partyPost">党内职务</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="partyPost" value="${people.partyPost }"/>
+						</div>
+						<label class="col-lg-1 control-label" for="partyOrganization">所在党组织</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="partyOrganization" value="${people.partyOrganization }"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="partySuperior">党组织隶属</label>
+						<div class="col-lg-4">
+							<select class="form-control" name="partySuperior" data-value="${people.partySuperior }">
+								<option value=""> -- 请选择 -- </option>
+								<option value="社区">社区</option>
+								<option value="街道">街道</option>
+								<option value="本系统内">本系统内</option>
+								<option value="无">无</option>
+							</select>
+						</div>
+						<label class="col-lg-1 control-label" for="partyOrgContact">党组织联系电话</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="partyOrgContact" id="partyOrgContact" value="${people.partyOrgContact }"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="CYOrganization">共青团组织</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="CYOrganization"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<h4>计生信息</h4>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="childrenCount">子女数</label>
+						<div class="col-lg-4">
+							<input type="number" class="form-control" name="childrenCount" value="${people.childrenCount }"/>
+						</div>
+						<label class="col-lg-1 control-label" for="contraceptionMeasure">节育措施</label>
+						<div class="col-lg-4">
+							<select class="form-control" name="contraceptionMeasure" data-value="${people.contraceptionMeasure }">
+								<option value=""> -- 请选择 -- </option>
+								<option value="上环">上环</option>
+								<option value="取环">取环</option>
+								<option value="结扎">结扎</option>
+								<option value="无">无</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="pregnancyWeeks">现孕周</label>
+						<div class="col-lg-4">
+							<input type="number" class="form-control" name="pregnancyWeeks" value="${people.pregnancyWeeks }"/>
+						</div>
+						<label class="col-lg-1 control-label" for="familyPlanningCode">计划生育证编号</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="familyPlanningCode" value="${people.familyPlanningCode }"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-1 control-label" for="familyPlanningType">计划生育证类型</label>
+						<div class="col-lg-4">
+							<input type="text" class="form-control" name="familyPlanningType" value="${people.familyPlanningType }"/>
 						</div>
 					</div>
 					<div class="form-group">
