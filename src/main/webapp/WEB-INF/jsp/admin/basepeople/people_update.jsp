@@ -419,7 +419,7 @@
 					<div class="form-group">
 						<label class="col-lg-1 control-label" for="CYOrganization">共青团组织</label>
 						<div class="col-lg-4">
-							<input type="text" class="form-control" name="CYOrganization"/>
+							<input type="text" class="form-control" name="CYOrganization" id="CYOrganization" value="${people.CYOrganization }"/>
 						</div>
 					</div>
 					<div class="form-group">
