@@ -386,14 +386,14 @@ define(function(require, exports, module){
 	 */
 	function bindPageTabEvent($page){
 		//阻止跳转
-		$page.on('click', 'a[href]', function(){
+		$($page).on('click', 'a[href]', function(e){
 			e.preventDefault();
 		});
 		
 		/**
 		 * 将a标签天跳转页面修改为在标签页中打开
 		 */
-		$page.on('click', 'a.tab[href]', $page, function(){
+		$($page).on('click', 'a.tab[href]', $page, function(){
 			var _this = $(this);
 			var uri = _this.attr('href'),
 				tabId = _this.attr('target'),

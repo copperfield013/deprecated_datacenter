@@ -7,7 +7,9 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
+import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
 import cn.sowell.datacenter.model.basepeople.dto.ResultDto;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import org.apache.log4j.Logger;
 import org.elasticsearch.client.transport.TransportClient;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -150,7 +152,21 @@ public class AdminBasePeopleController {
 		return  Res;
 	}
 
-
+	/**
+	 *
+	 * @param criteria
+	 * @param model
+	 * @param pageInfo
+	 * @return
+	 */
+	@RequestMapping("/diclist")
+	public String diclist(BasePeopleDictionaryCriteria criteria, Model model, PageInfo pageInfo){
+		List<TBasePeopleDictionaryEntity> list = basePeopleService.querydicList(criteria, pageInfo);
+		model.addAttribute("list", list);
+		model.addAttribute("pageInfo", pageInfo);
+		model.addAttribute("criteria", criteria);
+		return AdminConstants.JSP_BASEPEOPLE + "/dictionary_list.jsp";
+	}
 
 
 }

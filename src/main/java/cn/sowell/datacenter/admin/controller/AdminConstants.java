@@ -33,6 +33,7 @@ public interface AdminConstants {
 	 */
 	final String JSP_BASEPEOPLE = JSP_BASE + "/basepeople";
 
+
 	final String JSP_FIELD = JSP_BASE + "/basefield";
 
 	final String JSP_PEOPLEDATA = JSP_BASE + "/peopledata";

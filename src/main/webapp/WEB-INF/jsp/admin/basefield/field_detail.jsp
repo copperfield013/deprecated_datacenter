@@ -3,41 +3,41 @@
 <div id="field-add">
 	<div class="page-header">
 		<div class="header-title">
-			<h1>添加字段</h1>
+			<h1>编辑Demo</h1>
 		</div>
 	</div>
 	<div class="page-body">
 		<div class="row">
 			<div class="col-lg-12">
-				<form class="bv-form form-horizontal validate-form" action="admin/field/do_add">
+				<form class="bv-form form-horizontal validate-form" action="admin/field/do_update">
 					<div class="form-group">
 						<label class="col-lg-2 control-label" for="id">id</label>
 						<div class="col-lg-5">
-							<input type="text" class="form-control" name="id" />
+							<input type="text" class="form-control" name="id" value="${fieldDataDto.id}" />
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="col-lg-2 control-label" for="title">字段中文名</label>
 						<div class="col-lg-5">
-							<input type="text" class="form-control" name="title" />
+							<input type="text" class="form-control" name="title" value="${fieldDataDto.title}" />
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="col-lg-2 control-label" for="title_en">字段英文名</label>
 						<div class="col-lg-5">
-							<input type="text" class="form-control" name="title_en" />
+							<input type="text" class="form-control" name="title_en"  value="${fieldDataDto.title_en}" />
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="col-lg-2 control-label" for="type">类型</label>
 						<div class="col-lg-5">
-							<input type="text" class="form-control" name="type" />
+							<input type="text" class="form-control" name="type"   value="${fieldDataDto.type}"/>
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="col-lg-2 control-label" for="check_rule">字段校验规则</label>
 						<div class="col-lg-5">
-							<input type="text" class="form-control" name="check_rule" />
+							<input type="text" class="form-control" name="check_rule"  value="${fieldDataDto.check_rule} "/>
 						</div>
 					</div>
 

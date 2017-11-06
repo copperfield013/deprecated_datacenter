@@ -18,7 +18,7 @@
                 <tr>
                     <%--<td>${i.index + 1 }</td>--%>
                     <td>${item.id }</td>
-                    <td>${item.title }</td>
+                        <td><a class="tab" href="admin/field/detail/${item.id }" target="field_detail_${item.id }" title="编辑">${item.title }</a></td>
                     <td>${item.title_en }</td>
                     <td>${item.type }</td>
                         <td>${item.check_rule}</td>
@@ -37,6 +37,6 @@
 <script>
     seajs.use(['utils'], function(Utils){
         var $page = $('#field-list');
-        Utils.datepicker($('#date', $page));
+        //Utils.datepicker($('#date', $page));
     });
 </script>

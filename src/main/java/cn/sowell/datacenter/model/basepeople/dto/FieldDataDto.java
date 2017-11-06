@@ -1,9 +1,9 @@
 package cn.sowell.datacenter.model.basepeople.dto;
 
-public class FieldDataDto {
+public class  FieldDataDto  {
 
     /**
-     *                 json.put("id", "2");
+     *          json.put("id", "2");
      json.put("title", "身份证号");
      json.put("title_en", "idcode");
      json.put("type", "1");
@@ -27,7 +27,7 @@ public class FieldDataDto {
 
     @Override
     public String toString() {
-        return "FieldDataDto{" +
+        return "{" +
                 "id='" + id + '\'' +
                 ", title='" + title + '\'' +
                 ", title_en='" + title_en + '\'' +

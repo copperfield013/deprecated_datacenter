@@ -4,7 +4,9 @@ import java.util.List;
 
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
+import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 
 public interface BasePeopleDao {
@@ -44,4 +46,6 @@ public interface BasePeopleDao {
 
 
 	List<TBasePeopleItemEntity> fieldList (String field);
+
+	public List<TBasePeopleDictionaryEntity> querydicList(BasePeopleDictionaryCriteria bpCriteria, PageInfo pageInfo) ;
 }

@@ -6,6 +6,8 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import cn.sowell.copframe.dao.deferedQuery.HibernateRefrectResultTransformer;
+import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -84,4 +86,24 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 	}
 
 
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<TBasePeopleDictionaryEntity> querydicList(BasePeopleDictionaryCriteria bpCriteria, PageInfo pageInfo) {
+		String hql = "from TBasePeopleDictionaryEntity p";
+		DeferedParamQuery dQuery = new DeferedParamQuery(hql);
+		if(TextUtils.hasText(bpCriteria.getcCnName())){
+			dQuery.appendCondition(" and p.cCnName like :name")
+					.setParam("name", "%" + bpCriteria.getcCnName() + "%");
+		}
+		Query countQuery = dQuery.createQuery(sFactory.getCurrentSession(), true, new WrapForCountFunction());
+		Integer count = FormatUtils.toInteger(countQuery.uniqueResult());
+		pageInfo.setCount(count);
+		if(count > 0){
+			Query query = dQuery.createQuery(sFactory.getCurrentSession(), true, null);
+			QueryUtils.setPagingParamWithCriteria(query , pageInfo);
+			return query.list();
+		}
+		return new ArrayList<TBasePeopleDictionaryEntity>();
+	}
 }

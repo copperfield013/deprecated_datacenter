@@ -8,12 +8,15 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
 import cn.sowell.datacenter.model.basepeople.dto.FieldDataDto;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -118,10 +121,12 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 				client.prepareSearch("ydd")
 						.setTypes("demo")
 						.setSearchType(SearchType.DEFAULT)
-						.setFrom(0);
+						.setFrom(0)
+						.setSize(50)
+				;
 		QueryBuilder queryBuilder = QueryBuilders.matchAllQuery();
 		builder.setQuery(queryBuilder);
-		SearchResponse response  = builder.execute().actionGet();
+		SearchResponse response  = builder.addSort("id",SortOrder.ASC).execute().actionGet();
 
 		List<FieldDataDto> list = new ArrayList<>();
 		for(SearchHit hit:response.getHits()){
@@ -131,7 +136,7 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 					hit.getSource().get("type").toString(),
 					hit.getSource().get("check_rule").toString()));
 
-			System.out.println("总数量："+response.getHits().getTotalHits()+" 耗时："+response.getTookInMillis());
+		//	System.out.println("总数量："+response.getHits().getTotalHits()+" 耗时："+response.getTookInMillis());
 		}
 		return  list;
 	}
@@ -165,6 +170,23 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 	@Override
 	public List<TBasePeopleItemEntity> FieldList(String field) {
 		return basePeopleDao.fieldList(field);
+	}
+
+	@Override
+	public FieldDataDto queryFieldById(String FieldId) {
+		GetResponse response = client
+				.prepareGet("ydd", "demo",FieldId)
+				.execute().actionGet();
+		return new FieldDataDto(response.getSource().get("id").toString(),
+				response.getSource().get("title").toString(),
+				response.getSource().get("title_en").toString(),
+				response.getSource().get("type").toString(),
+				response.getSource().get("check_rule").toString());
+	}
+
+	@Override
+	public List<TBasePeopleDictionaryEntity> querydicList(BasePeopleDictionaryCriteria criteria, PageInfo pageInfo) {
+		return basePeopleDao.querydicList(criteria, pageInfo);
 	}
 
 

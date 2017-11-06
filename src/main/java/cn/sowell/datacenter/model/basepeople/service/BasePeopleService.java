@@ -4,9 +4,11 @@ import java.util.List;
 
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
+import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
 import cn.sowell.datacenter.model.basepeople.dto.FieldDataDto;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
 
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 import com.alibaba.fastjson.JSONArray;
 
@@ -58,4 +60,10 @@ public interface BasePeopleService {
 
 	List<TBasePeopleItemEntity> FieldList(String field);
 
+
+	FieldDataDto queryFieldById(String FieldId);
+
+
+
+	List<TBasePeopleDictionaryEntity> querydicList(BasePeopleDictionaryCriteria criteria, PageInfo pageInfo);
 }
