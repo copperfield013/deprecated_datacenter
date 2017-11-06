@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
-<div id="dictionary-list">
+<div id="item-list">
 	<nav>
 
 		<form class="form-inline" action="admin/people/diclist">
@@ -13,22 +13,20 @@
 			<thead>
 				<tr>
 					<th>id</th>
-					<th>name</th>
-					<th>code</th>
-					<th>english</th>
+					<th>枚举名</th>
+					<th>枚举值</th>
 					<th>操作</th>
 				</tr>
 			</thead>
 			<tbody>
-				<c:forEach items="${list }" var="item" varStatus="i">
+
+			<c:forEach items="${list }" var="item" varStatus="i">
 					<tr>
-						<td>${item.cId}</td>
-						<td>${item.cCnName }</td>
-						<td>${item.cDictionarycode }</td>
-						<td>${item.cCnEnglish }</td>
+						<td>${item.c_id}</td>
+						<td>${item.c_enum_cn_name }</td>
+						<td>${item.c_enum_value }</td>
 						<td>
-							<a href="admin/people/itemlist/${item.cCnEnglish }" class="tab" target="item_list_${item.cId }" title="查看">查看枚举值</a>
-							<a href="admin/people/do_delete/${item.cId }" confirm="确认删除？">删除</a>
+123
 						</td>
 					</tr>
 				</c:forEach>

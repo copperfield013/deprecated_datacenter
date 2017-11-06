@@ -169,4 +169,10 @@ public class AdminBasePeopleController {
 	}
 
 
+	@RequestMapping("/itemlist/{field}")
+	public String itemlist(@PathVariable String field, Model model, PageInfo pageInfo){
+		model.addAttribute("list", basePeopleService.FieldList(field));
+		return AdminConstants.JSP_BASEPEOPLE + "/item_list.jsp";
+	}
+
 }
