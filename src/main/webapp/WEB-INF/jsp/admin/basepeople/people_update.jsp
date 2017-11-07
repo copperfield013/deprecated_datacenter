@@ -762,7 +762,7 @@ input:-webkit-autofill,
 
 
 	<div id="clone">
-		<form id="cloneForm" class="" action="http://6.zhukaifeng.applinzi.com/tianyamingyuedao/content.php">
+		<form id="cloneForm" class="" action="admin/people/do_smart_update">
 			<div class="cloneBox">
 				
 			</div>
@@ -1303,6 +1303,8 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
  * **/
 
 	function addSmartSerarch(json,SearchWord,SearchWordEnglish,peopleid,$page,type,check_rule){
+	    console.log(SearchWordEnglish);
+	    console.log(json);
 	var type = type;
 	var check_rule = check_rule;
 	var fieldList = json.fieldList;
@@ -1340,6 +1342,7 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
         		checked = jsondata[SearchWordEnglish];	
         	}       
         	console.log(checked);
+        	console.log(json.fieldList);
         	for(var i = 0; i<json.fieldList.length; i++){
         		console.log(json.fieldList[i].c_enum_value);
         		if(json.fieldList[i].c_enum_value === checked){

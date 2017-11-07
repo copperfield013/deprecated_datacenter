@@ -1,8 +1,6 @@
 package cn.sowell.datacenter.admin.controller.basepeople;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -16,10 +14,7 @@ import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.ServletRequestDataBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
@@ -143,7 +138,7 @@ public class AdminBasePeopleController {
 			Res.setData(people);
 			Res.setType(type);
 			Res.setStatus("success");
-			if(Arrays.asList(AdminConstants.FRELD).contains(field)){
+			if(Arrays.asList(AdminConstants.FRELD).contains(type)){
 			Res.setFieldList(basePeopleService.FieldList(field));
 			}
 		} catch (Exception e){
@@ -173,6 +168,25 @@ public class AdminBasePeopleController {
 	public String itemlist(@PathVariable String field, Model model, PageInfo pageInfo){
 		model.addAttribute("list", basePeopleService.FieldList(field));
 		return AdminConstants.JSP_BASEPEOPLE + "/item_list.jsp";
+	}
+
+	@ResponseBody
+	@RequestMapping("/do_smart_update")
+	public AjaxPageResponse doUpdate(@RequestParam Map<String,String> map){
+
+		System.out.println(map.get("id").toString());
+		map.remove("id");
+		try {
+			Iterator<Map.Entry<String, String>> it = map.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry<String, String> entry = it.next();
+				System.out.println("key= " + entry.getKey() + " and value= " + entry.getValue());
+			}
+			return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改成功", "demo_list");
+		} catch (Exception e) {
+			logger.error("修改失败", e);
+			return AjaxPageResponse.FAILD("修改失败");
+		}
 	}
 
 }

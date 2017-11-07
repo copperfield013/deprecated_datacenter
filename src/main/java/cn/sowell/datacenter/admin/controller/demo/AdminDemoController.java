@@ -87,6 +87,9 @@ public class AdminDemoController {
 	@ResponseBody
 	@RequestMapping("/do_update")
 	public AjaxPageResponse doUpdate(@RequestParam Map<String,String> map){
+
+		System.out.println(map.get("id").toString());
+		map.remove("id");
 		try {
 			Iterator<Map.Entry<String, String>> it = map.entrySet().iterator();
 			while (it.hasNext()) {
