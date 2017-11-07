@@ -1,7 +1,9 @@
 package cn.sowell.datacenter.model.basepeople.dao.impl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -105,5 +107,19 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 			return query.list();
 		}
 		return new ArrayList<TBasePeopleDictionaryEntity>();
+	}
+
+	@Override
+	public void updateBasePeople(Map<String, String> map, String id) {
+			String mapsql ="";
+			Iterator<Map.Entry<String, String>> it = map.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry<String, String> entry = it.next();
+				System.out.println("key= " + entry.getKey() + " and value= " + entry.getValue());
+				mapsql += entry.getKey() + "='" + entry.getValue() + "',";
+			}
+		String sql = "update t_base_people set  "+mapsql.substring(0,mapsql.length()-1)+" where id = :id ";
+		SQLQuery query = sFactory.getCurrentSession().createSQLQuery(sql);
+		query.setString("id",id).executeUpdate();
 	}
 }

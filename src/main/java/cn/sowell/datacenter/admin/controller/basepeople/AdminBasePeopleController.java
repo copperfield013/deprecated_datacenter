@@ -173,20 +173,10 @@ public class AdminBasePeopleController {
 	@ResponseBody
 	@RequestMapping("/do_smart_update")
 	public AjaxPageResponse doUpdate(@RequestParam Map<String,String> map){
-
-		System.out.println(map.get("id").toString());
+   		String id = map.get("id").toString();
 		map.remove("id");
-		try {
-			Iterator<Map.Entry<String, String>> it = map.entrySet().iterator();
-			while (it.hasNext()) {
-				Map.Entry<String, String> entry = it.next();
-				System.out.println("key= " + entry.getKey() + " and value= " + entry.getValue());
-			}
-			return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改成功", "demo_list");
-		} catch (Exception e) {
-			logger.error("修改失败", e);
-			return AjaxPageResponse.FAILD("修改失败");
-		}
+		basePeopleService.updateBasePeople(map,id);
+		return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改成功", "people_list");
 	}
 
 }

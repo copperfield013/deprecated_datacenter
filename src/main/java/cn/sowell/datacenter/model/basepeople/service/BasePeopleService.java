@@ -1,6 +1,7 @@
 package cn.sowell.datacenter.model.basepeople.service;
 
 import java.util.List;
+import java.util.Map;
 
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
@@ -66,4 +67,6 @@ public interface BasePeopleService {
 
 
 	List<TBasePeopleDictionaryEntity> querydicList(BasePeopleDictionaryCriteria criteria, PageInfo pageInfo);
+
+	void updateBasePeople (Map<String,String> map,String id);
 }

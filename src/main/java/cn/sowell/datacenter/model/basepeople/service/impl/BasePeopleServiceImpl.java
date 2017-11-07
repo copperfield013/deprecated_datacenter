@@ -189,5 +189,10 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 		return basePeopleDao.querydicList(criteria, pageInfo);
 	}
 
+	@Override
+	public void updateBasePeople(Map<String, String> map, String id) {
+		basePeopleDao.updateBasePeople(map,id);
+	}
+
 
 }

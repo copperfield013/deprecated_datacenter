@@ -31,13 +31,27 @@
 					<div class="form-group">
 						<label class="col-lg-2 control-label" for="type">类型</label>
 						<div class="col-lg-5">
-							<input type="text" class="form-control" name="type" />
+							<select class="form-control" name="type">
+								<option value=""> -- 请选择 -- </option>
+								<option value="1">文本输入框</option>
+								<option value="2">单选框</option>
+								<option value="3">单选下拉框</option>
+								<option value="4">多选下拉框</option>
+								<option value="5">暂无</option>
+								<option value="6">时间控件</option>
+							</select>
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="col-lg-2 control-label" for="check_rule">字段校验规则</label>
 						<div class="col-lg-5">
-							<input type="text" class="form-control" name="check_rule" />
+							<select class="form-control" name="check_rule">
+								<option value=""> -- 请选择 -- </option>
+								<option value="1">email</option>
+								<option value="2">idcode</option>
+								<option value="3">phone</option>
+
+							</select>
 						</div>
 					</div>
 

@@ -1230,6 +1230,11 @@ input:-webkit-autofill,
 seajs.use(['utils','ajax'], function(Utils,Ajax){
 	var $page = $('#people-update${people.id }');
 	Utils.datepicker($('#date', $page));
+    Utils.datepicker($('#lowIncomeInsuredStart', $page));
+    Utils.datepicker($('#lowIncomeInsuredEnd', $page));
+    Utils.datepicker($('#unemployeeDate', $page));
+    Utils.datepicker($('#partyDate', $page));
+
 	var sFocus = Utils.focus($('.search${people.id }', $page));
 	var fieldArray = [];    //最后一次从ES中获取到的数据
 	
@@ -1401,7 +1406,7 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
             $(".cloneBox").prepend(
         '<div class="datacenter-menu-box datacenter-gird-box">' +
                 '<label class="" for="'+SearchWordEnglish+'">'+SearchWord+'</label>' +
-                '<input type="text" class="form-control data-picker datacenter-form-control" id="smartdate" name="'+SearchWord+'"' +
+                '<input type="text" class="form-control data-picker datacenter-form-control" id="smartdate" name="'+SearchWordEnglish+'"' +
                 'readonly="readonly" css-cursor="text"' +
                 'value='+dataTime+'>' +
                 '</div>');
