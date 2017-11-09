@@ -21,6 +21,12 @@
 	   			<span class="menu-text">人口查询</span>
 	   		</a>
 	   	</li>
+		<li><a class="tab" href="admin/field/list" target="field_list"
+			title="字段列表"> <span class="menu-text">字段列表</span>
+		</a></li>
+		<li><a class="tab" href="admin/people/diclist"
+			target="dictionary_list" title="字典列表"> <span class="menu-text">字典列表</span>
+		</a></li>
 	</ul>
 </li>
 <li>

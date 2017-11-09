@@ -1,15 +1,16 @@
 package cn.sowell.datacenter.admin.controller.people;
 
 import java.io.IOException;
-import java.net.DatagramSocket;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.sun.javafx.logging.PulseLogger;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -19,11 +20,12 @@ import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.ServletRequestDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.abc.dto.ErrorInfomation;
 
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JsonResponse;
@@ -36,8 +38,11 @@ import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
 import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
+import cn.sowell.datacenter.model.peopledata.service.PeopleButtService;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
 import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
+
+import com.alibaba.fastjson.JSON;
 
 @Controller
 @RequestMapping(AdminConstants.URI_BASE + "/peopledata")
@@ -52,6 +57,10 @@ public class AdminPeopleDataController {
 	
 	@Resource
 	FrameDateFormat dateFormat;
+	
+	@Resource
+	PeopleButtService buttService;
+	
 	
 	Logger logger = Logger.getLogger(AdminPeopleDataController.class);
 	@org.springframework.web.bind.annotation.InitBinder
@@ -95,7 +104,7 @@ public class AdminPeopleDataController {
 	public String update(@PathVariable String peopleCode, Model model){
 		PeopleData people = peopleService.getPeople(peopleCode);
 		model.addAttribute("people", people);
-		return AdminConstants.JSP_PEOPLEDATA + "/peopledata_update.jsp";
+		return AdminConstants.JSP_PEOPLEDATA + "/peopledata_update_new.jsp";
 	}
 	
 	@ResponseBody
@@ -242,6 +251,36 @@ public class AdminPeopleDataController {
 		} catch (Exception e) {
 			logger.error("删除失败", e);
 			return AjaxPageResponse.FAILD("删除失败");
+		}
+	}
+	
+	@ResponseBody
+	@RequestMapping("/smart_search")
+	public JsonResponse smartsearch(String peopleCode, String type, String field, HttpServletResponse response) {
+		JsonResponse jRes = new JsonResponse();
+		try {
+			PeopleData people = peopleService.getPeople(peopleCode);
+			jRes.put("data", JSON.toJSON(people));
+			jRes.put("type", type);
+			jRes.setStatus("success");
+			if(Arrays.asList(AdminConstants.FRELD).contains(type)){
+				jRes.put("fieldList", buttService.fieldList(field));
+			}
+		} catch (Exception e){
+			jRes.setStatus("faild");
+		}
+		return jRes;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/do_smart_update")
+	public AjaxPageResponse doUpdate(String peopleCode, @RequestParam Map<String,String> map){
+		try {
+			buttService.updatePeople(peopleCode, map);
+			return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改成功", "people_list");
+		} catch (Exception e) {
+			logger.error(e);
+			return AjaxPageResponse.FAILD("修改失败");
 		}
 	}
 	
