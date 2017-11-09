@@ -13,8 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
-
-import com.abc.people.People;
+import cn.sowell.datacenter.model.peopledata.service.PeopleButtService;
 
 @ContextConfiguration(locations = "classpath*:spring-config/spring-junit.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -24,6 +23,9 @@ public class TestABCExecuteService {
 	
 	@Resource
 	FrameDateFormat dateFormat;
+	
+	@Resource
+	PeopleButtService buttService;
 	
 	@Test
 	public void testEdit() throws IOException {
@@ -38,4 +40,19 @@ public class TestABCExecuteService {
 		//People people = abcService.mergePeople(data);
 		//System.out.println(people);
 	}
+	
+	@Test
+	public void testUpdate(){
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("name", "修改后");
+		String peopleCode = "765ddd7710d14b3fb807f01077df3c01";
+		buttService.updatePeople(peopleCode, map);
+	}
+	
+	
+	
+	
+	
+	
+	
 }
