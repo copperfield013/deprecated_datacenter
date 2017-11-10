@@ -54,7 +54,7 @@ public class SearchPeopleServiceImpl implements SearchPeopleService{
 	        //查询详情
 			BoolQueryBuilder qb = QueryBuilders.boolQuery();
 			if(!name.equals(""))
-				qb = qb.should(QueryBuilders.matchPhraseQuery("name", name));//进行短语匹配
+				qb = qb.filter(QueryBuilders.matchPhraseQuery("name", name));//进行短语匹配过滤
 			if(!idCode.equals("")){
 				String id = "*"+idCode+"*";
 				qb = qb.must(new QueryStringQueryBuilder(id).field("idCode"));
@@ -63,7 +63,7 @@ public class SearchPeopleServiceImpl implements SearchPeopleService{
 				BoolQueryBuilder addressQuery = QueryBuilders.boolQuery();
 				String addressList[] = address.split(" ");//将多个条件断开
 				for(int i=0;i<addressList.length;i++){
-					addressQuery = addressQuery.should(QueryBuilders.matchPhraseQuery("address", addressList[i]).boost(2));//设定了权值为2，默认为1
+					addressQuery = addressQuery.should(QueryBuilders.matchPhraseQuery("address", addressList[i]));
 				}
 				qb = qb.should(addressQuery);
 			}
@@ -76,7 +76,7 @@ public class SearchPeopleServiceImpl implements SearchPeopleService{
 						contentQuery = contentQuery.must(new QueryStringQueryBuilder(con).field("content"));
 					}				
 					else
-						contentQuery = contentQuery.should(QueryBuilders.matchPhraseQuery("content", contentList[i]).boost(2));
+						contentQuery = contentQuery.should(QueryBuilders.matchPhraseQuery("content", contentList[i]));
 				}
 				qb.should(contentQuery);
 			}
@@ -93,10 +93,9 @@ public class SearchPeopleServiceImpl implements SearchPeopleService{
 				highLight(hit,"address");
 				highLight(hit,"content");
 				jsonThree.add(hit.getSource());
-				System.out.println("权值："+hit.getScore()+"内容："+hit.getSource());
+				logger.debug("权值："+hit.getScore()+"  内容："+hit.getSource());
 			}
-			//System.out.println(jsonThree);
-			System.out.println("总数量："+count+" 耗时："+response.getTookInMillis());
+			logger.debug("总数量："+count+" 耗时："+response.getTookInMillis());
 			pageInfo.setCount(count);
 			return jsonThree;
 		} catch (Exception e) {
