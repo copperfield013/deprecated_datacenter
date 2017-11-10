@@ -25,7 +25,6 @@ import cn.sowell.datacenter.model.esbasic.service.EsBasicService;
 @Service
 public class EsBasicServiceImpl implements EsBasicService {
 	private Logger logger = Logger.getLogger(EsBasicService.class);
-	@Resource
 	private TransportClient client = SearchTransportClient.getInstance().getTransportClient();
 	private String index = "ydd";
 	private String type = "peopleDemo";

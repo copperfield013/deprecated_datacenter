@@ -29,7 +29,6 @@ import cn.sowell.datacenter.model.esbasic.SearchTransportClient;
 @Service
 public class SearchPeopleServiceImpl implements SearchPeopleService{	
 	private Logger logger = Logger.getLogger(SearchPeopleService.class);
-	@Resource
 	private TransportClient client = SearchTransportClient.getInstance().getTransportClient();
 	private String index = "ydd";
 	private String type = "peopleDemo";
