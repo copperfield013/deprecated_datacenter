@@ -1,7 +1,5 @@
 package cn.sowell.datacenter.admin.controller.searchpop;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -15,21 +13,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
 import cn.sowell.datacenter.model.basepeople.service.SearchPeopleService;
+import cn.sowell.datacenter.model.esbasic.service.EsBasicService;
 
 @Controller
 @RequestMapping("/admin/search")
 public class SearchPopController {
 	@Resource
 	SearchPeopleService searchPeopleService;
+	
+	@Resource
+	EsBasicService esBasicService;
 	
 	Logger logger = Logger.getLogger(SearchPopController.class);
 	
@@ -63,7 +63,7 @@ public class SearchPopController {
 	@RequestMapping("/do_delete/{id}")
 	public AjaxPageResponse doDelte(@PathVariable String id){
 		try {
-			searchPeopleService.eSearchDelete(id);;
+			esBasicService.eSearchDelete(id);;
 			return AjaxPageResponse.REFRESH_LOCAL("删除成功");
 		} catch (Exception e) {
 			logger.error("删除失败", e);
@@ -73,7 +73,7 @@ public class SearchPopController {
 	
 	@RequestMapping("/detail/{id}")
 	public String detail(@PathVariable String id, Model model){
-		Map<String, Object> search = searchPeopleService.eSearchGet(id);
+		Map<String, Object> search = esBasicService.eSearchGet(id);
 		model.addAttribute("search", search);
 		return AdminConstants.JSP_SEARCH + "/search_detail.jsp";
 	}

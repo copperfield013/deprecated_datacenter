@@ -34,7 +34,6 @@
 
 	<div class="page-body">
 		<div class="row list-area">
-		<a class='tab' href='admin/search/detail/1' target='search_detail_1' title='详情'>xxx</a>
 		<table class="table">
 			<thead>
 				<tr>
@@ -89,7 +88,7 @@ seajs.use(['utils','ajax','paging'], function(Utils,Ajax,Paging){
 									+"<td><a class='tab' href='admin/search/detail/"+people[i].id+"' target='search_detail_"+people[i].id+"' title='详情'>" + people[i].name + "</a></td>"
 									+"<td>" + people[i].idCode + "</td>"
 									+"<td>" + people[i].address + "</td>"
-									+"<td>" + people[i].content.substr(0,50) + "</td>"
+									+"<td>" + people[i].content + "</td>"
 									+"<td><a href='admin/search/detail/"+people[i].id+"' class='tab' target='' title='修改'>修改</a>&nbsp;"
 										+"<a  href='admin/search/do_delete/"+people[i].id+"' confirm='确认删除？'>删除</a></td></tr>";
 					}

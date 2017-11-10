@@ -33,10 +33,10 @@ import org.springframework.stereotype.Service;
 
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
-import cn.sowell.datacenter.model.basepeople.SearchTransportClient;
 import cn.sowell.datacenter.model.basepeople.dao.BasePeopleDao;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
 import cn.sowell.datacenter.model.basepeople.service.BasePeopleService;
+import cn.sowell.datacenter.model.esbasic.SearchTransportClient;
 
 
 
