@@ -784,7 +784,7 @@ input:-webkit-autofill,
 		<div class="row">
 			<div class="col-lg-12">
 				<form class="bv-form form-horizontal validate-form"
-					action="admin/people/do_update">
+					action="admin/peopledata/do_update">
 					<div class="form-group">
 						<h4>基本信息</h4>
 					</div>
