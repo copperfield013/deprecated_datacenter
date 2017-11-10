@@ -16,13 +16,14 @@
 		</authentication-provider>
 	</authentication-manager>
 	<beans:bean id="webexpressionHandler" class="org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler" />
+	<beans:bean id="cpfInvalidSessionStrategy" class="cn.sowell.copframe.web.CpfInvalidSessionStrategy" />
 	<!-- 拦截管理界面请求 -->
 	<http pattern="/admin/login" security="none" />
 	<http pattern="/admin/**" use-expressions="false" auto-config="true" authentication-manager-ref="authenticationManager">
 		<intercept-url pattern="/admin/**" access="${admin_default_authen}"  />
 
 		<!-- 同一时间内允许同一账号保持4个在线,error-if-maximum-exceeded="true"表示第第四个以后的登不进去 -->
-		<session-management>
+		<session-management invalid-session-strategy-ref="cpfInvalidSessionStrategy" >
 			<concurrency-control max-sessions="4" error-if-maximum-exceeded="true" />
 		</session-management>
 		<csrf disabled="true" />
@@ -37,5 +38,4 @@
 		<logout logout-success-url="/admin/login" logout-url="/admin/logout"
 			invalidate-session="true" delete-cookies="JSESSIONID" />
 	</http>
-
 </beans:beans>

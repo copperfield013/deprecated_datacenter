@@ -167,6 +167,9 @@ define(function(require, exports, module){
 		    data: 		fData,
 		    processData: false,
 		    contentType: false,
+		    headers		: {
+		    	'request-category'	: 'cpf-ajax'
+		    },
 		    success		: function(data, status, jqXHR){
 		    	commonHandleSucAjax(data, status, jqXHR);
 		    	var resContentType = utils.trim(jqXHR.getResponseHeader("Content-Type"));

@@ -10,7 +10,7 @@
 	
 	<properties>
 		<version.kie>6.5.0.Final</version.kie>
-		<version.cpfweb>0.2.3</version.cpfweb>
+		<version.cpfweb>0.2.4</version.cpfweb>
 		<version.abc>1.7.42</version.abc>
 	</properties>
 	
