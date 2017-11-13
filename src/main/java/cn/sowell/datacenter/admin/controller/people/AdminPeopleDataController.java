@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.alibaba.fastjson.JSONArray;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -20,10 +21,7 @@ import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.ServletRequestDataBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -282,6 +280,24 @@ public class AdminPeopleDataController {
 			logger.error(e);
 			return AjaxPageResponse.FAILD("修改失败");
 		}
+	}
+
+
+
+	@ResponseBody
+	@RequestMapping(value="titleSearch")
+	public JsonResponse esearch(String txt) {
+		JsonResponse jsonResponses = new JsonResponse();
+		try{
+			jsonResponses.put("data",buttService.titleSearch(txt.trim()));
+			return jsonResponses;
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+			return jsonResponses;
+		}
+
 	}
 	
 }

@@ -1440,10 +1440,10 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
 			var check_rule = "";	
 			
 			for(var i=0; i<keyArray.length; i++){
-				if(keyWord === keyArray[i].title){
-					SearchWord = keyArray[i].title;
+				if(keyWord === keyArray[i].cCnName){
+					SearchWord = keyArray[i].cCnName;
 					type = keyArray[i].type;
-					SearchWordEnglish = keyArray[i].title_en;
+					SearchWordEnglish = keyArray[i].cCnEnglish;
 					check_rule = keyArray[i].check_rule;
 				}
 			}
@@ -1483,13 +1483,13 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
 	$('.search${people.peopleCode }').keyup(function(event) {
 		if (event.keyCode > "40" || event.keyCode == "32"|| event.keyCode == "8"
 			&& $(this).val() != ""&& $(this).val() != null) {
-			Ajax.ajax('admin/people/titleSearch',
+			Ajax.ajax('admin/peopledata/titleSearch',
 					{txt : $(this).val()},
 					function(json) {
-						fieldArray = json;
+						fieldArray = json.data;
 						$('.search${people.peopleCode }').bigAutocomplete({
 							width : 190,
-							data : json
+							data : json.data
 							});
 					});
 		
@@ -1645,8 +1645,8 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
 				var cont = "<table><tbody>";
 
 				for (var i = 0; i < data_.length; i++) {
-					cont += "<tr><td><div id="+data_[i].title_en+">"
-							+ data_[i].title + "</div></td></tr>"
+					cont += "<tr><td><div id="+data_[i].cCnEnglish+">"
+							+ data_[i].cCnName + "</div></td></tr>"
 				}
 
 				cont += "</tbody></table>";

@@ -48,7 +48,9 @@ public interface BasePeopleDao {
 
 	List<TBasePeopleItemEntity> fieldList (String field);
 
-	public List<TBasePeopleDictionaryEntity> querydicList(BasePeopleDictionaryCriteria bpCriteria, PageInfo pageInfo) ;
+	List<TBasePeopleDictionaryEntity> querydicList(BasePeopleDictionaryCriteria bpCriteria, PageInfo pageInfo) ;
 
 	void updateBasePeople(Map<String,String> map, String id);
+
+	List<TBasePeopleDictionaryEntity> searchList(String txt) ;
 }

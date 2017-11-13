@@ -6,9 +6,27 @@ import javax.persistence.*;
 @Table(name = "t_base_people_dictionary")
 public class TBasePeopleDictionaryEntity {
     private int cId;
-    private String cCnName;
-    private String cDictionarycode;
-    private String cCnEnglish;
+    private  String cCnName;
+    private  String cDictionarycode;
+    private  String cCnEnglish;
+    private  String  type;
+    private  String  check_rule;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getCheck_rule() {
+        return check_rule;
+    }
+
+    public void setCheck_rule(String check_rule) {
+        this.check_rule = check_rule;
+    }
 
     @Id
     @Column(name = "c_id")

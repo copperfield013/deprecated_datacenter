@@ -122,4 +122,18 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 		SQLQuery query = sFactory.getCurrentSession().createSQLQuery(sql);
 		query.setString("id",id).executeUpdate();
 	}
+
+	@Override
+	public List<TBasePeopleDictionaryEntity> searchList(String txt) {
+		String hql = "from TBasePeopleDictionaryEntity p";
+		DeferedParamQuery dQuery = new DeferedParamQuery(hql);
+			dQuery.appendCondition(" and p.cCnName like :name").setParam("name", "%" + txt + "%");
+		Query countQuery = dQuery.createQuery(sFactory.getCurrentSession(), true, new WrapForCountFunction());
+		Integer count = FormatUtils.toInteger(countQuery.uniqueResult());
+		if(count > 0){
+			Query query = dQuery.createQuery(sFactory.getCurrentSession(), true, null);
+			return query.list();
+		}
+		return new ArrayList<TBasePeopleDictionaryEntity>();
+	}
 }

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.format.Formatter;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,11 @@ public class PeopleButtServiceImpl implements PeopleButtService{
 		bindProperties(people, map);
 		people.setPeopleCode(peopleCode);
 		abcService.savePeople(people);
+	}
+
+	@Override
+	public List<TBasePeopleDictionaryEntity> titleSearch(String txt) {
+		return basePeopleDao.searchList(txt);
 	}
 
 	private void bindProperties(PeopleData people, Map<String, String> map) {

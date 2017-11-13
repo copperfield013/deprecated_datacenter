@@ -3,6 +3,7 @@ package cn.sowell.datacenter.model.peopledata.service;
 import java.util.List;
 import java.util.Map;
 
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 
 /**
@@ -29,5 +30,8 @@ public interface PeopleButtService {
 	 * @param map
 	 */
 	void updatePeople(String peopleCode, Map<String, String> map);
+
+
+      List<TBasePeopleDictionaryEntity> titleSearch (String txt);
 
 }
