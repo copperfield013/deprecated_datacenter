@@ -1,5 +1,6 @@
 package cn.sowell.datacenter.model.basepeople.dao;
 
+import java.sql.Savepoint;
 import java.util.List;
 import java.util.Map;
 
@@ -53,4 +54,8 @@ public interface BasePeopleDao {
 	void updateBasePeople(Map<String,String> map, String id);
 
 	List<TBasePeopleDictionaryEntity> searchList(String txt) ;
+
+	void saveOrUpdate (Object pojo);
+
+	public <T> T getDicById(Class<T> clazz, String id);
 }

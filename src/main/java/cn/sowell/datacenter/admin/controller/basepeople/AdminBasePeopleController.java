@@ -161,14 +161,7 @@ public class AdminBasePeopleController {
 	 * @param pageInfo
 	 * @return
 	 */
-	@RequestMapping("/diclist")
-	public String diclist(BasePeopleDictionaryCriteria criteria, Model model, PageInfo pageInfo){
-		List<TBasePeopleDictionaryEntity> list = basePeopleService.querydicList(criteria, pageInfo);
-		model.addAttribute("list", list);
-		model.addAttribute("pageInfo", pageInfo);
-		model.addAttribute("criteria", criteria);
-		return AdminConstants.JSP_BASEPEOPLE + "/dictionary_list.jsp";
-	}
+
 
 
 	@RequestMapping("/itemlist/{field}")

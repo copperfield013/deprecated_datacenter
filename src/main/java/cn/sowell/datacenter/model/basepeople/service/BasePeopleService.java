@@ -70,5 +70,10 @@ public interface BasePeopleService {
 
 	void updateBasePeople (Map<String,String> map,String id);
 
-	void insert(Object pojo);
+
+	void saveOrUpdate (Object pojo);
+
+	void deleteObj(Object pojo);
+
+	TBasePeopleDictionaryEntity getDicById(String id);
 }

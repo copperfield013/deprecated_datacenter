@@ -11,6 +11,7 @@ import cn.sowell.copframe.dao.deferedQuery.HibernateRefrectResultTransformer;
 import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
+import org.apache.poi.ss.formula.functions.T;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.SessionFactory;
@@ -60,7 +61,12 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 	public <T> T get(Class<T> clazz, Long id) {
 		return sFactory.getCurrentSession().get(clazz, id);
 	}
-	
+
+
+	@Override
+	public void saveOrUpdate(Object pojo) {
+		sFactory.getCurrentSession().saveOrUpdate(pojo);
+	}
 	@Override
 	public void update(Object pojo) {
 		sFactory.getCurrentSession().update(pojo);
@@ -135,5 +141,11 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 			return query.list();
 		}
 		return new ArrayList<TBasePeopleDictionaryEntity>();
+	}
+
+
+	@Override
+	public <T> T getDicById(Class<T> clazz, String id) {
+		return sFactory.getCurrentSession().get(clazz, id);
 	}
 }

@@ -3,8 +3,8 @@
 <div id="dictionary-list">
 	<nav>
 
-		<form class="form-inline" action="admin/people/diclist">
-			<a class="btn btn-primary tab" href="admin/people/add" title="创建人口" target="people_add" >创建</a>
+		<form class="form-inline" action="admin/peopleDictionary/list">
+			<a class="btn btn-primary tab" href="admin/peopleDictionary/add" title="创建字段" target="dictionary_add" >新增</a>
 		</form>
 
 	</nav>
@@ -14,7 +14,6 @@
 				<tr>
 					<th>id</th>
 					<th>name</th>
-					<th>code</th>
 					<th>english</th>
 					<th>类型</th>
 					<th>规则</th>
@@ -26,13 +25,12 @@
 					<tr>
 						<td>${item.cId}</td>
 						<td>${item.cCnName }</td>
-						<td>${item.cDictionarycode }</td>
 						<td>${item.cCnEnglish }</td>
 						<td>${item.type}</td>
 						<td>${item.check_rule}</td>
 						<td>
 							<a href="admin/people/itemlist/${item.cCnEnglish }" class="tab" target="item_list_${item.cId }" title="查看">查看枚举值</a>
-							<a href="admin/people/do_delete/${item.cId }" confirm="确认删除？">删除</a>
+							<a href="admin/peopleDictionary/do_delete/${item.cId }" confirm="确认删除？">删除</a>
 						</td>
 					</tr>
 				</c:forEach>

@@ -16,6 +16,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 
+import org.apache.poi.ss.formula.functions.T;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -194,10 +195,19 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 		basePeopleDao.updateBasePeople(map,id);
 	}
 
+
 	@Override
-	public void insert(Object pojo) {
-		basePeopleDao.insert(pojo);
+	public void saveOrUpdate(Object pojo) {
+		basePeopleDao.saveOrUpdate(pojo);
 	}
 
+	@Override
+	public void deleteObj(Object pojo){
+		basePeopleDao.delete(pojo);
+	}
 
+	@Override
+	public TBasePeopleDictionaryEntity getDicById(String id) {
+		return basePeopleDao.getDicById(TBasePeopleDictionaryEntity.class,id);
+	}
 }
