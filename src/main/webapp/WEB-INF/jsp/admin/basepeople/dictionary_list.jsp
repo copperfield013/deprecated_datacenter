@@ -16,6 +16,8 @@
 					<th>name</th>
 					<th>code</th>
 					<th>english</th>
+					<th>类型</th>
+					<th>规则</th>
 					<th>操作</th>
 				</tr>
 			</thead>
@@ -26,6 +28,8 @@
 						<td>${item.cCnName }</td>
 						<td>${item.cDictionarycode }</td>
 						<td>${item.cCnEnglish }</td>
+						<td>${item.type}</td>
+						<td>${item.check_rule}</td>
 						<td>
 							<a href="admin/people/itemlist/${item.cCnEnglish }" class="tab" target="item_list_${item.cId }" title="查看">查看枚举值</a>
 							<a href="admin/people/do_delete/${item.cId }" confirm="确认删除？">删除</a>

@@ -1,13 +1,14 @@
 package cn.sowell.datacenter.model.basepeople.pojo;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "t_base_people_dictionary")
 public class TBasePeopleDictionaryEntity {
-    private int cId;
+    private String cId;
     private  String cCnName;
-    private  String cDictionarycode;
     private  String cCnEnglish;
     private  String  type;
     private  String  check_rule;
@@ -30,11 +31,13 @@ public class TBasePeopleDictionaryEntity {
 
     @Id
     @Column(name = "c_id")
-    public int getcId() {
+    @GeneratedValue(generator = "paymentableGenerator")
+    @GenericGenerator(name = "paymentableGenerator", strategy = "uuid")
+    public String getcId() {
         return cId;
     }
 
-    public void setcId(int cId) {
+    public void setcId(String cId) {
         this.cId = cId;
     }
 
@@ -48,15 +51,6 @@ public class TBasePeopleDictionaryEntity {
         this.cCnName = cCnName;
     }
 
-    @Basic
-    @Column(name = "c_dictionarycode")
-    public String getcDictionarycode() {
-        return cDictionarycode;
-    }
-
-    public void setcDictionarycode(String cDictionarycode) {
-        this.cDictionarycode = cDictionarycode;
-    }
 
     @Basic
     @Column(name = "c_cn_english")

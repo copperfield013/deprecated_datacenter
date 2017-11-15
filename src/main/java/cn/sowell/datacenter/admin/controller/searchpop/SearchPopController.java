@@ -78,4 +78,5 @@ public class SearchPopController {
 		return AdminConstants.JSP_SEARCH + "/search_detail.jsp";
 	}
 
+
 }

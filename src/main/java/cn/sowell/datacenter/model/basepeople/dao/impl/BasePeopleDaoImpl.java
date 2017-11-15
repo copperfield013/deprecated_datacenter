@@ -77,7 +77,7 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 				" i.*" +
 				" FROM" +
 				" t_base_people_dictionary d" +
-				" LEFT JOIN t_base_people_item i ON i.c_dictionarycode = d.c_dictionarycode";
+				" LEFT JOIN t_base_people_item i ON i.c_dictionaryid = d.c_id";
 		DeferedParamQuery dQuery = new DeferedParamQuery(sql);
 		dQuery.appendCondition(" and d.c_cn_english = :field")
 				.setParam("field", field);
@@ -127,7 +127,7 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 	public List<TBasePeopleDictionaryEntity> searchList(String txt) {
 		String hql = "from TBasePeopleDictionaryEntity p";
 		DeferedParamQuery dQuery = new DeferedParamQuery(hql);
-			dQuery.appendCondition(" and p.cCnName like :name").setParam("name", "%" + txt + "%");
+		dQuery.appendCondition(" and p.cCnName like :name").setParam("name", "%" + txt + "%");
 		Query countQuery = dQuery.createQuery(sFactory.getCurrentSession(), true, new WrapForCountFunction());
 		Integer count = FormatUtils.toInteger(countQuery.uniqueResult());
 		if(count > 0){

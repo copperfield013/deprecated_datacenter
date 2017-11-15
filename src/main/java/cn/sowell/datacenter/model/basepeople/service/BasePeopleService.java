@@ -69,4 +69,6 @@ public interface BasePeopleService {
 	List<TBasePeopleDictionaryEntity> querydicList(BasePeopleDictionaryCriteria criteria, PageInfo pageInfo);
 
 	void updateBasePeople (Map<String,String> map,String id);
+
+	void insert(Object pojo);
 }

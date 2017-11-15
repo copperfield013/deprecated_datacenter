@@ -194,5 +194,10 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 		basePeopleDao.updateBasePeople(map,id);
 	}
 
+	@Override
+	public void insert(Object pojo) {
+		basePeopleDao.insert(pojo);
+	}
+
 
 }
