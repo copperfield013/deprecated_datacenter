@@ -1,7 +1,8 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <link rel="stylesheet" href="media/admin/bigautocomplete/css/jquery.bigautocomplete.css" type="text/css" />
-
+<link rel="stylesheet" href="media/admin/peopleupdate/swinput.css" type="text/css" />
+<script src="media/admin/peopleupdate/swinput.js"></script>
 <style>
 div.tab-content>.tab-pane{
 	position:relative;
@@ -9,786 +10,101 @@ div.tab-content>.tab-pane{
 .tab-content {
 	background-color: #ffffff;
 }
-.clone-btn {
-	padding-right: 40px;
-	padding-bottom: 20px;
-	text-align: right;
-	display: none;
-	border-bottom: 2px solid #999999;
-
+.page-body {
+	border-top: 1px solid #999999;
+	padding-right: 0;
 }
-.btn.btn-palegreen {
-	margin-right: 25px;
+.smartForm.search #saveSmartForm {
+	display: none;
+}
+.smartForm.edit #editSmartForm {
+	display: none;
+}
+.infor-search {
+	margin: 0 5px 0 15px;
+}
+
+.form-inline {
+	display:inline-block;
 }
 .cloneBox {
-	padding:0 20px;
+	padding:20px;
+}
+#editSmartForm,
+#saveSmartForm {
+	display:block;
+	float:right;
+	margin-right: 40px;
+}
+#editIntegratedForm,
+#saveIntegratedForm {
+	display:block;
+	float:right;
+	margin-right: 40px;
+}
+.page-body.search #saveIntegratedForm {
+	display: none;
+}
+.page-body.edit #editIntegratedForm {
+	display: none;
 }
 .cloneBox .col-lg-2 .control-label{
 	margin-left: 0;
 }
 .datacenter-gird-box {
 	border: 1px solid transparent;
+	margin-bottom: 5px;
 }
 .datacenter-menu-box {
 	padding: 10px 0;
 }
 .datacenter-gird-box span,
 .datacenter-gird-box label {
-	display: block;
+	display:inline-block;
+	width: 40px;
 	color: #9e9e9e;
-	margin-bottom: 15px;
+	margin-right:15px;
 }
+
 </style>
-<style>
-input:-webkit-autofill,
-    textarea:-webkit-autofill,
-    select:-webkit-autofill {
-        background-color: transparent;
-    }
 
-    .datacenter-input {
-        width: 350px;
-        margin-top: 16px;
-        margin-bottom: 15px;
-        padding: 0;
-        box-sizing: border-box;
-        position: relative;
-    }
-    .datacenter-form-control {
-    	width: 215px;
-    }
-    .datacenter-form-control > label {
-    	
-    }
-    
-
-    .datacenter-input>.basic-slide {
-        outline: none;
-        border: none;
-        width: 100%;
-        height: 36px;
-        line-height: 36px;
-        border-bottom: 1px solid #9e9e9e;
-        background-color: transparent;
-        font-size: 14px;
-        -webkit-box-shadow: none;
-        box-shadow: none;
-        -webkit-box-sizing: content-box;
-        box-sizing: content-box;
-        -webkit-transition: all 0.3s;
-        transition: all 0.3s;
-        margin: 0 0 20px 0;
-        padding: 0;
-        color: #444444;
-        font-family: "Roboto", sans-serif;
-    }
-
-    .datacenter-input>textarea.basic-slide {
-        padding: 0.8em 0 1.6em 0.5em;
-        overflow: auto;
-        overflow-y: hidden;
-        resize: none;
-        min-height: 4.5em;
-        line-height: 1.5em;
-        box-sizing: content-box;
-        font-size: 14px
-    }
-
-    .datacenter-input>.basic-slide.vaild,
-    .datacenter-input>.basic-slide.vaild:focus {
-        border-bottom: 1px solid #4CAF50;
-        -webkit-box-shadow: 0 1px 0 0 #4CAF50;
-        box-shadow: 0 1px 0 0 #4CAF50;
-    }
-
-    .datacenter-input>.basic-slide.invaild,
-    .datacenter-input>.basic-slide.invaild:focus {
-        border-bottom: 1px solid #F44336;
-        -webkit-box-shadow: 0 1px 0 0 #F44336;
-        box-shadow: 0 1px 0 0 #F44336;
-    }
-
-    .datacenter-input>.basic-slide:focus {
-        border-bottom: 1px solid #26a69a;
-        -webkit-box-shadow: 0 1px 0 0 #26a69a;
-        box-shadow: 0 1px 0 0 #26a69a;
-    }
-
-    .datacenter-input>.basic-slide:focus+label {
-        color: #26a69a;
-    }
-
-    .datacenter-input>label {
-        position: absolute;
-        left: 0;
-        top: 0;
-        font-size: 14px;
-        color: #9e9e9e;
-        height: 100%;
-        width: 100%;
-        cursor: text;
-        -webkit-transform: translateY(12px);
-        transform: translateY(12px);
-        -webkit-transition: -webkit-transform .2s ease-out;
-        transition: -webkit-transform .2s ease-out;
-        transition: transform .2s ease-out;
-        transition: transform .2s ease-out, -webkit-transform .2s ease-out;
-        -webkit-transform-origin: 0% 100%;
-        transform-origin: 0% 100%;
-        pointer-events: none;
-    }
-
-    .datacenter-input>label.active {
-        -webkit-transform: translateY(-14px);
-        transform: translateY(-14px);
-        -webkit-transform-origin: 0 0;
-        transform-origin: 0 0;
-    }
-
-    .datacenter-input>label.active:after {
-        content: "";
-        display: none;
-        font-size: 12px;
-        position: absolute;
-        top: 100%;
-        width: auto;
-        -webkit-transform: translateY(9px);
-        transform: translateY(9px);
-    }
-
-    .datacenter-input>.basic-slide.vaild+label.active:after {
-        display: block;
-        color: #4CAF50;
-        content: "格式正确"
-    }
-
-    .datacenter-input>.basic-slide.invaild+label.active:after {
-        display: block;
-        color: #F44336;
-        content: "格式错误"
-    }
-    /* textarea自适应高度所需div */
-
-    .hiddendiv {
-        padding: 0.8em 0 1.6em 0.5em;
-        height: auto;
-        line-height: 1.5em;
-        box-sizing: content-box;
-        font-size: 14px;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        visibility: hidden;
-        position: absolute;
-        top: -999999999px;
-    }
-
-    .datacenter-radio,
-    .datacenter-checkbox {
-        pointer-events: none;
-        opacity: 0;
-        padding: 0;
-        opacity: 0;
-	    position: absolute;
-	    left: -9999px;
-	    z-index: 12;
-	    width: 0;
-	    height: 0;
-	    cursor: pointer;
-    }
-
-    .datacenter-radio+label,
-    .datacenter-checkbox+label {
-        position: relative;
-        font-family: "Roboto", sans-serif;
-        font-size: 14px;
-        color: #9e9e9e;
-        padding-left: 30px;
-        margin-right: 15px;
-        cursor: pointer;
-        display: inline-block;
-        height: 25px;
-        line-height: 25px;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        box-sizing: border-box;
-    }
-
-    .datacenter-radio+label:before {
-        position: absolute;
-        content: " ";
-        border: 2px solid #5a5a5a;
-        border-radius: 50%;
-        top: 0;
-        left: 0;
-        width: 16px;
-        height: 16px;
-        -webkit-transition: .28s ease;
-        transition: .28s ease;
-        box-sizing: border-box;
-        margin: 4px;
-    }
-    .datacenter-radio:checked+label:before {
-        border-color: #26a69a;
-    }
-    .datacenter-radio+label:after {
-        position: absolute;
-        content: '';
-        left: 0;
-        top: 0;
-        width: 16px;
-        height: 16px;
-        -webkit-transition: .28s ease;
-        transition: .28s ease;
-        background-color: #26a69a;
-        border-radius: 50%;
-        -webkit-transform: scale(0);
-        transform: scale(0);
-        box-sizing: border-box;
-        margin: 4px;
-    }
-    .datacenter-radio:checked+label:after {
-        -webkit-transform: scale(0.5);
-        transform: scale(0.5);
-    }
-    .datacenter-checkbox+label:before,
-    .datacenter-checkbox+label:after  {
-        margin-top: 4px;
-        box-sizing: border-box;
-        content: '';
-        position: absolute;
-        -webkit-transition: border .25s, background-color .25s, width .20s .1s, height .20s .1s, top .20s .1s, left .20s .1s;
-        transition: border .25s, background-color .25s, width .20s .1s, height .20s .1s, top .20s .1s, left .20s .1s;
-    }
-    .datacenter-checkbox+label:after {
-        height: 20px;
-        width: 20px;
-        background-color: transparent;
-        border: 2px solid #5a5a5a;
-        top: 0px;
-        border-radius: 2px;
-        top: 0;
-        left: 0;
-    }
-    .datacenter-checkbox:checked+label:before {
-        top: 2px;
-        left: 1px;
-        width: 8px;
-        height: 13px;
-        border-top: 2px solid transparent;
-        border-left: 2px solid transparent;
-        border-right: 2px solid #fff;
-        border-bottom: 2px solid #fff;
-        -webkit-transform: rotateZ(37deg);
-        transform: rotateZ(37deg);
-        -webkit-transform-origin: 100% 100%;
-        transform-origin: 100% 100%;
-        z-index: 1;
-    }
-    .datacenter-checkbox:checked+label:after {
-        width: 20px;
-        height: 20px;
-        border: 2px solid #26a69a;
-        background-color: #26a69a;
-        z-index: 0;
-    }
-
-    /*select*/
-    .datacenter-select {
-        position: relative;
-        color: #9e9e9e;
-    }
-    .datacenter-select > .down-icon {
-        position: absolute;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        height: 10px;
-        margin: auto 0;
-        font-size: 10px;
-        line-height: 10px;
-    }
-    .datacenter-select > .select-dropdown {
-        position: relative;
-        cursor: pointer;
-        background-color: transparent;
-        border: none;
-        border-bottom: 1px solid #9e9e9e;
-        outline: none;
-        height: 42px;
-        line-height: 42px;
-        width: 100%;
-        font-size: 14px;
-        margin: 0 0 20px 0;
-        padding: 0;
-        display: block;
-        color: #333333;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-    }
-    .datacenter-select > ul.dropdown-content {
-        background-color: #fff;
-        margin: 0;
-        width: 100%;
-        min-width: 100px;
-        max-height: 350px;
-        overflow-y: auto;
-        display: none;
-        position: absolute;
-        z-index: 999;
-        padding: 0;
-        top: 0;
-        left: 0;
-        -webkit-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2);
-        box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2);
-        -webkit-transition: all 0.3s ease-out;
-        transition: all 0.3s ease-out;
-    }
-    .datacenter-select > ul.dropdown-content.active {
-        display: block;
-    }
-    .datacenter-select > ul.dropdown-content > li {
-        clear: both;
-        color: rgba(0,0,0,0.87);
-        cursor: pointer;
-        width: 100%;
-        text-align: left;
-        text-transform: none;
-        list-style: none;
-        font-size: 14px;
-        color: #26a69a;
-        display: block;
-        padding: 14px 16px;
-        box-sizing: border-box;
-    }
-    .datacenter-select > ul.dropdown-content > li:hover,
-    .datacenter-select > ul.dropdown-content > li.disabled {
-        background-color: rgba(0,0,0,0.06);
-        
-    }
-    .datacenter-select > ul.dropdown-content > li.disabled {
-        color: rgba(0,0,0,0.3);
-    }
-    .datacenter-select > ul.dropdown-content > li.active {
-       background-color: rgba(0,0,0,0.03);
-    }
-    .datacenter-select > select {
-        display: none;
-    }
-</style>
-<script>
-'use strict';
-
-;(function (window, document) {
-
-    var SWinput;
-    var VERSION = '1.0.0';
-    var swinputMap = {}; //保存所有SWinput对象
-
-    SWinput = function (pt, options) {
-        //pt  容器元素
-        var me = this;
-
-        me.wrapper = typeof pt === 'string' ? document.querySelector(pt) : pt;
-
-        this._init(me.wrapper, options);
-    };
-
-    SWinput.version = VERSION;
-
-    SWinput.prototype = {
-        //初始化
-        _init: function _init(wrapper, options) {
-
-            var me = this;
-
-            //实例化的包裹层
-            me.warpper = wrapper;
-
-            //创建ID
-            me.id = options && options.id || Number(Math.random().toString().substr(2, 8) + Date.now()).toString(36);
-
-            //默认选项
-            me.options = {
-                type: "1",
-                title_en: "text",
-                title: "defaultBox"
-
-            };
-
-            //参数和并
-            for (var i in options) {
-                me.options[i] = options[i];
-            }
-
-            //document事件监听
-            //类型筛选
-            switch (me.options.type) {
-                case "1":
-                    me.inputCallback(me.wrapper, me.options, me.id);
-                    break;
-                case "2":
-                	me.radioCallback(me.wrapper, me.options, me.id);
-                    break;
-                case "3":
-                	me.selectCallback(me.wrapper, me.options, me.id);                   
-                    break;
-                case "5":
-                    me.checkBoxCallback(me.wrapper, me.options, me.id);
-                    break;
-                case "7":
-                	me.textareaCallback(me.wrapper, me.options, me.id);
-                    break;
-                default:
-                    break;
-            }
-        },
-
-        //input类型render 并且添加事件监听
-        inputCallback: function inputCallback(wrapper, options, id) {
-            var me = this;
-            var regular = options.check_rule;
-            var title = options.title;
-            var SWid = id;
-            var _thisELE = null; //当前元素
-            var _thisINPUT = null; //
-            var value = options.a_value ? options.a_value : "";
-            var name = options.title_en;
-            var html = '<div class="datacenter-swinput datacenter-input" sw_id = ' + SWid + '>\n                            <input class="basic-slide" type="text" data-type="' + regular + '" autocomplete="off" name="'+name+'">\n                            <label>' + title + '</label>\n                        </div>';
-
-            var checkInput = function checkInput(target) {
-                var target = target;
-                var hasValue = target.value !== ""; //当前input是否有值
-                var value = ""; //input的值
-                var vaild = false; //值是否合法有效
-
-                if (!hasValue) {
-                    target.nextElementSibling.classList.remove("active");
-                    target.classList.remove("vaild");
-                    target.classList.remove("invaild");
-                } else {
-                    target.nextElementSibling.classList.add("active");
-                    value = target.value;
-                    vaild = me.regular(regular, value);
-                    if (vaild) {
-                        target.classList.remove("invaild");
-                        target.classList.add("vaild");
-                    } else {
-                        target.classList.remove("vaild");
-                        target.classList.add("invaild");
-                    }
-                }
-            };
-
-            wrapper.insertAdjacentHTML('beforeend', html); //后期加入错误处理机制
-
-            _thisELE = document.querySelector('div[sw_id=\'' + SWid + '\']');
-            _thisINPUT = document.querySelector('div[sw_id=\'' + SWid + '\']>input');
-
-            _thisINPUT.setAttribute("value", value); //初始化放值
-            checkInput(_thisINPUT);
-
-            //添加事件监听
-            _thisINPUT.addEventListener('focus', function (evt) {
-                var target = evt.target;
-                target.nextElementSibling.classList.add("active");
-            }, false);
-
-            _thisINPUT.addEventListener('blur', function (evt) {
-                var target = evt.target;
-                checkInput(target);
-            }, false);
-
-            //保存SWinput对象；
-            me.swinput = _thisELE;
-            swinputMap[me.id] = me;
-        },
-
-        //正则验证
-        regular: function regular(_regular, value) {
-
-            function checkEmail(email) {
-                // 邮箱验证方法
-                console.log('reg email');
-                var reg = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/;
-                var re = new RegExp(reg);
-                var result = false;
-                re.test(email) ? result = true : result = false;
-                return result;
-            }
-
-            function checkIdentity(identity) {
-                //  身份证号码验证
-                console.log('reg identity');
-                // 15位数身份证正则表达式
-                var reg1 = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$/;
-                // 18位数身份证正则表达式
-                var reg2 = /^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[A-Z])$/;
-                if (identity.match(reg1) == null && identity.match(reg2) == null) {
-                    return false;
-                } else {
-                    return true;
-                }
-            }
-
-            function checkMobiles(mobiles) {
-                //  手机验证
-                console.log('reg mobiles');
-                var reg = /^(((13[0-9]{1})|(15[0-9]{1})|(17[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
-                var re = new RegExp(reg);
-                var result = false;
-                re.test(mobiles) ? result = true : result = false;
-                return result;
-            }
-
-            switch (_regular) {//验证规则选定
-                case "1":
-                    return checkEmail(value);
-                case "2":
-                    return checkIdentity(value);
-                case "3":
-                    return checkMobiles(value);
-                default:
-                    return true;
-            }
-        },
-
-        //textarea类型render 同时添加事件监听 没有正则验证  支持 高度自适应内容
-        textareaCallback: function textareaCallback(wrapper, options, id) {
-            var me = this;
-            var title = options.title;
-            var SWid = id;
-            var _thisELE = null; //当前元素
-            var _thisTEXTAREA = null; //当前插入的元素中的textarea元素
-            var hiddenDiv = null; //对应的div
-            var html = '<div class="datacenter-swinput datacenter-input" sw_id = ' + SWid + '>\n                            <textarea class="basic-slide"></textarea>\n                            <label>' + title + '</label>\n                        </div>';
-            var hiddenHtml = '<div class="hiddendiv" sw_id = ' + SWid + ' ></div>';
-
-            wrapper.insertAdjacentHTML('beforeend', html); //后期需要加入错误处理机制
-            document.body.insertAdjacentHTML('beforeend', hiddenHtml);
-
-            _thisELE = document.querySelector('div[sw_id=\'' + SWid + '\']');
-            _thisTEXTAREA = document.querySelector('div[sw_id=\'' + SWid + '\']>textarea');
-
-            //设置hiddenDIV
-            hiddenDiv = document.querySelector('div.hiddendiv[sw_id=\'' + SWid + '\']');
-            hiddenDiv.style.width = window.getComputedStyle(_thisELE.querySelector('textarea')).width;
-
-            //添加事件监听
-            _thisTEXTAREA.addEventListener('focus', function (evt) {
-                var target = evt.target;
-                target.nextElementSibling.classList.add("active");
-            }, false);
-
-            _thisTEXTAREA.addEventListener('blur', function (evt) {
-                var target = evt.target;
-                var hasValue = target.value !== ""; //当前input是否有值
-                var value = ""; //input的值
-
-                if (!hasValue) {
-                    target.nextElementSibling.classList.remove("active");
-                }
-            }, false);
-
-            _thisTEXTAREA.addEventListener('input', function (evt) {
-                var target = evt.target;
-                var height = parseFloat(window.getComputedStyle(target).height); //textarea现有高度  
-                var minHeight = parseFloat(window.getComputedStyle(target).minHeight); //textarea最小高度
-                var targetValue = target.value;
-                //内容放置到对应的div
-                hiddenDiv.textContent = targetValue;
-                var hiddenHeight = parseFloat(window.getComputedStyle(hiddenDiv).height);
-
-                if (hiddenHeight > height || hiddenHeight < height && height > minHeight) {
-                    target.style.height = hiddenHeight + "px";
-                }
-            }, false);
-
-            //保存SWinput对象；
-            me.swinput = _thisELE;
-            swinputMap[me.id] = me;
-        },
-
-        //select类型render 添加相应的事件监听 无正则验证 只提供单选  多选请用checkbox
-        selectCallback: function selectCallback(wrapper, options, id) {
-            var me = this;
-            var option = options.fileList;
-            var SWid = id;
-            var _thisELE = null;
-            var _thisINPUT = null;
-            var _thisSelect = null;
-            var _thisList = null;
-            var optionHtml = "";
-            var selectHtml = "";
-            var title = "";
-            var value = "";
-            var name = options.name;
-            var checked = options.checked;
-            for (var i = 0; i < option.length; i++) {
-                title = option[i].title;
-                value = option[i].value;
-                optionHtml += '<li class="" data-index = ' + (i + 1) + ' data-value= "'+value+'">' + title + '</li>';
-
-                selectHtml += '<option value="' + value + '">' + title + '</option>';
-            }
-            var html = '<div class="datacenter-select" sw_id="' + SWid + '">\n                            <span class="down-icon">▼</span>\n                            <input type="text" class="select-dropdown" readonly="true" value="选择一个选项">\n                            <ul class="dropdown-content">\n                                <li class="disabled active">选择一个选项</li>  \n                                ' + optionHtml + '                              \n                            </ul>\n                            <select class="initialized" name="'+name+'">\n                                <option value="" disabled selected>选择一个选项</option>\n                                ' + selectHtml + '\n                            </select>\n                        </div>';
-
-            wrapper.insertAdjacentHTML('beforeend', html); //后期需要加入错误处理机制
-
-            _thisELE = document.querySelector('div[sw_id=\'' + SWid + '\']');
-            _thisINPUT = document.querySelector('div[sw_id=\'' + SWid + '\']>input');
-            _thisList = document.querySelector('div[sw_id=\'' + SWid + '\']>ul');
-            _thisSelect = document.querySelector('div[sw_id=\'' + SWid + '\']>select');
-
-            //事件监听
-            _thisINPUT.addEventListener("click", function (evt) {
-                //展开，同时判断向上展开还是向下展开
-                var target = evt.target;
-                // var topDistance = $(this).parent('.selection-container').offset().top;  //元素距离顶部的距离
-                // var scrollTop = $(window).scrollTop();  //网页被卷起高度
-                // var viewHeight = $(window).height(); //可视区域高度
-                // var selectionHeight = $(this).height();
-                // var selectHeight = $(this).parent('.selection-container').height();   //selection 整体高度
-                // var viewTop = topDistance - scrollTop;  //元素距离可视区域顶部距离
-                // var viewBottom = viewHeight - viewTop - selectHeight;    // selection距离可视区域底部距离
-                // var dropHeight = $(this).parent('.selection-container').find('.selection-drop').height();
-                _thisList.classList.add("active");
-            }, false);
-
-            _thisList.addEventListener("click", function (evt) {
-                var target = evt.target;
-                var allOption = target.parentNode.children;
-                var index = 1;
-                var text = "";
-                if (target.classList.contains('disabled')) {
-                    _thisList.classList.remove("active");
-                    return;
-                }
-                for (var i = 0; i < allOption.length; i++) {
-                    allOption[i].classList.remove("active");
-                }
-                _thisList.classList.remove("active");
-                target.classList.add('active');
-
-                //设置inputvalue
-                text = target.textContent;
-                _thisINPUT.setAttribute('value', text);
-
-                //设置select对应选项
-                index = target.getAttribute('data-index');
-                _thisSelect.children[index].selected = true;
-            }, false);
-            //如果有值
-            if(checked !== ""){
-            	var index = 0;
-                var listLength = _thisList.children.length;
-            	for( var i=0; i < listLength; i++){
-            		if(_thisList.children[i].getAttribute('data-value') === checked){            			
-						index = _thisList.children[i].getAttribute('data-index');
-						console.log(index);
-            		}
-            	}
-            	_thisINPUT.setAttribute('value', checked);
-            	_thisSelect.children[index].selected = true;
-            }
-        },
-
-        //radio类型render
-        radioCallback: function radioCallback(wrapper, options, id) {
-            var me = this;
-            var title = options.title;
-            var name = options.name;
-            var SWid = id;
-            var value = options.value;
-            var checked = "";
-            options.check ? checked = "checked" : "";
-            var _thisELE = null; //当前元素 radio
-            var html = '<input ' + checked + ' class="datacenter-radio" id="' + SWid + '" name="' + name + '" type="radio" value="' + value + '">\n                        <label for="' + SWid + '">' + title + '</label>';
-
-            wrapper.insertAdjacentHTML('beforeend', html); //后期加入错误处理机制
-            _thisELE = document.querySelector('div[id=\'' + SWid + '\']');
-
-            //保存SWinput对象；
-            me.swinput = _thisELE;
-            swinputMap[me.id] = me;
-        },
-
-        //checkbox类型render
-        checkBoxCallback: function checkBoxCallback(wrapper, options, id) {
-            var me = this;
-            var title = options.title;
-            var name = options.name;
-            var SWid = id;
-            var value = options.value;
-            var _thisELE = null; //当前元素 radio
-            var checked = "";
-            options.check ? checked = "checked" : "";
-            var html = '<input ' + checked + ' class="datacenter-checkbox" id="' + SWid + '" name="' + name + '" type="checkbox" value="' + value + '">\n                        <label for="' + SWid + '">' + title + '</label>';
-
-            wrapper.insertAdjacentHTML('beforeend', html); //后期加入错误处理机制
-            _thisELE = document.querySelector('input[id=\'' + SWid + '\']');
-
-            //保存SWinput对象；
-            me.swinput = _thisELE;
-            swinputMap[me.id] = me;
-        }
-
-    };
-
-    window.SWinput = SWinput;
-})(window, document);
-</script>
 <div id="peopledata-update${people.peopleCode }">
 	<div class="page-header">
 		<div class="header-title">
 			<h1>修改人口</h1>
 		</div>
 	</div>
-
-	<!--  这里加入一个搜索框 下面加入个区间选择克隆对象？-->
-	<nav>
+	
+	<nav class="smartForm search">
 		<div class="form-inline">
 			<div class="form-group">
-				<label for="search">填报字段</label> <input type="text"
-					class="form-control search${people.peopleCode }" id="0" name="search" />
+				<label class="infor-search" for="search">信息查询</label> 
+				<input type="text" class="form-control search-input" id="0" name="search" />
 			</div>
 			<button type="button" class="btn btn-default" id="smartSubmit">查询</button>
 		</div>
-	</nav>
-
-
-	<div id="clone">
+		<button type="button" class="btn btn-default" id="editSmartForm">编辑</button>
+		<button type="button" class="btn btn-default" id="saveSmartForm">保存</button>
 		<form id="cloneForm" class="" action="admin/peopledata/do_smart_update">
 			<div class="cloneBox">
 				
 			</div>
 	        <div class="clone-btn">
 	        	<input type="hidden" name="peopleCode" value="${people.peopleCode }" />
-	        	<!-- <button class="btn  btn-palegreen" id='check' type = "submit">
-					<i class=" glyphicon glyphicon-ok"></i>确认
-				</button>
-	        	<button class="btn  btn-darkorange" id='remove' type="button">
-					<i class=" glyphicon glyphicon-remove"></i>取消
-				</button> -->
-				<input type = "button" value = "确认" id="check">
-				<input type = "button" value = "取消" id="remove">
 	        </div>
 		</form>
-	</div>
+	</nav>
+		
 
-	<div class="page-body">
+	<div class="page-body search">
 		<div class="row">
 			<div class="col-lg-12">
-				<form class="bv-form form-horizontal validate-form"
-					action="admin/peopledata/do_update">
+				<form id="integratedForm" class="bv-form form-horizontal validate-form search"action="admin/peopledata/do_update">
+					<button type="button" class="btn btn-default" id="editIntegratedForm">编辑</button>
+					<button type="button" class="btn btn-default" id="saveIntegratedForm">保存</button>
 					<div class="form-group">
 						<h4>基本信息</h4>
 					</div>
-					<input type="hidden" name="id" value="${people.id }" />
 					<input type="hidden" name="peopleCode" value="${people.peopleCode }">
 					<div class="form-group">
 						<div>
@@ -1214,30 +530,125 @@ input:-webkit-autofill,
 							<input type="text" class="form-control" name="familyPlanningType" value="${people.familyPlanningType }"/>
 						</div>
 					</div>
-					<div class="form-group">
-						<div class="col-lg-offset-3 col-lg-3">
-							<input class="btn btn-block btn-darkorange" type="submit"
-								value="提交" />
-						</div>
-					</div>
 				</form>
 			</div>
 
 		</div>
 	</div>
 </div>
-
+<div disabled="true"  id="test">测试</div>
 <script>
 seajs.use(['utils','ajax'], function(Utils,Ajax){
+	$('#test').on('click',function(){
+		console.log("i am click");
+	})
 	var $page = $('#peopledata-update${people.peopleCode }');
+	var PAGEDATA = 
 	Utils.datepicker($('#date', $page));
     Utils.datepicker($('#lowIncomeInsuredStart', $page));
     Utils.datepicker($('#lowIncomeInsuredEnd', $page));
     Utils.datepicker($('#unemployeeDate', $page));
     Utils.datepicker($('#partyDate', $page));
-
-	var sFocus = Utils.focus($('.search${people.peopleCode }', $page));
+	console.log($page);
+	var sFocus = $('.search${people.peopleCode }');
 	var fieldArray = [];    //最后一次从ES中获取到的数据
+	//查询表单部分初始化成查看 方法
+	var searchSmartInit = function() {
+		$('.smartForm.search .cloneBox',$page).find('input').prop("disabled",true)
+			.css({
+				"border":"none"
+			});
+		$('.smartForm.search .cloneBox',$page).find('.datacenter-select span').css("display","none");
+	}
+	//查询表单部分初始化成 编辑 方法
+	var editSmartInit = function() {
+		$('.smartForm.edit .cloneBox',$page).find('input').prop("disabled",false)
+			.css({
+				"border":"1px solid #e9e9e9"
+			});
+		$('.smartForm.edit .cloneBox',$page).find('.datacenter-select span').css("display","block");
+	}
+	
+	
+	//完整表单部分初始化成查看方法
+	var searchInit = function(){
+		$('.page-body.search',$page).find('input').prop("disabled",true).css({
+			"border":"none",
+			"backgroundColor":"#ffffff",
+			"cursor":"auto"
+		});
+		var allSelect = $('.page-body.search',$page).find('select');
+		for(var i=0; i<allSelect.length; i++){		
+			var value = $(allSelect[i]).val();
+			var parentEle = $(allSelect[i]).parent();
+			var inputHtml = '<input type="text" class="form-control replace-select" value="'+value+'" disabled="" data-bv-field="handicappedCode" style="border: none; background-color: rgb(255, 255, 255);cursor: auto">'
+			$(allSelect[i]).css("display","none");
+			parentEle.append(inputHtml);
+		}
+	}
+	
+	
+	//完整表单部分初始化成编辑方法
+	var editInit = function(){
+		$('.replace-select',$page).remove();  
+		$('.page-body.edit',$page).find('input').prop("disabled",false).css({
+			"border":"1px solid #d5d5d5",
+			"backgroundColor":"#fbfbfb"
+		})
+		$('.page-body.edit',$page).find('select').css({
+			"display":"block"
+		})
+		
+	}
+	
+	//页面加载初始化成查看状态
+	searchInit();
+	
+	//完整表单部分编辑保存按钮的点击事件
+	$('#editIntegratedForm',$page).on('click',function(){
+		//需要进行判断，判断smartForm处是否处于查看状态，否 ，则提醒用户保存smartForm表单（“是否保存已修改过的信息”）
+		var smartFormStatus = $('.smartForm',$page).hasClass('edit');  //true 则 smartForm为查看状态
+		if(smartFormStatus){
+			var userDirective = confirm("是否保存已修改的信息");
+			if(!userDirective){
+				return;
+			}
+			$('#saveSmartForm',$page).click();
+		}				
+		$('.page-body.search',$page).removeClass("search").addClass("edit");
+		editInit();
+	})
+	
+	$('#saveIntegratedForm',$page).on('click',function(){
+		$('#integratedForm').submit();
+		$('.page-body.edit',$page).removeClass("edit").addClass("search");
+		searchInit();
+		
+	})
+	
+	//smartForm部分编辑保存按钮的点击事件
+	$('#editSmartForm',$page).on('click',function(){
+		//需要进行判断，判断完整表单处是否处于查看状态，否 ，则提醒用户保存完整表单（“是否保存已修改过的信息”）
+		var integratedFormStatus = $('.page-body',$page).hasClass('search');  //true 则 smartForm为查看状态
+		if(!integratedFormStatus){
+			var userDirective = confirm("是否保存已修改的信息");
+			if(!userDirective){
+				return;
+			}
+			$('#saveIntegratedForm',$page).click();
+		}		
+		$('.smartForm.search',$page).removeClass("search").addClass("edit");
+		editSmartInit();
+	})
+	
+	$('#saveSmartForm',$page).on('click',function(){
+		$('#cloneForm').submit();
+		$('.smartForm.edit',$page).removeClass("edit").addClass("search");
+		searchSmartInit();
+		
+	})
+	
+	
 	
 	function IdentityCodeValid(code) {
         var city={11:"北京",12:"天津",13:"河北",14:"山西",15:"内蒙古",21:"辽宁",22:"吉林",23:"黑龙江 ",31:"上海",32:"江苏",33:"浙江",34:"安徽",35:"福建",36:"江西",37:"山东",41:"河南",42:"湖北 ",43:"湖南",44:"广东",45:"广西",46:"海南",50:"重庆",51:"四川",52:"贵州",53:"云南",54:"西藏 ",61:"陕西",62:"甘肃",63:"青海",64:"宁夏",65:"新疆",71:"台湾",81:"香港",82:"澳门",91:"国外 "};
@@ -1301,16 +712,14 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
 /**
  *  根据传回的type生成相应的输入框
  *  1.基础文本输入框  input
- *  2.选择按钮
+ * 
  *  3.下拉选择框
  *  4.date时间控件
- *  5.other
+ *  
  * *
  * **/
 
 	function addSmartSerarch(json,SearchWord,SearchWordEnglish,peopleCode,$page,type,check_rule){
-	    console.log(SearchWordEnglish);
-	    console.log(json);
 	var type = type;
 	var check_rule = check_rule;
 	var fieldList = json.fieldList;
@@ -1318,23 +727,25 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
 	var boxLength = $('.datacenter-gird-box').length;
 	var boxHtml = '<div class="datacenter-gird-box datacenter-menu-box" data-uid="'+boxLength+'"><span class="radio-box-title">'+SearchWord+'</span></div>';
 	var inputHtml = '<div class="datacenter-gird-box" data-uid="'+boxLength+'"></div>';
+	var status = $('.smartForm').hasClass("search");  //是否处于查看状态
+	console.log(type);
 	console.log(json);
 	console.log(SearchWordEnglish);
-	$('.clone-btn').css("display","block");
 	switch(type){
 		case  "1":
-			$('.cloneBox').prepend(inputHtml);
+			$('.cloneBox',$page).prepend(inputHtml);
 			 new SWinput('div[data-uid="'+boxLength+'"]', {
 	            type: "1",
 	            title: SearchWord,
 	            title_en: SearchWordEnglish,
 	            check_rule: check_rule,
-	            a_value: jsondata[SearchWordEnglish]
+	            a_value: jsondata[SearchWordEnglish],
+	            status: "check"
 	        });
 				break;
 
         case  "7": 
-        	$('.cloneBox').prepend(inputHtml);
+        	$('.cloneBox',$page).prepend(inputHtml);
         	new SWinput('div[data-uid="'+boxLength+'"]', {
                 type: '7',
                 title: SearchWord,
@@ -1342,7 +753,7 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
             });
         	break;
         case  "2": 
-        	$(".cloneBox").prepend(boxHtml);
+        	$(".cloneBox",$page).prepend(boxHtml);
         	var checked = false;
         	if( typeof(jsondata[SearchWordEnglish]) !== "undefined"){
         		checked = jsondata[SearchWordEnglish];	
@@ -1366,7 +777,7 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
         	}
         	break;
         case  "5": 
-        	$(".cloneBox").prepend(boxHtml);
+        	$(".cloneBox",$page).prepend(boxHtml);
         	for(var i = 0; i<json.fieldList.length; i++){
         		new SWinput('div[data-uid="'+boxLength+'"]', {
     	            type: "5",
@@ -1377,7 +788,7 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
         	}
         	break;
         case  "3": 
-        	$(".cloneBox").prepend(boxHtml);
+        	$(".cloneBox",$page).prepend(boxHtml);
         	var fileList = [];
         	var checked = "";
         	var name = SearchWordEnglish;
@@ -1393,7 +804,8 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
                 type: '3',
                 fileList: fileList,
                 checked:  checked,
-                name: name
+                name: name,
+                status: "check"
             }) 
         	break;
         case  "6":
@@ -1404,7 +816,7 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
         		dataTime = '';
         	}
         	console.log(dataTime);
-            $(".cloneBox").prepend(
+            $(".cloneBox",$page).prepend(
         '<div class="datacenter-menu-box datacenter-gird-box">' +
                 '<label class="" for="'+SearchWordEnglish+'">'+SearchWord+'</label>' +
                 '<input type="text" class="form-control data-picker datacenter-form-control" id="smartdate" name="'+SearchWordEnglish+'"' +
@@ -1423,22 +835,25 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
         break;
 		default: alert("请输入正确的字段");
 	}
+	if(status){
+    	searchSmartInit();
+    }else{
+    	editSmartInit();
+    }
     }	
     
     
     
-	//如果已经查询过则不再查询
+	//查询  如果已经查询过则不再查询
 		var alreadyName = [];
-		$("#smartSubmit").on("click",function(){
-			console.log("查询点击");
+		$("#smartSubmit",$page).on("click",function(){
 			var peopleCode = '${people.peopleCode }';
-			var keyWord = $('.search${people.peopleCode }').val();
+			var keyWord = $('.search-input',$page).val();
 			var keyArray = fieldArray;
 			var SearchWord = "";
 			var SearchWordEnglish="";
 			var type = "";
 			var check_rule = "";	
-			
 			for(var i=0; i<keyArray.length; i++){
 				if(keyWord === keyArray[i].cCnName){
 					SearchWord = keyArray[i].cCnName;
@@ -1463,14 +878,12 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
 		$("#clone").on('click',"[id='check']",function(){			
 			$('#cloneForm').submit();
 			$(".cloneBox").html("");			
-            $('.clone-btn').css("display","none");
             alreadyName = [];
 		});
 
 	    $("#clone").on('click',"[id='remove']",function(){
 	    		alreadyName = [];
 				$(".cloneBox").html("");
-	    		$('.clone-btn').css("display","none");
 	    		alreadyName = [];
 	    });
     
@@ -1480,16 +893,16 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
 	 * *
 	 * **/	
 	var k = null;
-	$('.search${people.peopleCode }').keyup(function(event) {
+	$('.search-input',$page).keyup(function(event) {
 		if (event.keyCode > "40" || event.keyCode == "32"|| event.keyCode == "8"
 			&& $(this).val() != ""&& $(this).val() != null) {
 			Ajax.ajax('admin/peopledata/titleSearch',
 					{txt : $(this).val()},
 					function(json) {
 						fieldArray = json.data;
-						$('.search${people.peopleCode }').bigAutocomplete({
+						$('.search-input',$page).bigAutocomplete({
 							width : 190,
-							data : json.data
+							data : json.data,
 							});
 					});
 		
@@ -1498,7 +911,7 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
 	if ($(this).val() == "" || $(this).val() == null)
 		hideContent();
 	});
-	$('.search${people.peopleCode }').keydown(function(event) {
+	$('.search-input',$page).keydown(function(event) {
 		switch (event.keyCode) {
 		case 40://向下键
 			if ($("#bigAutocompleteContent").css("display") == "none") return;
@@ -1546,7 +959,8 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
 			}
 
 			break;
-		case 13://回车键隐藏下拉框
+		case 13://回车键隐藏下拉框,同时查询
+			$("#smartSubmit",$page).click();
 			hideContent();
 			break;
 		case 27://ESC键隐藏下拉框
@@ -1562,14 +976,14 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
 	}
 	var bigAutocomplete = new function() {
 		this.holdText = null;//输入框中原始输入的内容
-
+		
 		//初始化插入自动补全div，并在document注册mousedown，点击非div区域隐藏div
 		this.init = function() {
 			$("body").append("<div id='bigAutocompleteContent' class='bigautocomplete-layout'></div>");
 			$(document).bind('mousedown',function(event) {
 				var $target = $(event.target);
 				if ((!($target.parents().andSelf().is('#bigAutocompleteContent')))
-						&& (!$target.is(sFocus))) {
+						&& (!$target.is(sFocus))) {					
 					hideContent();
 					}
 				})
@@ -1584,6 +998,7 @@ seajs.use(['utils','ajax'], function(Utils,Ajax){
 
 			//单击选中行后，选中行内容设置到输入框中，并执行callback函数
 			$("#bigAutocompleteContent").delegate("tr","click",function() {
+				console.log(sFocus);
 				sFocus.val($(this).find("div:last").html());
 				hideContent();
 				});
