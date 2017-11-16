@@ -11,13 +11,26 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.DVConstraint;
+import org.apache.poi.hssf.usermodel.HSSFDataValidationHelper;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.CellValue;
+import org.apache.poi.ss.usermodel.DataValidation;
+import org.apache.poi.ss.usermodel.DataValidationConstraint;
+import org.apache.poi.ss.usermodel.DataValidationHelper;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddressList;
 import org.springframework.stereotype.Service;
 
 import com.abc.application.ApplicationInfo;
@@ -246,4 +259,125 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		return entity;
 	}
 	
+	@Override
+	public Workbook outputPeople(String[] columnNames, List<Map<String, Object>> listmap, String[] keys){		
+		try {
+			// 创建excel工作簿
+	        Workbook wb = new HSSFWorkbook();
+			// 创建第一个sheet
+			Sheet sheet = wb.createSheet(listmap.get(0).get("sheetName").toString());
+			
+			sheet.setColumnWidth(1, 10*2*256);//设定宽度，一个数字256，一个汉字512
+			sheet.setColumnWidth(3, 10*2*256);
+			
+			CellStyle cs1 = createColumnNames(wb);//设置列名样式
+			CellStyle cs2 = createColumnStyle(wb);//设置列表样式
+			
+			// 创建第一行
+			Row row1 = sheet.createRow(0);
+			//创建列名
+		    for(int i=0;i<columnNames.length;i++){
+		    	Cell cell = row1.createCell(i);
+		        cell.setCellValue(columnNames[i]);
+		        cell.setCellStyle(cs1);
+		        }
+			
+		    //创建列表
+			for (int i = 1; i < listmap.size(); i++) {
+				Row row2 = sheet.createRow(i);
+				for(int j=0;j<keys.length;j++){
+	                Cell cell = row2.createCell(j);
+	                cell.setCellValue(listmap.get(i).get(keys[j]) == null?" ": listmap.get(i).get(keys[j]).toString());
+	                cell.setCellStyle(cs2);
+	            }
+			}
+						
+			String[] sexlist = { "男性", "女性", "不明" };  			  
+			sheet = setValidation(sheet, sexlist, 1, listmap.size(), 2, 2);//设置下拉列表
+			sheet = setPrompt(sheet, "姓名", "这是姓名",1, listmap.size(), 0, 0);//设置提示
+			
+			return wb;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+				
+	}
+	
+	// 创建列名单元格格式
+	private CellStyle createColumnNames(Workbook wb) {	 
+		CellStyle cs = wb.createCellStyle();
+		Font f = wb.createFont();
+		f.setFontHeightInPoints((short) 10);
+	    f.setColor(IndexedColors.BLACK.getIndex());
+	    f.setBoldweight(Font.BOLDWEIGHT_BOLD);
+	    cs.setFont(f);
+	    cs.setBorderLeft(CellStyle.BORDER_THIN);
+	    cs.setBorderRight(CellStyle.BORDER_THIN);
+	    cs.setBorderTop(CellStyle.BORDER_THIN);
+	    cs.setBorderBottom(CellStyle.BORDER_THIN);
+	    cs.setAlignment(CellStyle.ALIGN_CENTER);
+	    return cs; 
+	}
+	
+	private CellStyle createColumnStyle(Workbook wb) {
+		CellStyle cs = wb.createCellStyle();
+		cs.setAlignment(CellStyle.ALIGN_CENTER);
+		cs.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+		cs.setWrapText(false);
+		cs.setBorderBottom(BorderStyle.THIN);    
+		cs.setBorderLeft(BorderStyle.THIN);   
+		cs.setBorderTop(BorderStyle.THIN);    
+		cs.setBorderRight(BorderStyle.THIN); 
+		return cs;
+	}
+
+	/** 
+     * 设置单元格上提示 
+     * @param sheet  要设置的sheet. 
+     * @param promptTitle 标题 
+     * @param promptContent 内容 
+     * @param firstRow 开始行 
+     * @param endRow  结束行 
+     * @param firstCol  开始列 
+     * @param endCol  结束列 
+     * @return 设置好的sheet. 
+     */  
+    public Sheet setPrompt(Sheet sheet, String promptTitle,  
+            String promptContent, int firstRow, int endRow ,int firstCol,int endCol)  {
+    	// 构造constraint对象
+    	DataValidationConstraint constraint = DVConstraint.createFormulaListConstraint("E1");
+    	// 设置数据有效性加载在哪个单元格上
+		CellRangeAddressList regions = new CellRangeAddressList(firstRow,endRow, firstCol, endCol);
+		DataValidationHelper help = new HSSFDataValidationHelper((HSSFSheet) sheet);
+		DataValidation validation = help.createValidation(constraint, regions);  
+        validation.createPromptBox(promptTitle, promptContent);  
+        sheet.addValidationData(validation);  
+        return sheet;  
+	}
+
+	/** 
+     * 设置某些列的值只能输入预制的数据,显示下拉框. 
+     * @param sheet 要设置的sheet. 
+     * @param list 下拉框显示的内容 
+     * @param firstRow 开始行 
+     * @param endRow 结束行 
+     * @param firstCol 开始列 
+     * @param endCol  结束列 
+     * @return 设置好的sheet. 
+     */  
+	private Sheet setValidation(Sheet sheet, String[] list, int firstRow, int endRow, int firstCol, int endCol) {
+		// 构造constraint对象
+		DataValidationConstraint constraint = DVConstraint.createExplicitListConstraint(list);
+		// 设置数据有效性加载在哪个单元格上
+		CellRangeAddressList regions = new CellRangeAddressList(firstRow,endRow, firstCol, endCol);
+		DataValidationHelper help = new HSSFDataValidationHelper((HSSFSheet) sheet);		
+		DataValidation validation = help.createValidation(constraint, regions);
+		validation.createErrorBox("输入值有误", "请从下拉框中选择");
+		validation.setShowErrorBox(true);
+		sheet.addValidationData(validation);
+        return sheet;  
+	}
+
 }

@@ -2,9 +2,11 @@ package cn.sowell.datacenter.model.basepeople;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import com.abc.dto.ErrorInfomation;
 import com.abc.mapping.entity.Entity;
@@ -73,6 +75,8 @@ public interface ABCExecuteService {
 	Entity getHistoryPeople(String peopleCode, Date date, List<ErrorInfomation> errors);
 
 	Entity savePeople(PeopleData people);
+
+	Workbook outputPeople(String[] columnNames, List<Map<String, Object>> listmap, String[] keys);
 
 	
 

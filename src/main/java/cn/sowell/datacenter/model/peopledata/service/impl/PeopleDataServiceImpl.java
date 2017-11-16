@@ -2,7 +2,9 @@ package cn.sowell.datacenter.model.peopledata.service.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -96,5 +98,26 @@ public class PeopleDataServiceImpl implements PeopleDataService{
 			peopleData.setErrors(errors);
 		}
 		return peopleData;
+	}
+
+
+	@Override
+	public List<Map<String, Object>> queryMap(PeopleDataCriteria criteria, PageInfo pageInfo) {
+		List<PeopleData> list = query(criteria, pageInfo);
+        List<Map<String, Object>> listmap = new ArrayList<Map<String, Object>>();
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("sheetName", "text");
+        listmap.add(map);
+        PeopleData data = null;
+        for (int i = 0; i < list.size(); i++) {
+        	data = list.get(i);
+            Map<String, Object> mapValue = new HashMap<String, Object>();
+            mapValue.put("name", data.getName());
+            mapValue.put("idCode", data.getIdcode());
+            mapValue.put("gender", data.getGender());
+            mapValue.put("address", data.getAddress());
+            listmap.add(mapValue);
+        }
+		return listmap;
 	}
 }

@@ -2,6 +2,7 @@ package cn.sowell.datacenter.model.peopledata.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
@@ -14,5 +15,7 @@ public interface PeopleDataService {
 	PeopleData getPeople(String peopleCode);
 
 	PeopleData getHistoryPeople(String peopleCode, Date date);
+
+	List<Map<String, Object>> queryMap(PeopleDataCriteria criteria, PageInfo pageInfo);
 
 }
