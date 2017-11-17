@@ -242,7 +242,7 @@ public class EntityTransfer {
 									Entity rEntity = bindData(ele, new Entity(annoRecord.entityName()));
 									target.putRecordEntity(propName, annoRecord.domainName(), rEntity);
 								}
-							}else {
+							}else if(value != null){
 								Entity rEntity = bindData(value, new Entity(annoRecord.entityName()));
 								target.putRecordEntity(propName, annoRecord.domainName(), rEntity);
 							}
