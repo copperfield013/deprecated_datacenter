@@ -208,8 +208,8 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 	}
 
 	@Override
-	public TBasePeopleDictionaryEntity getDicById(String id) {
-		return basePeopleDao.getDicById(TBasePeopleDictionaryEntity.class,id);
+	public TBasePeopleDictionaryEntity getDicById(Long id) {
+		return basePeopleDao.get(TBasePeopleDictionaryEntity.class,id);
 	}
 
 	@Override

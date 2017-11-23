@@ -52,28 +52,25 @@ public class PeopleDateDcitionaryController {
 
 
     @RequestMapping("/update/{id}")
-    public String update(@PathVariable String id,Model model){
-        basePeopleService.getDicById(id);
+    public String update(@PathVariable Long id,Model model){
+
+
         model.addAttribute("dictionaryDataDto",   basePeopleService.getDicById(id));
         return AdminConstants.JSP_BASEPEOPLE + "/dictionary_detail.jsp";
     }
 
 
-//    @ResponseBody
-//    @RequestMapping("/save")
-//    public AjaxPageResponse dosave(TBasePeopleDictionaryEntity tBasePeopleDictionaryEntity){
-//        try {
-//            if(TextUtils.hasText(tBasePeopleDictionaryEntity.getcId())) {
-//            }else{
-//                tBasePeopleDictionaryEntity.setcId(null);
-//            }
-//            basePeopleService.saveOrUpdate(tBasePeopleDictionaryEntity);
-//            return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("保存成功", "dictionary_list");
-//        } catch (Exception e) {
-//            logger.error("保存失败", e);
-//            return AjaxPageResponse.FAILD("保存失败");
-//        }
-//    }
+    @ResponseBody
+    @RequestMapping("/save")
+    public AjaxPageResponse dosave(TBasePeopleDictionaryEntity tBasePeopleDictionaryEntity){
+        try {
+            basePeopleService.saveOrUpdate(tBasePeopleDictionaryEntity);
+            return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("保存成功", "dictionary_list");
+        } catch (Exception e) {
+            logger.error("保存失败", e);
+            return AjaxPageResponse.FAILD("保存失败");
+        }
+    }
 
 
 
@@ -89,7 +86,7 @@ public class PeopleDateDcitionaryController {
 
     @ResponseBody
     @RequestMapping("/do_delete/{id}")
-    public AjaxPageResponse doDelte(@PathVariable int id){
+    public AjaxPageResponse doDelte(@PathVariable Long id){
         try {
             TBasePeopleDictionaryEntity tBasePeopleDictionaryEntity = new TBasePeopleDictionaryEntity();
             tBasePeopleDictionaryEntity.setcId(id);

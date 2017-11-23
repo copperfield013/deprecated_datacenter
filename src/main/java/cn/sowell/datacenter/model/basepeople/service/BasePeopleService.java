@@ -76,7 +76,7 @@ public interface BasePeopleService {
 
 	void deleteObj(Object pojo);
 
-	TBasePeopleDictionaryEntity getDicById(String id);
+	TBasePeopleDictionaryEntity getDicById(Long id);
 
 
 	List<CityEntiy>  getbystatus (String status);

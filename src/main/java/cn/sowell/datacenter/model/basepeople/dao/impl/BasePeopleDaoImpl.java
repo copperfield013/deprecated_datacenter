@@ -146,10 +146,12 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 
 
 	@Override
-	public <T> T getDicById(Class<T> clazz, String id) {
+	public <T> T getDicById(Class<T> clazz, Long id) {
 		return sFactory.getCurrentSession().get(clazz, id);
 	}
 
+
+	@SuppressWarnings("unlocked")
 	@Override
 	public List<CityEntiy> getbystatus(String status) {
 		String sql ="SELECT\n" +

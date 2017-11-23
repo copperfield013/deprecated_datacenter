@@ -58,7 +58,7 @@ public interface BasePeopleDao {
 
 	void saveOrUpdate (Object pojo);
 
-	public <T> T getDicById(Class<T> clazz, String id);
+	public <T> T getDicById(Class<T> clazz, Long id);
 
 
 	/**

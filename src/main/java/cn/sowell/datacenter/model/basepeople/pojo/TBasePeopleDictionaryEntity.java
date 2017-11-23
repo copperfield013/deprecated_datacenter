@@ -7,11 +7,11 @@ import javax.persistence.*;
 @Entity
 @Table(name = "t_base_people_dictionary")
 public class TBasePeopleDictionaryEntity {
-    private int cId;
+    private  Long    cId;
     private  String cCnName;
     private  String cCnEnglish;
-    private  String  type;
-    private  String  check_rule;
+    private  String type;
+    private  String check_rule;
 
     public String getType() {
         return type;
@@ -31,11 +31,12 @@ public class TBasePeopleDictionaryEntity {
 
     @Id
     @Column(name = "c_id")
-    public int getcId() {
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    public Long getcId() {
         return cId;
     }
 
-    public void setcId(int cId) {
+    public void setcId(Long cId) {
         this.cId = cId;
     }
 
