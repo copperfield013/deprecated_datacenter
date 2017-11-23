@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 
 import cn.sowell.copframe.dao.deferedQuery.HibernateRefrectResultTransformer;
 import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
+import cn.sowell.datacenter.model.basepeople.pojo.CityEntiy;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 import org.apache.poi.ss.formula.functions.T;
@@ -147,5 +148,23 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 	@Override
 	public <T> T getDicById(Class<T> clazz, String id) {
 		return sFactory.getCurrentSession().get(clazz, id);
+	}
+
+	@Override
+	public List<CityEntiy> getbystatus(String status) {
+		String sql ="SELECT\n" +
+				"\tSUBSTR(id,1,9) as c,\n" +
+				"\tt_position. NAME AS n\n" +
+				"FROM\n" +
+				"\tt_position";
+		DeferedParamQuery dQuery = new DeferedParamQuery(sql);
+
+		dQuery.appendCondition("where id like '6%'");
+		dQuery.appendCondition(" and level =:level")
+				.setParam("level", status);
+
+		SQLQuery query = dQuery.createSQLQuery(sFactory.getCurrentSession(), true, null);
+		query.setResultTransformer(HibernateRefrectResultTransformer.getInstance(CityEntiy.class));
+		return query.list();
 	}
 }

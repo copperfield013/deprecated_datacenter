@@ -24,7 +24,7 @@
 				<c:forEach items="${list }" var="item" varStatus="i">
 					<tr>
 						<td>${item.cId}</td>
-						<td>${item.cCnName }</td>
+						<td><a class="tab" href="admin/peopleDictionary/update/${item.cId }" target="people_detail_${item.cId }" title="详情">${item.cCnName }</a></td>
 						<td>${item.cCnEnglish }</td>
 						<td>${item.type}</td>
 						<td>${item.check_rule}</td>

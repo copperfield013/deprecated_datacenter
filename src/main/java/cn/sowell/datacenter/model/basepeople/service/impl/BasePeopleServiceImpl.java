@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 
 import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
 import cn.sowell.datacenter.model.basepeople.dto.FieldDataDto;
+import cn.sowell.datacenter.model.basepeople.pojo.CityEntiy;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 import com.alibaba.fastjson.JSONArray;
@@ -209,5 +210,10 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 	@Override
 	public TBasePeopleDictionaryEntity getDicById(String id) {
 		return basePeopleDao.getDicById(TBasePeopleDictionaryEntity.class,id);
+	}
+
+	@Override
+	public List<CityEntiy> getbystatus(String status) {
+		return basePeopleDao.getbystatus(status);
 	}
 }

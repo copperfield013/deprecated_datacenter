@@ -89,6 +89,7 @@ public class importSmartSerch {
     public static void addEs(String jsonValue, String esId) {
         IndexResponse response = client
                 .prepareIndex("ydd", "demo", esId)
+                .setSource()
                 .setSource(jsonValue).execute().actionGet();
 
     }

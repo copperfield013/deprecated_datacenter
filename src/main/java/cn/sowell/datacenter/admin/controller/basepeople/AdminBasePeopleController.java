@@ -154,15 +154,6 @@ public class AdminBasePeopleController {
 		return  Res;
 	}
 
-	/**
-	 *
-	 * @param criteria
-	 * @param model
-	 * @param pageInfo
-	 * @return
-	 */
-
-
 
 	@RequestMapping("/itemlist/{field}")
 	public String itemlist(@PathVariable String field, Model model, PageInfo pageInfo){
@@ -178,5 +169,7 @@ public class AdminBasePeopleController {
 		basePeopleService.updateBasePeople(map,id);
 		return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改成功", "people_list");
 	}
+
+
 
 }

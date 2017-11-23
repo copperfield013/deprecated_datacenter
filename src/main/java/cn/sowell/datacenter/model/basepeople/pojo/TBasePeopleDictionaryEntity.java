@@ -7,7 +7,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "t_base_people_dictionary")
 public class TBasePeopleDictionaryEntity {
-    private String cId;
+    private int cId;
     private  String cCnName;
     private  String cCnEnglish;
     private  String  type;
@@ -31,13 +31,11 @@ public class TBasePeopleDictionaryEntity {
 
     @Id
     @Column(name = "c_id")
-    @GeneratedValue(generator = "paymentableGenerator")
-    @GenericGenerator(name = "paymentableGenerator", strategy = "uuid")
-    public String getcId() {
+    public int getcId() {
         return cId;
     }
 
-    public void setcId(String cId) {
+    public void setcId(int cId) {
         this.cId = cId;
     }
 

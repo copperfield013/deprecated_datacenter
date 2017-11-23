@@ -8,6 +8,7 @@ import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
 import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
+import cn.sowell.datacenter.model.basepeople.pojo.CityEntiy;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 
@@ -58,4 +59,11 @@ public interface BasePeopleDao {
 	void saveOrUpdate (Object pojo);
 
 	public <T> T getDicById(Class<T> clazz, String id);
+
+
+	/**
+	 * 测试导出全国省市区数据
+	 */
+
+	List<CityEntiy> getbystatus (String status);
 }

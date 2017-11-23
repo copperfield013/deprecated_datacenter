@@ -59,21 +59,21 @@ public class PeopleDateDcitionaryController {
     }
 
 
-    @ResponseBody
-    @RequestMapping("/save")
-    public AjaxPageResponse dosave(TBasePeopleDictionaryEntity tBasePeopleDictionaryEntity){
-        try {
-            if(TextUtils.hasText(tBasePeopleDictionaryEntity.getcId())) {
-            }else{
-                tBasePeopleDictionaryEntity.setcId(null);
-            }
-            basePeopleService.saveOrUpdate(tBasePeopleDictionaryEntity);
-            return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("保存成功", "dictionary_list");
-        } catch (Exception e) {
-            logger.error("保存失败", e);
-            return AjaxPageResponse.FAILD("保存失败");
-        }
-    }
+//    @ResponseBody
+//    @RequestMapping("/save")
+//    public AjaxPageResponse dosave(TBasePeopleDictionaryEntity tBasePeopleDictionaryEntity){
+//        try {
+//            if(TextUtils.hasText(tBasePeopleDictionaryEntity.getcId())) {
+//            }else{
+//                tBasePeopleDictionaryEntity.setcId(null);
+//            }
+//            basePeopleService.saveOrUpdate(tBasePeopleDictionaryEntity);
+//            return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("保存成功", "dictionary_list");
+//        } catch (Exception e) {
+//            logger.error("保存失败", e);
+//            return AjaxPageResponse.FAILD("保存失败");
+//        }
+//    }
 
 
 
@@ -89,7 +89,7 @@ public class PeopleDateDcitionaryController {
 
     @ResponseBody
     @RequestMapping("/do_delete/{id}")
-    public AjaxPageResponse doDelte(@PathVariable String id){
+    public AjaxPageResponse doDelte(@PathVariable int id){
         try {
             TBasePeopleDictionaryEntity tBasePeopleDictionaryEntity = new TBasePeopleDictionaryEntity();
             tBasePeopleDictionaryEntity.setcId(id);

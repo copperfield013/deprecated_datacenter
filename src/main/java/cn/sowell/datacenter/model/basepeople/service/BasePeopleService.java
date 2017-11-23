@@ -9,6 +9,7 @@ import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
 import cn.sowell.datacenter.model.basepeople.dto.FieldDataDto;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
 
+import cn.sowell.datacenter.model.basepeople.pojo.CityEntiy;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 import com.alibaba.fastjson.JSONArray;
@@ -76,4 +77,7 @@ public interface BasePeopleService {
 	void deleteObj(Object pojo);
 
 	TBasePeopleDictionaryEntity getDicById(String id);
+
+
+	List<CityEntiy>  getbystatus (String status);
 }
