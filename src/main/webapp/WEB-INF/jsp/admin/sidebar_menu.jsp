@@ -43,3 +43,28 @@
 	   	</li>
 	</ul>
 </li>
+
+<li>
+	<a href="#" class="menu-dropdown">
+		<i class="menu-icon fa fa-bookmark"></i>
+		<span>地址管理</span>
+		<i></i>
+	</a>
+	<ul class="submenu">
+	   	<li>
+	   		<a class="tab" href="admin/address/list" target="address_list" title="地址信息">
+	   			<span class="menu-text">地址信息</span>
+	   		</a>
+	   	</li>
+	   	<li>
+	   		<a class="tab" href="admin/position/position_list" target="position_list" title="行政区域">
+	   			<span class="menu-text">行政区域</span>
+	   		</a>
+	   	</li>
+	   	<li>
+	   		<a class="tab" href="admin/special_position/special_position_list" target="special_position_list" title="特殊地名">
+	   			<span class="menu-text">特殊地名</span>
+	   		</a>
+	   	</li>
+	</ul>
+</li>

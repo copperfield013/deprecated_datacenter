@@ -46,4 +46,11 @@ public interface AdminConstants {
 	 */
 	//下拉
 	final String[] FRELD ={"2","3","4"};;
+	
+	final String JSP_ADDRESS = JSP_BASE + "/address";
+	
+	final String JSP_POSITION = JSP_BASE + "/position";
+	
+	final String JSP_SPECIAL_POSITION = JSP_BASE + "/specialposition";
+	
 }
