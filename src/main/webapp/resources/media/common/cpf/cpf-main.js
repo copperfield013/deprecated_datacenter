@@ -28,6 +28,7 @@ define(function(require){
 	require('dialog');
 	require('tree');
 	require('tab');
+	require('innerpage');
 	require('css');
 	require('control');
 	$CPF.init({

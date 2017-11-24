@@ -1,14 +1,14 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <div id="address-same-list-right">
-	<form action="#"  class="form-inline">
+	<form action="admin/address/getAddressList"  class="form-inline">
 		<input type="hidden" id="curAddressCode" name="curAddressCode" value="${addressEntity.code }"/>
 		<nav>
 			<div class="form-group">
 				<label for="addressStr">地址名称</label>
 				<input type="text" class="form-control" id="addressStr" name="addressStr" value="${addressStr }" />
 			</div>
-			<button type="button" id="address-search-btn" class="btn btn-default">查询</button>
+			<button type="submit" id="address-search-btn" class="btn btn-default">查询</button>
 		</nav>
 		<div class="row list-area">
 			<h4>相同地址列表</h4>
@@ -40,7 +40,7 @@
 	seajs.use(['Dialog', 'ajax', 'utils'], function(Dialog, Ajax, Utils){
 		var $page = $('#address-same-list-right');
 		
-		$("#address-search-btn", $page).click(function(){
+		/* $("#address-search-btn", $page).click(function(){
 			var addressStr = $("#addressStr").val();
 			var pageInfo = '${addressPageInfo}';
 			Ajax.ajax("admin/address/getAddressList",{
@@ -49,7 +49,7 @@
 			},{
 				//TODO ajax的回调函数，提交后的处理方法
 			})
-		});
+		}); */
 		
 		$(".address_add_category", $page).click(function(){
 			var curAddressCode = $("#curAddressCode").val();

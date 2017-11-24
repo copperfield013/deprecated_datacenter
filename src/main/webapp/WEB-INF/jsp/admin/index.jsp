@@ -101,7 +101,8 @@
 					'css'		: 'COMMON/cpf/cpf-css.js?v=${cpfVersion}',
 					'timer'		: 'COMMON/cpf/cpf-timer.js?v=${cpfVersion}',
 					'console'	: 'COMMON/cpf/cpf-console.js?v=${cpfVersion}',
-					'control'	: 'COMMON/cpf/cpf-control.js?v=${cpfVersion}'
+					'control'	: 'COMMON/cpf/cpf-control.js?v=${cpfVersion}',
+					'innerpage'	: 'COMMON/cpf/cpf-innerpage.js?v=$${cpfVersion}'
 				}
 	    		});
 	    		seajs.use('COMMON/cpf/cpf-main.js?v=${cpfVersion}');
