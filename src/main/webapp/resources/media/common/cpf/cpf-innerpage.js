@@ -43,7 +43,8 @@ define(function(require, exports, module){
 		};
 		var param = $.extend({}, defaultParam, _param);
 		var _this = this,
-			formData, url;
+			formData, 
+			url;
 		var pageType = 'innerPage';
 		
 		var Page = require('page');
@@ -73,9 +74,19 @@ define(function(require, exports, module){
 		};
 		
 		this.refresh = function(){
-			var url = this.getContent().attr($CPF.getParam('innerPageURLAttrName'));
-			if(url){
-				this.loadContent(url);
+			if(!url){
+				var _url = this.getContent().attr($CPF.getParam('innerPageURLAttrName'));
+				if(!_url){
+					var $form = $('form', this.getContent()).first();
+					_url = $form.attr('action');
+				}
+				if(_url){
+					this.loadContent(_url, null, formData);
+				}else{
+					$.error('刷新时没有找到URL');
+				}
+			}else{
+				this.loadContent(url, null, formData);
 			}
 		};
 		
