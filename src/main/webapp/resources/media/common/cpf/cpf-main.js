@@ -33,6 +33,7 @@ define(function(require){
 	require('control');
 	$CPF.init({
 		loadingImg			: 'media/admin/cpf/image/loading.gif',
+		innerPageLoadingImg	: 'media/admin/cpf/image/innerpage-loading.gif',
 		maxPageCount		: 8,
 		sessionInvalidURL	: 'admin/login'
 	});

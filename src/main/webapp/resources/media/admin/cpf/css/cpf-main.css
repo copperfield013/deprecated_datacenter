@@ -336,3 +336,24 @@ nav{
 	    text-align: left;
 	}
 }
+.cpf-inner-page{
+	position: relative !important;
+}
+.inner-page-loading{
+	position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 9999;
+    background-color: #999;
+    opacity: 0.2;
+    text-align: center;
+    vertical-align: middle;
+}
+.inner-page-loading>img {
+    width: 50px;
+    z-index: 999999;
+    height: 50px;
+}
+
