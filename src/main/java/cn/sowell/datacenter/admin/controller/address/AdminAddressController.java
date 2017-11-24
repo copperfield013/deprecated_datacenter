@@ -236,7 +236,7 @@ public class AdminAddressController {
 	@RequestMapping("/getAddressList")
 	public String getAddressEntityList(@RequestParam(required=false, defaultValue="") String addressStr, PageInfo addressPageInfo, Model model) {
 		List<SplitedAddressEntity> addressList = addressEntityService.queryAddressStrList(addressStr, addressPageInfo);
-		model.addAttribute("addressEntityList", addressList);
+		model.addAttribute("addressList", addressList);
 		model.addAttribute("addressPageInfo", addressPageInfo);
 		return AdminConstants.JSP_ADDRESS + "/address_same_list_right.jsp";
 	}
