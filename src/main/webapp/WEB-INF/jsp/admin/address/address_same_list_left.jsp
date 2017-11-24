@@ -5,7 +5,7 @@
 		<label class="col-lg-2">地址名称</label>
 		<div class="col-lg-4">${addressEntity.name }</div>
 	</div>
-	<form action="#">
+	<form action="admin/address/sameList">
 		<div class="list-area">
 			<h4>相同地址列表</h4>
 			<table class="table">

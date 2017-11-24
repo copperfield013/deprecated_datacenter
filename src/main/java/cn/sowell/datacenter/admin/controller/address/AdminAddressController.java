@@ -233,7 +233,6 @@ public class AdminAddressController {
 	 * @param model
 	 * @return
 	 */
-	@ResponseBody
 	@RequestMapping("/getAddressList")
 	public String getAddressEntityList(@RequestParam(required=false, defaultValue="") String addressStr, PageInfo addressPageInfo, Model model) {
 		List<SplitedAddressEntity> addressList = addressEntityService.queryAddressStrList(addressStr, addressPageInfo);
@@ -249,6 +248,7 @@ public class AdminAddressController {
 	 * @param model
 	 * @return
 	 */
+	@RequestMapping("/sameList")
 	public String getSameAddressEntityList(@RequestParam String addressCode, PageInfo theSamePageInfo, Model model) {
 		List<SplitedAddressEntity> list = addressEntityService.findTheSameAddress(addressCode, theSamePageInfo);
 		model.addAttribute("sameList", list);
