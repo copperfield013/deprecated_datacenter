@@ -239,7 +239,7 @@ public class AdminAddressController {
 		List<SplitedAddressEntity> addressList = addressEntityService.queryAddressStrList(addressStr, addressPageInfo);
 		model.addAttribute("addressEntityList", addressList);
 		model.addAttribute("addressPageInfo", addressPageInfo);
-		return null;
+		return AdminConstants.JSP_ADDRESS + "/address_same_list_right.jsp";
 	}
 	
 	/**
@@ -253,7 +253,7 @@ public class AdminAddressController {
 		List<SplitedAddressEntity> list = addressEntityService.findTheSameAddress(addressCode, theSamePageInfo);
 		model.addAttribute("sameList", list);
 		model.addAttribute("theSamePageInfo", theSamePageInfo);
-		return null;
+		return AdminConstants.JSP_ADDRESS + "/address_same_list_left.jsp";
 	}
 	
 	/**
