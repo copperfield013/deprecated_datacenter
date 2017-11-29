@@ -7,10 +7,7 @@ import java.util.Map;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
 import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
-import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
-import cn.sowell.datacenter.model.basepeople.pojo.CityEntiy;
-import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
-import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
+import cn.sowell.datacenter.model.basepeople.pojo.*;
 
 public interface BasePeopleDao {
 	/**
@@ -66,4 +63,12 @@ public interface BasePeopleDao {
 	 */
 
 	List<CityEntiy> getbystatus (String status);
+
+
+	/**
+	 * 根据用户读取字段*/
+	  List<TBasePeopleDictionaryEntity> dicListByUser();
+
+
+	List<BasePeopleItem> dicItemByUser();
 }

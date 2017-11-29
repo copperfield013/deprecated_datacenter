@@ -4,7 +4,7 @@
 	<nav>
 
 		<form class="form-inline" action="admin/people/diclist">
-			<a class="btn btn-primary tab" href="admin/people/add" title="创建人口" target="people_add" >创建</a>
+			<a class="btn btn-primary tab" href="admin/peopleDictionary/addEnum/${list[0].c_dictionaryid}" title="创建枚举" target="enum_add" >创建</a>
 		</form>
 
 	</nav>
@@ -22,11 +22,11 @@
 
 			<c:forEach items="${list }" var="item" varStatus="i">
 					<tr>
-						<td>${item.c_id}</td>
+						<td>${i.index+1}</td>
 						<td>${item.c_enum_cn_name }</td>
 						<td>${item.c_enum_value }</td>
 						<td>
-123
+							<a href="admin/peopleDictionary/do_enumdelete/${item.c_id }" confirm="确认删除？">删除</a>
 						</td>
 					</tr>
 				</c:forEach>

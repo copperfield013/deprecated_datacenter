@@ -10,9 +10,7 @@ import javax.annotation.Resource;
 
 import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
 import cn.sowell.datacenter.model.basepeople.dto.FieldDataDto;
-import cn.sowell.datacenter.model.basepeople.pojo.CityEntiy;
-import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
-import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
+import cn.sowell.datacenter.model.basepeople.pojo.*;
 import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
@@ -36,7 +34,6 @@ import org.springframework.stereotype.Service;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
 import cn.sowell.datacenter.model.basepeople.dao.BasePeopleDao;
-import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
 import cn.sowell.datacenter.model.basepeople.service.BasePeopleService;
 import cn.sowell.datacenter.model.esbasic.SearchTransportClient;
 
@@ -215,5 +212,15 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 	@Override
 	public List<CityEntiy> getbystatus(String status) {
 		return basePeopleDao.getbystatus(status);
+	}
+
+	@Override
+	public List<TBasePeopleDictionaryEntity> dicListByUser() {
+		return basePeopleDao.dicListByUser();
+	}
+
+	@Override
+	public List<BasePeopleItem> dicItemByUser() {
+		return basePeopleDao.dicItemByUser();
 	}
 }

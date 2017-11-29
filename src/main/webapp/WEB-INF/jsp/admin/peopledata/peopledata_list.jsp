@@ -38,7 +38,7 @@
 						<td>${item.address }</td>
 						<td>${item.contact }</td>
 						<td>
-							<a href="admin/peopledata/update/${item.peopleCode }" class="tab" target="people_update_${item.peopleCode }" title="修改-${item.name }">修改</a>
+							<a href="admin/peopledata/smart/${item.peopleCode }" class="tab" target="people_update_${item.peopleCode }" title="修改-${item.name }">修改</a>
 							<a href="admin/peopledata/do_delete/${item.peopleCode }" confirm="确认删除？">删除</a>
 						</td>
 					</tr>

@@ -7,10 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
@@ -18,6 +15,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import cn.sowell.datacenter.model.basepeople.pojo.BasePeopleItem;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
+import cn.sowell.datacenter.model.basepeople.service.BasePeopleService;
+import cn.sowell.datacenter.model.peopledata.service.PojoService;
+import cn.sowell.datacenter.model.peopledata.service.impl.PropertyParser;
+import com.abc.query.criteria.Criteria;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -64,6 +67,12 @@ public class AdminPeopleDataController {
 	
 	@Resource
 	PeopleButtService buttService;
+
+	@Resource
+	PojoService pojoService;
+
+	@Resource
+	BasePeopleService basePeopleService;
 	
 	
 	Logger logger = Logger.getLogger(AdminPeopleDataController.class);
@@ -238,6 +247,22 @@ public class AdminPeopleDataController {
 		model.addAttribute("datetime", datetime);
 		model.addAttribute("peopleCode", peopleCode);
 		return AdminConstants.JSP_PEOPLEDATA + "/peopledata_detail.jsp";
+	}
+
+
+	@RequestMapping("/smart/{peopleCode}")
+	public String smart(@PathVariable String peopleCode, Model model){
+
+		PeopleData people = peopleService.getPeople(peopleCode);
+		PropertyParser parser = pojoService.createPropertyParser(people);
+		List<TBasePeopleDictionaryEntity> list = basePeopleService.dicListByUser();
+
+		List<BasePeopleItem> itemList  =basePeopleService.dicItemByUser();
+		model.addAttribute("peopleMap", parser);
+		model.addAttribute("dic", list);
+		model.addAttribute("itemList", itemList);
+		model.addAttribute("peopleCode", peopleCode);
+		return AdminConstants.JSP_PEOPLEDATA + "/peopledata_smart.jsp";
 	}
 	
 	@RequestMapping("/history/{peopleCode}")

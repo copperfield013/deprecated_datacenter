@@ -49,6 +49,7 @@ public class AdminDemoController {
 		model.addAttribute("pageInfo", pageInfo);
 		model.addAttribute("criteria", criteria);
 		return AdminConstants.JSP_DEMO + "/demo_list.jsp";
+
 	}
 	
 	@RequestMapping("/detail/{id}")
@@ -56,6 +57,7 @@ public class AdminDemoController {
 		PlainDemo demo = demoService.getDemo(id);
 		model.addAttribute("demo", demo);
 		return AdminConstants.JSP_DEMO + "/demo_detail.jsp";
+
 	}
 	
 	@RequestMapping("/add")

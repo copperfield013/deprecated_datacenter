@@ -9,9 +9,7 @@ import javax.annotation.Resource;
 
 import cn.sowell.copframe.dao.deferedQuery.HibernateRefrectResultTransformer;
 import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
-import cn.sowell.datacenter.model.basepeople.pojo.CityEntiy;
-import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
-import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
+import cn.sowell.datacenter.model.basepeople.pojo.*;
 import org.apache.poi.ss.formula.functions.T;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -26,7 +24,6 @@ import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
 import cn.sowell.datacenter.model.basepeople.dao.BasePeopleDao;
-import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
 
 @Repository
 public class BasePeopleDaoImpl implements BasePeopleDao{
@@ -155,8 +152,8 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 	@Override
 	public List<CityEntiy> getbystatus(String status) {
 		String sql ="SELECT\n" +
-				"\tSUBSTR(id,1,9) as c,\n" +
-				"\tt_position. NAME AS n\n" +
+				"\tSUBSTR(id,1,9) as city,\n" +
+				"\tt_position. NAME AS name\n" +
 				"FROM\n" +
 				"\tt_position";
 		DeferedParamQuery dQuery = new DeferedParamQuery(sql);
@@ -169,4 +166,32 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 		query.setResultTransformer(HibernateRefrectResultTransformer.getInstance(CityEntiy.class));
 		return query.list();
 	}
+
+
+	public  List<TBasePeopleDictionaryEntity> dicListByUser(){
+		String hql = "from TBasePeopleDictionaryEntity p";
+		DeferedParamQuery dQuery = new DeferedParamQuery(hql);
+		Query countQuery = dQuery.createQuery(sFactory.getCurrentSession(), true, new WrapForCountFunction());
+		Integer count = FormatUtils.toInteger(countQuery.uniqueResult());
+		if(count > 0){
+			Query query = dQuery.createQuery(sFactory.getCurrentSession(), true, null);
+			return query.list();
+		}
+		return new ArrayList<TBasePeopleDictionaryEntity>();
+	}
+
+	@Override
+	public List<BasePeopleItem> dicItemByUser() {
+		String hql = "from BasePeopleItem p";
+		DeferedParamQuery dQuery = new DeferedParamQuery(hql);
+		Query countQuery = dQuery.createQuery(sFactory.getCurrentSession(), true, new WrapForCountFunction());
+		Integer count = FormatUtils.toInteger(countQuery.uniqueResult());
+		if(count > 0){
+			Query query = dQuery.createQuery(sFactory.getCurrentSession(), true, null);
+			return query.list();
+		}
+		return new ArrayList<BasePeopleItem>();
+
+
+}
 }

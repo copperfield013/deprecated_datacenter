@@ -286,6 +286,7 @@ public class AdminAddressController {
 	 * @return
 	 * @throws UnsupportedEncodingException
 	 */
+	@Deprecated
 	@RequestMapping("/replyCategory")
 	public String getCategory(@RequestParam String addressStr, Model model) throws UnsupportedEncodingException {
 		addressStr = new String(addressStr.getBytes("ISO-8859-1"),  "UTF-8");

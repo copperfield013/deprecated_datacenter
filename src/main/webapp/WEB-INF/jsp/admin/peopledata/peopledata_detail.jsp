@@ -202,7 +202,7 @@
 
 			<!-- 工作信息 -->
 			<div class="row">
-				<label class="col-lg-2">公司名称</label>
+				<label class="col-lg-2">公司名${people.workExperiences.size()}</label>
 				<div class="col-lg-4">${people.workExperiences[0].companyName }</div>
 				<label class="col-lg-2">工作单位</label>
 				<div class="col-lg-4">${people.workExperiences[0].workUnit }</div>

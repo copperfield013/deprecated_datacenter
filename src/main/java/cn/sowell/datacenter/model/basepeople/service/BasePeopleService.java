@@ -7,11 +7,8 @@ import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
 import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
 import cn.sowell.datacenter.model.basepeople.dto.FieldDataDto;
-import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
+import cn.sowell.datacenter.model.basepeople.pojo.*;
 
-import cn.sowell.datacenter.model.basepeople.pojo.CityEntiy;
-import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
-import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 import com.alibaba.fastjson.JSONArray;
 
 public interface BasePeopleService {
@@ -29,7 +26,8 @@ public interface BasePeopleService {
 	 * @param people
 	 */
 	void create(BasePeople people);
-	
+
+
 	BasePeople getPeopleById(Long id);
 	
 	/**
@@ -44,8 +42,6 @@ public interface BasePeopleService {
 	 */
 	void delete(Long id);
 
-
-
 	/**
 	 * 使用ES 返回前端模糊查询字段 返回对象为Json
 	 * @param title
@@ -54,30 +50,31 @@ public interface BasePeopleService {
 	
 	JSONArray titleSearchByEs(String title);
 
-
 	List<FieldDataDto> queryFieldList(PageInfo pageInfo);
 
 	void addField(FieldDataDto field);
 
-
 	List<TBasePeopleItemEntity> FieldList(String field);
 
-
 	FieldDataDto queryFieldById(String FieldId);
-
-
 
 	List<TBasePeopleDictionaryEntity> querydicList(BasePeopleDictionaryCriteria criteria, PageInfo pageInfo);
 
 	void updateBasePeople (Map<String,String> map,String id);
 
-
+	/**
+	 * 根据主键ID是否存在自动更新或者插入对象
+	 * @param pojo
+	 */
 	void saveOrUpdate (Object pojo);
 
 	void deleteObj(Object pojo);
 
 	TBasePeopleDictionaryEntity getDicById(Long id);
 
-
 	List<CityEntiy>  getbystatus (String status);
+
+	List<TBasePeopleDictionaryEntity> dicListByUser();
+
+	List<BasePeopleItem> dicItemByUser();
 }

@@ -1,45 +1,34 @@
 package cn.sowell.datacenter.model.basepeople.pojo;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 public class CityEntiy {
     /**
      * 省份 城市
      */
 
-    String c;
-    String n;
+    @JSONField(name="c")
+    String city;
+
+    @JSONField(name="n")
+    String name;
 
 
-    public CityEntiy(String c, String n) {
-        this.c = c;
-        this.n = n;
+    public String getCity() {
+        return city;
     }
 
-    public CityEntiy() {
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 
-
-    public String getc() {
-        return c;
-    }
-
-    public void setc(String c) {
-        this.c = c;
-    }
-
-    public String getn() {
-        return n;
-    }
-
-    public void setn(String n) {
-        this.n = n;
-    }
-
-    @Override
-    public String toString() {
-        return "CityEntiy{" +
-                "c='" + c + '\'' +
-                ", n='" + n + '\'' +
-                '}';
-    }
 }

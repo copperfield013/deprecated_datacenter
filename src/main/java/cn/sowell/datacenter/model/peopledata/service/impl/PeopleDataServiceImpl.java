@@ -83,6 +83,7 @@ public class PeopleDataServiceImpl implements PeopleDataService{
 	@Override
 	public PeopleData getPeople(String peopleCode) {
 		Entity p = abcService.getPeople(peopleCode);
+
 		return transfer(p);
 	}
 
