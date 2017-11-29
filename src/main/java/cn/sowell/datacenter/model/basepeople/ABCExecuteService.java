@@ -13,6 +13,9 @@ import com.abc.mapping.entity.Entity;
 import com.abc.query.criteria.Criteria;
 
 import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
@@ -76,7 +79,7 @@ public interface ABCExecuteService {
 
 	Entity savePeople(PeopleData people);
 
-	Workbook outputPeople(String[] columnNames, List<Map<String, Object>> listmap, String[] keys);
+	Workbook downloadPeople(List<Map<String, Object>> listmap, List<TBasePeopleDictionaryEntity> keys, List<String[]> columnLists, ExcelModel model);
 
 	
 

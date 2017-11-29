@@ -14,7 +14,8 @@
 			<button type="submit" class="btn btn-default">查询</button>
 			<a class="btn btn-primary tab" href="admin/peopledata/add" title="创建人口" target="people_add" >创建</a>
 			<a class="btn btn-primary tab" href="admin/peopledata/import" title="导入人口" target="people_import">导入</a>
-			<input class="btn btn-primary" type="button" value="导出" onclick="download()"/>
+			<a class="btn btn-primary tab" href="admin/peopledata/output" title="导出人口" target="people_download">导出</a>
+			
 		</form>
 	</nav>
 	<div class="row list-area">
@@ -51,9 +52,6 @@
 <script>
 	seajs.use(['utils'], function(Utils){
 		var $page = $('#peopledata-list');
-		download = function (){
-		    var url="admin/peopledata/download";
-		    window.open(url);
-		}
+		
 	});
 </script>

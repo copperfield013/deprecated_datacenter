@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -23,6 +24,7 @@ import cn.sowell.datacenter.model.peopledata.service.impl.PropertyParser;
 import com.abc.query.criteria.Criteria;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -42,6 +44,12 @@ import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
+import cn.sowell.datacenter.model.basepeople.ExcelModelCriteria;
+import cn.sowell.datacenter.model.basepeople.dao.BasePeopleDao;
+import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
+import cn.sowell.datacenter.model.basepeople.pojo.TitemName;
 import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
@@ -73,6 +81,8 @@ public class AdminPeopleDataController {
 
 	@Resource
 	BasePeopleService basePeopleService;
+	
+
 	
 	
 	Logger logger = Logger.getLogger(AdminPeopleDataController.class);
@@ -330,23 +340,77 @@ public class AdminPeopleDataController {
 
 	}
 	
+	@RequestMapping("/output")
+	public String output(ExcelModelCriteria criteria, PageInfo pageInfo, Model model){
+		List<ExcelModel> list = buttService.queryModel(criteria,pageInfo);
+		model.addAttribute("list", list);
+		model.addAttribute("pageInfo", pageInfo);
+		model.addAttribute("criteria", criteria);
+		return AdminConstants.JSP_PEOPLEDATA + "/peopledata_output.jsp";
+	}
+	
+	@RequestMapping("/outputAdd/{modelId}")
+	public String outputAdd(@PathVariable Long modelId, Model model){
+		ExcelModel excelModel = buttService.getExcelModel(modelId);
+		List<TBasePeopleDictionaryEntity> list = new ArrayList<TBasePeopleDictionaryEntity>();
+		if(modelId !=0){
+			list = buttService.getDicByModelId(modelId);
+		}
+		model.addAttribute("id", modelId);
+		model.addAttribute("model", excelModel);
+		model.addAttribute("list", list);		
+		return AdminConstants.JSP_PEOPLEDATA + "/peopledata_output_add.jsp";
+	}
+	
 	@ResponseBody
-	@RequestMapping("/download")
-	public String download(HttpServletRequest request,HttpServletResponse response,PeopleDataCriteria criteria, PageInfo pageInfo) throws IOException{
-        String fileName="excel文件";       
-        List<Map<String, Object>> listmap = peopleService.queryMap(criteria, pageInfo);
-        String columnNames[]={"姓名","身份证","性别","地址"};//列名
-        String keys[] = {"name","idCode","gender","address"};//map中的key                
+	@RequestMapping("/do_outputAdd")
+	public AjaxPageResponse do_outputAdd(ExcelModel model, @RequestParam String[] list){
+		try {
+			if(model.getId()==null){
+				buttService.addExcelList(model,list);
+				return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("生成模板成功", "peopledata_output");
+			}
+			else{
+				buttService.updateExcelList(model,list);
+				return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改模板成功", "peopledata_output");
+			}
+		} catch (Exception e) {
+			logger.error(e);
+			return AjaxPageResponse.FAILD("生成模板失败");
+		}
+	}
+	
+	@ResponseBody
+	@RequestMapping("/output_delete/{modelId}")
+	public AjaxPageResponse outputDelete(@PathVariable Long modelId){
+		try {
+			buttService.deleteModel(modelId);
+			return AjaxPageResponse.REFRESH_LOCAL("删除成功");
+		} catch (Exception e) {
+			logger.error("删除失败", e);
+			return AjaxPageResponse.FAILD("删除失败");
+		}
+	}
+	
+	@ResponseBody
+	@RequestMapping("/do_download/{modelId}")
+	public JsonResponse downloadExcel(HttpServletRequest request,HttpServletResponse response,
+			@PathVariable Long modelId,PeopleDataCriteria criteria, PageInfo pageInfo) throws IOException{
+		String fileName="excel文件";
+		List<TBasePeopleDictionaryEntity> keys = buttService.getColumnNames(modelId);//map中的key
+		List<String[]> columnLists = buttService.columnLists(keys);				
+		List<Map<String, Object>> listmap = peopleService.queryMap(criteria, pageInfo,keys);
+		ExcelModel model = buttService.getExcelModel(modelId);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         try {
-            abcService.outputPeople(columnNames,listmap,keys).write(os);
+            abcService.downloadPeople(listmap,keys,columnLists,model).write(os);
         } catch (IOException e) {
             e.printStackTrace();
         }
         byte[] content = os.toByteArray();
         InputStream is = new ByteArrayInputStream(content);
         os.close();
-        // 设置response参数，可以打开下载页面
+		 // 设置response参数，可以打开下载页面
         response.reset();
         response.setContentType("application/vnd.ms-excel;charset=utf-8");
         response.setHeader("Content-Disposition", "attachment;filename="+ new String((fileName + ".xls").getBytes(), "iso-8859-1"));
@@ -369,8 +433,12 @@ public class AdminPeopleDataController {
                 bis.close();
             if (bos != null)
                 bos.close();
+            if (out != null)
+            	out.close();
         }
-        return null;
-    }
+        return null;	
+	}
+	
+
 	
 }

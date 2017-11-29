@@ -7,11 +7,19 @@ import javax.persistence.*;
 @Entity
 @Table(name = "t_base_people_dictionary")
 public class TBasePeopleDictionaryEntity {
+	@Id
+    @Column(name = "c_id")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private  Long    cId;
+    @Basic
+    @Column(name = "c_cn_name")
     private  String cCnName;
+    @Basic
+    @Column(name = "c_cn_english")
     private  String cCnEnglish;
     private  String type;
     private  String check_rule;
+    
 
     public String getType() {
         return type;
@@ -29,9 +37,7 @@ public class TBasePeopleDictionaryEntity {
         this.check_rule = check_rule;
     }
 
-    @Id
-    @Column(name = "c_id")
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    
     public Long getcId() {
         return cId;
     }
@@ -40,8 +46,7 @@ public class TBasePeopleDictionaryEntity {
         this.cId = cId;
     }
 
-    @Basic
-    @Column(name = "c_cn_name")
+    
     public String getcCnName() {
         return cCnName;
     }
@@ -51,8 +56,7 @@ public class TBasePeopleDictionaryEntity {
     }
 
 
-    @Basic
-    @Column(name = "c_cn_english")
+   
     public String getcCnEnglish() {
         return cCnEnglish;
     }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 
@@ -16,6 +17,6 @@ public interface PeopleDataService {
 
 	PeopleData getHistoryPeople(String peopleCode, Date date);
 
-	List<Map<String, Object>> queryMap(PeopleDataCriteria criteria, PageInfo pageInfo);
+	List<Map<String, Object>> queryMap(PeopleDataCriteria criteria, PageInfo pageInfo, List<TBasePeopleDictionaryEntity> keys);
 
 }

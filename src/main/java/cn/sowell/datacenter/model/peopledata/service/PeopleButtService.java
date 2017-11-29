@@ -3,8 +3,13 @@ package cn.sowell.datacenter.model.peopledata.service;
 import java.util.List;
 import java.util.Map;
 
+import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.datacenter.model.basepeople.ExcelModelCriteria;
+import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
+import cn.sowell.datacenter.model.basepeople.pojo.TitemName;
+import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 
 /**
  * 
@@ -33,5 +38,26 @@ public interface PeopleButtService {
 
 
       List<TBasePeopleDictionaryEntity> titleSearch (String txt);
+
+	void insert(TitemName item);
+	
+	List<TBasePeopleDictionaryEntity> getColumnNames(Long modelId);
+
+	/**
+	 * 获得下拉列表集合
+	 */
+	List<String[]> columnLists(List<TBasePeopleDictionaryEntity> keys);
+
+	List<ExcelModel> queryModel(ExcelModelCriteria criteria, PageInfo pageInfo);
+
+	void addExcelList(ExcelModel model, String[] list);
+
+	void updateExcelList(ExcelModel model, String[] list);
+	
+	ExcelModel getExcelModel(Long modelId);
+
+	List<TBasePeopleDictionaryEntity> getDicByModelId(Long modelId);
+
+	void deleteModel(Long modelId);
 
 }

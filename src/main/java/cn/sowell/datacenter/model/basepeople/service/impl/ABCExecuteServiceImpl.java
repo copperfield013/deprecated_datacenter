@@ -1,5 +1,7 @@
 package cn.sowell.datacenter.model.basepeople.service.impl;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -16,6 +18,7 @@ import org.apache.poi.hssf.usermodel.HSSFDataValidationHelper;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -48,6 +51,9 @@ import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.excel.CellTypeUtils;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
+import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.service.impl.EntityTransfer;
 import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
@@ -260,42 +266,58 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	}
 	
 	@Override
-	public Workbook outputPeople(String[] columnNames, List<Map<String, Object>> listmap, String[] keys){		
-		try {
+	public Workbook downloadPeople(List<Map<String, Object>> listmap, List<TBasePeopleDictionaryEntity> keys,
+			List<String[]> columnLists, ExcelModel model){		
+		try {   
+	          
+	        FileInputStream fis = new FileInputStream("D:/demo.xls");  
+			System.out.println("导入模板");
+			
 			// 创建excel工作簿
-	        Workbook wb = new HSSFWorkbook();
-			// 创建第一个sheet
-			Sheet sheet = wb.createSheet(listmap.get(0).get("sheetName").toString());
-			
-			sheet.setColumnWidth(1, 10*2*256);//设定宽度，一个数字256，一个汉字512
-			sheet.setColumnWidth(3, 10*2*256);
-			
-			CellStyle cs1 = createColumnNames(wb);//设置列名样式
-			CellStyle cs2 = createColumnStyle(wb);//设置列表样式
-			
-			// 创建第一行
-			Row row1 = sheet.createRow(0);
-			//创建列名
-		    for(int i=0;i<columnNames.length;i++){
+	        Workbook wb = new HSSFWorkbook(fis);
+	        Sheet sheet = wb.getSheetAt(0);
+            wb.setSheetName(0, model.getTitleName());
+            //获得model样式
+	        CellStyle titleStytle = sheet.getRow(0).getCell(0).getCellStyle();
+	        CellStyle columnStytle = sheet.getRow(1).getCell(0).getCellStyle();
+	        CellStyle listStytle = sheet.getRow(2).getCell(0).getCellStyle();
+			//创建标题
+            Cell title = sheet.createRow(0).createCell(0);
+            title.setCellValue(model.getModelName());
+            title.setCellStyle(titleStytle);
+            //创建隐藏行
+            Row row1 = sheet.createRow(1);
+		    for(int i=0;i<keys.size();i++){
+		    	sheet.setColumnWidth(i, 10*2*256);//设定宽度，一个数字256，一个汉字512
 		    	Cell cell = row1.createCell(i);
-		        cell.setCellValue(columnNames[i]);
-		        cell.setCellStyle(cs1);
+		        cell.setCellValue(keys.get(i).getcCnEnglish());
+		        }
+		    row1.setZeroHeight(true);
+			//创建列名
+            Row row2 = sheet.createRow(2);
+		    for(int i=0;i<keys.size();i++){
+		    	Cell cell = row2.createCell(i);
+		        cell.setCellValue(keys.get(i).getcCnName());
+		        cell.setCellStyle(columnStytle);
 		        }
 			
 		    //创建列表
-			for (int i = 1; i < listmap.size(); i++) {
-				Row row2 = sheet.createRow(i);
-				for(int j=0;j<keys.length;j++){
-	                Cell cell = row2.createCell(j);
-	                cell.setCellValue(listmap.get(i).get(keys[j]) == null?" ": listmap.get(i).get(keys[j]).toString());
-	                cell.setCellStyle(cs2);
+			for (int i = 0; i < listmap.size(); i++) {
+				Row row3 = sheet.createRow(i+3);
+				for(int j=0;j<keys.size();j++){
+					String key = keys.get(j).getcCnEnglish();
+	                Cell cell = row3.createCell(j);
+	                cell.setCellValue(listmap.get(i).get(key) == null?" ": listmap.get(i).get(key).toString());
+	                cell.setCellStyle(listStytle);
 	            }
 			}
-						
-			String[] sexlist = { "男性", "女性", "不明" };  			  
-			sheet = setValidation(sheet, sexlist, 1, listmap.size(), 2, 2);//设置下拉列表
-			sheet = setPrompt(sheet, "姓名", "这是姓名",1, listmap.size(), 0, 0);//设置提示
+			for(int i = 0; i < columnLists.size(); i++){
+				String[] columnList = columnLists.get(i);
+				if(columnList.length!=0)
+					sheet = setValidation(sheet,columnList, 2, listmap.size()+2, i, i);//设置下拉列表
+			}
 			
+			//sheet = setPrompt(sheet, "姓名", "这是姓名",1, listmap.size(), 0, 0);//设置提示
 			return wb;
 			
 		} catch (Exception e) {
@@ -305,33 +327,6 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 				
 	}
 	
-	// 创建列名单元格格式
-	private CellStyle createColumnNames(Workbook wb) {	 
-		CellStyle cs = wb.createCellStyle();
-		Font f = wb.createFont();
-		f.setFontHeightInPoints((short) 10);
-	    f.setColor(IndexedColors.BLACK.getIndex());
-	    f.setBoldweight(Font.BOLDWEIGHT_BOLD);
-	    cs.setFont(f);
-	    cs.setBorderLeft(CellStyle.BORDER_THIN);
-	    cs.setBorderRight(CellStyle.BORDER_THIN);
-	    cs.setBorderTop(CellStyle.BORDER_THIN);
-	    cs.setBorderBottom(CellStyle.BORDER_THIN);
-	    cs.setAlignment(CellStyle.ALIGN_CENTER);
-	    return cs; 
-	}
-	
-	private CellStyle createColumnStyle(Workbook wb) {
-		CellStyle cs = wb.createCellStyle();
-		cs.setAlignment(CellStyle.ALIGN_CENTER);
-		cs.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
-		cs.setWrapText(false);
-		cs.setBorderBottom(BorderStyle.THIN);    
-		cs.setBorderLeft(BorderStyle.THIN);   
-		cs.setBorderTop(BorderStyle.THIN);    
-		cs.setBorderRight(BorderStyle.THIN); 
-		return cs;
-	}
 
 	/** 
      * 设置单元格上提示 

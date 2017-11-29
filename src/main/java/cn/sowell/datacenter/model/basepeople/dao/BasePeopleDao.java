@@ -7,7 +7,9 @@ import java.util.Map;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
 import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
+import cn.sowell.datacenter.model.basepeople.ExcelModelCriteria;
 import cn.sowell.datacenter.model.basepeople.pojo.*;
+import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 
 public interface BasePeopleDao {
 	/**
@@ -22,7 +24,7 @@ public interface BasePeopleDao {
 	 * 对象插入到数据表中
 	 * @param pojo
 	 */
-	void insert(Object pojo);
+	Long insert(Object pojo);
 
 	/**
 	 * 从数据库中查找对应的pajo对象
@@ -63,7 +65,14 @@ public interface BasePeopleDao {
 	 */
 
 	List<CityEntiy> getbystatus (String status);
+	
+	List<TBasePeopleDictionaryEntity> getColumns(Long modelId);
 
+	List<ExcelModel> queryExcelModel(ExcelModelCriteria criteria, PageInfo pageInfo);
+
+	void deleteExcelOrder(Long modelId);
+
+	List<TBasePeopleDictionaryEntity> getDicByModelId(Long modelId);
 
 	/**
 	 * 根据用户读取字段*/

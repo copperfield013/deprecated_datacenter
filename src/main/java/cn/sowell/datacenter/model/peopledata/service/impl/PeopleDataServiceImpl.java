@@ -1,5 +1,6 @@
 package cn.sowell.datacenter.model.peopledata.service.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.spring.binder.FieldRefectUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
@@ -103,20 +105,28 @@ public class PeopleDataServiceImpl implements PeopleDataService{
 
 
 	@Override
-	public List<Map<String, Object>> queryMap(PeopleDataCriteria criteria, PageInfo pageInfo) {
+	public List<Map<String, Object>> queryMap(PeopleDataCriteria criteria, PageInfo pageInfo,
+			List<TBasePeopleDictionaryEntity> keys) {
+		pageInfo.setPageSize(10);
+		long a=System.currentTimeMillis();
 		List<PeopleData> list = query(criteria, pageInfo);
+		System.out.println("查询耗时 : "+(System.currentTimeMillis()-a)/1000f+" 秒 ");
         List<Map<String, Object>> listmap = new ArrayList<Map<String, Object>>();
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("sheetName", "text");
-        listmap.add(map);
         PeopleData data = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         for (int i = 0; i < list.size(); i++) {
         	data = list.get(i);
             Map<String, Object> mapValue = new HashMap<String, Object>();
-            mapValue.put("name", data.getName());
-            mapValue.put("idCode", data.getIdcode());
-            mapValue.put("gender", data.getGender());
-            mapValue.put("address", data.getAddress());
+            for(int j = 0;j < keys.size();j++){
+            	switch(keys.get(j).getcCnEnglish()){
+            		case "name" : mapValue.put("name", data.getName()); break;
+            		case "idcode" : mapValue.put("idcode", data.getIdcode()); break;
+            		case "gender" : mapValue.put("gender", data.getGender()); break;
+            		case "nation" : mapValue.put("nation", data.getNation()); break;
+            		case "birthday" : mapValue.put("birthday", data.getBirthday()==null? "" : sdf.format(data.getBirthday())); break;
+            		case "address" : mapValue.put("address", data.getAddress()); break;
+            	}            		
+            }
             listmap.add(mapValue);
         }
 		return listmap;
