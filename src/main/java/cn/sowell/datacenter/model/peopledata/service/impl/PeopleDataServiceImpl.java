@@ -26,6 +26,7 @@ import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
+import cn.sowell.datacenter.model.peopledata.service.PojoService;
 
 @Service
 public class PeopleDataServiceImpl implements PeopleDataService{
@@ -33,6 +34,9 @@ public class PeopleDataServiceImpl implements PeopleDataService{
 	@Resource
 	ABCExecuteService abcService;
 	FieldRefectUtils<PeopleData> fieldUtils;
+	
+	@Resource
+	PojoService pojoService;
 	
 	Logger logger = Logger.getLogger(PeopleDataServiceImpl.class);
 	
@@ -118,14 +122,9 @@ public class PeopleDataServiceImpl implements PeopleDataService{
         	data = list.get(i);
             Map<String, Object> mapValue = new HashMap<String, Object>();
             for(int j = 0;j < keys.size();j++){
-            	switch(keys.get(j).getcCnEnglish()){
-            		case "name" : mapValue.put("name", data.getName()); break;
-            		case "idcode" : mapValue.put("idcode", data.getIdcode()); break;
-            		case "gender" : mapValue.put("gender", data.getGender()); break;
-            		case "nation" : mapValue.put("nation", data.getNation()); break;
-            		case "birthday" : mapValue.put("birthday", data.getBirthday()==null? "" : sdf.format(data.getBirthday())); break;
-            		case "address" : mapValue.put("address", data.getAddress()); break;
-            	}            		
+            	String cCnEnglish = keys.get(j).getcCnEnglish();
+            	PropertyParser parser = pojoService.createPropertyParser(data);
+            	mapValue.put(cCnEnglish, parser.get(cCnEnglish));         		
             }
             listmap.add(mapValue);
         }
