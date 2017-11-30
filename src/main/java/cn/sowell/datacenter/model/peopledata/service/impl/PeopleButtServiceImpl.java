@@ -25,7 +25,6 @@ import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
 import cn.sowell.datacenter.model.basepeople.ExcelModelCriteria;
 import cn.sowell.datacenter.model.basepeople.dao.BasePeopleDao;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
-import cn.sowell.datacenter.model.basepeople.pojo.TitemName;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 import cn.sowell.datacenter.model.peopledata.service.PeopleButtService;
@@ -87,12 +86,7 @@ public class PeopleButtServiceImpl implements PeopleButtService{
 		return basePeopleDao.getColumns(modelId);
 	}
 
-	@Override
-	public void insert(TitemName item) {
-		// TODO Auto-generated method stub
-		basePeopleDao.insert(item);
-		
-	}
+
 
 	@Override
 	public List<String[]> columnLists(List<TBasePeopleDictionaryEntity> keys) {

@@ -65,5 +65,7 @@ public class TBasePeopleDictionaryEntity {
         this.cCnEnglish = cCnEnglish;
     }
 
-
+//    public String getValueName(){
+//        String changeValue[]  ="1,2,3,4,5"
+//    }
 }

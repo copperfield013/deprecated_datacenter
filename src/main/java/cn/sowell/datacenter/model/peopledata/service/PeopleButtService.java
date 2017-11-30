@@ -8,7 +8,6 @@ import cn.sowell.datacenter.model.basepeople.ExcelModelCriteria;
 import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
-import cn.sowell.datacenter.model.basepeople.pojo.TitemName;
 import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 
 /**
@@ -39,7 +38,6 @@ public interface PeopleButtService {
 
       List<TBasePeopleDictionaryEntity> titleSearch (String txt);
 
-	void insert(TitemName item);
 	
 	List<TBasePeopleDictionaryEntity> getColumnNames(Long modelId);
 

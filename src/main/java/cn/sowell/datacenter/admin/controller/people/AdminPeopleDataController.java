@@ -49,7 +49,6 @@ import cn.sowell.datacenter.model.basepeople.dao.BasePeopleDao;
 import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
-import cn.sowell.datacenter.model.basepeople.pojo.TitemName;
 import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
