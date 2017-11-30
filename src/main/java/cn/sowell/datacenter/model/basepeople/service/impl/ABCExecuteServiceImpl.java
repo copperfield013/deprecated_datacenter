@@ -46,6 +46,7 @@ import com.abc.query.criteria.Criteria;
 import com.abc.query.entity.impl.EntitySortedPagedQuery;
 import com.abc.record.HistoryTracker;
 
+import cn.sowell.copframe.common.property.PropertyPlaceholder;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
@@ -267,10 +268,9 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public Workbook downloadPeople(List<Map<String, Object>> listmap, List<TBasePeopleDictionaryEntity> keys,
-			List<String[]> columnLists, ExcelModel model){		
-		try {   
-	          
-	        FileInputStream fis = new FileInputStream("D:/demo.xls");  
+			List<String[]> columnLists, ExcelModel model, String path){		
+		try {
+	        FileInputStream fis = new FileInputStream(path);  
 			System.out.println("导入模板");
 			
 			// 创建excel工作簿
@@ -318,6 +318,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 			}
 			
 			//sheet = setPrompt(sheet, "姓名", "这是姓名",1, listmap.size(), 0, 0);//设置提示
+			fis.close();
 			return wb;
 			
 		} catch (Exception e) {

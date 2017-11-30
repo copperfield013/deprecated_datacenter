@@ -3,7 +3,6 @@ package cn.sowell.datacenter.model.peopledata.service.impl;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -26,7 +25,6 @@ import cn.sowell.datacenter.model.basepeople.ExcelModelCriteria;
 import cn.sowell.datacenter.model.basepeople.dao.BasePeopleDao;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
-import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 import cn.sowell.datacenter.model.peopledata.service.PeopleButtService;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
 
@@ -84,9 +82,7 @@ public class PeopleButtServiceImpl implements PeopleButtService{
 	public List<TBasePeopleDictionaryEntity> getColumnNames(Long modelId) {
 		// TODO Auto-generated method stub
 		return basePeopleDao.getColumns(modelId);
-	}
-
-
+	}	
 
 	@Override
 	public List<String[]> columnLists(List<TBasePeopleDictionaryEntity> keys) {

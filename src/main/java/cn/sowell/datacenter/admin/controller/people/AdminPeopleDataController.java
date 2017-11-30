@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -21,10 +20,8 @@ import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.service.BasePeopleService;
 import cn.sowell.datacenter.model.peopledata.service.PojoService;
 import cn.sowell.datacenter.model.peopledata.service.impl.PropertyParser;
-import com.abc.query.criteria.Criteria;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -36,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
+import cn.sowell.copframe.common.property.PropertyPlaceholder;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JsonResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
@@ -45,10 +43,7 @@ import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
 import cn.sowell.datacenter.model.basepeople.ExcelModelCriteria;
-import cn.sowell.datacenter.model.basepeople.dao.BasePeopleDao;
 import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
-import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
-import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
@@ -396,13 +391,14 @@ public class AdminPeopleDataController {
 	public JsonResponse downloadExcel(HttpServletRequest request,HttpServletResponse response,
 			@PathVariable Long modelId,PeopleDataCriteria criteria, PageInfo pageInfo) throws IOException{
 		String fileName="excel文件";
-		List<TBasePeopleDictionaryEntity> keys = buttService.getColumnNames(modelId);//map中的key
-		List<String[]> columnLists = buttService.columnLists(keys);				
-		List<Map<String, Object>> listmap = peopleService.queryMap(criteria, pageInfo,keys);
-		ExcelModel model = buttService.getExcelModel(modelId);
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
         try {
-            abcService.downloadPeople(listmap,keys,columnLists,model).write(os);
+        	String path =request.getSession().getServletContext().getRealPath(PropertyPlaceholder.getProperty("excel_model_path"));
+        	List<TBasePeopleDictionaryEntity> keys = buttService.getColumnNames(modelId);//map中的key
+    		List<String[]> columnLists = buttService.columnLists(keys);				
+    		List<Map<String, Object>> listmap = peopleService.queryMap(criteria, pageInfo,keys);
+    		ExcelModel model = buttService.getExcelModel(modelId);
+        	abcService.downloadPeople(listmap,keys,columnLists,model,path).write(os);
         } catch (IOException e) {
             e.printStackTrace();
         }
