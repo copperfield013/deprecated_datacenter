@@ -160,18 +160,8 @@ public class PeopleButtServiceImpl implements PeopleButtService{
 	}
 
 	@Override
-	public List<BasePeopleDicInfomation> getDicInfo() {
-		List<BasePeopleDicInfomation> infoList = new ArrayList<BasePeopleDicInfomation>();
-		List<TBasePeopleInformationEntity> info = basePeopleDao.infoList();
-		for(int i = 0; i < info.size(); i++){
-			BasePeopleDicInfomation dicInfo = new BasePeopleDicInfomation();
-			dicInfo.setId(info.get(i).getId());
-			dicInfo.setCnName(info.get(i).getCnName());
-			dicInfo.setEnName(info.get(i).getEnName());
-			dicInfo.setDicList(basePeopleDao.getDicByInfoId(info.get(i).getId()));
-			infoList.add(dicInfo);
-		}
-		return infoList;
+	public List<TBasePeopleInformationEntity> getDicInfo() {
+		return basePeopleDao.infoList();
 	}
 
 }

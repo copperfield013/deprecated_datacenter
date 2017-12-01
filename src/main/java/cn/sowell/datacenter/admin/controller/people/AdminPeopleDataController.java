@@ -349,7 +349,7 @@ public class AdminPeopleDataController {
 	public String outputAdd(@PathVariable Long modelId, Model model){
 		ExcelModel excelModel = buttService.getExcelModel(modelId);
 		List<TBasePeopleDictionaryEntity> list = new ArrayList<TBasePeopleDictionaryEntity>();
-		List<BasePeopleDicInfomation> infoList = buttService.getDicInfo();
+		List<TBasePeopleInformationEntity> infoList = buttService.getDicInfo();
 		if(modelId !=0){
 			list = buttService.getDicByModelId(modelId);
 		}

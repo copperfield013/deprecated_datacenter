@@ -58,6 +58,6 @@ public interface PeopleButtService {
 
 	void deleteModel(Long modelId);
 
-	List<BasePeopleDicInfomation> getDicInfo();
+	List<TBasePeopleInformationEntity> getDicInfo();
 
 }
