@@ -11,30 +11,27 @@
     .zpage-body {
         top: 0;
     }
+    
     div.tab-content>.tab-pane {
     	background-color: #ffffff;
+    	overflow: hidden;
+    }
+    .menu-wrap {
+    	overflow: auto;
+    	top: 116px;
     }
     .zpage-menubody {
     	position: static;
-    }
-    .zpage-body {
-    	position: static;
+    	overflow: hidden;
+    	padding-bottom: 260px;
     }
     .integratedForm-button {
     	position: static;
     }
-    .menu-wrap {
-    	position: static;
-    }
 </style>
 <div id="people-update${peopleMap["peopleCode"]}">
-    <div class="page-header">
-        <div class="header-title">
-            <h1>动态字段修改人口</h1>
-        </div>
-    </div>
-
     <div class="zpage-body zclear search">
+    	<h1 class="zpage-title">动态字段修改人口</h1>
         <div class="integratedForm-button zclear">
             <span id="editIntegratedForm">编辑</span>
             <span id="saveIntegratedForm">保存</span>
@@ -82,7 +79,7 @@
                                 <label class="zlabel list-label" for="${item.cCnEnglish}">${item.cCnName}</label>
                                 <span class="colon">:</span>
                                 <div class="zinfor-input-wrap">
-                                    <input type="text" class="zinput  list-input" id="date"
+                                    <input type="text" class="zinput  list-input ztime-pick"
                                            name="${item.cCnEnglish}" readonly="readonly" css-cursor="text"
                                            value='<fmt:formatDate value="${peopleMap[keys]}" pattern="yyyy-MM-dd" />' />
                                 </div>
@@ -107,13 +104,16 @@
                 ['utils', 'ajax'],
                 function (Utils, Ajax) {
                     var $page = $('#people-update${peopleMap["peopleCode"]}');
-                    console.log($page);
-                    console.log( $('#editIntegratedForm', $page) );
-//                    Utils.datepicker($('#date', $page));
-//                    Utils.datepicker($('#lowIncomeInsuredStart', $page));
-//                    Utils.datepicker($('#lowIncomeInsuredEnd', $page));
-//                    Utils.datepicker($('#unemployeeDate', $page));
-//                    Utils.datepicker($('#partyDate', $page));
+
+                    var container = $('.zitem-group',$page);
+                   /*  Utils.datepicker($('#date', $page));
+                    Utils.datepicker($('#lowIncomeInsuredStart', $page));
+                    Utils.datepicker($('#lowIncomeInsuredEnd', $page));
+                    Utils.datepicker($('#unemployeeDate', $page));
+                    Utils.datepicker($('#partyDate', $page)); */
+                    Utils.datepicker($('.ztime-pick', $page),container);
+	
+
                     //完整表单处 select 替换 对应的select选中值加上selected属性值,同时加上展示html
                     var selectList = $('.zpage-body .select-replace');
                     for (var i = 0; i < selectList.length; i++) {
