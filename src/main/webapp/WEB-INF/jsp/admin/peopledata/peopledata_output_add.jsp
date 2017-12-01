@@ -22,7 +22,7 @@ position:initial;
 	float:left;
 }
 .aaa  
-    {float:left; width:100px; height:35px; margin:10px;padding:10px;border:1px solid #aaaaaa;
+    {float:left; width:150px; height:35px; margin:10px;padding:10px;border:1px solid #aaaaaa;
     text-align:center;}
 </style>
 <script>
