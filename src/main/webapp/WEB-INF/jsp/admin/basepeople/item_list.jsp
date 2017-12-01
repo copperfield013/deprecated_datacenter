@@ -23,7 +23,7 @@
 			<c:forEach items="${list }" var="item" varStatus="i">
 					<tr>
 						<td>${i.index+1}</td>
-						<td>${item.c_enum_cn_name }</td>
+						<td><a class="tab" href="admin/peopleDictionary/UpdateEnum/${item.c_id}" target="enum_add_${item.c_id}" title="详情">${item.c_enum_cn_name }</a></td>
 						<td>${item.c_enum_value }</td>
 						<td>
 							<a href="admin/peopleDictionary/do_enumdelete/${item.c_id }" confirm="确认删除？">删除</a>

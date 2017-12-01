@@ -223,4 +223,9 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 	public List<BasePeopleItem> dicItemByUser() {
 		return basePeopleDao.dicItemByUser();
 	}
+
+	@Override
+	public BasePeopleItem getEnumById(Long id) {
+		return basePeopleDao.get(BasePeopleItem.class, id);
+	}
 }

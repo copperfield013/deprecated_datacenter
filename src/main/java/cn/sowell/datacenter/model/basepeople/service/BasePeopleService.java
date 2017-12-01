@@ -77,4 +77,6 @@ public interface BasePeopleService {
 	List<TBasePeopleDictionaryEntity> dicListByUser();
 
 	List<BasePeopleItem> dicItemByUser();
+
+	BasePeopleItem getEnumById(Long id);
 }

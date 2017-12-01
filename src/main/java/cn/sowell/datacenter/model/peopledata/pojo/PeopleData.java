@@ -49,7 +49,7 @@ public class PeopleData implements EntityData{
 	private String lowIncomeInsuredType;
 	private String lowIncomeInsuredReason;
 	private String lowIncomeInsuredId;
-	private String lowIncomeInsuredAmount;
+		private String lowIncomeInsuredAmount;
 	private Date lowIncomeInsuredStart;
 	private Date lowIncomeInsuredEnd;
 	

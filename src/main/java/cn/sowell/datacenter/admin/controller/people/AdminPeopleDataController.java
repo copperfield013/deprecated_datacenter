@@ -310,7 +310,7 @@ public class AdminPeopleDataController {
 	public AjaxPageResponse doUpdate(String peopleCode, @RequestParam Map<String,String> map){
 		try {
 			buttService.updatePeople(peopleCode, map);
-			return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改成功", "people_list");
+			return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改成功", "peopledata_list");
 		} catch (Exception e) {
 			logger.error(e);
 			return AjaxPageResponse.FAILD("修改失败");

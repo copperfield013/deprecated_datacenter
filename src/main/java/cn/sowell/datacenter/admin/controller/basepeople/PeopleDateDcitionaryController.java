@@ -123,7 +123,7 @@ public class PeopleDateDcitionaryController {
     }
 
 
-    @RequestMapping("/EditEnum/Enumid}")
+    @RequestMapping("/EditEnum/{dicid}")
     public String EditEnum(@PathVariable String dicid,Model model){
         BasePeopleItem basePeopleItem = new BasePeopleItem();
         basePeopleItem.setcDictionaryId(dicid);
@@ -131,16 +131,25 @@ public class PeopleDateDcitionaryController {
         return AdminConstants.JSP_BASEPEOPLE + "/item_detail.jsp";
     }
 
+    @ResponseBody
     @RequestMapping("/SaveEnum")
     public AjaxPageResponse EditEnum( BasePeopleItem basePeopleItem) {
         try {
             basePeopleService.saveOrUpdate(basePeopleItem);
-            return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("保存成功", "dictionary_list");
+            return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("保存成功", "item_list_"+basePeopleItem.getcDictionaryId());
         } catch (Exception e) {
+
             logger.error("保存失败", e);
             return AjaxPageResponse.FAILD("保存失败");
         }
 
+
+    }
+
+    @RequestMapping("/UpdateEnum/{id}")
+    public String UpdateEnum(@PathVariable Long id,Model model){
+        model.addAttribute("ItemDto", basePeopleService.getEnumById(id));
+        return AdminConstants.JSP_BASEPEOPLE + "/item_detail.jsp";
     }
 
 }

@@ -1,10 +1,7 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp" %>
-<link rel="stylesheet" href="media/admin/bigautocomplete/css/jquery.bigautocomplete.css" type="text/css"/>
-<link rel="stylesheet" href="media/admin/peopleupdate/swinput.css" type="text/css"/>
 <link rel="stylesheet" href="media/admin/peopleupdate/cover.css" type="text/css"/>
 <link rel="stylesheet" href="media/admin/peopleupdate/selection.css" type="text/css"/>
-<script src="media/admin/peopleupdate/swinput.js"></script>
 <script src="media/admin/peopleupdate/selection.js"></script>
 <style>
     .integratedForm-button {
@@ -45,9 +42,9 @@
         <div class="menu-wrap zclear">
             <div class="zpage-menubody">
                 <form id="integratedForm" class="search"
-                      action="admin/peopledata/do_update" autocomplete="off">
+                      action="admin/peopledata/do_smart_update" autocomplete="off">
                     <input type="hidden" name="peopleCode"
-                           value=" ${peopleMap["peopleCode"]}">
+                           value="${peopleMap["peopleCode"]}">
                     <div class="zitem-group zclear" data-group="basic">
                         <c:forEach items="${dic }" var="item" varStatus="i">
                             <c:set var="keys" value="${item.cCnEnglish}"></c:set>
@@ -112,11 +109,11 @@
                     var $page = $('#people-update${peopleMap["peopleCode"]}');
                     console.log($page);
                     console.log( $('#editIntegratedForm', $page) );
-                    Utils.datepicker($('#date', $page));
-                    Utils.datepicker($('#lowIncomeInsuredStart', $page));
-                    Utils.datepicker($('#lowIncomeInsuredEnd', $page));
-                    Utils.datepicker($('#unemployeeDate', $page));
-                    Utils.datepicker($('#partyDate', $page));
+//                    Utils.datepicker($('#date', $page));
+//                    Utils.datepicker($('#lowIncomeInsuredStart', $page));
+//                    Utils.datepicker($('#lowIncomeInsuredEnd', $page));
+//                    Utils.datepicker($('#unemployeeDate', $page));
+//                    Utils.datepicker($('#partyDate', $page));
                     //完整表单处 select 替换 对应的select选中值加上selected属性值,同时加上展示html
                     var selectList = $('.zpage-body .select-replace');
                     for (var i = 0; i < selectList.length; i++) {
@@ -140,7 +137,7 @@
                         var value = $(inputList[i]).val();
                         var listValueHtml = "<span class='list-value'>" + value + "</span>";
                         $(inputList[i]).closest('.zinfor-input-wrap').append(listValueHtml);
-                    }                         
+                    }
 
                     //完整表单部分初始化成查看方法
                     var searchInit = function () {
@@ -171,7 +168,7 @@
                     $('#editIntegratedForm', $page)
                         .on(
                             'click',
-                            function () { 
+                            function () {
                             	console.log(1);
                                 $('.zpage-body.search', $page)
                                     .removeClass("search")
@@ -185,7 +182,7 @@
                                 "edit").addClass("search");
                             searchInit();
                         })
-                  
+
                     //身份验证
                     function IdentityCodeValid(code) {
                         var city = {
@@ -285,7 +282,7 @@
                             return false;
                         }
                     });
-                   
+
                 });
     </script>
 </div>

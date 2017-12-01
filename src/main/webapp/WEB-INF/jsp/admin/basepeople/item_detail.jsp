@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
-<div id="item-add">
+<div id="enum-add">
     <div class="page-header">
         <div class="header-title">
             <h1>编辑枚举值</h1>
@@ -14,13 +14,13 @@
                     <div class="form-group">
                         <label class="col-lg-2 control-label" for="cId"></label>
                         <div class="col-lg-5">
-                            <input class="form-control"   name="cId" value="${ItemDto.cId}" />
+                            <input class="form-control"  type="hidden" name="cId" value="${ItemDto.cId}" />
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-lg-2 control-label" for="cDictionaryId">dicid</label>
+                        <label class="col-lg-2 control-label" for="cDictionaryId"></label>
                         <div class="col-lg-5">
-                            <input type="text" class="form-control"  type="hidden" name="cDictionaryId" value="${ItemDto.cDictionaryId}" />
+                            <input 。 class="form-control"  type="hidden" name="cDictionaryId" value="${ItemDto.cDictionaryId}" />
                         </div>
                     </div>
                     <div class="form-group">
