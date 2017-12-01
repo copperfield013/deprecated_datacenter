@@ -32,7 +32,7 @@ position:initial;
 					<tr>
 						<td><input name="model" id="${i.index + 1 }" value="${item.id }" style="opacity: 1; position: static; height: 13px; border: medium none; background-color: rgb(255, 255, 255); cursor: auto;" type="radio">
 							${i.index + 1 }</td>
-						<td><a class="tab" href="admin/peopledata/output_detail/${item.id }" target="people_detail_${item.id }" title="详情-${item.modelName }">${item.modelName }</a></td>
+						<td><a class="tab" href="admin/peopledata/outputDetail/${item.id }" target="people_detail_${item.id }" title="详情-${item.modelName }">${item.modelName }</a></td>
 						<td>
 							<a href="admin/peopledata/outputAdd/${item.id }" class="tab" target="people_outputAdd_${item.id }" title="修改-${item.modelName }">修改</a>
 							<a href="admin/peopledata/output_delete/${item.id }" confirm="确认删除？">删除</a>

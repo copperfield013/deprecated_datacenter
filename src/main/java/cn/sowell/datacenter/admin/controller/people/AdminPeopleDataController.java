@@ -360,6 +360,16 @@ public class AdminPeopleDataController {
 		return AdminConstants.JSP_PEOPLEDATA + "/peopledata_output_add.jsp";
 	}
 	
+	@RequestMapping("/outputDetail/{modelId}")
+	public String outputDetail(@PathVariable Long modelId, Model model){
+		ExcelModel excelModel = buttService.getExcelModel(modelId);
+		List<TBasePeopleDictionaryEntity> list = buttService.getDicByModelId(modelId);
+		model.addAttribute("id", modelId);
+		model.addAttribute("model", excelModel);
+		model.addAttribute("list", list);
+		return AdminConstants.JSP_PEOPLEDATA + "/peopledata_output_detail.jsp";
+	}
+	
 	@ResponseBody
 	@RequestMapping("/do_outputAdd")
 	public AjaxPageResponse do_outputAdd(ExcelModel model, @RequestParam String[] list){

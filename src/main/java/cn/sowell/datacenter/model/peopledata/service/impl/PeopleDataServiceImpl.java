@@ -126,7 +126,7 @@ public class PeopleDataServiceImpl implements PeopleDataService{
             	String cnType = keys.get(j).getType();
             	PropertyParser parser = pojoService.createPropertyParser(data);
             	Object value = parser.get(cCnEnglish);            	
-            	if(cnType.equals("6")&&(value!=null||value!=""))//判断是否为date类型
+            	if(cnType.equals("6")&&value!=null&&value!="")//判断是否为date类型
             		mapValue.put(cCnEnglish, sdf.format(value));
             	else
             		mapValue.put(cCnEnglish, value);            	         		
