@@ -276,20 +276,19 @@ define(function(require, exports){
 			SEQUENCE_MAP[key] = currentSeq + 1;
 			return currentSeq;
 		},
-		datepicker		: function($dom){
+		datepicker		: function($dom,container){
 			return $($dom).datepicker({
 				format		: 'yyyy-mm-dd',
 				weekStart	: 1,
 				daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],  
                 monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月',  
                         '七月', '八月', '九月', '十月', '十一月', '十二月' ]
-			});
+			},container);
 		},
 		/**
 		 * 获取焦点
 		 */
 		focus		: function($dom){
-			
 			return $($dom).focus(function(){
 				sFocus = $(this);
 			});
