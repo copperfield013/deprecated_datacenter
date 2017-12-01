@@ -9,9 +9,12 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import cn.sowell.datacenter.model.basepeople.pojo.BasePeopleDicInfomation;
 import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
 import cn.sowell.datacenter.model.basepeople.pojo.ExcelModelOrder;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleInformationEntity;
+
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.format.Formatter;
 import org.springframework.stereotype.Service;
@@ -154,6 +157,21 @@ public class PeopleButtServiceImpl implements PeopleButtService{
 	@Override
 	public ExcelModel getExcelModel(Long modelId) {
 		return basePeopleDao.get(ExcelModel.class, modelId);
+	}
+
+	@Override
+	public List<BasePeopleDicInfomation> getDicInfo() {
+		List<BasePeopleDicInfomation> infoList = new ArrayList<BasePeopleDicInfomation>();
+		List<TBasePeopleInformationEntity> info = basePeopleDao.infoList();
+		for(int i = 0; i < info.size(); i++){
+			BasePeopleDicInfomation dicInfo = new BasePeopleDicInfomation();
+			dicInfo.setId(info.get(i).getId());
+			dicInfo.setCnName(info.get(i).getCnName());
+			dicInfo.setEnName(info.get(i).getEnName());
+			dicInfo.setDicList(basePeopleDao.getDicByInfoId(info.get(i).getId()));
+			infoList.add(dicInfo);
+		}
+		return infoList;
 	}
 
 }

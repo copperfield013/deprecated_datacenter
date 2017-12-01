@@ -15,8 +15,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import cn.sowell.datacenter.model.basepeople.pojo.BasePeopleDicInfomation;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeopleItem;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleInformationEntity;
 import cn.sowell.datacenter.model.basepeople.service.BasePeopleService;
 import cn.sowell.datacenter.model.peopledata.service.PojoService;
 import cn.sowell.datacenter.model.peopledata.service.impl.PropertyParser;
@@ -347,12 +349,14 @@ public class AdminPeopleDataController {
 	public String outputAdd(@PathVariable Long modelId, Model model){
 		ExcelModel excelModel = buttService.getExcelModel(modelId);
 		List<TBasePeopleDictionaryEntity> list = new ArrayList<TBasePeopleDictionaryEntity>();
+		List<BasePeopleDicInfomation> infoList = buttService.getDicInfo();
 		if(modelId !=0){
 			list = buttService.getDicByModelId(modelId);
 		}
 		model.addAttribute("id", modelId);
 		model.addAttribute("model", excelModel);
-		model.addAttribute("list", list);		
+		model.addAttribute("list", list);
+		model.addAttribute("infolist", infoList);
 		return AdminConstants.JSP_PEOPLEDATA + "/peopledata_output_add.jsp";
 	}
 	

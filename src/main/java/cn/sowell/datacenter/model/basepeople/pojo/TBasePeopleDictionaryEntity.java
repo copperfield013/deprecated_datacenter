@@ -19,6 +19,9 @@ public class TBasePeopleDictionaryEntity {
     private  String cCnEnglish;
     private  String type;
     private  String check_rule;
+    @Basic
+    @Column(name = "c_info_id")
+    private  Long    cInfoId;
     
 
     public String getType() {
@@ -64,6 +67,14 @@ public class TBasePeopleDictionaryEntity {
     public void setcCnEnglish(String cCnEnglish) {
         this.cCnEnglish = cCnEnglish;
     }
+
+	public Long getcInfoId() {
+		return cInfoId;
+	}
+
+	public void setcInfoId(Long cInfoId) {
+		this.cInfoId = cInfoId;
+	}
 
 //    public String getValueName(){
 //        String changeValue[]  ="1,2,3,4,5"

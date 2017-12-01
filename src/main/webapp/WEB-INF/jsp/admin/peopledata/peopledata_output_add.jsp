@@ -146,16 +146,13 @@ var sFocus;
 		    });
 		}
 		selectOne = function(enname,pageId,cId){
-			//var enname = dic.cCnEnglish;
-			//var cnname = dic.cCnName;
-			//var cId = dic.cId
 			var idName = enname+"_"+pageId;
-			var id = $("#"+idName);
-			var name = id.prop("name");
-			var val = id.val().split("_")[0];//cnname+"_"+pageId;
-			var cbox = $("input[name='"+name+"']");
+			var id = $("#"+idName);//字段id
+			var name = id.prop("name");//字段name值
+			var val = id.val().split("_")[0];//字段value
+			var cbox = $("input[name='"+name+"']");//同name值字段
 			var isCheck = id.is(':checked');
-			if(isCheck==true){
+			if(isCheck==true){//添加div块
 				var html = "<div id='checked_"+idName+"_"+cId+"' class='aaa'>"
 						+"<input id='list_"+idName+"_"+cId+"' type='hidden' name='list' value='"+cId+"' />"+val
 						+"<a href='#' onclick='deleteDiv("+idName+")' style='float:right;text-decoration:none;font-family:Marlett'>r</a>"
@@ -163,19 +160,19 @@ var sFocus;
 				$("#cloneBox_"+pageId).append(html);
 				
 			}
-			else{
+			else{//删除div块
 				$("#checked_"+idName+"_"+cId).remove();
 				$("#list_"+idName+"_"+cId).remove();
 			}
 			for(i=0;i<cbox.length;i++){
 				var isCheck2 = cbox[i].checked;
-				if(isCheck2==false){
+				if(isCheck2==false){//如果有未选中子项目 则父项目未选中
 					$("input[value='"+name+"']").each(function() {
 						this.checked=false;
 					});
 					break;
 				}
-				if(i==(cbox.length-1))
+				if(i==(cbox.length-1))//如果子项目全选中则父项目选中
 					$("input[value='"+name+"']").each(function() {
 						this.checked=true;
 					});
@@ -441,110 +438,20 @@ var sFocus;
 	</nav>
 	
 	<div class="page-body">
-		<div class="row">
-				<h4><input name="information" type="checkbox" value="people_${id}" onchange="selectAll('people_${id}')" />基本信息</h4>
+		<c:forEach items="${infolist }" var="info" varStatus="i">
+			<div class="row">
+				<h4><input name="information" type="checkbox" value="${info.enName}_${id}" onchange="selectAll('${info.enName}_${id}')" />${info.cnName}</h4>
 			</div>
 			<div class="row">
-				<label class="col-lg-2"><input name="people_${id}" class="con" type="checkbox" onchange="selectOne('name',${id},'14')" id="name_${id}" value="姓名_${id}"  />姓名</label>
-				<label class="col-lg-2"><input name="people_${id}" class="con" type="checkbox" onchange="selectOne('idcode',${id},'15')" id="idcode_${id}" value="身份证号_${id}" />身份证号</label>
-				<label class="col-lg-2"><input name="people_${id}" class="con" type="checkbox" onchange="selectOne('gender',${id},'2')" id="gender_${id}" value="性别_${id}" />性别</label>
-				<label class="col-lg-2"><input name="people_${id}" class="con" type="checkbox" onchange="selectOne('birthday',${id},'17')" id="birthday_${id}" value="生日_${id}" />生日</label>
-				<label class="col-lg-2"><input name="people_${id}" class="con" type="checkbox" onchange="selectOne('nation',${id},'1')" id="nation_${id}" value="民族_${id}" />民族</label>
+			<c:forEach items="${info.dicList }" var="dic" varStatus="i">
+					<label class="col-lg-2">
+						<input name="${info.enName}_${id}" class="con" type="checkbox" 
+							onchange="selectOne('${dic.cCnEnglish}',${id},${dic.cId})" 
+							id="${dic.cCnEnglish}_${id}" value="${dic.cCnName}_${id}"  />${dic.cCnName}</label>				
+			</c:forEach>
 			</div>
-			<div class="row">
-				<label class="col-lg-2"><input name="people_${id}" class="con" type="checkbox" onchange="selectOne('peopleType',${id},'6')" id="peopleType_${id}" value="人口类型_${id}" />人口类型</label>	
-				<label class="col-lg-2"><input name="people_${id}" class="con" type="checkbox" onchange="selectOne('maritalStatus',${id},'3')" id="maritalStatus_${id}" value="婚姻状况_${id}" />婚姻状况</label>
-				<label class="col-lg-2"><input name="people_${id}" class="con" type="checkbox" onchange="selectOne('religion',${id},'4')" id="religion_${id}" value="宗教信仰_${id}" />宗教信仰</label>
-				<label class="col-lg-2"><input name="people_${id}" class="con" type="checkbox" onchange="selectOne('healthCondition',${id},'5')" id="healthCondition_${id}" value="健康状况_${id}" />健康状况</label>
-				<%-- <label class="col-lg-2">家庭医生</label>--%>
-			</div>
-			<div class="row">
-				<h4><input name="information" type="checkbox" value="handicapped" onchange="selectAll('handicapped')" />残疾人信息</h4>
-			</div>
-			<div class="row">
-				<label class="col-lg-2"><input name="handicapped" class="con" type="checkbox" onchange="selectOne('handicapped')" value="残疾证号" />残疾证号</label>
-				<label class="col-lg-2"><input name="handicapped" class="con" type="checkbox" onchange="selectOne('handicapped')" value="残疾类型" />残疾类型</label>
-				<label class="col-lg-2"><input name="handicapped" class="con" type="checkbox" onchange="selectOne('handicapped')" value="残疾级别" />残疾级别</label>
-				<label class="col-lg-2"><input name="handicapped" class="con" type="checkbox" onchange="selectOne('handicapped')" value="残疾原因" />残疾原因</label>
-			</div>
-			<div class="row">
-				<h4><input name="information" type="checkbox" value="lowIncomeInsured" onchange="selectAll('lowIncomeInsured')" />低保信息</h4>
-			</div>
-			<div class="row">
-				<label class="col-lg-2"><input name="lowIncomeInsured" class="con" type="checkbox" onchange="selectOne('lowIncomeInsured')" value="低保证号" />低保证号</label>
-				<label class="col-lg-2"><input name="lowIncomeInsured" class="con" type="checkbox" onchange="selectOne('lowIncomeInsured')" value="低保人员类别" />低保人员类别</label>
-				<label class="col-lg-2"><input name="lowIncomeInsured" class="con" type="checkbox" onchange="selectOne('lowIncomeInsured')" value="低保原因" />低保原因</label>
-				<label class="col-lg-2"><input name="lowIncomeInsured" class="con" type="checkbox" onchange="selectOne('lowIncomeInsured')" value="享受低保标识" />享受低保标识</label>
-				<label class="col-lg-2"><input name="lowIncomeInsured" class="con" type="checkbox" onchange="selectOne('lowIncomeInsured')" value="享受低保金额" />享受低保金额</label>
-			</div>
-			<div class="row">
-				<label class="col-lg-2"><input name="lowIncomeInsured" class="con" type="checkbox" onchange="selectOne('lowIncomeInsured')" value="享受开始日期" />享受开始日期</label>
-				<label class="col-lg-2"><input name="lowIncomeInsured" class="con" type="checkbox" onchange="selectOne('lowIncomeInsured')" value="享受结束日期" />享受结束日期</label>
-			</div>
-			
-			<div class="row">
-				<h4><input name="" type="checkbox" value="unemployee" onchange="selectAll('unemployee')" />失业信息</h4>
-			</div>
-			
-			<div class="row">
-				<label class="col-lg-2"><input name="unemployee" class="con" type="checkbox" onchange="selectOne('unemployee')" value="就失业日期" />就失业日期</label>
-				<label class="col-lg-2"><input name="unemployee" class="con" type="checkbox" onchange="selectOne('unemployee')" value="就失业证号" />就失业证号</label>
-				<label class="col-lg-2"><input name="unemployee" class="con" type="checkbox" onchange="selectOne('unemployee')" value="就失业状态" />就失业状态</label>
-				<label class="col-lg-2"><input name="unemployee" class="con" type="checkbox" onchange="selectOne('unemployee')" value="就业标识" />就业标识</label>
-				<label class="col-lg-2"><input name="unemployee" class="con" type="checkbox" onchange="selectOne('unemployee')" value="就业困难人员类型" />就业困难人员类型</label>
-			</div>
-			<div class="row">
-				<label class="col-lg-2"><input name="unemployee" class="con" type="checkbox" onchange="selectOne('unemployee')" value="就业类型" />就业类型</label>
-				<label class="col-lg-2"><input name="unemployee" class="con" type="checkbox" onchange="selectOne('unemployee')" value="就业能力" />就业能力</label>
-				<label class="col-lg-2"><input name="unemployee" class="con" type="checkbox" onchange="selectOne('unemployee')" value="就业情况" />就业情况</label>
-				<label class="col-lg-2"><input name="unemployee" class="con" type="checkbox" onchange="selectOne('unemployee')" value="就业去向" />就业去向</label>
-				<label class="col-lg-2"><input name="unemployee" class="con" type="checkbox" onchange="selectOne('unemployee')" value="就业途径" />就业途径</label>
-			</div>
+		</c:forEach>
 	
-			<div class="row">
-				<h4><input name="information" type="checkbox" value="political" onchange="selectAll('political')" />党员信息</h4>
-			</div>
-
-
-			<!-- 党员信息 -->
-			<div class="row">
-				<label class="col-lg-2"><input name="political" class="con" type="checkbox" onchange="selectOne('political')" value="政治面貌" />政治面貌</label>
-				<label class="col-lg-2"><input name="political" class="con" type="checkbox" onchange="selectOne('political')" value="入党日期" />入党日期</label>
-				<label class="col-lg-2"><input name="political" class="con" type="checkbox" onchange="selectOne('political')" value="党内职务" />党内职务</label>
-				<label class="col-lg-2"><input name="political" class="con" type="checkbox" onchange="selectOne('political')" value="所在党组织" />所在党组织</label>
-				<label class="col-lg-2"><input name="political" class="con" type="checkbox" onchange="selectOne('political')" value="党组织隶属" />党组织隶属</label>
-			</div>
-			<div class="row">
-				<label class="col-lg-2"><input name="political" class="con" type="checkbox" onchange="selectOne('political')" value="党组织联系电话" />党组织联系电话</label>
-				<label class="col-lg-2"><input name="political" class="con" type="checkbox" onchange="selectOne('political')" value="共青团组织" />共青团组织</label>
-			</div>
-
-			<div class="row">
-				<h4><input name="information" type="checkbox" value="familyPlanning" onchange="selectAll('familyPlanning')" />计生信息</h4>
-			</div>
-
-			<!-- 计生信息 -->
-			<div class="row">
-				<label class="col-lg-2"><input name="familyPlanning" class="con" type="checkbox" onchange="selectOne('familyPlanning')" value="子女数" />子女数</label>
-				<label class="col-lg-2"><input name="familyPlanning" class="con" type="checkbox" onchange="selectOne('familyPlanning')" value="节育措施" />节育措施</label>
-				<label class="col-lg-2"><input name="familyPlanning" class="con" type="checkbox" onchange="selectOne('familyPlanning')" value="现孕周" />现孕周</label>
-				<label class="col-lg-2"><input name="familyPlanning" class="con" type="checkbox" onchange="selectOne('familyPlanning')" value="计划生育证编号" />计划生育证编号</label>
-				<label class="col-lg-2"><input name="familyPlanning" class="con" type="checkbox" onchange="selectOne('familyPlanning')" value="计划生育证类型" />计划生育证类型</label>
-			</div>
-			<div class="form-group">
-				<div class="col-lg-offset-3 col-lg-3">
-				<c:if test="${id == 0}">
-					<input class="btn btn-block btn-darkorange"  onclick="saveModel(${id})" value="生成模板" />
-				</c:if>
-				<c:if test="${id != 0}">
-					<input class="btn btn-block btn-darkorange"  onclick="saveModel(${id})" value="修改模板" />
-				</c:if>
-					
-				</div>
-			</div>
-	</div>
-	<c:forEach items="${list }" var="item" varStatus="i">
 	
-	</c:forEach>
 </div>
 

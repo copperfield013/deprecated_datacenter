@@ -29,8 +29,6 @@ import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
 import cn.sowell.datacenter.model.basepeople.dao.BasePeopleDao;
-import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
-import cn.sowell.datacenter.model.basepeople.pojo.ExcelModelOrder;
 
 @Repository
 public class BasePeopleDaoImpl implements BasePeopleDao{
@@ -265,5 +263,32 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 			return query.list();
 		}
 		return new ArrayList<BasePeopleItem>();
+	}
+
+	@Override
+	public List<TBasePeopleDictionaryEntity> getDicByInfoId(Long infoId) {
+		String hql = "from TBasePeopleDictionaryEntity p";
+		DeferedParamQuery dQuery = new DeferedParamQuery(hql);
+		dQuery.appendCondition(" and p.cInfoId = :infoId").setParam("infoId", infoId);
+		Query countQuery = dQuery.createQuery(sFactory.getCurrentSession(), true, new WrapForCountFunction());
+		Integer count = FormatUtils.toInteger(countQuery.uniqueResult());
+		if(count > 0){
+			Query query = dQuery.createQuery(sFactory.getCurrentSession(), true, null);
+			return query.list();
+		}
+		return new ArrayList<TBasePeopleDictionaryEntity>();
+	}
+
+	@Override
+	public List<TBasePeopleInformationEntity> infoList() {
+		String hql = "from TBasePeopleInformationEntity p";
+		DeferedParamQuery dQuery = new DeferedParamQuery(hql);
+		Query countQuery = dQuery.createQuery(sFactory.getCurrentSession(), true, new WrapForCountFunction());
+		Integer count = FormatUtils.toInteger(countQuery.uniqueResult());
+		if(count > 0){
+			Query query = dQuery.createQuery(sFactory.getCurrentSession(), true, null);
+			return query.list();
+		}
+		return new ArrayList<TBasePeopleInformationEntity>();
 	}
 }

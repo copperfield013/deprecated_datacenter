@@ -80,4 +80,8 @@ public interface BasePeopleDao {
 
 
 	List<BasePeopleItem> dicItemByUser();
+
+	List<TBasePeopleDictionaryEntity> getDicByInfoId(Long infoId);
+
+	List<TBasePeopleInformationEntity> infoList();
 }
