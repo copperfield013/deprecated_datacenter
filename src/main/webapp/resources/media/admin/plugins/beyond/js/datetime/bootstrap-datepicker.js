@@ -21,11 +21,12 @@
 	
 	// Picker object
 	
-	var Datepicker = function(element, options){
+	var Datepicker = function(element, options,container){
 		this.element = $(element);
+		this.container = container;
 		this.format = DPGlobal.parseFormat(options.format||this.element.data('date-format')||'mm/dd/yyyy');
 		this.picker = $(DPGlobal.template)
-							.appendTo('body')
+							.appendTo(container)
 							.on({
 								click: $.proxy(this.click, this)//,
 								//mousedown: $.proxy(this.mousedown, this)
@@ -36,7 +37,7 @@
 		if (this.isInput) {
 			this.element.on({
 				focus: $.proxy(this.show, this),
-				//blur: $.proxy(this.hide, this),
+				blur: $.proxy(this.hide, this),
 				keyup: $.proxy(this.update, this)
 			});
 		} else {
@@ -150,11 +151,17 @@
 		},
 		
 		place: function(){
+			var ELEMENT = this.component ? this.component : this.element;
 			var offset = this.component ? this.component.offset() : this.element.offset();
+			var top = this.component ? this.component[0].offsetTop : this.element[0].offsetTop;
+			var left = this.component ? this.component[0].offsetLeft : this.element[0].offsetLeft;
+
 			this.picker.css({
-				top: offset.top + this.height,
-				left: offset.left
+				top: top + this.height,
+				left: left
 			});
+
+			
 		},
 		
 		update: function(newDate){
@@ -332,15 +339,16 @@
 		}
 	};
 	
-	$.fn.datepicker = function ( option, val ) {
+	$.fn.datepicker = function ( option ,container) {
 		return this.each(function () {
 			var $this = $(this),
 				data = $this.data('datepicker'),
-				options = typeof option === 'object' && option;
+				options = typeof option === 'object' && option;	
+				container = container ? container : 'body';
 			if (!data) {
-				$this.data('datepicker', (data = new Datepicker(this, $.extend({}, $.fn.datepicker.defaults,options))));
+				$this.data('datepicker', (data = new Datepicker(this, $.extend({}, $.fn.datepicker.defaults,options),container)));
 			}
-			if (typeof option === 'string') data[option](val);
+			/*if (typeof option === 'string') data[option](val);*/
 		});
 	};
 
