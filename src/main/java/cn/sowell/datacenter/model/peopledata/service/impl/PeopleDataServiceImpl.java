@@ -123,8 +123,13 @@ public class PeopleDataServiceImpl implements PeopleDataService{
             Map<String, Object> mapValue = new HashMap<String, Object>();
             for(int j = 0;j < keys.size();j++){
             	String cCnEnglish = keys.get(j).getcCnEnglish();
+            	String cnType = keys.get(j).getType();
             	PropertyParser parser = pojoService.createPropertyParser(data);
-            	mapValue.put(cCnEnglish, parser.get(cCnEnglish));         		
+            	Object value = parser.get(cCnEnglish);            	
+            	if(cnType.equals("6")&&(value!=null||value!=""))//判断是否为date类型
+            		mapValue.put(cCnEnglish, sdf.format(value));
+            	else
+            		mapValue.put(cCnEnglish, value);            	         		
             }
             listmap.add(mapValue);
         }
