@@ -451,7 +451,17 @@ var sFocus;
 			</c:forEach>
 			</div>
 		</c:forEach>
-	
+		<div class="form-group">
+				<div class="col-lg-offset-3 col-lg-3">
+				<c:if test="${id == 0}">
+					<input class="btn btn-block btn-darkorange"  onclick="saveModel(${id})" value="生成模板" />
+				</c:if>
+				<c:if test="${id != 0}">
+					<input class="btn btn-block btn-darkorange"  onclick="saveModel(${id})" value="修改模板" />
+				</c:if>
+					
+				</div>
+		</div>
 	
 </div>
 
