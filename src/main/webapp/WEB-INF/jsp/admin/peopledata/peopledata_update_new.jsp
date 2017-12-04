@@ -1186,6 +1186,7 @@
 						$('.search-input', $page)
 								.bind("keyup click",
 										function(event) {
+											if(event.keyCode == 40 || event.keyCode == 38)return;										
 											if (
 													 $(this).val() != ""
 													&& $(this).val() != null) {
@@ -1272,7 +1273,7 @@
 													$(this)
 															.attr(
 																	'id',
-																	$nextSiblingLi.attr("id"));
+																	$previousSiblingLi.attr("id"));
 													//div滚动到选中的行,jquery-1.6.1 $$previousSiblingTr.offset().top 有bug，数值有问题
 													/* $("#bigAutocompleteContent")
 															.scrollTop(
