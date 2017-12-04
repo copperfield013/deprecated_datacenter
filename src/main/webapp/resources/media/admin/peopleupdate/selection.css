@@ -249,7 +249,7 @@ input::-ms-reveal {
     display: block;
     position: absolute;
     background-color: #ffffff;
-    width: 100%;
+    width: 300px;
     z-index: 1001;
     margin-top: 1px;
     border: 1px solid #d9d9d9;
