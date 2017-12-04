@@ -6,7 +6,7 @@
 	type="text/css" />
 <link rel="stylesheet" href="media/admin/peopleupdate/swinput.css"
 	type="text/css" />
-<link rel="stylesheet" href="media/admin/peopleupdate/cover.css"
+<link rel="stylesheet" href="media/admin/peopleupdate/cover.css?v=1.0"
 	type="text/css" />
 <link rel="stylesheet" href="media/admin/peopleupdate/selection.css"
 	type="text/css" />
@@ -676,11 +676,11 @@
 					[ 'utils', 'ajax' ],
 					function(Utils, Ajax) {
 						var $page = $('#peopledata-update${people.peopleCode }');
-						Utils.datepicker($('#date', $page));
-						Utils.datepicker($('#lowIncomeInsuredStart', $page));
-						Utils.datepicker($('#lowIncomeInsuredEnd', $page));
-						Utils.datepicker($('#unemployeeDate', $page));
-						Utils.datepicker($('#partyDate', $page));
+						Utils.datepicker($('#date', $page),$(".zpage-menubody"));
+						Utils.datepicker($('#lowIncomeInsuredStart', $page),$(".zpage-menubody"));
+						Utils.datepicker($('#lowIncomeInsuredEnd', $page),$(".zpage-menubody"));
+						Utils.datepicker($('#unemployeeDate', $page),$(".zpage-menubody"));
+						Utils.datepicker($('#partyDate', $page),$(".zpage-menubody"));
 						//完整表单处 select 替换 对应的select选中值加上selected属性值,同时加上展示html
 						var selectList=$('.zpage-body .select-replace'); 
 						for(var i=0; i<selectList.length; i++){							
@@ -696,7 +696,8 @@
 							var listValueHtml = "<span class='list-value'>"+name+"</span>";
 							$(selectList[i]).closest('.zinfor-input-wrap').append(listValueHtml);
 						}
-						$('.select-replace').Selection({							
+						$('.select-replace').Selection({	
+							
 						});
 						
 						//完整表单处input加上展示html
