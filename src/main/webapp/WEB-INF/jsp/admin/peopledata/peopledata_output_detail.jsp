@@ -25,12 +25,10 @@
 		<div class="form-inline" >
 			<input id='modelId' type='hidden' name='id' value='${model.id}' />
 			<div style="padding:2px">
-				<label for="search">模板名</label> 
-				<input type="text" class="form-control" name="modelName" value='${model.modelName}'/>
+				<label for="search">模板名:${model.modelName}</label> 
 			</div>
 			<div style="padding:2px">
-				<label for="search">表格名</label> 
-				<input type="text" class="form-control" name="titleName" value='${model.titleName}'/>
+				<label for="search">表格名:${model.titleName}</label> 
 			</div>			
 		</div>
 		

@@ -376,11 +376,11 @@ public class AdminPeopleDataController {
 		try {
 			if(model.getId()==null){
 				buttService.addExcelList(model,list);
-				return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("生成模板成功", "peopledata_output");
+				return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("生成模板成功", "people_output");
 			}
 			else{
 				buttService.updateExcelList(model,list);
-				return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改模板成功", "peopledata_output");
+				return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改模板成功", "people_output");
 			}
 		} catch (Exception e) {
 			logger.error(e);

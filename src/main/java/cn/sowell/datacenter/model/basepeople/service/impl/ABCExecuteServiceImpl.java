@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import javax.annotation.Resource;
+
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.DVConstraint;
 import org.apache.poi.hssf.usermodel.HSSFDataValidationHelper;
@@ -56,7 +58,9 @@ import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
+import cn.sowell.datacenter.model.peopledata.service.PojoService;
 import cn.sowell.datacenter.model.peopledata.service.impl.EntityTransfer;
+import cn.sowell.datacenter.model.peopledata.service.impl.PropertyParser;
 import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
 
 @Service
@@ -69,6 +73,9 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	private DateFormat defaultDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
 	
 	EntityTransfer eTransfer = new EntityTransfer();
+	
+	@Resource
+	PojoService pojoService;
 	
 	
 	/*@Override
@@ -148,6 +155,9 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		if(writeMapperName != null){
 			execute(sheet, headerRow, IMPORT_NODE_NAME, writeMapperName, importStatus);
 		}
+		else{
+			executeByModel(sheet, headerRow, IMPORT_NODE_NAME, writeMapperName, importStatus);
+		}
 	}
 	
 	private NumberFormat numberFormat = new DecimalFormat("0.000");
@@ -184,6 +194,47 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		importStatus.appendMessage("导入完成");
 		importStatus.setEnded();
 	}
+	
+	protected void executeByModel(Sheet sheet, Row headerRow, String mapperName, String writeMapperName, ImportStatus importStatus) throws ImportBreakException {
+		importStatus.appendMessage("正在计算总行数");
+		importStatus.setTotal(colculateRowCount(sheet)-1);
+		int rownum = 3;
+		
+		importStatus.appendMessage("开始导入");
+		while(true){
+			if(importStatus.breaked()){
+				throw new ImportBreakException();
+			}
+			Row row = sheet.getRow(rownum++);
+			if(row == null || row.getCell(0) == null || !TextUtils.hasText(getStringWithBlank(row.getCell(0)))){
+				break;
+			}
+			importStatus.setCurrent(rownum - 3);
+			importStatus.startItemTimer().appendMessage("导入第" + importStatus.getCurrent() + "条数据");
+			PeopleData people  = new PeopleData();
+			PropertyParser parser = pojoService.createPropertyParser(people);
+			int length = headerRow.getPhysicalNumberOfCells();
+			try{
+				for(int i = 0; i < length; i++){
+					String key = getStringWithBlank(headerRow.getCell(i));
+					String value = getStringWithBlank(row.getCell(i));
+					parser.put(key,value);
+				}
+			}catch(Exception e){
+				logger.error("模板发生异常", e);
+				importStatus.endItemTimer().appendMessage("模板发生异常");
+			}
+			try {
+				savePeople(people);
+				importStatus.endItemTimer().appendMessage("第" + importStatus.getCurrent() + "条数据导入完成，用时" + numberFormat.format(importStatus.lastInterval()));
+			} catch (Exception e) {
+				logger.error("导入第" + rownum + "行时发生异常", e);
+				importStatus.endItemTimer().appendMessage("第" + importStatus.getCurrent() + "条数据导入异常，用时" + numberFormat.format(importStatus.lastInterval()));
+			}
+		}
+		importStatus.appendMessage("导入完成");
+		importStatus.setEnded();
+	}
 
 	private Integer colculateRowCount(Sheet sheet) {
 		int rownum = 2;
@@ -193,7 +244,6 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		} while (row != null && row.getCell(0) != null && TextUtils.hasText(getStringWithBlank(row.getCell(0))));
 		return rownum - 3;
 	}
-
 
 	private Entity createImportEntity(String mappingName, Row headerRow,
 			Row row) {
@@ -314,7 +364,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 			for(int i = 0; i < columnLists.size(); i++){
 				String[] columnList = columnLists.get(i);
 				if(columnList.length!=0)
-					sheet = setValidation(sheet,columnList, 2, listmap.size()+2, i, i);//设置下拉列表
+					sheet = setValidation(sheet,columnList, 3, listmap.size()+2, i, i);//设置下拉列表
 			}
 			
 			//sheet = setPrompt(sheet, "姓名", "这是姓名",1, listmap.size(), 0, 0);//设置提示

@@ -14,7 +14,7 @@
 			<button type="submit" class="btn btn-default">查询</button>
 			<a class="btn btn-primary tab" href="admin/peopledata/add" title="创建人口" target="people_add" >创建</a>
 			<a class="btn btn-primary tab" href="admin/peopledata/import" title="导入人口" target="people_import">导入</a>
-			<a class="btn btn-primary tab" href="admin/peopledata/output" title="导出人口" target="people_download">导出</a>
+			<a class="btn btn-primary tab" href="admin/peopledata/output" title="导出人口" target="people_output">导出</a>
 			
 		</form>
 	</nav>

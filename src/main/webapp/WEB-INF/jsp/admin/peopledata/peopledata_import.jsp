@@ -30,6 +30,7 @@
 								<option value="lowincome">低保数据</option>
 								<option value="handicapped">残疾人数据</option>
 								<option value="familyPlanning">计生数据</option>
+								<option value="aaa">模板</option>
 							</select>
 						</div>
 					</div>

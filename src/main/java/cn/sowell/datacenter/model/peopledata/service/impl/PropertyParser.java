@@ -22,6 +22,11 @@ public class PropertyParser implements Map<String, Object>{
 		Expression exp = parser.parseExpression(expEl);
 		return exp.getValue(obj);
 	}
+	
+	public void setPropertyValue(String expEl,Object value){
+		Expression exp = parser.parseExpression(expEl);
+		exp.setValue(obj, value);
+	}
 
 	@Override
 	public int size() {
@@ -54,7 +59,7 @@ public class PropertyParser implements Map<String, Object>{
 
 	@Override
 	public Object put(String key, Object value) {
-		// TODO Auto-generated method stub
+		setPropertyValue(key,value);
 		return null;
 	}
 
