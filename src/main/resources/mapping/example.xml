@@ -30,6 +30,25 @@
 	<label name="三无老人" alias="三无老人" subdomain="三无老人" />
 	<label name="是否有车" alias="是否有车" subdomain="有车" />
 	<label name="人口类型" alias="人口类型" subdomain="户籍人口,流动人口" />
+	
+	<!-- 工作信息 -->
+	<multiattribute name="workExperience" abcattr="工作经历">
+		<attribute name="companyName" alias="公司名称" abcattr="工作单位名称" />
+		<attribute name="workAddress" alias="工作地址" abcattr="通用地址" />
+		<attribute name="unitContact" alias="单位电话" abcattr="联系电话" />
+		<attribute name="workDepartment" alias="当前部门" abcattr="工作部门" />
+		<attribute name="unitNature" alias="单位性质" abcattr="单位性质" />
+		<attribute name="salary" alias="工资" abcattr="月收入" datatype="FLOAT" />
+		<attribute name="workDuty" alias="工作职责" abcattr="工作职责" />
+		<attribute name="workSubject" alias="工作主题" abcattr="分管工作" />
+		<attribute name="workedOccupation" alias="曾从事职业" abcattr="曾从事职业" />
+	</multiattribute>
+
+	<multiattribute name="教育信息" abcattr="教育经历">
+			<attribute name="school name" alias="院校名称" abcattr="院校名称" />
+			<attribute name="enter date" alias="入职日期" datatype="DATE"
+				abcattr="入学日期" />
+	</multiattribute>
 
 	<relation name="医疗信息">
 		<label subdomain="家庭医生" />
@@ -48,15 +67,8 @@
 				abcattr="出生日期" />
 		</ABC>
 	</relation>
-	<record name="教育信息">
-		<label subdomain="教育经历" />
-		<ABC name="educationhistory" abcattr="教育经历">
-			<attribute name="school name" alias="院校名称" abcattr="院校名称" />
-			<attribute name="enter date" alias="入职日期" datatype="DATE"
-				abcattr="入学日期" />
-
-		</ABC>
-	</record>
+	
+	
 	<record name="家庭信息">
 		<label subdomain="家庭信息" />
 		<ABC name="familyInfomation" abcattr="家庭信息">
