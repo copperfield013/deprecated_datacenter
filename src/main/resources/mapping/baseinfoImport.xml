@@ -77,7 +77,7 @@
 	<attribute name="partyOrgContact" alias="党组织联系电话" abcattr="党组织电话" />
 
 	<!-- 工作信息 -->
-	<multiattribute name="workExperience" abcattr="工作经历">
+	<!-- <multiattribute name="workExperience" abcattr="工作经历">
 		<attribute name="companyName" alias="公司名称" abcattr="工作单位名称" />
 		<attribute name="workAddress" alias="工作地址" abcattr="通用地址" />
 		<attribute name="unitContact" alias="单位电话" abcattr="联系电话" />
@@ -94,7 +94,7 @@
 			<attribute name="enter date" alias="入职日期" datatype="DATE"
 				abcattr="入学日期" />
 	</multiattribute>
-
+ -->
 	<!-- 计生信息 -->
 	<attribute name="childrenCount" alias="子女数" abcattr="子女数"
 		datatype="INT" />
