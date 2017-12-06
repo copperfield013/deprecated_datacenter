@@ -22,28 +22,25 @@
 	<body>
 		<div class="navbar">
 	        <div class="navbar-inner">
-	            <div class="navbar-container">
-	                <div class="navbar-header pull-left">
-	                    <a href="admin/logout" class="navbar-brand">
-	                        <small>
-	                            <img src="media/admin/main/image/datacenter-logo.png"/>
-	                        </small>
-	                    </a>
-	                </div>
-	                <div class="sidebar-collapse" id="sidebar-collapse">
+	             <div class="navbar-header pull-left">
+	                 <a href="admin/logout" class="datacenter-logo">	                   
+	                                                                        易+数据融合中心
+	                 </a>
+	             </div>
+	             <div class="sidebar-collapse" id="sidebar-collapse">
 	                    <i class="collapse-icon fa fa-bars"></i>
-	                </div>
-	                <div class="cmd-right">
+	             </div>
+	             <div class="cmd-right">
 	                	<a class="jump" href="admin/logout">退出登录</a>
-	                </div>
-				</div>
+	             </div>
+
 			</div>
 		</div>
 	    <div class="main-container container-fluid">
 	        <div class="page-container">
 	            <div class="page-sidebar" id="sidebar">
 	                <ul class="nav sidebar-menu">
-	                	<li class="open">
+	                	<li class="open first">
 	                		<a href="#">
 	                			<i class="menu-icon glyphicon glyphicon-home"></i>
 	                			<span class="menu-text">主页面</span>
