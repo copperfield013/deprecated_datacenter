@@ -2,12 +2,16 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
 	xsi:schemaLocation="http://www.springframework.org/schema/mvc 
 http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd 
 http://www.springframework.org/schema/beans 
 http://www.springframework.org/schema/beans/spring-beans-4.3.xsd 
 http://www.springframework.org/schema/context 
-http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+http://www.springframework.org/schema/context/spring-context-4.3.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
 		
 		
 		
@@ -22,6 +26,18 @@ http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 	<context:component-scan base-package="cn.sowell.datacenter.model.*.service.impl" />
 	<!-- controller自动扫描(自动注入) -->
 	<context:component-scan base-package="cn.sowell.datacenter.*.controller.*" />
+	
+	<bean id="junitOpenSessionInterceptor" class="org.springframework.orm.hibernate5.support.OpenSessionInterceptor" >
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	
+	<aop:config>
+		<aop:pointcut id="junitPointCuts"
+			expression="(execution(* cn.sowell.datacenter.test.abc.TestPojoService.test()))
+			" />
+		<aop:advisor advice-ref="junitOpenSessionInterceptor" pointcut-ref="junitPointCuts" />
+	</aop:config>
 	
 	
 </beans>
