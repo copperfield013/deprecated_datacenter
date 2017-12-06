@@ -68,7 +68,7 @@ public interface BasePeopleDao {
 	
 	List<TBasePeopleDictionaryEntity> getColumns(Long modelId);
 
-	List<ExcelModel> queryExcelModel(ExcelModelCriteria criteria, PageInfo pageInfo);
+	List<ExcelModel> queryExcelModel(ExcelModelCriteria criteria, PageInfo pageInfo,String type);
 
 	void deleteExcelOrder(Long modelId);
 

@@ -46,7 +46,7 @@ public interface PeopleButtService {
 	 */
 	List<String[]> columnLists(List<TBasePeopleDictionaryEntity> keys);
 
-	List<ExcelModel> queryModel(ExcelModelCriteria criteria, PageInfo pageInfo);
+	List<ExcelModel> queryModel(ExcelModelCriteria criteria, PageInfo pageInfo,String type);
 
 	void addExcelList(ExcelModel model, String[] list);
 

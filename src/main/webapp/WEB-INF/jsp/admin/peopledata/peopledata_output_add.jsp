@@ -26,7 +26,7 @@ position:initial;
     text-align:center;}
 </style>
 <script>
-var sFocus;
+	var sFocus;
 	seajs.use(['ajax', 'dialog','utils'], function(Ajax, Dialog,Utils){
 		var $page = $('#peopledata_output_add${id}');
 		

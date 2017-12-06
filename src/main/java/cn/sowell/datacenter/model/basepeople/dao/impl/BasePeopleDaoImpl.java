@@ -175,13 +175,15 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 	}
 
 	@Override
-	public List<ExcelModel> queryExcelModel(ExcelModelCriteria criteria, PageInfo pageInfo) {
+	public List<ExcelModel> queryExcelModel(ExcelModelCriteria criteria, PageInfo pageInfo,String type) {
 		String hql = "from ExcelModel e";
 		DeferedParamQuery dQuery = new DeferedParamQuery(hql);
 		if(TextUtils.hasText(criteria.getModelName())){
 			dQuery.appendCondition(" and e.modelName like :name")
 					.setParam("name", "%" + criteria.getModelName() + "%");
 		}
+
+		dQuery.appendCondition("and e.type = :type").setParam("type",type);
 		Query countQuery = dQuery.createQuery(sFactory.getCurrentSession(), true, new WrapForCountFunction());
 		Integer count = FormatUtils.toInteger(countQuery.uniqueResult());
 		pageInfo.setCount(count);

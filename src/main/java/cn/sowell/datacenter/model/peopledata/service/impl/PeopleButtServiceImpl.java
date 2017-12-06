@@ -104,9 +104,9 @@ public class PeopleButtServiceImpl implements PeopleButtService{
 	}
 
 	@Override
-	public List<ExcelModel> queryModel(ExcelModelCriteria criteria, PageInfo pageInfo) {
+	public List<ExcelModel> queryModel(ExcelModelCriteria criteria, PageInfo pageInfo,String type) {
 		// TODO Auto-generated method stub
-		return basePeopleDao.queryExcelModel(criteria,pageInfo);
+		return basePeopleDao.queryExcelModel(criteria,pageInfo ,type);
 	}
 
 	@Override

@@ -4,7 +4,7 @@
 	<nav>
 
 		<form class="form-inline" action="admin/people/diclist">
-			<a class="btn btn-primary tab" href="admin/peopleDictionary/addEnum/${list[0].c_dictionaryid}" title="创建枚举" target="enum_add" >创建</a>
+			<a class="btn btn-primary tab" href="admin/peopleDictionary/addEnum/${fieldid}" title="创建枚举" target="enum_add" >创建</a>
 		</form>
 
 	</nav>

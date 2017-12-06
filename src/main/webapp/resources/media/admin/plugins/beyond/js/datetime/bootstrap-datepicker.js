@@ -116,12 +116,12 @@
                 	PICKER.css({
                         top: offset.top - 232
                     })
-                }else {             
+                }else {
                     PICKER.css({
                         top: offset.top + EleHeight,
                     })
                 }
-                
+
 			});
 			$(document).on('', function(ev){
 				if ($(ev.target).closest('.datepicker').length == 0) {
@@ -173,15 +173,15 @@
 		},
 		
 		place: function(){
-			
-			var windowHeight = $(window).height(); 
+
+			var windowHeight = $(window).height();
 			var offset = this.component ? this.component.offset() : this.element.offset();
 			var bottomHeight = windowHeight - offset.top - this.height;  //触发元素距离底部的距离
 			var	pickerLeft = offset.left;
 			var pickerTop;
-			
+
 			if( bottomHeight > 240 ){
-				pickerTop = offset.top + this.height;	
+				pickerTop = offset.top + this.height;
 				this.picker.removeClass('bottom');
 			}else {
 				pickerTop = offset.top - 232;

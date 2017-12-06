@@ -30,7 +30,7 @@
 						<td>${item.check_rule}</td>
 						<td>
 						<c:if test="${item.type > 2 and item.type<4 }">
-								<a href="admin/people/itemlist/${item.cCnEnglish }" class="tab" target="item_list_${item.cId}" title="查看">查看枚举值</a>
+								<a href="admin/people/itemlist/${item.cCnEnglish }/${item.cId}" class="tab" target="item_list_${item.cId}" title="查看">查看枚举值</a>
 						</c:if>
 
 							<a href="admin/peopleDictionary/do_delete/${item.cId }" confirm="确认删除？">删除</a>
