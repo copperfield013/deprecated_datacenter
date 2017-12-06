@@ -7,7 +7,7 @@ html,body{
 .main-container {
     position: absolute;
     padding: 0;
-    top: 45px;
+    top: 50px;
     bottom: 0;
     left: 0;
     right: 0;
@@ -15,23 +15,28 @@ html,body{
 div.page-container, div.page-container, div.page-container>.page-content{
 	height: 100%;
 }
+
 div.page-container>.page-content{
 	position: relative;
 }
+.div.page-container>.page-content > .tabbable {
+	height: 100%;
+}
 div.tab-warp{
 	position:relative;
+	height: 30px;
 }
 a.move {
 	display:none;
 	position:absolute;
 	top:0;
-	width:34px;
-	height:34px;
-	line-height:34px;
+	width:30px;
+	height:30px;
+	line-height:30px;
 	text-align:center;
-	color:#000000;
-	font-size:18px;
-	z-index:999999999;
+	color:#333;
+	font-size:14px;
+	z-index:999;
 	background-color:#eeeeee;
 	text-decoration:none;
 }
@@ -43,25 +48,36 @@ a.right {
 	right:0;
 	border-left: 1px solid #d6d8dd;
 }
+div.nav-tabs-wrap {
+	height: 30px;
+	background-color: #e9e9e9;
+}
 ul.nav-tabs{
-	height: 34px;
+	height: 30px;
 	position:absolute;
 	top:0;
 }
 div.tab-content{
 	position: absolute;
-    top: 34px;
+    top: 30px;
     right: 0;
     left: 0;
     bottom: 0;
     overflow: hidden;
-    padding: 0 0 0 10px;
+    padding: 0;
+    background-color: #ffffff;
 }
 div.tab-content>.tab-pane{
 	width: 100%;
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
+    color: #656565;
+    font-size: 14px;
+    padding-left: 20px;
+}
+div.tab-content>.tab-pane>h1{
+	padding-left: 20px;
 }
 #loading-container{
 	position: absolute;
@@ -92,9 +108,9 @@ div.tab-content>.tab-pane{
 .cpf-paginator-jump-button{
 	top: -1px;
     width: 3em;
-    background: #2DC3E8;
+    background: #126def;
     color: #fff;
-    border-color: #2DC3E8;
+    border-color: #126def;
     border-radius: 0;
     text-align: center;
 }
@@ -118,7 +134,7 @@ li.cpf-paginator-total-count>span:HOVER {
 }
 /* 标签页模块 */
 .navbar .navbar-inner{
-	background-color: #197FC6;
+	background-color: #0c173e;
 }
 li.main-tab-title{
 	position: relative;
@@ -129,21 +145,19 @@ li.main-tab-title>a{
 .main-tab-title>span{
     position: absolute;
     top: 9px;
-    right: 3px;
+    right: 16px;
     color: #000;
     z-index: 100;
-    font-size: 15px;
+    font-size: 10px;
     cursor: pointer;
     display: inline-block;
-    width: 15px;
-    height: 15px;
+    width: 10px;
+    height: 10px;
     text-align: center;
-    border-radius: 15px;
-    line-height: 15px;
+    line-height: 10px;
 }
 .main-tab-title>span:HOVER{
-	background-color: #e92525;
-	color: #fff;
+	font-weight: 700;
 }
 .main-tab-content{
 	overflow-y: auto;
@@ -275,7 +289,7 @@ label.form-control-title {
     right: 1em;
     text-align: center;
     vertical-align: middle;
-    line-height: 45px;
+    line-height: 50px;
     font-size: 1.1em;
 }
 .cmd-right a{
@@ -357,3 +371,14 @@ nav{
     height: 50px;
 }
 
+/* 样式重写 zkf*/
+.datacenter-logo {
+	padding-left: 20px;
+    font-size: 20px;
+    color: #ffffff;
+    text-decoration: none;
+}
+.datacenter-logo:hover {
+	text-decoration: none;
+	color:#ffffff;
+}
