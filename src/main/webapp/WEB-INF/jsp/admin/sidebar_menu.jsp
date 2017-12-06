@@ -3,7 +3,6 @@
 	<a href="#" class="menu-dropdown">
 	    <i class="menu-icon fa fa-bookmark"></i>
 	    <span class="menu-text">Demo</span>
-	    <i class="menu-expand"></i>
 	</a>
 	<ul class="submenu">
 	   	<li>
@@ -20,11 +19,11 @@
 	   		<a class="tab" href="admin/search/list" target="search_list" title="列表">
 	   			<span class="menu-text">人口查询</span>
 	   		</a>
-	   	</li>
+	   	</li>   	
 		<li><a class="tab" href="admin/field/list" target="field_list"
 			title="字段列表"> <span class="menu-text">字段列表</span>
 		</a></li>
-		<li><a class="tab" href="admin/people/diclist"
+		<li><a class="tab" href="admin/peopleDictionary/list"
 			target="dictionary_list" title="字典列表"> <span class="menu-text">字典列表</span>
 		</a></li>
 	</ul>
@@ -32,7 +31,7 @@
 <li>
 	<a href="#" class="menu-dropdown">
 		<i class="menu-icon fa fa-bookmark"></i>
-		<span>ABC人口</span>
+		<span class="menu-text"">ABC人口</span>
 		<i></i>
 	</a>
 	<ul class="submenu">
@@ -47,7 +46,7 @@
 <li>
 	<a href="#" class="menu-dropdown">
 		<i class="menu-icon fa fa-bookmark"></i>
-		<span>地址管理</span>
+		<span class="menu-text"">地址管理</span>
 		<i></i>
 	</a>
 	<ul class="submenu">
