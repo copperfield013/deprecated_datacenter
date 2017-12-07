@@ -2,7 +2,8 @@
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <style>
 	#address-list {
-		padding-right: 20px;
+		padding: 0 20px;
+		position: relative;
 	}
 	#address-list a.opera {
 		color: #126def;
@@ -15,6 +16,9 @@
 	}
 	#address-list a:hover {
 		color: #4b90f3;
+	}
+	#address-list a.operation-btn:hover {
+		color: #ffffff;
 	}
 	#address-list a:active {
 		color: #0f5acf;
@@ -95,58 +99,85 @@
 		</table>
 		<div class="cpf-paginator" pageNo="${pageInfo.pageNo }" pageSize="${pageInfo.pageSize }" count="${pageInfo.count }"></div>
 	</div>
-<script type="text/x-jquery-tmpl" id="address-detail">
-	<div style="z-index:999">
-		<div class="page-header">
-			<div class="header-title">
-				<h1>地址详情</h1>
-			</div>
+	
+<script type="text/x-jquery-tmpl" class="address-detail">
+	<div class="pane-card">
+		<span class="pane-close">×</span>
+		<h1 class="pane-title">地址详情</h1>
+		<div class="pane-item">
+			<span class="pane-item-label">地址名称</span>
+			<span class="pane-item-colon">:</span>
+			<span class="pane-item-text">\${addressStr }</span>
 		</div>
-		<div class="page-body">
-			<div class="row">
-				<label class="col-lg-2">地址名称</label>
-				<div class="col-lg-6">\${addressStr }</div>
-			</div>
-			<div class="row">
-				<label class="col-lg-2">行政区域</label>
-				<div class="col-lg-6">\${position }</div>
-			</div>
-			<div class="row">
-				<label class="col-lg-2">地点名/楼栋名</label>
-				<div class="col-lg-6">\${keyPoint }</div>
-			</div>
-			<div class="row">
-				<label class="col-lg-2">后址</label>
-				<div class="col-lg-6">\${laterPart }</div>
-			</div>
-			<div class="row">
-				<label class="col-lg-2">系统分词</label>
-				<div class="col-lg-6">\${splitName }</div>
-			</div>
-			<div class="row">
-				<label class="col-lg-2">人工分词</label>
-				<div class="col-lg-6">\${artificialSplitName }</div>
-			</div>
+		<div class="pane-item">
+			<span class="pane-item-label">行政区域</span>
+			<span class="pane-item-colon">:</span>
+			<span class="pane-item-text">\${position }</span>
+		</div>
+		<div class="pane-item">
+			<span class="pane-item-label">地点名/楼栋名</span>
+			<span class="pane-item-colon">:</span>
+			<span class="pane-item-text">\${keyPoint }</span>
+		</div>
+		<div class="pane-item">
+			<span class="pane-item-label">后址</span>
+			<span class="pane-item-colon">:</span>
+			<span class="pane-item-text">\${laterPart }</span>
+		</div>
+		<div class="pane-item">
+			<span class="pane-item-label">系统分词</span>
+			<span class="pane-item-colon">:</span>
+			<span class="pane-item-text">\${splitName }</span>
+		</div>
+		<div class="pane-item">
+			<span class="pane-item-label">人工分词</span>
+			<span class="pane-item-colon">:</span>
+			<span class="pane-item-text">\${artificialSplitName }</span>
 		</div>
 	</div>
 </script>
 </div>
 <script>
 	seajs.use(['ajax','utils'], function(Ajax,Utils){
-		var $page = $('#address-list');
+		var $page = $('#address-list');		
+		
 		
 		$(".address_detail_hover").click(function(){
 			var addressName = $(this).closest('tr[data-name]').attr('data-name');
-			console.log(addressName);
 			var $this = $(this);
 			var page = $(this).getLocatePage();
-			console.log(page);
 			Ajax.ajax("admin/address/detail", {
 				addressStr : addressName
 			},function(data){
-				console.log("succsess data:" + data);
-				$("#address-detail").tmpl(data).appendTo($this.closest('td'));
+				var trHeight = $this.closest('tr').height();
+				var pageOffset = $page.offset();
+				var trOffset = $this.closest('tr').offset();
+				var trPosition = $this.closest('tr').position();
+				var thisOffset = $this.offset();
+				var THISELE = $(".address-detail").tmpl(data).appendTo($this.closest('#address-list'));
+				var ELEHEIGHT = THISELE.outerHeight();
+				var docHeight= $('body').height();
+				var top;
+				
+				if( docHeight - thisOffset.top >= ELEHEIGHT || trPosition.top < ELEHEIGHT ){
+					top = trOffset.top - pageOffset.top + trHeight -5;
+					$('.pane-card').addClass('bottom');
+				}else {
+					top = trOffset.top - pageOffset.top - ELEHEIGHT + 5 ;
+					$('.pane-card').addClass('top');
+				}
+				THISELE.css({
+					top: top ,
+					left: thisOffset.left - pageOffset.left + 20
+				});
 			});
 		});
+		
+		$page.on('click','.pane-close',function(){
+			$(this).closest('.pane-card').remove();
+		})
+		$page.on('click',function(){
+			$('.pane-card').remove();
+		})
 	});
 </script>
