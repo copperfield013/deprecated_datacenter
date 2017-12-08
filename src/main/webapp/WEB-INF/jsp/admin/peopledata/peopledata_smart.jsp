@@ -43,7 +43,7 @@
                     <input type="hidden" name="peopleCode"
                            value="${peopleMap["peopleCode"]}">
                     <div class="zitem-group zclear" data-group="basic">
-                        <c:forEach items="${dic }" var="item" varStatus="i">
+                        <c:forEach items="${dic}" var="item" varStatus="i">
                             <c:set var="keys" value="${item.cCnEnglish}"></c:set>
                         <c:choose>
                         <c:when test="${item.type <3}">
