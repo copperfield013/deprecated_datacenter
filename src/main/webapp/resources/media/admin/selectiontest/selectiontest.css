@@ -42,7 +42,6 @@ input::-ms-reveal {
 }
 .selection-container {
     width:350px;
-    position: relative;
     zoom: 1;
     display: inline-block;
     user-select: none;
