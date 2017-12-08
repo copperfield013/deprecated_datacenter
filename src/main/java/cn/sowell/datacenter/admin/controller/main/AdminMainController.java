@@ -9,7 +9,7 @@ import cn.sowell.datacenter.admin.controller.AdminConstants;
 
 @Controller
 @RequestMapping("/admin")
-public class AdminMainController {
+public class  AdminMainController {
 	
 	
 	@RequestMapping("/login")

@@ -162,6 +162,8 @@ public class AdminBasePeopleController {
 		return AdminConstants.JSP_BASEPEOPLE + "/item_list.jsp";
 	}
 
+
+	@Deprecated
 	@ResponseBody
 	@RequestMapping("/do_smart_update")
 	public AjaxPageResponse doUpdate(@RequestParam Map<String,String> map){

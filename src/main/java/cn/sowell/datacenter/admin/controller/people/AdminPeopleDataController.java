@@ -449,6 +449,15 @@ public class AdminPeopleDataController {
     }
 
 
+    /***
+     *
+     * @param criteria
+     * @param pageInfo
+     * @param model
+     * @return
+     * 字段模版展示页
+     */
+
     @RequestMapping("/model")
     public String model(ExcelModelCriteria criteria, PageInfo pageInfo, Model model) {
         List<ExcelModel> list = buttService.queryModel(criteria, pageInfo, "1");
@@ -457,5 +466,33 @@ public class AdminPeopleDataController {
         model.addAttribute("criteria", criteria);
         return AdminConstants.JSP_PEOPLEDATA + "/peopledata_model.jsp";
     }
+
+
+    @RequestMapping("/modelAdd/{modelId}")
+    public String modelAdd(@PathVariable Long modelId, Model model){
+        ExcelModel excelModel = buttService.getExcelModel(modelId);
+        List<TBasePeopleDictionaryEntity> list = new ArrayList<TBasePeopleDictionaryEntity>();
+        List<TBasePeopleInformationEntity> infoList = buttService.getDicInfo();
+        if(modelId !=0){
+            list = buttService.getDicByModelId(modelId);
+        }
+        model.addAttribute("id", modelId);
+        model.addAttribute("model", excelModel);
+        model.addAttribute("list", list);
+        model.addAttribute("infolist", infoList);
+        return AdminConstants.JSP_PEOPLEDATA + "/peopledata_model_add.jsp";
+    }
+
+
+    @RequestMapping("/modelDetail/{modelId}")
+    public String modelDetail(@PathVariable Long modelId, Model model){
+        ExcelModel excelModel = buttService.getExcelModel(modelId);
+        List<TBasePeopleDictionaryEntity> list = buttService.getDicByModelId(modelId);
+        model.addAttribute("id", modelId);
+        model.addAttribute("model", excelModel);
+        model.addAttribute("list", list);
+        return AdminConstants.JSP_PEOPLEDATA + "/peopledata_model_detail.jsp";
+    }
+
 
 }
