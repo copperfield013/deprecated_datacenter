@@ -353,3 +353,10 @@ div.margin-left-20 {
     display: table-cell;
     vertical-align: middle;
 }
+input.basic-input {
+	background-color: #ffffff;
+	border: 1px solid #d9d9d9;
+	padding-left: 1em;
+	color: #656565;
+	border-radius: 2px;
+}
