@@ -43,7 +43,7 @@ define(function(require, exports, module){
 		};
 		var param = $.extend({}, defaultParam, _param);
 		var _this = this,
-			formData, 
+			formData = new FormData($(param.$content).find('form')[0]), 
 			url;
 		var pageType = 'innerPage';
 		
