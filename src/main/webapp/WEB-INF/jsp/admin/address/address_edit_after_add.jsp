@@ -166,7 +166,8 @@
 	        width: "180px",
 	    });
 		
-		$('.address-add-level').on('click',function(){
+		//增加一级  依次修改之后的name属性
+		$('#address-edit-after-add-form').on('click','.address-add-level',function(){
 			
 			var THISITEM = $(this).closest('.address-participle-item');	
 			var SELECTED = THISITEM.find('select').attr("data-value");				  //选中项
@@ -235,7 +236,38 @@
 				})
 		})
 		
-		$("#address-edit-after-add-submit-btn", $page).on("click", function(){
+		//去除当前行 依次修改之后的name属性
+		$('#address-edit-after-add-form').on('click','.address-remove-level',function(){
+			var NEXTELELIST = $(this).closest('.address-participle-item').nextAll();
+			
+			for(var i = 0; i<NEXTELELIST.length;i++){   //顺次修改之后的select的name属性
+				var SELECTNAME = $(NEXTELELIST[i]).find('select').attr("name");
+				var wordName = $(NEXTELELIST[i]).find('input.content').attr("name");
+				var endName = $(NEXTELELIST[i]).find('input.address-participle-end').attr("name");
+				var hiddenName = $(NEXTELELIST[i]).find('input[type=hidden]').attr("name");
+				
+				var INDEX = parseFloat(SELECTNAME.substr(9,1)) - 1;
+				var SELECTLENGTH = SELECTNAME.length;
+				var wordLength = wordName.length;
+				var endLength = endName.length;
+				var hiddenLength = hiddenName.length;
+				
+				SELECTNAME = SELECTNAME.substr(0,9) + INDEX + SELECTNAME.substring(10,SELECTLENGTH);
+				wordName = wordName.substr(0,9) + INDEX + wordName.substring(10,wordLength);
+				endName = endName.substr(0,9) + INDEX + endName.substring(10,endLength);
+				hiddenName = hiddenName.substr(0,9) + INDEX + hiddenName.substring(10,hiddenLength);
+				
+				$(NEXTELELIST[i]).find('select').attr("name",SELECTNAME);
+				$(NEXTELELIST[i]).find('input.content').attr("name",wordName);
+				$(NEXTELELIST[i]).find('input.address-participle-end').attr("name",endName);
+				$(NEXTELELIST[i]).find('input[type=hidden]').attr("name",hiddenName);
+			}
+			
+			$(this).closest('.address-participle-item').remove();
+			
+		})
+		
+		$(".address-button-submit", $page).on("click", function(){
 			var list = '${list }';
 			//var length = ${fn:length(list)};
 			var addressStr = '${splitedAddressEntity.name}';
