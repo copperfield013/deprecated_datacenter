@@ -72,6 +72,31 @@ public class AddressDaoImpl implements AddressDao {
 		return query.list();*/
 		return new ArrayList<SplitedAddressEntity>();
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<SplitedAddressEntity> getNotTheSameAddressList(String addressStr, String addressCode, PageInfo pageInfo) {
+		String hql = "from SplitedAddressEntity @mainWhere";
+		Session session = sessionFactory.getCurrentSession();
+		DeferedParamQuery dQuery = new DeferedParamQuery(hql);
+		DeferedParamSnippet mainWhere = dQuery.createConditionSnippet("mainWhere");
+		if(addressStr != null && !addressStr.equals("")) {
+			mainWhere.append(" and name like :name");
+			dQuery.setParam("name", "%" + addressStr + "%");
+		}
+		if(addressCode != null && !addressCode.equals("")) {
+			mainWhere.append(" and code <> :code");
+			dQuery.setParam("code", addressCode);
+		}
+		Query countQuery = dQuery.createQuery(session, false, new WrapForCountFunction());
+		pageInfo.setCount(FormatUtils.toInteger(countQuery.uniqueResult()));
+		if(pageInfo.getCount() > 0) {
+			Query query = dQuery.createQuery(session, false, null);
+			QueryUtils.setPagingParamWithCriteria(query, pageInfo);
+			return query.list();
+		}
+		return new ArrayList<SplitedAddressEntity>();
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override

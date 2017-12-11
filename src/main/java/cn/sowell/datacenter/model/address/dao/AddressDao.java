@@ -15,6 +15,8 @@ public interface AddressDao {
 	
 	List<SplitedAddressEntity> getTheSameAddress(String addressCode, PageInfo pageInfo);
 	
+	List<SplitedAddressEntity> getNotTheSameAddressList(String addressStr, String addressCode, PageInfo pageInfo);
+	
 	List<AddressCode> getAddressCodeList();
 	
 	void delete(SplitedAddressEntity splitedAddressEntity);

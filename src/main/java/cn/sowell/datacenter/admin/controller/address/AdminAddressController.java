@@ -19,6 +19,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -35,6 +36,7 @@ import com.abc.position.constant.PositionLevel;
 import com.alibaba.fastjson.JSONObject;
 
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
+import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.JsonResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
@@ -217,12 +219,14 @@ public class AdminAddressController {
 		addressStr = new String(addressStr.getBytes("ISO-8859-1"),  "UTF-8");
 		SplitedAddressEntity sAddressEntity = addressService.queryEntity(addressStr);
 		List<SplitedAddressEntity> list = addressEntityService.findTheSameAddress(sAddressEntity.getCode(), theSamePageInfo);
-		List<SplitedAddressEntity> addressList = addressEntityService.queryAddressStrList(null, addressPageInfo);
+		List<SplitedAddressEntity> addressList = addressEntityService.queryNotTheSameAddressList(null, sAddressEntity.getCode(), addressPageInfo);
 		model.addAttribute("addressEntity", sAddressEntity);
 		model.addAttribute("sameList", list);
 		model.addAttribute("addressList", addressList);
 		model.addAttribute("theSamePageInfo", theSamePageInfo);
 		model.addAttribute("addressPageInfo", addressPageInfo);
+		model.addAttribute("addressName", sAddressEntity.getName());
+		model.addAttribute("addressCode", sAddressEntity.getCode());
 		return AdminConstants.JSP_ADDRESS + "/address_same_list.jsp";
 	}
 	
@@ -234,10 +238,12 @@ public class AdminAddressController {
 	 * @return
 	 */
 	@RequestMapping("/getAddressList")
-	public String getAddressEntityList(@RequestParam(required=false, defaultValue="") String addressStr, PageInfo addressPageInfo, Model model) {
-		List<SplitedAddressEntity> addressList = addressEntityService.queryAddressStrList(addressStr, addressPageInfo);
+	public String getAddressEntityList(@RequestParam(required=false, defaultValue="") String addressStr, @RequestParam String addressCode, PageInfo addressPageInfo, Model model) {
+		List<SplitedAddressEntity> addressList = addressEntityService.queryNotTheSameAddressList(addressStr, addressCode, addressPageInfo);
+		model.addAttribute("addressStr", addressStr);
 		model.addAttribute("addressList", addressList);
 		model.addAttribute("addressPageInfo", addressPageInfo);
+		model.addAttribute("addressCode", addressCode);
 		return AdminConstants.JSP_ADDRESS + "/address_same_list_right.jsp";
 	}
 	
@@ -249,10 +255,11 @@ public class AdminAddressController {
 	 * @return
 	 */
 	@RequestMapping("/sameList")
-	public String getSameAddressEntityList(@RequestParam String addressCode, PageInfo theSamePageInfo, Model model) {
+	public String getSameAddressEntityList(@RequestParam String addressName, @RequestParam String addressCode, PageInfo theSamePageInfo, Model model) {
 		List<SplitedAddressEntity> list = addressEntityService.findTheSameAddress(addressCode, theSamePageInfo);
 		model.addAttribute("sameList", list);
 		model.addAttribute("theSamePageInfo", theSamePageInfo);
+		model.addAttribute("addressName", addressName);
 		return AdminConstants.JSP_ADDRESS + "/address_same_list_left.jsp";
 	}
 	
@@ -265,18 +272,38 @@ public class AdminAddressController {
 	 */
 	@ResponseBody
 	@RequestMapping("/remove")
-	public AjaxPageResponse removeCategory(@RequestParam String addressStr, Model model) throws UnsupportedEncodingException {
-		addressStr = new String(addressStr.getBytes("ISO-8859-1"),  "UTF-8");
+	public JsonResponse removeCategory(@RequestParam String addressStr, Model model) throws UnsupportedEncodingException {
+		JsonResponse jres = new JsonResponse();
+		//addressStr = new String(addressStr.getBytes("ISO-8859-1"),  "UTF-8");
 		SplitedAddressEntity splitedAddressEntity = addressService.queryEntity(addressStr);
 		splitedAddressEntity.createCode();
 		//splitedAddressEntity.setCode(null);
 		try {
 			addressService.saveOrUpdate(splitedAddressEntity);
-			return AjaxPageResponse.REFRESH_LOCAL("操作成功！");
+			jres.put("result", "success");
 		}catch (Exception e) {
 			logger.error("操作失败！", e);
-			return AjaxPageResponse.FAILD("操作失败！");
+			jres.put("result", "failed");
 		}
+		return jres;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/batchRemove")
+	public JsonResponse batchRemoveCategory(@RequestBody JsonRequest jreq) {
+		JsonResponse jres = new JsonResponse();
+		try {
+			for(int i = 0; i < jreq.getJsonObject().getJSONArray("addressNames").size(); i++) {
+				SplitedAddressEntity splitedAddressEntity = addressService.queryEntity(jreq.getJsonObject().getJSONArray("addressNames").get(i).toString());
+				splitedAddressEntity.createCode();
+				addressService.saveOrUpdate(splitedAddressEntity);
+			}
+			jres.put("result", "success");
+		}catch (Exception e) {
+			logger.error("操作失败！", e);
+			jres.put("result", "failed");
+		}
+		return jres;
 	}
 	
 	/**
@@ -313,17 +340,37 @@ public class AdminAddressController {
 		}
 	}
 	
-	
+	@ResponseBody
 	@RequestMapping("/updateAddressEntityCategory")
-	public String updateAddressEntityCategory(@RequestParam String addressCode, @RequestParam String addressName) {
+	public JsonResponse updateAddressEntityCategory(@RequestParam String addressCode, @RequestParam String addressName) {
+		JsonResponse jres = new JsonResponse();
 		SplitedAddressEntity splitedAddressEntity = addressService.queryEntity(addressName);
 		splitedAddressEntity.setCode(addressCode);
 		try {
 			addressService.saveOrUpdate(splitedAddressEntity);
+			jres.put("result", "success");
 		}catch (Exception e) {
-			logger.error("删除失败！", e);
+			logger.error("更新失败！", e);
+			jres.put("result", "failed");
 		}
-		return "";
+		return jres;
+	}
+	@ResponseBody
+	@RequestMapping("/batchUpdateAddressEntityCategory")
+	public JsonResponse batchUpdateAddressEntityCategory(@RequestBody JsonRequest jreq) {
+		JsonResponse jres = new JsonResponse();
+		try {
+			for(int i = 0; i < jreq.getJsonObject().getJSONArray("addressNames").size(); i++) {
+				SplitedAddressEntity splitedAddressEntity = addressService.queryEntity(jreq.getJsonObject().getJSONArray("addressNames").get(i).toString());
+				splitedAddressEntity.setCode(jreq.getJsonObject().getString("addressCode"));
+				addressService.saveOrUpdate(splitedAddressEntity);
+			}
+			jres.put("result", "success");
+		}catch (Exception e) {
+			logger.error("更新失败！", e);
+			jres.put("result", "failed");
+		}
+		return jres;
 	}
 	
 	@RequestMapping("/import")

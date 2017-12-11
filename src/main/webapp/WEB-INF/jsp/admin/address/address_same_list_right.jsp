@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <div id="address-same-list-right">
 	<form action="admin/address/getAddressList"  class="form-inline">
-		<input type="hidden" id="curAddressCode" name="curAddressCode" value="${addressEntity.code }"/>
+		<input type="hidden" id="curAddressCode" name="addressCode" value="${addressCode }"/>
 		<nav>
 			<div class="form-group">
 				<label for="addressStr">地址名称</label>
@@ -15,15 +15,18 @@
 			<table class="table">
 				<thead>
 					<tr>
+						<th><input type="checkbox" id="select-all-address-ids" style="left:	0; opacity: 1; margin-top: -17px;"/></th>
 						<th>序号</th>
 						<th>地址名称</th>
-						<th>操作</th>
+						<th><a href="#" id="move-to-the-same">移至相同</a></th>
+						<!-- <th>操作</th> -->
 					</tr>
 				</thead>
 				<tbody>
 					<c:forEach items="${addressList }" var="address" varStatus="i">
 						<tr data-name="${address.name }">
-							<td>${i.index + 1 }</td>
+							<td><input type="checkbox" name="address-id-checkbox" style="left:	0; opacity: 1;"/></td>
+							<td>${i.index + 1 }</td> 	
 							<td><a class="address_detail_hover" href="#">${address.name }</a></td>
 							<td>
 								<a class="address_add_category" href="#">选择</a>
@@ -37,19 +40,8 @@
 	</form>
 </div>
 <script>
-	seajs.use(['Dialog', 'ajax', 'utils'], function(Dialog, Ajax, Utils){
+	seajs.use(['dialog', 'ajax', 'page', 'utils'], function(Dialog, Ajax, Page, Utils){
 		var $page = $('#address-same-list-right');
-		
-		/* $("#address-search-btn", $page).click(function(){
-			var addressStr = $("#addressStr").val();
-			var pageInfo = '${addressPageInfo}';
-			Ajax.ajax("admin/address/getAddressList",{
-				addressStr	:	addressStr,
-				pageInfo	:	pageInfo
-			},{
-				//TODO ajax的回调函数，提交后的处理方法
-			})
-		}); */
 		
 		$(".address_add_category", $page).click(function(){
 			var curAddressCode = $("#curAddressCode").val();
@@ -59,11 +51,65 @@
 					Ajax.ajax("admin/address/updateAddressEntityCategory", {
 						addressCode	:	curAddressCode,
 						addressName	:	addressName
-					}, {
-						//TODO 回调  请求提交后页面的处理方法
+					}, function(json){
+						if(json.result == 'success'){
+							console.log("success!");
+							Dialog.notice("操作成功！", 'success');
+							Page.getPage("address-same-list").refresh();
+						}else{
+							console.log("failed");
+							Dialog.notice("操作失败！", 'error');
+						}
 					});
 				}
 			});
+		});
+		
+		/**
+			全选和反选
+		**/
+		$("#select-all-address-ids", $page).click(function(){
+			if($(this).is(':checked')){
+				$("input[name='address-id-checkbox']", $page).each(function(){
+					 $(this).prop("checked",true);
+					 //console.log("all checked");
+				});
+			}else{
+				$("input[name='address-id-checkbox']", $page).each(function(){
+					$(this).removeAttr("checked",false);
+					 //console.log("remove all checked");
+				});
+			}
+		});
+		
+		$("#move-to-the-same", $page).click(function(){
+			var length = $("input[name='address-id-checkbox']:checked", $page).length;
+			var addressNames = [];
+			$("input[name='address-id-checkbox']:checked", $page).each(function(){
+				addressNames.push($(this).closest('tr[data-name]').attr('data-name'));
+			});
+			if(length > 0){
+				Dialog.confirm("确定添加到相同地址？", function(yes){
+					if(yes){
+						Ajax.postJson("admin/address/batchUpdateAddressEntityCategory", {
+							addressCode	:	$("#curAddressCode").val(),
+							addressNames	:	addressNames
+						}, function(json){
+							if(json.result == 'success'){
+								console.log("success!");
+								Dialog.notice("操作成功！", 'success');
+								Page.getPage("address-same-list").refresh();
+								Page.getPage("address-all-list").refresh();
+							}else{
+								console.log("failed");
+								Dialog.notice("操作失败！", 'error');
+							}
+						});
+					}
+				});
+			}else{
+				Dialog.notice("至少选择一条记录！", "warning");
+			}
 		});
 	});
 </script>

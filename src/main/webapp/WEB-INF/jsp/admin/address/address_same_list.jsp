@@ -6,10 +6,10 @@
 			<h1>相同地址</h1>
 		</div>
 	</div>
-	<div id="address-same-list" class="cpf-inner-page" inner-page-id="address-same-list" style="width:48%;float:left;">
+	<div id="address-same-list" class="cpf-inner-page" inner-page-id="address-same-list" url="admin/address/sameList?addressCode=${addressCode }" style="width:47%;float:left;">
 		<jsp:include page="address_same_list_left.jsp"></jsp:include>
 	</div>
-	<div id="address-all-list" class="cpf-inner-page" inner-page-id="address-all-list" style="width:48%;float:right;">
+	<div id="address-all-list" class="cpf-inner-page" inner-page-id="address-all-list" url="admin/address/getAddressList?addressCode=${addressCode }" style="width:47%;float:right;">
 		<jsp:include page="address_same_list_right.jsp"></jsp:include>
 	</div>
 </div>

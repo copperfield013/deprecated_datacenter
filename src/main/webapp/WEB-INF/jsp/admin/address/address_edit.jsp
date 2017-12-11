@@ -74,7 +74,7 @@
 			$(".content").each(function(){
 				artificialSplitName += $(this).val();
 			});
-			if(addressStr == artificialSplitName){
+			if(addressStr.trim() == artificialSplitName.trim()){
 				$("#address-edit-form").submit();
 			}else{
 				Dialog.notice("修改后的分词与地址不符！", "warning");

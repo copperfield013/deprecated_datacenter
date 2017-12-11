@@ -32,6 +32,12 @@ public class AddressEntityServiceImpl implements AddressEntityService {
 	public List<SplitedAddressEntity> findTheSameAddress(String addressCode, PageInfo pageInfo) {
 		return addressDao.getTheSameAddress(addressCode, pageInfo);
 	}
+	
+	@Override
+	public List<SplitedAddressEntity> queryNotTheSameAddressList(String addressStr, String addressCode, PageInfo pageInfo) {
+		return addressDao.getNotTheSameAddressList(addressStr, addressCode, pageInfo);
+	}
+
 
 	@Override
 	public List<AddressCode> getAddressCodeList() {
@@ -44,5 +50,4 @@ public class AddressEntityServiceImpl implements AddressEntityService {
 		splitedAddressEntity.setName(addressStr);
 		addressDao.delete(splitedAddressEntity);
 	}
-
 }
