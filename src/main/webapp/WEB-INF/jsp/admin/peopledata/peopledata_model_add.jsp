@@ -413,7 +413,6 @@ position:initial;
 				<input type="text" class="form-control" name="modelName" value='${model.modelName}'/>
 			</div>
 			<div style="padding:2px">
-
 				<input type="hidden"   class="form-control" name="type" value='1'/>
 			</div>
 			<div class="form-group" style="padding:2px">

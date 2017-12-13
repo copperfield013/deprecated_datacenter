@@ -408,6 +408,7 @@ position:initial;
 		
 		<form id="cloneForm_${id}" class="form-inline" action="admin/peopledata/do_outputAdd" >
 			<input id='modelId' type='hidden' name='id' value='${model.id}' />
+			<input id="model-type" type="hidden" name="type" value="${modelType }" />
 			<div style="padding:2px">
 				<label for="search">填模板名</label> 
 				<input type="text" class="form-control" name="modelName" value='${model.modelName}'/>
