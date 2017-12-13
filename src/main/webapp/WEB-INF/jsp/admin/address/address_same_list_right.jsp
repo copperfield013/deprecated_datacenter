@@ -1,36 +1,52 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
+<style>
+	#address-same-list-right  {
+		border: 1px solid #d9d9d9;
+		padding: 9px 20px 40px 20px;
+	}
+	#address-same-list-right .search-wrap .search-input {
+		width: 300px;
+	}
+	#address-same-list-right .address-subtitle {
+		margin:19px 0 10px 0;
+		font-size: 14px;
+		color: #126def;
+	}
+</style>
 <div id="address-same-list-right">
-	<form action="admin/address/getAddressList"  class="form-inline">
+	<form action="admin/address/getAddressList"  class="form-inline" id="address-same-list-right-search">
 		<input type="hidden" id="curAddressCode" name="addressCode" value="${addressCode }"/>
-		<nav>
-			<div class="form-group">
-				<label for="addressStr">地址名称</label>
-				<input type="text" class="form-control" id="addressStr" name="addressStr" value="${addressStr }" />
+		<div class="operation-search">
+			<label class="search-label" for="addressStr">地址名称</label>
+			<span class="colon">:</span>
+			<div class="search-wrap">
+				<input type="text" class="search-input" id="addressStr" name="addressStr" value="${addressStr }" />
+				<span id="address-search-btn" class="search-button">查询</span>
 			</div>
-			<button type="submit" id="address-search-btn" class="btn btn-default">查询</button>
-		</nav>
-		<div class="row list-area">
-			<h4>相同地址列表</h4>
+		</div>
+		<!-- <button type="submit" id="address-search-btn" class="btn btn-default">查询</button> -->
+		<div class=" list-area">
+			<h4 class="address-subtitle">全部地址列表</h4>
 			<table class="table">
 				<thead>
 					<tr>
-						<th><input type="checkbox" id="select-all-address-ids" style="left:	0; opacity: 1; margin-top: -17px;"/></th>
+						<th><input type="checkbox" id="select-all-address-ids"/><span class="zcheckbox all-choose"></span></th>
 						<th>序号</th>
-						<th>地址名称</th>
-						<th><a href="#" id="move-to-the-same">移至相同</a></th>
+						<th class="td-tleft">地址名称</th>
+						<!-- <th></th> -->
 						<!-- <th>操作</th> -->
 					</tr>
 				</thead>
 				<tbody>
 					<c:forEach items="${addressList }" var="address" varStatus="i">
 						<tr data-name="${address.name }">
-							<td><input type="checkbox" name="address-id-checkbox" style="left:	0; opacity: 1;"/></td>
+							<td><input type="checkbox" name="address-id-checkbox"/><span class="zcheckbox"></span></td>
 							<td>${i.index + 1 }</td> 	
-							<td><a class="address_detail_hover" href="#">${address.name }</a></td>
-							<td>
+							<td class="td-tleft"><a class="address_detail_hover" href="#">${address.name }</a></td>
+							<!-- <td>
 								<a class="address_add_category" href="#">选择</a>
-							</td>
+							</td> -->
 						</tr>
 					</c:forEach>
 				</tbody>
@@ -81,35 +97,9 @@
 				});
 			}
 		});
+		$("#address-search-btn",$page).click(function(){
+			$('#address-same-list-right-search').submit();
+		})
 		
-		$("#move-to-the-same", $page).click(function(){
-			var length = $("input[name='address-id-checkbox']:checked", $page).length;
-			var addressNames = [];
-			$("input[name='address-id-checkbox']:checked", $page).each(function(){
-				addressNames.push($(this).closest('tr[data-name]').attr('data-name'));
-			});
-			if(length > 0){
-				Dialog.confirm("确定添加到相同地址？", function(yes){
-					if(yes){
-						Ajax.postJson("admin/address/batchUpdateAddressEntityCategory", {
-							addressCode	:	$("#curAddressCode").val(),
-							addressNames	:	addressNames
-						}, function(json){
-							if(json.result == 'success'){
-								console.log("success!");
-								Dialog.notice("操作成功！", 'success');
-								Page.getPage("address-same-list").refresh();
-								Page.getPage("address-all-list").refresh();
-							}else{
-								console.log("failed");
-								Dialog.notice("操作失败！", 'error');
-							}
-						});
-					}
-				});
-			}else{
-				Dialog.notice("至少选择一条记录！", "warning");
-			}
-		});
 	});
 </script>

@@ -44,7 +44,7 @@
 			<div class="operation-search">
 				<label class="search-label" for="addressStr">地址名称</label>
 				<span class="colon">:</span>
-				<div class="search-warp">
+				<div class="search-wrap">
 					<input type="text" class="search-input" name="addressStr" value="${addressStr }" placeholder="请输入地址"/>
 					<span class="search-button">查询</span>
 				</div>
