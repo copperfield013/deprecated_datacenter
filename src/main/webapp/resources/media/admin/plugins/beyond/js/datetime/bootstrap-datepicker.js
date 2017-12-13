@@ -103,7 +103,6 @@
 			}
 			var that = this;
 			$(document).on('mousedown', function(ev){
-				$('input').blur();
 				if ($(ev.target).closest('.datepicker').length == 0) {
 					that.hide();
 				}
