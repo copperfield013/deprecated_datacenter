@@ -1,6 +1,5 @@
 package cn.sowell.datacenter.model.basepeople.service.impl;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -20,8 +19,6 @@ import org.apache.poi.hssf.usermodel.HSSFDataValidationHelper;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
@@ -29,17 +26,28 @@ import org.apache.poi.ss.usermodel.CellValue;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.DataValidationConstraint;
 import org.apache.poi.ss.usermodel.DataValidationHelper;
-import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
-import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.abc.application.ApplicationInfo;
+import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.copframe.utils.FormatUtils;
+import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.copframe.utils.excel.CellTypeUtils;
+import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
+import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
+import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
+import cn.sowell.datacenter.model.peopledata.service.PojoService;
+import cn.sowell.datacenter.model.peopledata.service.impl.EntityTransfer;
+import cn.sowell.datacenter.model.peopledata.service.impl.PropertyParser;
+import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
+
+import com.abc.application.FusitionContext;
+import com.abc.application.RemovedFusitionContext;
 import com.abc.dto.ErrorInfomation;
 import com.abc.mapping.entity.Entity;
 import com.abc.panel.Discoverer;
@@ -49,31 +57,19 @@ import com.abc.query.criteria.Criteria;
 import com.abc.query.entity.impl.EntitySortedPagedQuery;
 import com.abc.record.HistoryTracker;
 
-import cn.sowell.copframe.common.property.PropertyPlaceholder;
-import cn.sowell.copframe.dto.page.PageInfo;
-import cn.sowell.copframe.utils.FormatUtils;
-import cn.sowell.copframe.utils.TextUtils;
-import cn.sowell.copframe.utils.excel.CellTypeUtils;
-import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
-import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
-import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
-import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
-import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
-import cn.sowell.datacenter.model.peopledata.service.PojoService;
-import cn.sowell.datacenter.model.peopledata.service.impl.EntityTransfer;
-import cn.sowell.datacenter.model.peopledata.service.impl.PropertyParser;
-import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
-
 @Service
 public class ABCExecuteServiceImpl implements ABCExecuteService{
 
-	private static final String IMPORT_NODE_NAME = "baseinfoImport";
-	private static final String BASE_NODE_NAME = "baseinfoImport";
+	//private static final String IMPORT_NODE_NAME = "baseinfoImport";
+	//private static final String BASE_NODE_NAME = "baseinfoImport";
 	private Logger logger = Logger.getLogger(ABCExecuteService.class);
 	
 	private DateFormat defaultDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
 	
 	EntityTransfer eTransfer = new EntityTransfer();
+	
+	@Resource
+	FusitionContextFactoryDC fFactory;
 	
 	@Resource
 	PojoService pojoService;
@@ -108,7 +104,8 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public List<Entity> queryPeopleList(List<Criteria> criterias, PageInfo pageInfo){
-		Discoverer discoverer=PanelFactory.getDiscoverer(BASE_NODE_NAME);
+		FusitionContext context = fFactory.getContext(FusitionContextFactoryDC.KEY_BASE);
+		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		
 		EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(criterias, "编辑时间");
 		sortedPagedQuery.setPageSize(pageInfo.getPageSize());
@@ -119,13 +116,14 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public List<Entity> queryPeopleList(Function<String, List<Criteria>> handler, PageInfo pageInfo){
-		return queryPeopleList(handler.apply(BASE_NODE_NAME), pageInfo);
+		return queryPeopleList(handler.apply(fFactory.getConfig(FusitionContextFactoryDC.KEY_BASE).getMappingName()), pageInfo);
 	}
 	
 	
 	@Override
 	public Entity getPeople(String peopleCode) {
-		Discoverer discoverer = PanelFactory.getDiscoverer(BASE_NODE_NAME);
+		FusitionContext context = fFactory.getContext(FusitionContextFactoryDC.KEY_BASE);
+		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		Entity result=discoverer.discover(peopleCode);
 		return result;
 	}
@@ -153,26 +151,24 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	public void importPeople(Sheet sheet, ImportStatus importStatus, String dataType) throws ImportBreakException{
 		Row headerRow = sheet.getRow(1);
 		String writeMapperName = dataTypeMap.get(dataType);
+		FusitionContext context = fFactory.getContext(FusitionContextFactoryDC.KEY_IMPORT);
 		if(writeMapperName != null){
-			execute(sheet, headerRow, IMPORT_NODE_NAME, writeMapperName, importStatus);
+			execute(sheet, headerRow, null, context, importStatus);
 		}
 		else{
-			executeByModel(sheet, headerRow, IMPORT_NODE_NAME, writeMapperName, importStatus);
+			executeByModel(sheet, headerRow, importStatus);
 		}
 	}
 	
 	private NumberFormat numberFormat = new DecimalFormat("0.000");
 	
 	
-	protected void execute(Sheet sheet, Row headerRow, String mapperName, String writeMapperName, ImportStatus importStatus) throws ImportBreakException {
+	protected void execute(Sheet sheet, Row headerRow, String mapperName, FusitionContext context, ImportStatus importStatus) throws ImportBreakException {
 		importStatus.appendMessage("正在计算总行数");
 		importStatus.setTotal(colculateRowCount(sheet));
 		int rownum = 2;
 		importStatus.appendMessage("开始导入");
 		Integration integration=PanelFactory.getIntegration();
-		ApplicationInfo appInfo=new ApplicationInfo();
-		appInfo.setWriteMappingName(writeMapperName);
-		appInfo.setSource(ApplicationInfo.SOURCE_COMMON);
 		while(true){
 			if(importStatus.breaked()){
 				throw new ImportBreakException();
@@ -185,7 +181,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 			importStatus.startItemTimer().appendMessage("导入第" + importStatus.getCurrent() + "条数据");
 			try {
 				Entity entity = createImportEntity(mapperName, headerRow, row);
-				integration.integrate(entity, appInfo);
+				integration.integrate(entity, context);
 				importStatus.endItemTimer().appendMessage("第" + importStatus.getCurrent() + "条数据导入完成，用时" + numberFormat.format(importStatus.lastInterval()));
 			} catch (Exception e) {
 				logger.error("导入第" + rownum + "行时发生异常", e);
@@ -196,7 +192,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		importStatus.setEnded();
 	}
 	
-	protected void executeByModel(Sheet sheet, Row headerRow, String mapperName, String writeMapperName, ImportStatus importStatus) throws ImportBreakException {
+	protected void executeByModel(Sheet sheet, Row headerRow, ImportStatus importStatus) throws ImportBreakException {
 		importStatus.appendMessage("正在计算总行数");
 		importStatus.setTotal(colculateRowCount(sheet)-1);
 		int rownum = 3;
@@ -260,7 +256,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public void deletePeople(String peopleCode) {
-		ApplicationInfo appInfo=new ApplicationInfo(peopleCode, null, "list-delete" );
+		RemovedFusitionContext appInfo=new RemovedFusitionContext(peopleCode, null, "list-delete" );
 		if(!PanelFactory.getIntegration().remove(appInfo)){
 			throw new RuntimeException("删除失败");
 		}
@@ -268,11 +264,13 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public Entity getHistoryPeople(String peopleCode, Date date, List<ErrorInfomation> errors) {
-		Discoverer discoverer=PanelFactory.getDiscoverer(BASE_NODE_NAME);
+		FusitionContext context = fFactory.getContext(FusitionContextFactoryDC.KEY_BASE);
+		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		
 		HistoryTracker tracker = discoverer.track(peopleCode, date);
-		if(errors != null){
-			errors.addAll(tracker.getErrorInfomations());
+		List<ErrorInfomation> errorInfomations = tracker.getErrorInfomations();
+		if(errors != null && errorInfomations != null && !errorInfomations.isEmpty()){
+			errors.addAll(errorInfomations);
 		}
 		return tracker.getEntity();
 	}
@@ -306,14 +304,12 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public Entity savePeople(PeopleData people) {
-		Entity entity = new Entity(BASE_NODE_NAME);
+		FusitionContext context = fFactory.getContext(FusitionContextFactoryDC.KEY_BASE);
+		Entity entity = new Entity(fFactory.getConfig(FusitionContextFactoryDC.KEY_BASE).getMappingName());
 		eTransfer.bind(people, entity);
 		
-		ApplicationInfo appInfo=new ApplicationInfo();
-		appInfo.setWriteMappingName(BASE_NODE_NAME);
-		appInfo.setSource(ApplicationInfo.SOURCE_COMMON);
 		Integration integration=PanelFactory.getIntegration();
-		integration.integrate(entity, appInfo);
+		integration.integrate(entity, context);
 		return entity;
 	}
 	

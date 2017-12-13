@@ -50,6 +50,12 @@ public class TestABCExecuteService {
 	}
 	
 	
+	@Test
+	public void testRemove(){
+		abcService.deletePeople("574921909f1c4fff9a1c7b6e13ede71f");
+	}
+	
+	
 	
 	
 	

@@ -26,6 +26,25 @@
 	
 	<import resource="spring-security.xml"/>
 	
+	<bean id="baseNodeContextConfig" class="cn.sowell.datacenter.model.basepeople.service.impl.FusitionContextConfig"  >
+		<property name="mappingName" value="baseinfoImport" />
+		<property name="dictionaryMappingName" value="yjsq_people" />
+	</bean>
+	
+	<bean id="importNodeContextConfig" class="cn.sowell.datacenter.model.basepeople.service.impl.FusitionContextConfig"  >
+		<property name="mappingName" value="baseinfoImport" />
+		<property name="dictionaryMappingName" value="yjsq_people" />
+	</bean>
+	
+	<bean class="cn.sowell.datacenter.model.basepeople.service.impl.FusitionContextFactoryDC">
+		<property name="configMap">
+			<map>
+				<entry key="base" value-ref="baseNodeContextConfig" />
+				<entry key="import" value-ref="importNodeContextConfig" />
+			</map>
+		</property>
+	</bean>
+	
 	<mvc:interceptors>
 		<!-- 用于在请求中设置一些常用的变量 -->
 		<bean class="cn.sowell.datacenter.common.interceptor.CommonRequestAttributeSetInterceptor" />
