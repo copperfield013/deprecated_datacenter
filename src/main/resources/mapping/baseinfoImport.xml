@@ -88,7 +88,6 @@
 		<attribute name="workSubject" alias="工作主题" abcattr="分管工作" />
 	</multiattribute>
 
-
 	<!-- 计生信息 -->
 	<attribute name="childrenCount" alias="子女数" abcattr="子女数"
 		datatype="INT" />
@@ -98,8 +97,6 @@
 	<attribute name="familyPlanningCode" alias="计划生育证编号" abcattr="计划生育证编号" />
 	<attribute name="familyPlanningType" alias="计划生育证类型" abcattr="计划生育证类型" />
 
-
-
 	<relation name="医疗信息">
 		<label subdomain="家庭医生" />
 		<ABC name="familydoctor" abcattr="人口信息">
@@ -107,10 +104,7 @@
 			<attribute name="身份证号码" alias="证件号码" abcattr="证件号码" />
 		</ABC>
 	</relation>
-
-
-
-
+	
 	<relation name="家庭关系">
 		<label subdomain="夫妻,子女,父母" />
 		<ABC name="familyMember" abcattr="人口信息">
