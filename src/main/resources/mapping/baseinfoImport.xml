@@ -15,7 +15,7 @@
 	<attribute name="formerName" alias="曾用名" abcattr="曾用名" />
 
 	<attribute name="householdPlace" alias="户籍地址" abcattr="户籍地址" />
-	<attribute name="编辑时间" alias="编辑时间" abcattr="此人更新时间" />
+	<attribute name="编辑时间" alias="编辑时间" abcattr="更新时间" />
 	<!-- <attribute name="householdPlace" alias="户籍地址" abcattr="地址" attrsubtype="101002" 
 		/> <attribute name="国籍" alias="国籍" abcattr="国籍" /> -->
 

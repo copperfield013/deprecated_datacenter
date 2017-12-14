@@ -34,11 +34,14 @@ import org.apache.poi.ss.util.CellRangeAddressList;
 import org.springframework.stereotype.Service;
 
 import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.excel.CellTypeUtils;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
+import cn.sowell.datacenter.model.basepeople.dao.PropertyDictionaryDao;
 import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
+import cn.sowell.datacenter.model.basepeople.pojo.PeoplePropertyDictionary;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.service.PojoService;
@@ -74,6 +77,8 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	@Resource
 	PojoService pojoService;
 	
+	@Resource
+	PropertyDictionaryDao dictionartDao;
 	
 	/*@Override
 	public Entity createEntity(Map<String, String> data) {
@@ -133,6 +138,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		try {
 			importPeople(sheet, new ImportStatus(), dataType);
 		} catch (ImportBreakException e) {
+			logger.error("导入失败", e);
 		}
 	}
 	
@@ -201,6 +207,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		int rownum = 3;
 		
 		importStatus.appendMessage("开始导入");
+		Map<String, PeoplePropertyDictionary> headerPropertyMap = getHeaderPropertyNameMap(sheet, headerRow);
 		while(true){
 			if(importStatus.breaked()){
 				throw new ImportBreakException();
@@ -216,9 +223,12 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 			int length = headerRow.getPhysicalNumberOfCells();
 			try{
 				for(int i = 0; i < length; i++){
-					String key = getStringWithBlank(headerRow.getCell(i));
+					String header = getStringWithBlank(headerRow.getCell(i));
 					String value = getStringWithBlank(row.getCell(i));
-					parser.put(key,value);
+					PeoplePropertyDictionary property = headerPropertyMap.get(header);
+					if(property != null){
+						parser.put(property.getPropertyName(),value);
+					}
 				}
 			}catch(Exception e){
 				logger.error("模板发生异常", e);
@@ -234,6 +244,13 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		}
 		importStatus.appendMessage("导入完成");
 		importStatus.setEnded();
+	}
+	
+	private Map<String, PeoplePropertyDictionary> getHeaderPropertyNameMap(Sheet sheet,
+			Row headerRow) {
+		List<PeoplePropertyDictionary> list = dictionartDao.queryAllPropertyDictionary(null);
+		Map<String, PeoplePropertyDictionary> map = CollectionUtils.toMap(list, item->item.getCname());
+		return map;
 	}
 
 	private Integer colculateRowCount(Sheet sheet) {

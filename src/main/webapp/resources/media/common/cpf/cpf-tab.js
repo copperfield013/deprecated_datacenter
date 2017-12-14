@@ -11,7 +11,8 @@ define(function(require, exports, module){
 	;
 	//id-tab的map
 	var tabMap = {},
-		nextTab = 1
+		nextTab = 1,
+		activatedTabQueue = []
 		;
 	/**
 	 * 设置参数

@@ -28,7 +28,7 @@
 	
 	<bean id="baseNodeContextConfig" class="cn.sowell.datacenter.model.basepeople.service.impl.FusionContextConfig"  >
 		<property name="mappingName" value="baseinfoImport" />
-		<property name="dictionaryMappingName" value="yjsq_people" />
+		<property name="dictionaryMappingName" value="default_dm" />
 	</bean>
 	
 	<bean id="importBaseNodeContextConfig" class="cn.sowell.datacenter.model.basepeople.service.impl.FusionContextConfig"  >

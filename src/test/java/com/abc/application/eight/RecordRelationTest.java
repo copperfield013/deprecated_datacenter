@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.abc.application.FusitionContext;
+import com.abc.application.FusionContext;
 import com.abc.mapping.entity.Entity;
 import com.abc.mapping.entity.SimpleEntity;
 import com.abc.panel.Discoverer;
@@ -31,9 +31,9 @@ public class RecordRelationTest {
 	public void readData() {
 //		Session session = sessionFactory.getCurrentSession();
 		long startTime = System.currentTimeMillis();
-		FusitionContext context=new FusitionContext();
+		FusionContext context=new FusionContext();
 		context.setMappingName(writeMappingName);
-		context.setSource(FusitionContext.SOURCE_COMMON);
+		context.setSource(FusionContext.SOURCE_COMMON);
 		context.setDictionaryMappingName(dictionaryMappingName);
 		Integration integration=PanelFactory.getIntegration();
 		Entity entity=createEntity(mapperName);
