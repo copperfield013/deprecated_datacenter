@@ -16,14 +16,15 @@
 		<div class="row">
 			<div class="col-lg-12">
 				<form class="bv-form form-horizontal validate-form" action="admin/special_position/doEdit">
-					<div class="form-group">
+					<input type="hidden" name="id" value="${specialPosition.id }"/>
+					<%-- <div class="form-group">
 						<div>
 							<label class="col-lg-1 control-label" for="id">编码</label>
 							<div class="col-lg-4">
 								<input type="text" name="id" class="form-control" value="${specialPosition.id }" readonly="readonly"/>
 							</div>
 						</div>
-					</div>
+					</div> --%>
 					<div class="form-group">
 						<div>
 							<label class="col-lg-1 control-label" for="name">名称</label>

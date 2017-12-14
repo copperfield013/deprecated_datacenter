@@ -8,10 +8,10 @@
 	</div>
 
 	<div class="page-body">
-		<div class="row">
+		<%-- <div class="row">
 			<label class="col-lg-2">编码</label>
 			<div class="col-lg-4">${position.code }</div>
-		</div>
+		</div> --%>
 		<div class="row">
 			<label class="col-lg-2">名称</label>
 			<div class="col-lg-4">${position.name }</div>

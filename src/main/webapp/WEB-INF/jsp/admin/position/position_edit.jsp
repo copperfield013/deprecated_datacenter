@@ -16,14 +16,14 @@
 		<div class="row">
 			<div class="col-lg-12">
 				<form class="bv-form form-horizontal validate-form" action="admin/position/doEdit">
-					<div class="form-group">
+					<%-- <div class="form-group">
 						<div>
 							<label class="col-lg-1 control-label" for="name">编码</label>
 							<div class="col-lg-4">
 							<input type="text" name="code" class="form-control" value="${position.code }" readonly="readonly"/>
 							</div>
 						</div>
-					</div>
+					</div> --%>
 					<div class="form-group">
 						<div>
 							<label class="col-lg-1 control-label" for="name">名称</label>
@@ -48,6 +48,18 @@
 							</div>
 						</div>
 					</div> --%>
+					<div class="form-group">
+						<div>
+							<label class="col-lg-1 control-label" for="level">级别</label>
+							<div class="col-lg-4">
+								<select id="level" name="level" data-value="${position.level }">
+									<c:forEach items="${levelNameMap }" var="levelName">
+										<option value="${levelName.key }">${levelName.value }</option>
+									</c:forEach>
+								</select>
+							</div>
+						</div>
+					</div>
 				
 					<div class="form-group">
 			        	<div class="col-lg-offset-3 col-lg-3">

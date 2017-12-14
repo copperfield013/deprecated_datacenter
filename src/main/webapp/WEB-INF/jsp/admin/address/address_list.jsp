@@ -51,8 +51,8 @@
 			</div>
 			
 			<div class="margin-left-20">
-				<a class="operation-btn" href="admin/address/add" title="添加地址" target="address_add" >添加</a>
-				<a class="operation-btn" href="admin/address/import" title="导入地址" target="address_import" >导入</a>
+				<a class="operation-btn tab" href="admin/address/add" title="添加地址" target="address_add" >添加</a>
+				<a class="operation-btn tab" href="admin/address/import" title="导入地址" target="address_import">导入</a>
 			</div>
 		</form>
 	</div>

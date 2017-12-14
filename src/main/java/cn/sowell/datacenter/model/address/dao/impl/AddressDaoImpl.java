@@ -31,7 +31,7 @@ public class AddressDaoImpl implements AddressDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<SplitedAddressEntity> getAddressStrList(String addressStr, PageInfo pageInfo) {
-		String hql = "from SplitedAddressEntity @mainWhere";
+		String hql = "from SplitedAddressEntity @mainWhere order by modifyTime desc";
 		Session session = sessionFactory.getCurrentSession();
 		DeferedParamQuery dQuery = new DeferedParamQuery(hql);
 		DeferedParamSnippet mainWhere = dQuery.createConditionSnippet("mainWhere");
@@ -76,7 +76,7 @@ public class AddressDaoImpl implements AddressDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<SplitedAddressEntity> getNotTheSameAddressList(String addressStr, String addressCode, PageInfo pageInfo) {
-		String hql = "from SplitedAddressEntity @mainWhere";
+		String hql = "from SplitedAddressEntity @mainWhere order by modifyTime desc";
 		Session session = sessionFactory.getCurrentSession();
 		DeferedParamQuery dQuery = new DeferedParamQuery(hql);
 		DeferedParamSnippet mainWhere = dQuery.createConditionSnippet("mainWhere");

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.abc.extface.dto.Position;
+import com.abc.position.constant.PositionLevel;
 
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
@@ -45,7 +46,8 @@ public class AdminPositionController {
 	}
 	
 	@RequestMapping("/position_add")
-	public String add() {
+	public String add(Model model) {
+		model.addAttribute("levelNameMap", PositionLevel.LEVEL_NAME_MAP);
 		return AdminConstants.JSP_POSITION + "/position_add.jsp";
 	}
 	
@@ -65,6 +67,7 @@ public class AdminPositionController {
 	public String edit(@PathVariable Long id, Model model) {
 		Position position = positionService.getPosition(id);
 		model.addAttribute("position", position);
+		model.addAttribute("levelNameMap", PositionLevel.LEVEL_NAME_MAP);
 		return AdminConstants.JSP_POSITION + "/position_edit.jsp";
 	}
 	
