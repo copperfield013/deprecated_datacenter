@@ -266,7 +266,6 @@ div.margin-left-20 {
 .pagination>li {
 	display: inline-block;
 	vertical-align: middle;
-	margin-left: 10px;
 }
 .cpf-paginator-jump-text input {
 	text-align: center;

@@ -19,6 +19,8 @@
 	    font-size: 16px;
 	    border: 1px solid #126def;
 	    margin-bottom: 20px;
+	    cursor: pointer;
+	    
 	}
 	#move-to-the-same {
 		display: block;
@@ -29,6 +31,7 @@
 	    text-align: center;
 	    font-size: 16px;
 	    border: 1px solid #d9d9d9;
+	    cursor: pointer;
 	}
 </style>
 <div id="address-same-list-left">
