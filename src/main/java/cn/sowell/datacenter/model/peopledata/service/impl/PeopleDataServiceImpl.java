@@ -12,6 +12,7 @@ import javax.annotation.Resource;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import com.abc.application.FusionContext;
 import com.abc.dto.ErrorInfomation;
 import com.abc.mapping.entity.Entity;
 import com.abc.query.criteria.Criteria;
@@ -23,6 +24,7 @@ import cn.sowell.copframe.spring.binder.FieldRefectUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
+import cn.sowell.datacenter.model.basepeople.service.impl.FusionContextFactoryDC;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
@@ -38,6 +40,8 @@ public class PeopleDataServiceImpl implements PeopleDataService{
 	@Resource
 	PojoService pojoService;
 	
+	@Resource
+	FusionContextFactoryDC fFactory;
 	Logger logger = Logger.getLogger(PeopleDataServiceImpl.class);
 	
 	EntityTransfer eTransfer = new EntityTransfer();
@@ -48,22 +52,23 @@ public class PeopleDataServiceImpl implements PeopleDataService{
 	
 	@Override
 	public List<PeopleData> query(PeopleDataCriteria criteria, PageInfo pageInfo) {
+		FusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
 		List<Entity> list = abcService.queryPeopleList(mapperName->{
 			ArrayList<Criteria> cs = new ArrayList<Criteria>();
 			if(TextUtils.hasText(criteria.getName())){
-				LikeQueryCriteria like = CriteriaFactory.createLikeQueryCriteria(mapperName);
+				LikeQueryCriteria like = CriteriaFactory.createLikeQueryCriteria(context);
 				like.setName("name");
 				like.setValue(criteria.getName());
 				cs.add(like);
 			}
 			if(TextUtils.hasText(criteria.getAddress())){
-				LikeQueryCriteria like = CriteriaFactory.createLikeQueryCriteria(mapperName);
+				LikeQueryCriteria like = CriteriaFactory.createLikeQueryCriteria(context);
 				like.setName("address");
 				like.setValue(criteria.getAddress());
 				cs.add(like);
 			}
 			if(TextUtils.hasText(criteria.getIdcode())){
-				LikeQueryCriteria like = CriteriaFactory.createLikeQueryCriteria(mapperName);
+				LikeQueryCriteria like = CriteriaFactory.createLikeQueryCriteria(context);
 				like.setName("idcode");
 				like.setValue(criteria.getIdcode());
 				cs.add(like);

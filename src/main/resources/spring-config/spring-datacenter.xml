@@ -26,21 +26,39 @@
 	
 	<import resource="spring-security.xml"/>
 	
-	<bean id="baseNodeContextConfig" class="cn.sowell.datacenter.model.basepeople.service.impl.FusitionContextConfig"  >
+	<bean id="baseNodeContextConfig" class="cn.sowell.datacenter.model.basepeople.service.impl.FusionContextConfig"  >
 		<property name="mappingName" value="baseinfoImport" />
 		<property name="dictionaryMappingName" value="yjsq_people" />
 	</bean>
 	
-	<bean id="importNodeContextConfig" class="cn.sowell.datacenter.model.basepeople.service.impl.FusitionContextConfig"  >
-		<property name="mappingName" value="baseinfoImport" />
+	<bean id="importBaseNodeContextConfig" class="cn.sowell.datacenter.model.basepeople.service.impl.FusionContextConfig"  >
+		<property name="mappingName" value="importBase" />
 		<property name="dictionaryMappingName" value="yjsq_people" />
 	</bean>
 	
-	<bean class="cn.sowell.datacenter.model.basepeople.service.impl.FusitionContextFactoryDC">
+	<bean id="importHandicappedNodeContextConfig" class="cn.sowell.datacenter.model.basepeople.service.impl.FusionContextConfig"  >
+		<property name="mappingName" value="importHandicapped" />
+		<property name="dictionaryMappingName" value="yjsq_people" />
+	</bean>
+	
+	<bean id="importLowincomeNodeContextConfig" class="cn.sowell.datacenter.model.basepeople.service.impl.FusionContextConfig"  >
+		<property name="mappingName" value="importLowincome" />
+		<property name="dictionaryMappingName" value="yjsq_people" />
+	</bean>
+	
+	<bean id="importFamilyPlanningNodeContextConfig" class="cn.sowell.datacenter.model.basepeople.service.impl.FusionContextConfig"  >
+		<property name="mappingName" value="importFamilyPlanning" />
+		<property name="dictionaryMappingName" value="yjsq_people" />
+	</bean>
+	
+	<bean class="cn.sowell.datacenter.model.basepeople.service.impl.FusionContextFactoryDC">
 		<property name="configMap">
 			<map>
 				<entry key="base" value-ref="baseNodeContextConfig" />
-				<entry key="import" value-ref="importNodeContextConfig" />
+				<entry key="importBase" value-ref="importBaseNodeContextConfig" />
+				<entry key="importHandicapped" value-ref="importHandicappedNodeContextConfig" />
+				<entry key="importLowincome" value-ref="importLowincomeNodeContextConfig" />
+				<entry key="importFamilyPlanning" value-ref="importFamilyPlanningNodeContextConfig" />
 			</map>
 		</property>
 	</bean>

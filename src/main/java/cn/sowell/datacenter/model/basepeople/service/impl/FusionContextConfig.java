@@ -1,6 +1,6 @@
 package cn.sowell.datacenter.model.basepeople.service.impl;
 
-public class FusitionContextConfig {
+public class FusionContextConfig {
 	private String mappingName;
 	private String dictionaryMappingName;
 	public String getMappingName() {
