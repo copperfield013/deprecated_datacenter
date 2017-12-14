@@ -49,6 +49,7 @@ import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
 import cn.sowell.datacenter.model.basepeople.ExcelModelCriteria;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeopleItem;
 import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
+import cn.sowell.datacenter.model.basepeople.pojo.PeopleDataHistoryItem;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleInformationEntity;
 import cn.sowell.datacenter.model.basepeople.service.BasePeopleService;
@@ -250,14 +251,18 @@ public class AdminPeopleDataController {
 
 
     @RequestMapping("/detail/{peopleCode}")
-    public String detail(@PathVariable String peopleCode, String datetime, Model model){
+    public String detail(@PathVariable String peopleCode, String datetime, Long timestamp, Model model){
         Date date = null;
         date = dateFormat.parse(datetime);
+        if(timestamp != null){
+        	date = new Date(timestamp);
+        }
         PeopleData people = peopleService.getHistoryPeople(peopleCode, date);
         //PeopleData people = peopleService.getPeople(peopleCode);
         model.addAttribute("people", people);
         model.addAttribute("datetime", datetime);
         model.addAttribute("peopleCode", peopleCode);
+        model.addAttribute("date", date == null? new Date() : date);
         return AdminConstants.JSP_PEOPLEDATA + "/peopledata_detail.jsp";
     }
 
@@ -508,6 +513,26 @@ public class AdminPeopleDataController {
         model.addAttribute("model", excelModel);
         model.addAttribute("list", list);
         return AdminConstants.JSP_PEOPLEDATA + "/peopledata_model_detail.jsp";
+    }
+    
+    @ResponseBody
+    @RequestMapping("/paging_history/{peopleCode}")
+    public JsonResponse pagingHistory(@PathVariable String peopleCode, 
+    		@RequestParam Integer pageNo, 
+    		@RequestParam(defaultValue="100") Integer pageSize){
+    	JsonResponse response = new JsonResponse();
+    	try {
+			List<PeopleDataHistoryItem> historyItems = abcService.queryHistory(peopleCode, pageNo, pageSize);
+			response.put("history", JSON.toJSON(historyItems));
+			response.setStatus("suc");
+			if(historyItems.size() < pageSize){
+				response.put("isLast", true);
+			}
+		} catch (Exception e) {
+			logger.error("查询历史失败", e);
+		}
+    	
+    	return response;
     }
 
 

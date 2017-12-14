@@ -8,17 +8,17 @@ import java.util.function.Function;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import com.abc.dto.ErrorInfomation;
-import com.abc.mapping.entity.Entity;
-import com.abc.query.criteria.Criteria;
-
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
+import cn.sowell.datacenter.model.basepeople.pojo.PeopleDataHistoryItem;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
-import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
+
+import com.abc.dto.ErrorInfomation;
+import com.abc.mapping.entity.Entity;
+import com.abc.query.criteria.Criteria;
 
 public interface ABCExecuteService {
 	/**
@@ -80,6 +80,16 @@ public interface ABCExecuteService {
 	Entity savePeople(PeopleData people);
 
 	Workbook downloadPeople(List<Map<String, Object>> listmap, List<TBasePeopleDictionaryEntity> keys, List<String[]> columnLists, ExcelModel model, String path);
+
+	/**
+	 * 查询人口的历史信息
+	 * @param peopleCode
+	 * @param pageNo
+	 * @param pageSize
+	 * @return
+	 */
+	List<PeopleDataHistoryItem> queryHistory(String peopleCode, Integer pageNo,
+			Integer pageSize);
 
 	
 

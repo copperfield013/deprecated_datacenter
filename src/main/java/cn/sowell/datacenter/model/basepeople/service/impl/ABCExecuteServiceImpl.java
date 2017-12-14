@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +42,7 @@ import cn.sowell.copframe.utils.excel.CellTypeUtils;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
 import cn.sowell.datacenter.model.basepeople.dao.PropertyDictionaryDao;
 import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
+import cn.sowell.datacenter.model.basepeople.pojo.PeopleDataHistoryItem;
 import cn.sowell.datacenter.model.basepeople.pojo.PeoplePropertyDictionary;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
@@ -52,6 +54,7 @@ import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
 import com.abc.application.FusionContext;
 import com.abc.application.RemovedFusionContext;
 import com.abc.dto.ErrorInfomation;
+import com.abc.extface.dto.RecordHistory;
 import com.abc.mapping.entity.Entity;
 import com.abc.panel.Discoverer;
 import com.abc.panel.Integration;
@@ -59,6 +62,7 @@ import com.abc.panel.PanelFactory;
 import com.abc.query.criteria.Criteria;
 import com.abc.query.entity.impl.EntitySortedPagedQuery;
 import com.abc.record.HistoryTracker;
+
 
 @Service
 public class ABCExecuteServiceImpl implements ABCExecuteService{
@@ -443,5 +447,31 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		sheet.addValidationData(validation);
         return sheet;  
 	}
+	
+	
+	@Override
+	public List<PeopleDataHistoryItem> queryHistory(String peopleCode,
+			Integer pageNo, Integer pageSize) {
+		FusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
+		Discoverer discoverer=PanelFactory.getDiscoverer(context);
+		
+		List<RecordHistory> historyList = discoverer.trackHistory(peopleCode, pageNo, pageSize);
+		
+		List<PeopleDataHistoryItem> list = new ArrayList<PeopleDataHistoryItem>();
+		historyList.forEach(history->{
+			PeopleDataHistoryItem item = new PeopleDataHistoryItem();
+			item.setId(FormatUtils.toLong(history.getId()));
+			item.setTime(history.getCreationTime());
+			item.setUserName(toUserName(history.getUsergroupId()));
+			item.setDesc(history.getContent());
+			list.add(item);
+		});
+		return list;
+	}
+
+	private String toUserName(String usergroupId) {
+		return "户户户";
+	}
+	
 
 }

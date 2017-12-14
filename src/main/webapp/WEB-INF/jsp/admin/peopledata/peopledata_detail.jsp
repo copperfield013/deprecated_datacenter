@@ -1,8 +1,7 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
-<div class="detail" id="people-${peopleCode }">
 <style>
-	#people-${peopleCode } .toggle-history{
+	#people-${peopleCode } .history-container{
 	    position: absolute;
 	    right: 2em;
 	    display: inline-block;
@@ -23,7 +22,36 @@
 	    overflow-x: hidden;
 	    overflow-y: auto;
 	}
+	div#timeline-area {
+		display: none;
+	    position: absolute;
+	    right: 30px;
+	    top: 30px;
+	    z-index: 9999;
+	    bottom: 20px;
+	    width: 500px;
+	    background-color: #0c173e;
+	    border: 1px;
+	    border-style: dotted;
+	    overflow-x: hidden;
+	    overflow-y: auto;
+	    border-radius: 7px;
+	    padding: 10px;
+	}
+	.timeline-wrapper {
+	    position: absolute;
+	    left: 10px;
+	    right: -20px;
+	    bottom: 0;
+	    top: 0;
+	    overflow-y: scroll;
+	    padding-right: 10px;
+	}
+	.show-more-history{
+		color: #fff;
+	}
 </style>
+<div class="detail" id="people-${peopleCode }">
 	<div class="page-header">
 		<div class="header-title">
 			<h1>${people.name }-详情</h1>
@@ -31,16 +59,17 @@
 			    <h1 id="showErrors" class="fa fa-info-circle" style="cursor: pointer;color: #CD5C5C;"></h1>
 			</c:if>
 		</div>
-		<c:if test="${datetime == null}">
-			<div class="toggle-history">
-				<a href="#">查看历史</a>
-			</div>
-		</c:if>
-		<div class="header-buttons" style="${datetime == null?'display:none':''}">
-			<div>
-				<label>数据时间：</label>
-				<input class="form-control" css-width="200px" style="margin-top:3px;display: inline;margin-right: 1em;" type="text" id="datetime" placeholder="选择时间" value="${datetime }" />
-			</div>
+		<div class="history-container">
+			<%-- <c:if test="${datetime == null}">
+				<a href="#" class="toggle-history">查看历史</a>
+			</c:if>
+			<div class="history-datetime" style="${datetime == null?'display:none':''}">
+				<div>
+					<label>数据时间：</label>
+					<input class="form-control" css-width="200px" style="margin-top:3px;display: inline;margin-right: 1em;" type="text" id="datetime" placeholder="选择时间" value="${datetime }" />
+				</div>
+			</div> --%>
+			<a href="#" class="toggle-timeline">时间轴</a>
 		</div>
 	</div>
 	<div class="page-body">
@@ -302,19 +331,149 @@
 			</c:forEach>
 		</ul>
    </div>
+	<div id="timeline-area">
+		<div class="timeline-wrapper">
+			<div class="VivaTimeline">
+				<dl>
+					<dt><a href="#" class="show-more-history">查看更多</a></dt>
+				</dl>
+			</div>
+		</div>
+	</div>
 </div>
 <script>
-	seajs.use(['dialog'], function(Dialog){
+	seajs.use(['dialog', 'ajax', 'utils'], function(Dialog, Ajax, Utils){
 		var $page = $('#people-${peopleCode }');
 		var hasRecord = '${people != null}';
 		if(hasRecord != 'true'){
 			Dialog.notice('数据不存在', 'warning');
 			$('.header-title h1').text('数据不存在');
 		}
-		$('.toggle-history a', $page).click(function(){
+		$('a.toggle-history', $page).click(function(){
 			$(this).closest('.toggle-history').hide();
 			$('.header-buttons', $page).show();
 		});
+		var timelineInited = false;
+		$('a.toggle-timeline', $page).click(function(){
+			$('#timeline-area', $page).show();
+			if(!timelineInited){
+				$('.show-more-history', $page).trigger('click');
+			}
+		});
+		$page.click(function(e){
+			var $target = $(e.target);
+			if($target.closest('#timeline-area').length == 0
+				&& !$target.is('a.toggle-timeline')){
+				$('#timeline-area', $page).hide();
+			}
+			return false;
+		});
+		
+		//下一页
+		var curPageNo = 0;
+		$('.show-more-history', $page).click(function(){
+			var $this = $(this);
+			if(!$this.is('.disabled')){
+				$this.addClass('disabled').text('加载中');
+				Ajax.ajax('admin/peopledata/paging_history/${peopleCode}', {
+					pageNo	: curPageNo + 1
+				}, function(data){
+					if(data.status === 'suc'){
+						appendHistory(data.history);
+						curPageNo ++;
+						timelineInited = true;
+					}
+					if(data.isLast){
+						$this.text('没有更多了');					
+					}else{
+						$this.text('查看更多').removeClass('disabled');
+					}
+				});
+			}
+		});
+		$page.on('click', '.circ', function(){
+			var time = parseInt($(this).closest('dd').attr('data-time'));
+			$page.getLocatePage().loadContent('admin/peopledata/detail/${peopleCode}', null, {timestamp:time});
+			
+		});
+		console.log('1');
+		var theTime = parseInt('${date.time}');
+		function appendHistory(history){
+			if(history.length > 0){
+				var $dl = $('#timeline-area dl', $page);
+				
+				for(var i in history){
+					var item = history[i];
+					var $month = $('dt[data-month="' + item.monthKey + '"]', $dl);
+					if($month.length == 0){
+						var month = new Date(item.monthKey);
+						$month = $('<dt data-month="' + item.monthKey + '">').text(Utils.formatDate(month, 'yyyy年MM月'));
+						var inserted = false;
+						$('dt', $dl).each(function(){
+							var thisMonth = parseInt($(this).attr('data-month'));
+							if(thisMonth <= month){
+								$month.insertBefore(this);
+								inserted = true;
+								return false;
+							}
+						});
+						if(!inserted){
+							$('.show-more-history', $page).parent('dt').before($month);
+							//$dl.append($month);
+						}
+					}
+					$item = $(
+							'<dd class="pos-right clearfix">' +
+								'<div class="circ"></div>' + 
+								'<div class="time"></div>' +
+								'<div class="events">' + 
+			 						'<div class="events-header"></div>' + 
+									'<div class="events-body"></div>' + 
+								'</div>' +
+							'</dd>');
+					$item.find('.time').text(Utils.formatDate(new Date(item.timeKey), 'yyyy-MM-dd hh:mm:ss'));
+					$item.find('.events-header').text('操作人：' + item.userName);
+					$item.find('.events-body').text('详情');
+					$item.attr('data-id', item.id).attr('data-time', item.timeKey);
+					var inserted = false;
+					var $dds = $month.nextUntil('dt');
+					if($dds.length > 0){
+						$dds.each(function(){
+							var $this = $(this);
+							if($this.is('dd[data-time]')){
+								var thisTimeKey = parseInt($this.attr('data-time'));
+								if(thisTimeKey <= item.timeKey){
+									$item.insertBefore(this);
+									inserted = true;
+									return false;
+								}
+							}
+						});
+						if(!inserted){
+							$dds.last().after($item);
+						}
+					}else{
+						$month.after($item);
+					}
+				}
+				var $dd = $('dd', $dl);
+				var checked = false;
+				$dd.each(function(i){
+					var $this = $(this);
+					if(!checked){
+						var thisTime = parseInt($this.attr('data-time'));
+						if(theTime >= thisTime){
+							$this.addClass('current');
+							checked = true;
+						}
+					}
+					Utils.switchClass($this, 'pos-right', 'pos-left', i % 2 == 0);
+					
+				});
+				
+			}
+		}
+		
 		
 		$('#datetime', $page).datetimepicker({
 			language	: 'zh-CN',
