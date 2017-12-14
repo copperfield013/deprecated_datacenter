@@ -53,24 +53,19 @@ public class PeopleDataServiceImpl implements PeopleDataService{
 	@Override
 	public List<PeopleData> query(PeopleDataCriteria criteria, PageInfo pageInfo) {
 		FusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
+		CriteriaFactory criteriaFactory = new CriteriaFactory(context);
 		List<Entity> list = abcService.queryPeopleList(mapperName->{
 			ArrayList<Criteria> cs = new ArrayList<Criteria>();
 			if(TextUtils.hasText(criteria.getName())){
-				LikeQueryCriteria like = CriteriaFactory.createLikeQueryCriteria(context);
-				like.setName("name");
-				like.setValue(criteria.getName());
+				LikeQueryCriteria like = criteriaFactory.createLikeQueryCriteria("name", criteria.getName());
 				cs.add(like);
 			}
 			if(TextUtils.hasText(criteria.getAddress())){
-				LikeQueryCriteria like = CriteriaFactory.createLikeQueryCriteria(context);
-				like.setName("address");
-				like.setValue(criteria.getAddress());
+				LikeQueryCriteria like = criteriaFactory.createLikeQueryCriteria("address", criteria.getAddress());
 				cs.add(like);
 			}
 			if(TextUtils.hasText(criteria.getIdcode())){
-				LikeQueryCriteria like = CriteriaFactory.createLikeQueryCriteria(context);
-				like.setName("idcode");
-				like.setValue(criteria.getIdcode());
+				LikeQueryCriteria like = criteriaFactory.createLikeQueryCriteria("idcode", criteria.getIdcode());
 				cs.add(like);
 			}
 			return cs;

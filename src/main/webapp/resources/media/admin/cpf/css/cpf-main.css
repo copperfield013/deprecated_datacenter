@@ -93,6 +93,10 @@ div.tab-content>.tab-pane>h1{
 /* 分页模块 */
 .cpf-paginator{
 	text-align: right;
+	margin-top: 5px;
+}
+li.cpf-paginator-jump{
+	margin-right: 45px;
 }
 .cpf-paginator-jump>*{
     padding: 5px 10px;
@@ -102,7 +106,7 @@ div.tab-content>.tab-pane>h1{
     margin-left: 1em;
     border-width: 1px;
     border-color: #ccc;
-    width: 3em;
+    width: 5em;
 }
 .cpf-paginator-jump-button{
 	top: -1px;

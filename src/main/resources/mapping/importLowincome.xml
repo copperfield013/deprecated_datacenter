@@ -7,7 +7,7 @@
 	
 	<!-- 低保信息 -->
 	<attribute name="低保证号" alias="低保证号" abcattr="低保证号" />
-	<label name="低保人员类别" alias="低保人员类别" subdomain="低保人员,残保人员" />
+	<attribute name="低保人员类别" alias="低保人员类别" abcattr="低保人员类别" />
 	<attribute name="低保原因" alias="低保原因" abcattr="低保原因" />
 	<attribute name="享受低保标识" alias="享受低保标识" abcattr="享受低保标识" />
 	<attribute name="享受低保金额" alias="享受低保金额" abcattr="享受低保金额" datatype="FLOAT" />

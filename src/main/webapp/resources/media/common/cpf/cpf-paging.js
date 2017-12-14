@@ -180,7 +180,7 @@ define(function(require, exports, module){
 							.click(function(e){
 								e.stopImmediatePropagation();
 								//点击按钮时跳转页面
-								var pageNo = $(this).val();
+								var pageNo = $(this).prev('.cpf-paginator-jump-text').val();
 								pageInfo.pageNo = pageNo;
 								goPage($(this).getLocatePage(), pageNo, pageSizeSelect.val());
 								return false;
