@@ -36,21 +36,22 @@
         <h1 class="zpage-title">添加地址</h1>
         <div class="address-add-body">
             <form id="address-add-form" action="admin/address/doAdd" autocomplete="off">
-                <p class="address-add-label">请选择省市区</p>
+            	<input type="hidden" id="name"name="name"/>
+                <p class="address-add-label">请选择行政区域</p>
                 <select id="province" name="province">
-                                <option id="choosePro" value="-1">请选择您所在省份</option>
-                        </select>
+                	<option id="choosePro" value="-1">请选择您所在省份</option>
+                </select>
                 <select id="citys" name="city">
-                                <option id='chooseCity' value='-1'>请选择您所在城市</option>
-                            </select>
+                	<option id='chooseCity' value='-1'>请选择您所在城市</option>
+                </select>
                 <select id="county" name="county">
-                　　　　　　　   <option id='chooseCounty' value='-1'>请选择您所在区/县</option>
-                　　　　　　 </select>
+                	<option id='chooseCounty' value='-1'>请选择您所在区/县</option>
+                </select>
                 <select id="street" name="street">
-                                <option id='chooseStreet' value='-1'>请选择您所在街道</option>
-                        </select>
+                	<option id='chooseStreet' value='-1'>请选择您所在街道</option>
+                </select>
                 <p class="address-add-label">请填写详细地址</p>
-                <input type="text" class="address-add-input" name="name" />
+                <input type="text" class="address-add-input" id="detailed-address-name" name="detailed-address-name" />
                 <span class="submit-btn">提交</span>
             </form>
         </div>
@@ -63,6 +64,13 @@ $(function () {
 	var $page = $("#address-add");
 	
 	$('.submit-btn',$page).on("click",function(){
+		var name = '';
+		var province = $("#province", $page).find("option:selected").text();
+		var citys = $("#citys", $page).find("option:selected").text();
+		var county = $("#county", $page).find("option:selected").text();
+		var street = $("#street", $page).find("option:selected").text();
+		var detialedAddressName = $("#detailed-address-name", $page).val();
+		$("#name", $page).val(province + citys + county + street + detialedAddressName);
 		$('#address-add-form').submit();
 	})
     //街道数据对象
