@@ -312,7 +312,15 @@
                 //     close(e);
                 // });
             }
-
+            
+            //body绑定事件 关闭所有展开的selection
+            $("body").on('click',function(){
+            	var allSelect = $('.selection-container');
+                var allDrop = $('.selection-drop')
+                allSelect.removeClass('drop');
+                allDrop.removeClass('drop');          
+            })
+            
 
             // 单选选项点击
             var singleChose = function ($selection, $option, callBack) {
@@ -446,10 +454,8 @@
                 }
                 var allSelect = $('.selection-container');
                 var allDrop = $('.selection-drop')
-                for (var i = 0; i < allSelect.length; i++) {
-                    $(allSelect[i]).removeClass('drop');
-                    $(allDrop[i]).removeClass('drop');
-                }
+                allSelect.removeClass('drop');
+                allDrop.removeClass('drop');                
                 $selection.addClass('drop');
                 $drop.addClass('drop');
             }
