@@ -37,6 +37,37 @@
                     $drop.remove();
                 }
             }
+            
+            //隐藏
+            self.hidden = function() {
+            	var $selection,
+	                $select,
+	                soleId,
+	                $drop;
+	            for (var i = 0; i < self.length; i++) {
+	                $selection = $(self[i]).prev('.selection-container');
+	                $select = $selection.next('select');    //找到对应的select
+	                soleId = $selection.attr("soleId");
+	                $drop = $('.selection-drop[soleId=' + soleId + ']');
+	                
+	                $selection.css("display","none")
+	            }
+            }
+            //显示
+            self.show = function() {
+            	var $selection,
+	                $select,
+	                soleId,
+	                $drop;
+	            for (var i = 0; i < self.length; i++) {
+	                $selection = $(self[i]).prev('.selection-container');
+	                $select = $selection.next('select');    //找到对应的select
+	                soleId = $selection.attr("soleId");
+	                $drop = $('.selection-drop[soleId=' + soleId + ']');
+	                
+	                $selection.css("display","inline-block")	               
+	            }
+            }
 
             //重载(依据select重新加载选项,同时清空多选展示列表除标签,单选默认第一项)
             self.reload = function () {
