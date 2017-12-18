@@ -1,11 +1,12 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
+<style>
+	#position-add {
+		padding: 0 20px;
+	}
+</style>
 <div id="position-add">
-	<div class="page-header">
-		<div class="header-title">
-			<h1>添加地点</h1>
-		</div>
-	</div>
+	<h1 class="zpage-title">添加地点</h1>
 	<div class="page-body">
 		<div class="row">
 			<div class="col-lg-12">
