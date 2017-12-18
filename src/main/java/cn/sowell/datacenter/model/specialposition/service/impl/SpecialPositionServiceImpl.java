@@ -19,6 +19,7 @@ public class SpecialPositionServiceImpl implements SpecialPositionService {
 
 	@Resource
 	SpecialPositionDao specialPositionDao;
+	
 	@Override
 	public List<SpecialPosition> getSpecialPositionList(SpecialPositionCriteria specialPositionCriteria, PageInfo pageInfo) {
 		return specialPositionDao.getSpecialPositionList(specialPositionCriteria, pageInfo);

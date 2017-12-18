@@ -32,7 +32,7 @@ public class SpecialPositionDaoImpl implements SpecialPositionDao {
 	@Override
 	public List<SpecialPosition> getSpecialPositionList(SpecialPositionCriteria specialPositionCriteria, PageInfo pageInfo) {
 		Session session = sessionFactory.getCurrentSession();
-		String hql = "from SpecialPosition @mainWhere";
+		String hql = "from SpecialPosition @mainWhere order by modifyTime desc";
 		DeferedParamQuery dQuery = new DeferedParamQuery(hql);
 		DeferedParamSnippet mainWhere = dQuery.createConditionSnippet("mainWhere");
 		if(specialPositionCriteria.getSpecialPositionId() != null) {

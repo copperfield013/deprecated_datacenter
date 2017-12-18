@@ -32,7 +32,7 @@ public class PositionDaoImpl implements PositionDao {
 	@Override
 	public List<Position> getPositionList(PositionCriteria positionCriteria, PageInfo pageInfo) {
 		Session session = sessionFactory.getCurrentSession();
-		String hql = "from Position @mainWhere";
+		String hql = "from Position @mainWhere order by modifyTime desc";
 		DeferedParamQuery dQuery = new DeferedParamQuery(hql);
 		DeferedParamSnippet mainWhere = dQuery.createConditionSnippet("mainWhere");
 		if(positionCriteria.getCode() != null) {

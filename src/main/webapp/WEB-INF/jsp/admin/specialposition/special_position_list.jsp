@@ -28,16 +28,16 @@
 				</tr>
 			</thead>
 			<tbody>
-				<c:forEach items="${list }" var="specialPosition" varStatus="i">
+				<c:forEach items="${list }" var="specialPositionEntity" varStatus="i">
 					<tr>
 						<td>${i.index + 1 }</td>
-						<td><a class="tab" href="admin/special_position/special_position_detail/${specialPosition.id }" target="special_position_detail_${specialPosition.name }" title="详情-${specialPosition.name }" >${specialPosition.name }</a></td>
-						<td>${specialPosition.commonName }</td>
-						<td>${specialPosition.belongPosition }</td>
-						<td>${specialPosition.levelName }</td>	
+						<td><a class="tab" href="admin/special_position/special_position_detail/${specialPositionEntity.specialPosition.id }" target="special_position_detail_${specialPositionEntity.specialPosition.name }" title="详情-${specialPositionEntity.specialPosition.name }" >${specialPositionEntity.specialPosition.name }</a></td>
+						<td>${specialPositionEntity.specialPosition.commonName }</td>
+						<td>${specialPositionEntity.belongPositionName }</td>
+						<td>${specialPositionEntity.specialPosition.levelName }</td>	
 						<td>
-							<a class="tab" href="admin/special_position/special_position_edit/${specialPosition.id }" target="special_position_edit_${specialPosition.name }" title="修改-${specialPosition.name }">修改</a>
-							<a href="admin/special_position/special_position_delete/${specialPosition.id }" confirm="确认删除？">删除</a>
+							<a class="tab" href="admin/special_position/special_position_edit/${specialPositionEntity.specialPosition.id }" target="special_position_edit_${specialPositionEntity.specialPosition.name }" title="修改-${specialPositionEntity.specialPosition.name }">修改</a>
+							<a href="admin/special_position/special_position_delete/${specialPositionEntity.specialPosition.id }" confirm="确认删除？">删除</a>
 						</td>
 					</tr>
 				</c:forEach>

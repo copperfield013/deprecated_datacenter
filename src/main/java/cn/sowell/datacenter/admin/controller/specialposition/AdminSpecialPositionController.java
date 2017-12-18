@@ -1,5 +1,6 @@
 package cn.sowell.datacenter.admin.controller.specialposition;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.abc.address.service.AddressService;
+import com.abc.address.service.AddressServiceFactory;
 import com.abc.extface.dto.SpecialPosition;
 import com.abc.position.SpecialPositionIndex;
 import com.abc.position.constant.PositionLevel;
@@ -18,6 +21,7 @@ import com.abc.position.constant.PositionLevel;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.model.specialposition.pojo.SpecialPositionEntity;
 import cn.sowell.datacenter.model.specialposition.pojo.criteria.SpecialPositionCriteria;
 import cn.sowell.datacenter.model.specialposition.service.SpecialPositionService;
 
@@ -28,11 +32,22 @@ public class AdminSpecialPositionController {
 	SpecialPositionService specialPositionService;
 	
 	Logger logger = Logger.getLogger(AdminSpecialPositionController.class);
+	
+	private static AddressService addressService = AddressServiceFactory.getInstance();
 
 	@RequestMapping("/special_position_list")
 	public String list(SpecialPositionCriteria specialPositionCriteria, PageInfo pageInfo, Model model) {
 		List<SpecialPosition> list = specialPositionService.getSpecialPositionList(specialPositionCriteria, pageInfo);
-		model.addAttribute("list", list);
+		List<SpecialPositionEntity> specialPositionEntityList = new ArrayList<>();
+		if(list.size() > 0 ) {
+			list.forEach((specialPosition) ->{
+				SpecialPositionEntity specialPositionEntity = new SpecialPositionEntity();
+				specialPositionEntity.setSpecialPosition(specialPosition);
+				specialPositionEntity.setBelongPositionName(addressService.getPositionFullName(specialPosition.getBelongPosition()));
+				specialPositionEntityList.add(specialPositionEntity);
+			});
+		}
+		model.addAttribute("list", specialPositionEntityList);
 		model.addAttribute("criteria", specialPositionCriteria);
 		model.addAttribute("pageInfo", pageInfo);
 		return AdminConstants.JSP_SPECIAL_POSITION + "/special_position_list.jsp";
@@ -42,6 +57,7 @@ public class AdminSpecialPositionController {
 	public String detail(@PathVariable Long id, Model model) {
 		SpecialPosition specialPosition = specialPositionService.getSpecialPosition(id);
 		model.addAttribute("specialPosition", specialPosition);
+		model.addAttribute("belongPositionName", addressService.getPositionFullName(specialPosition.getBelongPosition()));
 		return AdminConstants.JSP_SPECIAL_POSITION + "/special_position_detail.jsp";
 	}
 	

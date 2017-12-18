@@ -22,7 +22,7 @@
 		</div>
 		<div class="row">
 			<label class="col-lg-2">所属行政区域</label>
-			<div class="col-lg-4">${specialPosition.belongPosition }</div>
+			<div class="col-lg-4">${belongPositionName }</div>
 		</div>
 		<div class="row">
 			<label class="col-lg-2">级别</label>
