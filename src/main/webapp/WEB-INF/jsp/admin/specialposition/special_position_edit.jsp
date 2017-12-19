@@ -29,7 +29,9 @@
 						<div>
 							<label class="col-lg-1 control-label" for="name">名称</label>
 							<div class="col-lg-4">
-								<input type="text" name="name" class="form-control" value="${specialPosition.name }"/>
+								<input type="text" name="name" class="form-control" value="${specialPosition.name }"
+									data-bv-notempty="true"
+									data-bv-notempty-message="名称不能为空"/>
 							</div>
 						</div>
 					</div>

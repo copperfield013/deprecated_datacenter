@@ -40,13 +40,13 @@
 <div id="address-list">
 	<h1 class="zpage-title">地址信息</h1>
 	<div class="operation-bar">
-		<form action="admin/address/list">
+		<form id="address-search-form" action="admin/address/list">
 			<div class="operation-search">
 				<label class="search-label" for="addressStr">地址名称</label>
 				<span class="colon">:</span>
 				<div class="search-wrap">
 					<input type="text" class="search-input" name="addressStr" value="${addressStr }" placeholder="请输入地址"/>
-					<span class="search-button">查询</span>
+					<span id="search-button" class="search-button">查询</span>
 				</div>
 			</div>
 			
@@ -141,6 +141,9 @@
 	seajs.use(['ajax','utils'], function(Ajax,Utils){
 		var $page = $('#address-list');		
 		
+		$("#search-button", $page).click(function(){
+			$("#address-search-form", $page).submit();
+		});
 		
 		$(".address_detail_hover").click(function(){
 			var addressName = $(this).closest('tr[data-name]').attr('data-name');

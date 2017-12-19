@@ -14,7 +14,9 @@
 					<div class="form-group">
 						<label class="col-lg-2 control-label" for="name">地址名称</label>
 						<div class="col-lg-5">
-							<input type="text" class="form-control" name="name" value="${addressStr }"/>
+							<input type="text" class="form-control" name="name" value="${addressStr }"
+								data-bv-notempty="true"
+								data-bv-notempty-message="名称不能为空"/>
 						</div>
 					</div>
 					<div class="form-group">

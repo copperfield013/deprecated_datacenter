@@ -80,7 +80,9 @@
 					</div> -->
 						<div class="margin-t15">
 							<span class="margin-r20 inline-middle label-w4 " for="name">名称</span>
-							<input type="text" name="name" class="basic-input small-input"/>
+							<input type="text" name="name" class="basic-input small-input" 
+								data-bv-notempty="true"
+								data-bv-notempty-message="名称不能为空"/>
 						</div>
 						
 						<div class="margin-t15">
