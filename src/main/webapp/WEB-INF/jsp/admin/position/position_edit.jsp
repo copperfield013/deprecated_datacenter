@@ -1,17 +1,22 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
-
+<style>
+	#position-edit {
+		padding: 0 20px;
+	}
+</style>
 <div id="position-edit">
-	<div class="page-header">
+<!-- 	<div class="page-header">
 		<div class="header-title">
 			<h1>修改地点信息</h1>
 		</div>
-	</div>
+	</div> -->
 
 
-	<div class="page-body" id="clone">
+	<!-- <div class="page-body" id="clone">
 		<div id="cloneInput"></div>
-	</div >
+	</div > -->
+	<h1 class="zpage-title">修改地点信息</h1>
 	<div class="page-body">
 		<div class="row">
 			<div class="col-lg-12">
@@ -26,8 +31,8 @@
 					</div> --%>
 					<div class="form-group">
 						<div>
-							<label class="col-lg-1 control-label" for="name">名称</label>
-							<div class="col-lg-4">
+							<label class="col-lg-2 control-label" for="name">名称</label>
+							<div class="col-lg-5">
 							<input type="text" name="name" class="form-control" value="${position.name }"
 								data-bv-notempty="true"
 								data-bv-notempty-message="名称不能为空"/>
@@ -36,8 +41,8 @@
 					</div>
 					<div class="form-group">
 						<div>
-							<label class="col-lg-1 control-label" for="name">别名</label>
-							<div class="col-lg-4">
+							<label class="col-lg-2 control-label" for="name">别名</label>
+							<div class="col-lg-5">
 							<input type="text" name="alias" class="form-control" value="${position.alias }"/>
 							</div>
 						</div>
@@ -52,8 +57,8 @@
 					</div> --%>
 					<div class="form-group">
 						<div>
-							<label class="col-lg-1 control-label" for="level">级别</label>
-							<div class="col-lg-4">
+							<label class="col-lg-2 control-label" for="level">级别</label>
+							<div class="col-lg-5">
 								<select id="level" name="level" data-value="${position.level }">
 									<c:forEach items="${levelNameMap }" var="levelName">
 										<option value="${levelName.key }">${levelName.value }</option>
