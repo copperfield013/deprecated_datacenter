@@ -181,6 +181,7 @@
                 }
                 return result;
             }
+            
 
             //  初始化分为单选和多选两种情况
             var render = function (options) {
@@ -495,16 +496,27 @@
             // }
 
             // 下拉框 点击展开收缩
-            var dropMenu = function (e) {
+            var dropMenu = function (e) {		            	
                 e.stopPropagation();
+                var windowHeight = $(window).height(); 
                 var selectionHeight = $(this).height();                               //selection不包含下拉框的高度
                 var selectHeight = $(this).parent('.selection-container').height();   //selection 整体高度
                 var position = checkPostion($(this));
-                // if (position === "top") {
-                //     $(this).parent('.selection-container').addClass('drop-top').find('.selection-drop').css({ 'bottom': selectHeight, 'top': "" });
-                // } else {
-                //     $(this).parent('.selection-container').removeClass('drop-top').find('.selection-drop').css({ 'top': selectionHeight, 'bottom': "" });
-                // }
+               /* var offset = $(this).parent('.selection-container').offset();
+                var bottomHeight = windowHeight - offset.top - selectionHeight;  //触发元素距离底部的距离
+                var	selectionLeft = offset.left;
+    			var selectionTop;
+    			if( bottomHeight > selectHeight ){
+    				selectionTop = offset.top + selectionHeight;	
+    				$(this).parent('.selection-container').removeClass('bottom');
+    			}else {
+    				pickerTop = offset.top - selectionHeight;
+    				$(this).parent('.selection-container').addClass('bottom');
+    			}
+    			this.picker.css({
+    				top: pickerTop,
+    				left: pickerLeft
+    			});*/
                 if ($(this).parent('.selection-container').hasClass('drop')) {
                     $(this).parent('.selection-container').removeClass('drop');
                     return;
