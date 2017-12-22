@@ -4,7 +4,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
 
+<link rel="stylesheet" type="text/css" href="media/common/plugins/iconfont/iconfont.css">
+
 <!--Basic Styles-->
+<!-- <link href="media/admin/plugins/typeahead/dist/examples.css" rel="stylesheet" /> -->
 <link href="media/admin/plugins/beyond/css/bootstrap.min.css" rel="stylesheet" />
 <link href="media/admin/plugins/beyond/css/font-awesome.min.css" rel="stylesheet" />
 
@@ -26,3 +29,4 @@
 <script src="${basePath }media/admin/plugins/timeline/jquery.eeyellow.Timeline.js"></script>
 <!-- SeaJS -->
 <script src="${basePath }media/sea-debug.js"></script>
+<script src="${basePath }media/admin/plugins/typeahead/dist/handlebars.js"></script>
