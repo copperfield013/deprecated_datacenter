@@ -140,8 +140,12 @@
 		$page.on('click','.pane-close',function(){
 			$(this).closest('.pane-card').remove();
 		})
-		$page.on('click',function(){
+		$page.on('click',function(e){
 			$('.pane-card').remove();
+		})
+		$page.on('click','.pane-card',function(e){
+			e.preventDefault();
+			e.stopPropagation();
 		})
 	});
 </script>
