@@ -1,26 +1,10 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
-<style>
-	#position-edit {
-		padding: 0 20px;
-	}
-</style>
-<div id="position-edit">
-<!-- 	<div class="page-header">
-		<div class="header-title">
-			<h1>修改地点信息</h1>
-		</div>
-	</div> -->
-
-
-	<!-- <div class="page-body" id="clone">
-		<div id="cloneInput"></div>
-	</div > -->
+<link href="media/admin/selectiontest/selectiontest.css" rel="stylesheet" type="text/css" />
+<script src="media/admin/selectiontest/selectiontest.js"></script>
+<div id="position-edit" class="zpage">
 	<h1 class="zpage-title">修改地点信息</h1>
-	<div class="page-body">
-		<div class="row">
-			<div class="col-lg-12">
-				<form class="bv-form form-horizontal validate-form" action="admin/position/doEdit">
+		<form class="bv-form  validate-form margin-t15" action="admin/position/doEdit">
 					<%-- <div class="form-group">
 						<div>
 							<label class="col-lg-1 control-label" for="name">编码</label>
@@ -29,23 +13,20 @@
 							</div>
 						</div>
 					</div> --%>
-					<div class="form-group">
-						<div>
-							<label class="col-lg-2 control-label" for="name">名称</label>
-							<div class="col-lg-5">
-							<input type="text" name="name" class="form-control" value="${position.name }"
+					<div class="zform-group">
+							<span class="zform-label" >名称</span>
+							<div class="form-group zform-item">
+							<input type="text" name="name" class="form-control basic-input item-input" value="${position.name }"
 								data-bv-notempty="true"
 								data-bv-notempty-message="名称不能为空"/>
 							</div>
-						</div>
 					</div>
-					<div class="form-group">
-						<div>
-							<label class="col-lg-2 control-label" for="name">别名</label>
-							<div class="col-lg-5">
-							<input type="text" name="alias" class="form-control" value="${position.alias }"/>
+
+					<div class="zform-group">
+							<span class="zform-label" >别名</span>
+							<div class="form-group zform-item">
+							<input type="text" name="alias" class="form-control basic-input item-input" value="${position.alias }"/>
 							</div>
-						</div>
 					</div>
 					<%-- <div class="form-group">
 						<div>
@@ -55,34 +36,28 @@
 							</div>
 						</div>
 					</div> --%>
-					<div class="form-group">
-						<div>
-							<label class="col-lg-2 control-label" for="level">级别</label>
-							<div class="col-lg-5">
+					<div class="zform-group">
+							<span class="zform-label" >级别</span>
+							<div class="form-group zform-item">
 								<select id="level" name="level" data-value="${position.level }">
 									<c:forEach items="${levelNameMap }" var="levelName">
 										<option value="${levelName.key }">${levelName.value }</option>
 									</c:forEach>
 								</select>
 							</div>
-						</div>
 					</div>
 				
-					<div class="form-group">
-			        	<div class="col-lg-offset-3 col-lg-3">
-			        		<input id="submit-btn" class="btn btn-block btn-darkorange" type="submit" value="提交" />
-				        </div>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
+			       <input id="submit-btn" class="form-primary-button margin-l80 margin-t30" type="submit" value="提交" />
+		</form>		
 </div>
 
 <script>
 	seajs.use(['ajax','utils'], function(Ajax, Utils){
 		var $page = $('#position-edit');
 		
+		$('#level',$page).Selection({
+			width: "180px"
+		})
 		/* $("#submit-btn", $page).on("click", function(){
 			var list = '${list}';
 			var length = ${fn:length(list)};
