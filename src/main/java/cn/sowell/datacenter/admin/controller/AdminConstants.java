@@ -18,6 +18,11 @@ public interface AdminConstants {
 	final String URI_BASE = "/admin";
 	
 	/**
+	 * 人口模块
+	 */
+	final String URI_PEOPLEDATA = URI_BASE + "/peopledata";
+	
+	/**
 	 * 管理端jsp资源的基本路径
 	 */
 	final String JSP_BASE = "/admin";
@@ -52,5 +57,7 @@ public interface AdminConstants {
 	final String JSP_POSITION = JSP_BASE + "/position";
 	
 	final String JSP_SPECIAL_POSITION = JSP_BASE + "/specialposition";
+
+	final String JSP_PEOPLEDATA_VIEWTMPL = JSP_PEOPLEDATA + "/viewtmpl";
 	
 }

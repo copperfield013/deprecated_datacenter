@@ -9,7 +9,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.elasticsearch.client.transport.TransportClient;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,10 +23,8 @@ import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
-import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
 import cn.sowell.datacenter.model.basepeople.dto.ResultDto;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
-import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.service.BasePeopleService;
 
 import com.alibaba.fastjson.JSONArray;
@@ -39,8 +36,6 @@ public class AdminBasePeopleController {
 	
 	@Resource
 	BasePeopleService basePeopleService;
-	
-	private TransportClient client;
 	
 	Logger logger = Logger.getLogger(AdminBasePeopleController.class);
 

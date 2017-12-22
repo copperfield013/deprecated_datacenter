@@ -8,6 +8,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import jxl.read.biff.BiffException;
+
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -25,6 +27,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
+import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
+import cn.sowell.copframe.dto.ajax.JsonRequest;
+import cn.sowell.copframe.dto.ajax.ResponseJSON;
+import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.model.address.pojo.SplitedAddressEntityTemp;
+import cn.sowell.datacenter.model.address.service.AddressEntityService;
+import cn.sowell.datacenter.model.position.service.PositionService;
+
 import com.abc.address.service.AddressService;
 import com.abc.address.service.AddressServiceFactory;
 import com.abc.extface.dto.AddressCode;
@@ -34,16 +46,6 @@ import com.abc.extface.dto.Position;
 import com.abc.extface.dto.SplitedAddressEntity;
 import com.abc.position.constant.PositionLevel;
 import com.alibaba.fastjson.JSONObject;
-
-import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
-import cn.sowell.copframe.dto.ajax.JsonRequest;
-import cn.sowell.copframe.dto.ajax.JsonResponse;
-import cn.sowell.copframe.dto.page.PageInfo;
-import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.model.address.pojo.SplitedAddressEntityTemp;
-import cn.sowell.datacenter.model.address.service.AddressEntityService;
-import cn.sowell.datacenter.model.position.service.PositionService;
-import jxl.read.biff.BiffException;
 
 @Controller
 @RequestMapping(AdminConstants.URI_BASE + "/address")
@@ -126,7 +128,7 @@ public class AdminAddressController {
 	
 	@ResponseBody
 	@RequestMapping("/detail")
-	public JsonResponse detail(@RequestParam String addressStr, Model model) throws UnsupportedEncodingException {
+	public ResponseJSON detail(@RequestParam String addressStr, Model model) throws UnsupportedEncodingException {
 		SplitedAddressEntity splitedAddressEntity = addressService.queryEntity(addressStr);
 		Position position = positionService.getPosition(splitedAddressEntity.getPositionCode());
 		JSONObject jo = new JSONObject();
@@ -136,7 +138,7 @@ public class AdminAddressController {
 		jo.put("laterPart", splitedAddressEntity.getLaterPart());
 		jo.put("splitName", splitedAddressEntity.getSplitNameToShow());
 		jo.put("artificialSplitName", splitedAddressEntity.getArtificialSplitNameToShow());
-		JsonResponse jres = new JsonResponse();
+		JSONObjectResponse jres = new JSONObjectResponse();
 		jres.setJsonObject(jo);
 		return jres;
 	}
@@ -272,8 +274,8 @@ public class AdminAddressController {
 	 */
 	@ResponseBody
 	@RequestMapping("/remove")
-	public JsonResponse removeCategory(@RequestParam String addressStr, Model model) throws UnsupportedEncodingException {
-		JsonResponse jres = new JsonResponse();
+	public ResponseJSON removeCategory(@RequestParam String addressStr, Model model) throws UnsupportedEncodingException {
+		JSONObjectResponse jres = new JSONObjectResponse();
 		//addressStr = new String(addressStr.getBytes("ISO-8859-1"),  "UTF-8");
 		SplitedAddressEntity splitedAddressEntity = addressService.queryEntity(addressStr);
 		splitedAddressEntity.createCode();
@@ -290,8 +292,8 @@ public class AdminAddressController {
 	
 	@ResponseBody
 	@RequestMapping("/batchRemove")
-	public JsonResponse batchRemoveCategory(@RequestBody JsonRequest jreq) {
-		JsonResponse jres = new JsonResponse();
+	public JSONObjectResponse batchRemoveCategory(@RequestBody JsonRequest jreq) {
+		JSONObjectResponse jres = new JSONObjectResponse();
 		try {
 			for(int i = 0; i < jreq.getJsonObject().getJSONArray("addressNames").size(); i++) {
 				SplitedAddressEntity splitedAddressEntity = addressService.queryEntity(jreq.getJsonObject().getJSONArray("addressNames").get(i).toString());
@@ -342,8 +344,8 @@ public class AdminAddressController {
 	
 	@ResponseBody
 	@RequestMapping("/updateAddressEntityCategory")
-	public JsonResponse updateAddressEntityCategory(@RequestParam String addressCode, @RequestParam String addressName) {
-		JsonResponse jres = new JsonResponse();
+	public JSONObjectResponse updateAddressEntityCategory(@RequestParam String addressCode, @RequestParam String addressName) {
+		JSONObjectResponse jres = new JSONObjectResponse();
 		SplitedAddressEntity splitedAddressEntity = addressService.queryEntity(addressName);
 		splitedAddressEntity.setCode(addressCode);
 		try {
@@ -357,8 +359,8 @@ public class AdminAddressController {
 	}
 	@ResponseBody
 	@RequestMapping("/batchUpdateAddressEntityCategory")
-	public JsonResponse batchUpdateAddressEntityCategory(@RequestBody JsonRequest jreq) {
-		JsonResponse jres = new JsonResponse();
+	public JSONObjectResponse batchUpdateAddressEntityCategory(@RequestBody JsonRequest jreq) {
+		JSONObjectResponse jres = new JSONObjectResponse();
 		try {
 			for(int i = 0; i < jreq.getJsonObject().getJSONArray("addressNames").size(); i++) {
 				SplitedAddressEntity splitedAddressEntity = addressService.queryEntity(jreq.getJsonObject().getJSONArray("addressNames").get(i).toString());

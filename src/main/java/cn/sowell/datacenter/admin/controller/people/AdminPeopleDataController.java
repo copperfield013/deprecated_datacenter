@@ -35,11 +35,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.alibaba.fastjson.JSON;
-
 import cn.sowell.copframe.common.property.PropertyPlaceholder;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
-import cn.sowell.copframe.dto.ajax.JsonResponse;
+import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.Assert;
 import cn.sowell.copframe.utils.TextUtils;
@@ -62,8 +60,10 @@ import cn.sowell.datacenter.model.peopledata.service.PojoService;
 import cn.sowell.datacenter.model.peopledata.service.impl.PropertyParser;
 import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
 
+import com.alibaba.fastjson.JSON;
+
 @Controller
-@RequestMapping(AdminConstants.URI_BASE + "/peopledata")
+@RequestMapping(AdminConstants.URI_PEOPLEDATA)
 public class AdminPeopleDataController {
 
 
@@ -158,8 +158,8 @@ public class AdminPeopleDataController {
 
     @ResponseBody
     @RequestMapping("/do_import")
-    public JsonResponse doImport(MultipartFile file, @RequestParam String sheetName, @RequestParam String dataType, HttpSession session){
-        JsonResponse jRes = new JsonResponse();
+    public JSONObjectResponse doImport(MultipartFile file, @RequestParam String sheetName, @RequestParam String dataType, HttpSession session){
+    	JSONObjectResponse jRes = new JSONObjectResponse();
         jRes.setStatus("error");
         String uuid = TextUtils.uuid();
         jRes.put("uuid", uuid);
@@ -214,8 +214,8 @@ public class AdminPeopleDataController {
 
     @ResponseBody
     @RequestMapping("/status_of_import")
-    public JsonResponse statusOfImport(HttpSession session, @RequestParam String uuid){
-        JsonResponse jRes = new JsonResponse();
+    public JSONObjectResponse statusOfImport(HttpSession session, @RequestParam String uuid){
+    	JSONObjectResponse jRes = new JSONObjectResponse();
         ImportStatus importStatus = (ImportStatus) session.getAttribute(KEY_IMPORT_STATUS + uuid);
         if(importStatus != null){
             jRes.put("totalCount", importStatus.getTotal());
@@ -238,8 +238,8 @@ public class AdminPeopleDataController {
 
     @ResponseBody
     @RequestMapping("/break_import")
-    public JsonResponse breakImport(HttpSession session, @RequestParam String uuid){
-        JsonResponse jRes = new JsonResponse();
+    public JSONObjectResponse breakImport(HttpSession session, @RequestParam String uuid){
+        JSONObjectResponse jRes = new JSONObjectResponse();
         ImportStatus importStatus = (ImportStatus) session.getAttribute(KEY_IMPORT_STATUS + uuid);
         if(importStatus != null){
             importStatus.breakImport();
@@ -302,8 +302,8 @@ public class AdminPeopleDataController {
 
     @ResponseBody
     @RequestMapping("/smart_search")
-    public JsonResponse smartsearch(String peopleCode, String type, String field, HttpServletResponse response) {
-        JsonResponse jRes = new JsonResponse();
+    public JSONObjectResponse smartsearch(String peopleCode, String type, String field, HttpServletResponse response) {
+        JSONObjectResponse jRes = new JSONObjectResponse();
         try {
             PeopleData people = peopleService.getPeople(peopleCode);
             jRes.put("data", JSON.toJSON(people));
@@ -334,15 +334,15 @@ public class AdminPeopleDataController {
 
     @ResponseBody
     @RequestMapping(value="titleSearch")
-    public JsonResponse esearch(String txt) {
-        JsonResponse jsonResponses = new JsonResponse();
+    public JSONObjectResponse esearch(String txt) {
+        JSONObjectResponse JSONObjectResponses = new JSONObjectResponse();
         try{
-            jsonResponses.put("data",buttService.titleSearch(txt.trim()));
-            return jsonResponses;
+            JSONObjectResponses.put("data",buttService.titleSearch(txt.trim()));
+            return JSONObjectResponses;
         }
         catch(Exception e) {
             e.printStackTrace();
-            return jsonResponses;
+            return JSONObjectResponses;
         }
 
     }
@@ -423,7 +423,7 @@ public class AdminPeopleDataController {
 
     @ResponseBody
     @RequestMapping("/do_download/{modelId}")
-    public JsonResponse downloadExcel(HttpServletRequest request,HttpServletResponse response,
+    public JSONObjectResponse downloadExcel(HttpServletRequest request,HttpServletResponse response,
                                       @PathVariable Long modelId,PeopleDataCriteria criteria, PageInfo pageInfo) throws IOException{
         String fileName="excel文件";
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -517,10 +517,10 @@ public class AdminPeopleDataController {
     
     @ResponseBody
     @RequestMapping("/paging_history/{peopleCode}")
-    public JsonResponse pagingHistory(@PathVariable String peopleCode, 
+    public JSONObjectResponse pagingHistory(@PathVariable String peopleCode, 
     		@RequestParam Integer pageNo, 
     		@RequestParam(defaultValue="100") Integer pageSize){
-    	JsonResponse response = new JsonResponse();
+    	JSONObjectResponse response = new JSONObjectResponse();
     	try {
 			List<PeopleDataHistoryItem> historyItems = abcService.queryHistory(peopleCode, pageNo, pageSize);
 			response.put("history", JSON.toJSON(historyItems));
