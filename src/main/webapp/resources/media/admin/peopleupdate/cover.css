@@ -82,41 +82,6 @@ div.tab-content {
 .search-inforbox {
 	
 }
-.search-input.zinput {
-	padding-left: 10px;
-	width: 400px;
-	height: 40px;
-	border-top-left-radius: 3px !important;
-	border-bottom-left-radius: 3px !important;
-	font-size: 14px;
-	background-color: #ffffff !important;
-	color: #656565;
-    border: 1px solid #126def;
-}
-.search-input.zinput:focus {
-	color: #656565;
-    background-color: #fff;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-    border-color: #126def;
-    outline: 0;
-}
-.search-input.zinput:hover {
-	border-color: #126def;
-}
-
-.search-button {
-	width: 60px;
-	text-align:center;
-	background-color: #126def;
-	border-top-right-radius: 3px;
-	border-bottom-right-radius: 3px;
-	display:inline-block;
-	font-size: 14px;
-	color: #ffffff;
-	cursor: pointer;
-}
 .smartForm.search #saveSmartForm {
 	display: none;
 }
