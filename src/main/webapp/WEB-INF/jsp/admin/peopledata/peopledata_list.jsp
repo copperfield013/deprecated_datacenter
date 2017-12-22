@@ -15,7 +15,8 @@
 			<a class="btn btn-primary tab" href="admin/peopledata/add" title="创建人口" target="people_add" >创建</a>
 			<a class="btn btn-primary tab" href="admin/peopledata/import" title="导入人口" target="people_import">导入</a>
 			<a class="btn btn-primary tab" href="admin/peopledata/output" title="导出人口" target="people_output">导出</a>
-			<a class="btn btn-primary tab" href="admin/peopledata/model" title="字段管理模版" target="people_model">字段管理模版</a>
+			<a class="btn tab" href="admin/peopledata/viewtmpl/to_create" title="字段管理模版" target="people_model">创建人口信息模板</a>
+			<a class="btn tab" href="admin/peopledata/model" title="字段管理模版" target="people_model">字段管理模版</a>
 		</form>
 	</nav>
 	<div class="row list-area">
