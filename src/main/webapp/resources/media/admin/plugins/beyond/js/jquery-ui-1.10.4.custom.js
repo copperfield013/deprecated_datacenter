@@ -4261,14 +4261,17 @@ $.widget("ui.sortable", $.ui.mouse, {
 
 	_createPlaceholder: function(that) {
 		that = that || this;
-		var className,
-			o = that.options;
-
+		var o = that.options;
+		var ph = o.placeholder;
+		var placeholderClassGetter = function(){return typeof ph === 'string'? ph: ''};
+		if(typeof ph === 'function'){
+			placeholderClassGetter = ph;
+			o.placeholder = null;
+		}
 		if(!o.placeholder || o.placeholder.constructor === String) {
-			className = o.placeholder;
 			o.placeholder = {
-				element: function() {
-
+				element: function(curr) {
+					var className = placeholderClassGetter.apply(this, [curr]);
 					var nodeName = that.currentItem[0].nodeName.toLowerCase(),
 						element = $( "<" + nodeName + ">", that.document[0] )
 							.addClass(className || that.currentItem[0].className+" ui-sortable-placeholder")
@@ -4291,7 +4294,7 @@ $.widget("ui.sortable", $.ui.mouse, {
 					return element;
 				},
 				update: function(container, p) {
-
+					var className = placeholderClassGetter.apply(this, [container.currentItem]);
 					// 1. If a className is set as 'placeholder option, we don't force sizes - the class is responsible for that
 					// 2. The option 'forcePlaceholderSize can be enabled to force it even if a class name is specified
 					if(className && !o.forcePlaceholderSize) {

@@ -111,13 +111,22 @@ define(function(require, exports){
 		 * @param class2 {String}
 		 * @param flag {Boolean} 为true的话，jqObj一定有class1没有class2；为false的话，jqObj有class2没有class1
 		 */
-		switchClass	: function(jqObj, class1, class2, flag){
+		switchClass	: function(jqObj, class1, class2, flag, callback){
 			var hasClass1 = jqObj.is('.' + class1),
 				hasClass2 = jqObj.is('.' + class2);
 			if((hasClass1 ^ hasClass2) === 1){
-				flag = flag || hasClass2;
+				if(typeof flag === 'function'){
+					callback = flag;
+					flag = hasClass2;
+				}else{
+					callback = (typeof callback === 'function')? callback: $.noop;
+					flag = flag || hasClass2;
+				}
 				jqObj.toggleClass(class1, flag);
 				jqObj.toggleClass(class2, !flag);
+				try{
+					callback.apply(jqObj, [flag]);
+				}catch(e){}
 			}
 			return this;
 		},
@@ -255,10 +264,12 @@ define(function(require, exports){
 		 */
 		removeStyle		: function(dom, styleName){
 			if(styleName){
-				var style = $(dom).attr('style'),
-					reg = new RegExp(styleName + '\\s*:\\s*([^;]+;)|([^;]+$)', 'gi')
-				style = style.replace(reg, '');
-				$(dom).attr('style', style);
+				var style = $(dom).attr('style');
+				if(style){
+					var reg = new RegExp(styleName + '\\s*:\\s*([^;]+;)|([^;]+$)', 'gi')
+					style = style.replace(reg, '');
+					$(dom).attr('style', style);
+				}
 			}
 			return this;
 		},
