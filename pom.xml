@@ -10,8 +10,8 @@
 	
 	<properties>
 		<version.kie>6.5.0.Final</version.kie>
-		<version.cpfweb>0.2.4</version.cpfweb>
-		<version.abc>1.8.19</version.abc>
+		<version.cpfweb>0.2.5</version.cpfweb>
+		<version.abc>1.8.26</version.abc>
 	</properties>
 	
 	<dependencies>
@@ -29,7 +29,7 @@
 		<dependency>
 			<groupId>cn.sowell.copframe</groupId>
 			<artifactId>cpf-spring</artifactId>
-			<version>0.3.2</version>
+			<version>0.3.6</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.sowell.copframe</groupId>
