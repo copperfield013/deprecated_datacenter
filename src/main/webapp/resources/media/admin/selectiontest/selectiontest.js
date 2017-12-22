@@ -4,12 +4,12 @@
         width: "100%",
         right: "0",
         lineList: false,                               //选项是否横向排列
-        inforText: "--请选择1--",                       //选择提示
-        callBack: function () { },                    //创建完成回调函数
-        clickCallBack: function () {       //选项点击回调函数            
+        inforText: "--请选择1--",                        //选择提示
+        callBack: function () { },                     //创建完成回调函数
+        clickCallBack: function () {       			   //选项点击回调函数            
         },
-        notMatchText: "暂无该海南",                    //搜索无果提示
-        items: [                                      //选项数组 (  [{ value: "option1",name:"选项一" }] ),如果是select初始化则不需要
+        notMatchText: "暂无该海南",                        //搜索无果提示
+        items: [                                       //选项数组 (  [{ value: "option1",name:"选项一" }] ),如果是select初始化则不需要
 
         ],
         selected: [],
@@ -465,11 +465,21 @@
              */
             var amendSelect = function ($select, name, status) {
                 var optionList = $select.find('option');
+                var isSingle = $select.attr("multiple");
+                if(typeof(isSingle) === "undefined"){ //单选
+                	for (var i = 0; i < optionList.length; i++) {
+                		$(optionList[i]).text() === name ?                       
+                             $(optionList[i]).prop("selected", true).attr("selected",true):   //js节点和dom节点同时转换,避免视觉混淆
+                        	 $(optionList[i]).prop("selected", false).attr("selected",false)
+
+                    }
+                	return;
+                };
                 for (var i = 0; i < optionList.length; i++) {
                     if ($(optionList[i]).text() === name) {
                         status == "add" ?
-                            $(optionList[i]).prop("selected", true) :
-                            $(optionList[i]).prop("selected", false)
+                            $(optionList[i]).prop("selected", true).attr("selected",true) :
+                            $(optionList[i]).prop("selected", false).attr("selected",false)
                     }
                 }
             }
