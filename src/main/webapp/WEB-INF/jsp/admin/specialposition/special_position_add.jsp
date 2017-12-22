@@ -3,144 +3,80 @@
 <link href="media/admin/selectiontest/selectiontest.css" rel="stylesheet" type="text/css" />
 <script src="media/admin/selectiontest/selectiontest.js"></script>
 <script src="media/admin/addressdata/area_pcc.js"></script>
-<style>
-	#special-position-add {
-		padding: 0 20px;
-	}
-	#special-position-add .special-position-submit {
-		margin-left: 80px;
-	}
-	.hide {
-		display: none;
-	}
-	.margin-t10 {
-		margin-top: 10px;
-	}
-	.margin-t15 {
-		margin-top: 15px;
-	}
-	.margin-t20 {
-		margin-top: 20px;
-	}
-	.margin-t30 {
-		margin-top: 30px;
-	}
-	.margin-r20 {
-		margin-right: 20px;
-	}
-	.inline-middle {
-		display: inline-block;
-		vertical-align: middle;
-	}
-	.label-w4 {
-		width: 4em;
-		text-align: right;
-	}
-	.small-input {
-		height: 30px;
-		width: 400px;
-	}
-	.special-position-button {
-		marign
-	}
-	.basic-button {
-		width: 100px;
-	    text-align: center;
-	    height: 30px;
-	    line-height: 30px;
-	    font-size: 14px;
-	    border: 1px solid #d9d9d9;
-	    color: #656565;
-	    display: inline-block;
-	    cursor: pointer;
-	    background-color: #ffffff;
-	}
-	.primary-button {
-		width: 100px;
-	    text-align: center;
-	    height: 30px;
-	    line-height: 30px;
-	    font-size: 14px;
-	    border: 1px solid #d9d9d9;
-	    display: inline-block;
-	    cursor: pointer;
-		color: #ffffff;
-    	background-color: #126def;
-	}
-</style>
-<div id="special-position-add">
+<div id="special-position-add" class="zpage">
 	<h1 class="zpage-title">添加地点</h1>
-	<div class="zpage-body">
-				<form id="specialPositionAddForm"  action="admin/special_position/doAdd">
+				<form id="specialPositionAddForm"  action="admin/special_position/doAdd" class="validate-form margin-t15" autocomplete="off">
 					<!-- <div class="form-group">
 						<label class="col-lg-2 control-label" for="code">编码</label>
 						<div class="col-lg-5">
 							<input type="text" class="form-control" name="id" />
 						</div>
 					</div> -->
-						<div class="margin-t15">
-							<span class="margin-r20 inline-middle label-w4 " for="name">名称</span>
-							<input type="text" name="name" class="basic-input small-input" 
-								data-bv-notempty="true"
-								data-bv-notempty-message="名称不能为空"/>
+						<div class="zform-group">
+							<span class="zform-label">名称</span> 
+							<div class="form-group zform-item">
+								<input type="text" name="name" class="basic-input item-input form-control" 
+									data-bv-notempty="true" data-bv-notempty-message="名称不能为空" data-bv-field="name"/>
+							</div>							
 						</div>
 						
-						<div class="margin-t15">
-							<span class="margin-r20 inline-middle label-w4" for="commonName">通用名称</span>
-							<input type="text" name="commonName" class="basic-input small-input"/>
+						<div class="zform-group">
+							<span class="zform-label">通用名称</span>
+							<div class="form-group zform-item">
+								<input type="text" name="commonName" class="basic-input item-input"/>
+							</div>				
 						</div>
 						
-						<div class="margin-t15">
-							<span class="margin-r20 inline-middle label-w4">行政区域级别</span>
-							<select class="choose-position">   <!-- 不加name属性，不提交 -->
-								<option>省级</option>
-								<option>市级</option>
-								<option>区级</option>
-								<option>街道</option>
-							</select>							
+						<div class="zform-group">
+							<span class="zform-label">行政区域级别</span>
+							<div class="form-group zform-item">
+								<select class="choose-position">   <!-- 不加name属性，不提交 -->
+									<option>省级</option>
+									<option>市级</option>
+									<option>区级</option>
+									<option>街道</option>
+								</select>
+							</div>							
 						</div>
-						<div class="margin-t15">
-							<span class="margin-r20 inline-middle label-w4"> 所属行政区域</span>
-								<select class="choose-position-province">
-									<option id="choosePPro" value="-1">省级</option>
-								</select>
-								<select class="choose-position-city">
-									<option id="choosePCity" value="-1">市级</option>
-								</select>
-								<select class="choose-position-county">
-									<option id="choosePCou" value="-1">区/县级</option>
-								</select>
-								<select class="choose-position-street">
-									<option id="choosePStr" value="-1">街道级</option>
+						<div class="zform-group">
+							<span class="zform-label"> 所属行政区域</span>
+							<div class="form-group zform-item">
+									<select class="choose-position-province">
+										<option id="choosePPro" value="-1">省级</option>
+									</select>
+									<select class="choose-position-city">
+										<option id="choosePCity" value="-1">市级</option>
+									</select>
+									<select class="choose-position-county">
+										<option id="choosePCou" value="-1">区/县级</option>
+									</select>
+									<select class="choose-position-street">
+										<option id="choosePStr" value="-1">街道级</option>
+									</select>
+							</div>
+						</div>					                
+						
+						<div class="zform-group">
+							<span class="zform-label">选择级别</span>
+							<div class="form-group zform-item">
+								<select id="level" name="level">
+									<c:forEach items="${levelNameMap }" var="levelName">
+										<option value="${levelName.key }">${levelName.value }</option>
+									</c:forEach>
 								</select>
 							</div>
-						<!-- <label class="col-lg-2 control-label" for="belongPosition">所属行政区域</label>
-						<div class="col-lg-5">
-							<input type="text" class="form-control" name="belongPosition" />
-						</div> -->                         
-						
-						<div class="margin-t15">
-							<span  for="level" class="margin-r20 inline-middle label-w4">选择级别</span>
-							<select id="level" name="level">
-								<c:forEach items="${levelNameMap }" var="levelName">
-									<option value="${levelName.key }">${levelName.value }</option>
-								</c:forEach>
-							</select>
 						</div>
-			        	
-			        	<!-- <input class="btn btn-block btn-darkorange" type="submit" value="提交" /> -->
+			        				        	
 			        	<input type="hidden"  name="belongPosition" />
+			        	
 			        	<div class=" margin-t30">
-			        		<span class="special-position-submit primary-button">提交</span>
+			        		<span class="special-position-submit form-primary-button margin-l80">提交</span>			        		 
 			        	</div>
-
 				</form>			
-	</div>
 </div>
 <script>
-	$(function(){
+seajs.use(['dialog', 'utils'], function(Dialog, Utils){
 		var $page = $('#special-position-add');
-		
 		//街道数据对象
 	    var streetJson = {
 	        codeFirst: [],
@@ -412,7 +348,6 @@
 		
 		//提交		
 		$(".special-position-submit",$page).on("click",function(){
-			console.log($('.choose-position',$page).val());
 			var pVal = $('.choose-position',$page).val(),
 				admDivision;
 			switch (pVal) {
@@ -431,6 +366,10 @@
 	            default:
 	                break;
 	        }
+			if( parseFloat(admDivision) === -1){
+				Dialog.notice("请选择行政区域！", "warning");
+				return;
+			}
 			admDivision = admDivision + "000";
 			$('input[name="belongPosition"]').val(admDivision);		
 			$('#specialPositionAddForm').submit();

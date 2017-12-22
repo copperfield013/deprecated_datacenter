@@ -1,34 +1,29 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
-<div class="detail" id="special-position-detail">
-<div class="page-header">
-	<div class="header-title">
-			<h1>特殊地名-${specialPosition.name }-详情</h1>
-		</div>
-	</div>
+<div class="zpage" id="special-position-detail">
+	<h1 class="zpage-title">特殊地名-${specialPosition.name }-详情</h1>
 
-	<div class="page-body">
+
 		<%-- <div class="row">
 			<label class="col-lg-2">编码</label>
 			<div class="col-lg-4">${specialPosition.id }</div>
 		</div> --%>
-		<div class="row">
-			<label class="col-lg-2">名称</label>
-			<div class="col-lg-4">${specialPosition.name }</div>
+		<div class="zform-group margin-t15">
+			<span class="zform-label">名称</span>
+			<div class="form-group zform-item">${specialPosition.name }</div>
 		</div>
-		<div class="row">
-			<label class="col-lg-2">通用名称</label>
-			<div class="col-lg-4">${specialPosition.commonName }</div>
+		<div class="zform-group">
+			<span class="zform-label">通用名称</span>
+			<div class="form-group zform-item">${specialPosition.commonName }</div>
 		</div>
-		<div class="row">
-			<label class="col-lg-2">所属行政区域</label>
-			<div class="col-lg-4">${belongPositionName }</div>
+		<div class="zform-group">
+			<span class="zform-label">所属行政区域</span>
+			<div class="form-group zform-item">${belongPositionName }</div>
 		</div>
-		<div class="row">
-			<label class="col-lg-2">级别</label>
-			<div class="col-lg-4">${specialPosition.levelName }</div>
+		<div class="zform-group">
+			<span class="zform-label">级别</span>
+			<div class="form-group zform-item">${specialPosition.levelName }</div>
 		</div>
-	</div>
 </div>
 <script>
 	seajs.use(['utils'], function(Utils){

@@ -1,21 +1,22 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
-<div id="special-position-list">
-	<nav>
+<div id="special-position-list" class="zpage">
+	<h1 class="zpage-title">特殊地名</h1>
+	<div class="operation-bar">
 		<form class="form-inline" action="admin/special_position/special_position_list">
-			<div class="form-group">
-				<label for="name">名称</label>
-				<input type="text" class="form-control" name="name" value="${criteria.name }" />
+			<div class="zform-group">
+				<span class="zform-label">名称</span>
+				<input type="text" class="basic-input list-input margin-r10" name="name" value="${criteria.name }" />
 			</div>
-			<div class="form-group">
-				<label for="alias">通用名称</label>
-				<input type="text" class="form-control" name="alias" value="${criteria.commonName }" />
+			<div class="zform-group">
+				<label  class="zform-label">通用名称</label>
+				<input type="text" class="basic-input list-input margin-r10" name="alias" value="${criteria.commonName }" />
 			</div>
-			<button type="submit" class="btn btn-default">查询</button>
-			<a class="btn btn-primary tab" href="admin/special_position/special_position_add" title="添加地点" target="special_position_add" >添加</a>
+			<button type="submit" class="operation-small-btn margin-l10">查询</button>
+			<a class="operation-small-btn margin-l10 tab" href="admin/special_position/special_position_add" title="添加地点" target="special_position_add" >添加</a>
 		</form>
-	</nav>
-	<div class="row list-area">
+	</div>
+	<div class="list-area">
 		<table class="table">
 			<thead>
 				<tr>
@@ -43,7 +44,7 @@
 				</c:forEach>
 			</tbody>
 		</table>
-		<div class="cpf-paginator" pageNo="${pageInfo.pageNo }" pageSize="${pageInfo.pageSize }" count="${pageInfo.count }"></div>
+		<div class="cpf-paginator margin-t40 margin-b40" pageNo="${pageInfo.pageNo }" pageSize="${pageInfo.pageSize }" count="${pageInfo.count }"></div>
 	</div>
 </div>
 <script>
