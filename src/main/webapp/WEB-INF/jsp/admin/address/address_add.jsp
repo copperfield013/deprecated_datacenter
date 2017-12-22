@@ -3,56 +3,40 @@
 <link href="media/admin/selectiontest/selectiontest.css" rel="stylesheet" type="text/css" />
 <script src="media/admin/selectiontest/selectiontest.js"></script>
 <script src="media/admin/addressdata/area_pcc.js"></script>
-<style>
-	#address-add {
-		padding-left: 20px;
-	}
-	#address-add .address-add-label {
-		margin-top: 10px;
-	}
-	#address-add .address-add-input {
-		background-color: #ffffff;
-		height: 36px;
-		padding-left: 1em;
-		border: 1px solid #d9d9d9;
-		width: 375px;
-	}
-	#address-add .submit-btn {
-		display: block;
-		width: 80px;
-		text-align:center;
-		height: 30px;
-		line-height:30px;
-		background-color: #126def;
-		margin: 20px 0;
-		color: #ffffff;
-		cursor: pointer;
-	}
-	#address-add .submit-btn:hover {
-		background-color: #4b90f3;
-	}
-</style>
-  <div id="address-add">
+
+  <div id="address-add" class="zpage">
         <h1 class="zpage-title">添加地址</h1>
-        <div class="address-add-body">
-            <form id="address-add-form" action="admin/address/doAdd" autocomplete="off">
-            	<input type="hidden" id="name"name="name"/>
-                <p class="address-add-label">请选择行政区域</p>
-                <select id="province" name="province">
-                	<option id="choosePro" value="-1">请选择您所在省份</option>
-                </select>
-                <select id="citys" name="city">
-                	<option id='chooseCity' value='-1'>请选择您所在城市</option>
-                </select>
-                <select id="county" name="county">
-                	<option id='chooseCounty' value='-1'>请选择您所在区/县</option>
-                </select>
-                <select id="street" name="street">
-                	<option id='chooseStreet' value='-1'>请选择您所在街道</option>
-                </select>
-                <p class="address-add-label">请填写详细地址</p>
-                <input type="text" class="address-add-input" id="detailed-address-name" name="detailed-address-name" />
-                <span class="submit-btn">提交</span>
+        <div class="margin-t15">
+            <form id="address-add-form" action="admin/address/doAdd" autocomplete="off" class="validate-form">
+            	<input type="hidden" id="name" name="name"/>
+            	<div class="zform-group">
+            		<span class="zform-label">请选择行政区域</span>
+            		<div class="form-group zform-item">
+		                <select id="province" name="province">
+		                	<option id="choosePro" value="-1">--省--</option>
+		                </select>
+		                <select id="citys" name="city">
+		                	<option id='chooseCity' value='-1'>--市--</option>
+		                </select>
+		                <select id="county" name="county">
+		                	<option id='chooseCounty' value='-1'>--区/县--</option>
+		                </select>
+		                <select id="street" name="street">
+		                	<option id='chooseStreet' value='-1'>--街道--</option>
+		                </select>
+		            </div>
+            	</div>
+                
+                <div class="zform-group">
+                	<span class="zform-label">请填写详细地址</span>
+                	<div class="form-group zform-item">
+                		<input type="text" class="basic-input item-input form-control" id="detailed-address-name" name="detailed-address-name" 
+                			data-bv-notempty="true" data-bv-notempty-message="地址不能为空" data-bv-field="detailed-address-name"/>
+                	</div>
+                </div>
+                
+                
+                <span class="form-primary-button margin-t30">提交</span>
             </form>
         </div>
     </div>
@@ -60,16 +44,25 @@
 <script>
 
 
-$(function () {
+seajs.use(['dialog', 'utils'], function(Dialog, Utils){
 	var $page = $("#address-add");
 	
-	$('.submit-btn',$page).on("click",function(){
+	$('.form-primary-button',$page).on("click",function(){
 		var name = '';
 		var province = $("#province", $page).find("option:selected").text();
+		var proVal = parseFloat( $("#province", $page).val());
 		var citys = $("#citys", $page).find("option:selected").text();
+		var cityVal = parseFloat($("#citys", $page).val());
 		var county = $("#county", $page).find("option:selected").text();
+		var countyVal = parseFloat($("#county", $page).val());
 		var street = $("#street", $page).find("option:selected").text();
+		var strVal = parseFloat($("#street", $page).val());
 		var detialedAddressName = $("#detailed-address-name", $page).val();
+		
+		if(proVal === -1 || cityVal === -1 || countyVal === -1 || strVal === -1){
+			Dialog.notice("请完成行政区域的选择", "warning");
+			return;
+		}
 		$("#name", $page).val(province + citys + county + street + detialedAddressName);
 		$('#address-add-form').submit();
 	})
@@ -266,7 +259,7 @@ $(function () {
     }
 
     var Province = $('#province',$page).Selection({
-        width: "180px",
+        width: "135px",
         right: "10px",
         clickCallBack: function () {       //选项点击回调函数            
             doProvAndCityRelation();
@@ -276,7 +269,7 @@ $(function () {
         },
     });
     var Citys = $('#citys',$page).Selection({
-        width: "180px",
+        width: "135px",
         right: "10px",
         clickCallBack: function () {       //选项点击回调函数            
             doCityAndCountyRelation()
@@ -285,7 +278,7 @@ $(function () {
         },
     });
     var County = $('#county',$page).Selection({
-        width: "180px",
+        width: "135px",
         right: "10px",
         clickCallBack: function () {       //选项点击回调函数            
             doCountyAndStreetRelation()
@@ -293,7 +286,7 @@ $(function () {
         },
     });
     var Street = $('#street',$page).Selection({
-        width: "180px",
+        width: "135px",
         right: "10px",
     });
 });

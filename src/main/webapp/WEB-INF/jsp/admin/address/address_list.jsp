@@ -1,43 +1,7 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
-<style>
-	#address-list {
-		padding: 0 20px;
-		position: relative;
-	}
-	#address-list a.opera {
-		color: #126def;
-	}
-	#address-list .pagination>li>a, .pager>li>a {
-		color: #656565;
-	}
-	#address-list .pagination>li.active>a, .pager>li.active>a {
-		color: #fff;
-	}
-	#address-list a:hover {
-		color: #4b90f3;
-	}
-	#address-list a.operation-btn:hover {
-		color: #ffffff;
-	}
-	#address-list a:active {
-		color: #0f5acf;
-	}
-	#address-list .address_detail_hover {
-		color: #656565;
-	}
-	#address-list .address_detail_hover:hover {
-		color: #656565;
-		cursor: pointer;
-	}
-	#address-list .table tbody > tr:hover .address_detail_hover{
-		color: #126def;
-	}
-	#address-list .cpf-paginator {
-		margin: 40px 0 50px 0;		
-	}
-</style>
-<div id="address-list">
+
+<div id="address-list" class="zpage">
 	<h1 class="zpage-title">地址信息</h1>
 	<div class="operation-bar">
 		<form id="address-search-form" action="admin/address/list">
@@ -48,12 +12,9 @@
 					<input type="text" class="search-input" name="addressStr" value="${addressStr }" placeholder="请输入地址"/>
 					<span id="search-button" class="search-button">查询</span>
 				</div>
-			</div>
-			
-			<div class="margin-left-20">
-				<a class="operation-btn tab" href="admin/address/add" title="添加地址" target="address_add" >添加</a>
-				<a class="operation-btn tab" href="admin/address/import" title="导入地址" target="address_import">导入</a>
-			</div>
+			</div>			
+			<a class="operation-btn tab margin-l15" href="admin/address/add" title="添加地址" target="address_add" >添加</a>
+			<a class="operation-btn tab margin-l15" href="admin/address/import" title="导入地址" target="address_import">导入</a>
 		</form>
 	</div>
 	<div class="list-area">
@@ -61,12 +22,12 @@
 			<thead>
 				<tr>
 					<th class="index">序号</th>
-					<th class="normal">地址名称</th>
+					<th class="normal td-tleft">地址名称</th>
 					<!-- <th>地点名/楼栋名</th>
 					<th>后址</th> -->
 					<!-- <th>地址分词地址</th>
 					<th>人工分词</th> -->
-					<th class="long">地址解析</th>
+					<th class="long td-tleft">地址解析</th>
 					<th class="short">操作</th>
 				</tr>
 			</thead>
@@ -74,7 +35,7 @@
 				<c:forEach items="${list }" var="address" varStatus="i">
 					<tr data-name="${address.name }">
 						<td>${i.index + 1 }</td>
-						<td><span class="address_detail_hover" href="javascript:;" target="address_detail_${address.name }">${address.name }</span></td>
+						<td class="td-tleft"><span class="td-list-hover">${address.name }</span></td>
 						<%-- <td><a class="tab" href="admin/address/detail?addressStr=${address.name}" target="address_detail_${address.name }" title="详情-${address.name }" >${address.name }</a></td> --%>
 						<%-- <td>${address.keyPoint }</td>
 						<td>${address.laterPart }</td> --%>
@@ -82,10 +43,10 @@
 						<td>${address.artificialSplitName }</td> --%>
 						<c:choose>
 							<c:when test="${ not empty address.artificialSplitName }">
-								<td>${address.artificialSplitNameToShow }</td>
+								<td class="td-tleft">${address.artificialSplitNameToShow }</td>
 							</c:when>
 							<c:otherwise>
-								<td>${address.splitNameToShow }</td>
+								<td class="td-tleft">${address.splitNameToShow }</td>
 							</c:otherwise>
 						</c:choose>
 						<td>
@@ -97,7 +58,7 @@
 				</c:forEach>
 			</tbody>
 		</table>
-		<div class="cpf-paginator" pageNo="${pageInfo.pageNo }" pageSize="${pageInfo.pageSize }" count="${pageInfo.count }"></div>
+		<div class="cpf-paginator margin-t40 margin-b40" pageNo="${pageInfo.pageNo }" pageSize="${pageInfo.pageSize }" count="${pageInfo.count }"></div>
 	</div>
 	
 <script type="text/x-jquery-tmpl" class="address-detail">
@@ -145,7 +106,7 @@
 			$("#address-search-form", $page).submit();
 		});
 		
-		$(".address_detail_hover").click(function(){
+		$(".td-list-hover",$page).click(function(){
 			var addressName = $(this).closest('tr[data-name]').attr('data-name');
 			var $this = $(this);
 			var page = $(this).getLocatePage();

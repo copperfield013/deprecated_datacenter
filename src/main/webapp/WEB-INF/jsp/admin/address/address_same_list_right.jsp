@@ -8,17 +8,12 @@
 	#address-same-list-right .search-wrap .search-input {
 		width: 300px;
 	}
-	#address-same-list-right .address-subtitle {
-		margin:19px 0 10px 0;
-		font-size: 14px;
-		color: #126def;
-	}
 </style>
 <div id="address-same-list-right">
 	<form action="admin/address/getAddressList"  class="form-inline" id="address-same-list-right-search">
 		<input type="hidden" id="curAddressCode" name="addressCode" value="${addressCode }"/>
 		<div class="operation-search">
-			<label class="search-label" for="addressStr">地址名称</label>
+			<span class="search-label" for="addressStr">地址名称</span>
 			<span class="colon">:</span>
 			<div class="search-wrap">
 				<input type="text" class="search-input" id="addressStr" name="addressStr" value="${addressStr }" />
@@ -27,13 +22,13 @@
 		</div>
 		<!-- <button type="submit" id="address-search-btn" class="btn btn-default">查询</button> -->
 		<div class=" list-area">
-			<h4 class="address-subtitle">全部地址列表</h4>
-			<table class="table">
+			<h4 class="zpage-subtitle margin-t15 margin-b10">全部地址列表</h4>
+			<table class="table margin-b30">
 				<thead>
 					<tr>
 						<th><input type="checkbox" id="select-all-address-ids"/><span class="zcheckbox all-choose"></span></th>
-						<th>序号</th>
-						<th class="td-tleft">地址名称</th>
+						<th class="index">序号</th>
+						<th class="td-tleft normal">地址名称</th>
 						<!-- <th></th> -->
 						<!-- <th>操作</th> -->
 					</tr>

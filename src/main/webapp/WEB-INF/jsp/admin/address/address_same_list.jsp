@@ -1,18 +1,7 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <style>
-	#address-category-list {
-		padding-left: 20px;
-		padding-bottom: 30px;
-		color: #656565;
-		font-size: 14px;		
-	}
-	#address-category-list:after {
-		display: block;
-		height: 0;
-		clear: both;
-		content: '';
-	}
+	/* 左右两个框 */
 	#address-category-list #address-same-list {
 		float:left;
 		padding-right: 25px;
@@ -24,6 +13,7 @@
 		padding-left: 25px;
 		width: 50%;
 	}
+	/* 左右按钮块 */
 	#address-category-list .opera-move {
 		position: absolute;
 		top: 0;
@@ -34,26 +24,11 @@
 		padding-top: 136px;
 		z-index: 9;
 	}
-	#address-category-list .address-subtitle {
-		margin:30px 0 10px 0;
-		font-size: 14px;
-		color: #126def;
-	}
 	#address-category-list .table {
 		border: 1px solid transparent;
-		margin-bottom: 30px;
-	}
-	#address-category-list .table td {
-		height: 40px;
-	}
-	#address-category-list .table th.td-tleft {
-		text-align: left;
-	}
-	#address-category-list .table td.td-tleft {
-		text-align: left;
 	}
 </style>
-<div id="address-category-list">
+<div id="address-category-list" class="zpage margin-b30 clear-fix">
 	<h1 class="zpage-title">相同地址</h1>
 	<div id="address-same-list" class="cpf-inner-page" inner-page-id="address-same-list" url="admin/address/sameList?addressCode=${addressCode }">
 		<jsp:include page="address_same_list_left.jsp"></jsp:include>		
@@ -63,7 +38,6 @@
 	</div>
 </div>
 <script>
-console.log(seajs);
 	seajs.use(['page', 'ajax', 'dialog', 'utils'], function(Page, Ajax, Dialog, Utils){
 		var $page = $('#address-category-list');
 		

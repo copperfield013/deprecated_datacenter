@@ -40,13 +40,13 @@
 	<form action="admin/address/sameList">
 		<input type="hidden" name="addressName" value="${addressName }"/>
 		<div class="list-area">
-			<h4 class="address-subtitle">相同地址列表</h4>
-			<table class="table">
+			<h4 class="zpage-subtitle margin-t20 margin-b10">相同地址列表</h4>
+			<table class="table margin-b30">
 				<thead>
 					<tr>
 						<th><input type="checkbox" id="select-all-the-same-address-name"/><span class="zcheckbox all-choose"></span></th>
-						<th>序号</th>
-						<th class="td-tleft">地址名称</th>
+						<th class="index">序号</th>
+						<th class="td-tleft normal">地址名称</th>
 						<!-- <th></th> -->
 						<!-- <th>操作</th> -->
 					</tr>
@@ -69,7 +69,7 @@
 	</form>
 </div>
 <div class="opera-move">
-	<span id="remove-from-the-same">></span>
+	<span id="remove-from-the-same"> > </span>
 	<span id="move-to-the-same"> < </span>
 </div>	
 <script>
