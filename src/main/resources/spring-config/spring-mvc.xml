@@ -42,7 +42,7 @@ http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 					</property>    
 				</bean>
 				<!-- 用于将返回的jsonReponse对象写到响应正文中 -->
-				<bean class="cn.sowell.copframe.messageConverter.JsonResponseConverter"  />
+				<bean class="cn.sowell.copframe.messageConverter.ResponseJsonConverter"  />
 				<!-- 用于将返回的xmlReponse对象写到响应正文中 -->
 				<bean class="cn.sowell.copframe.messageConverter.XMLResponseConverter"  />
 				<!-- 用于将返回的AjaxPageResponse转换成JSON并写到响应正文中 -->
