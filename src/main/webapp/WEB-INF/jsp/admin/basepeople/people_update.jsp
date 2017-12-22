@@ -91,7 +91,7 @@ input:-webkit-autofill,
         min-height: 4.5em;
         line-height: 1.5em;
         box-sizing: content-box;
-        font-size: 14px
+        font-size: 14px;
     }
 
     .datacenter-input>.basic-slide.vaild,
@@ -159,13 +159,13 @@ input:-webkit-autofill,
     .datacenter-input>.basic-slide.vaild+label.active:after {
         display: block;
         color: #4CAF50;
-        content: "格式正确"
+        content: "格式正确";
     }
 
     .datacenter-input>.basic-slide.invaild+label.active:after {
         display: block;
         color: #F44336;
-        content: "格式错误"
+        content: "格式错误";
     }
     /* textarea自适应高度所需div */
 
@@ -382,7 +382,6 @@ input:-webkit-autofill,
 </style>
 <script>
 'use strict';
-
 ;(function (window, document) {
 
     var SWinput;
