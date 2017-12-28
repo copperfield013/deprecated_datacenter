@@ -1,5 +1,6 @@
 @CHARSET "UTF-8";
-#viewtempl-create *{
+#viewtempl-create {
+    min-height: 95%;
 }
 #viewtempl-create .widget-caption{
 	font-size: 1.3em;
@@ -36,16 +37,11 @@
     padding-right: 4%;
     font-weight: bold;
 }
-.dbcol label.field-title {
+#viewtempl-create .dbcol label.field-title {
     width: 10% !important;
     padding-right: 2% !important;
 }
 
-#viewtempl-create .field-item-placeholder, #viewtempl-create .group-item-placeholder{
-	background-color: #666;
-	opacity: 0.5;
-	border: 1px solid #999;
-}
 #viewtempl-create .group-item-placeholder{
 	width: 100%;
 	height: 40px;
@@ -139,22 +135,21 @@
 	border: 1px solid #000;
 }
 #viewtempl-create #operate-area {
-	font-size: 3em;
-    line-height: 3em;
-    height: 3em;
-    text-align: right;
+    font-size: 3em;
+    line-height: 1.23em;
     padding-right: 1em;
     position: absolute;
-	bottom: 15px;
-    right: 30px;
-    
+    bottom: 20px;
+    right: 1em;
+    z-index: 1000;
+    width: 1em;
 }
-#viewtempl-create #operate-area a{
+#viewtempl-create #operate-area a i{
 	cursor: pointer;
 	color: #57b5e3;
 	opacity: 0.5;
 }
-#viewtempl-create #operate-area a:HOVER{
+#viewtempl-create #operate-area a i:HOVER{
 	opacity: 1;
 }
 #viewtempl-create span.group-title{
@@ -187,14 +182,14 @@
     padding-right: 26px;
 }
 
-.field-search i.field-picker-button {
+#viewtempl-create .field-search i.field-picker-button {
     left: initial;
     right: 0;
     cursor: pointer;
     font-size: 17px;
 }
-.field-search i.field-picker-button:HOVER {
-	color: #7e3794 !important;
+#viewtempl-create .field-search i.field-picker-button:HOVER {
+	color: #388E8E !important;
 }
 
 #viewtempl-create span.field-title-d {
@@ -219,24 +214,103 @@
 #viewtempl-create div.fieldpicker-container {
     position: absolute;
     right: -20px;
-    left: -10em;
     bottom: -15em;
     top: 35px;
     z-index: 9999;
+    display: none;
+    width: 420px;
 }
 
-#viewtempl-create .fieldpicker-container a[data-toggle="tab"] {
+#viewtempl-create .fieldpicker-container .nav-tabs.nav-justified {
+    display: flex;
+    flex-direction: row;
 }
-
-#viewtempl-create .fieldpicker-container a[data-toggle="tab"] {
+#viewtempl-create .fieldpicker-container .nav-tabs.nav-justified>li {
+    display: block;
     height: 30px;
-    word-break: keep-all;
+    line-height: 30px;
+    border-right: 1px solid #dcdcdc;
+    border-bottom: 1px solid #dcdcdc;
+    width: 110px;
 }
 
-#viewtempl-create .fieldpicker-container>ul {
-    overflow-x: hidden;
-    overflow-y: hidden;
+#viewtempl-create .fieldpicker-container .nav-tabs.nav-justified>li>a {
+    height: 29px;
+    word-break: keep-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    line-height: 30px;
+    border-top: none;
+    background-color: #fafafa;
+    margin-top: 0;
+    width: 109px;
+    padding: 0;
 }
+
+#viewtempl-create .fieldpicker-container .nav-tabs.nav-justified>li.active>a{
+	background-color: #fff;
+	height: 32px;
+}
+#viewtempl-create .fieldpicker-container .nav-tabs.nav-justified>li.dropdown>a{
+    width: 90px;
+}
+#viewtempl-create .fieldpicker-container a.dropdown-toggle {
+	text-align: center;
+}
+#viewtempl-create .fieldpicker-container a.dropdown-toggle>span {
+    word-break: keep-all;
+    max-width: 3em;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: inline-block;
+}
+#viewtempl-create .fieldpicker-container a.dropdown-toggle:AFTER{
+	content: "\f0dd";
+    vertical-align: top;
+    line-height: 25px;
+}
+#viewtempl-create .fieldpicker-container li.dropdown ul.dropdown-menu li>a {
+    width: 170px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+#viewtempl-create a.fieldpicker-field-item {
+    border: 1px solid #c2c2c2;
+    padding: 2px 9px;
+    margin: 0 5px;
+    word-break: keep-all;
+    color: #00C5CD;
+}
+#viewtempl-create a.fieldpicker-field-item:hover {
+    border: 1px solid #a0a0a0;
+    color: 	#009ACD;
+}
+#viewtempl-create .fieldpicker-field-container {
+    width: 100%;
+    min-height: 100%;
+    word-break: keep-all;
+    word-wrap: break-word;
+}
+#viewtempl-create .fieldpicker-container .tab-content {
+    padding: 5px 10px;
+}
+
+#viewtempl-create a.disabled.fieldpicker-field-item {
+    color: #ccc !important;
+}
+
+#viewtempl-create a#save i{
+    color: #EEAD0E !important;
+}
+#viewtempl-create a#save i:HOVER{
+    color: 	#FFC125 !important;
+}
+
+
 /***********自动完成样式Start*****************/
 /*****************************************/
 

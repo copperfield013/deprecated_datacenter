@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
+import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.common.property.PropertyPlaceholder;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
@@ -43,6 +44,7 @@ import cn.sowell.copframe.utils.Assert;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.common.property.PropertyParser;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
 import cn.sowell.datacenter.model.basepeople.ExcelModelCriteria;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeopleItem;
@@ -52,12 +54,14 @@ import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleInformationEntity;
 import cn.sowell.datacenter.model.basepeople.service.BasePeopleService;
 import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
+import cn.sowell.datacenter.model.common.utils.UserUtils;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
+import cn.sowell.datacenter.model.peopledata.pojo.PeopleTemplateData;
 import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 import cn.sowell.datacenter.model.peopledata.service.PeopleButtService;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
+import cn.sowell.datacenter.model.peopledata.service.PeopleDictionaryService;
 import cn.sowell.datacenter.model.peopledata.service.PojoService;
-import cn.sowell.datacenter.model.peopledata.service.impl.PropertyParser;
 import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
 
 import com.alibaba.fastjson.JSON;
@@ -89,6 +93,10 @@ public class AdminPeopleDataController {
 
 
     Logger logger = Logger.getLogger(AdminPeopleDataController.class);
+
+    @Resource
+	PeopleDictionaryService dictService;
+    
     @org.springframework.web.bind.annotation.InitBinder
     public void InitBinder(ServletRequestDataBinder binder) {
         System.out.println("执行了InitBinder方法");
@@ -249,23 +257,39 @@ public class AdminPeopleDataController {
     }
 
 
-
-    @RequestMapping("/detail/{peopleCode}")
-    public String detail(@PathVariable String peopleCode, String datetime, Long timestamp, Model model){
-        Date date = null;
-        date = dateFormat.parse(datetime);
-        if(timestamp != null){
-        	date = new Date(timestamp);
-        }
-        PeopleData people = peopleService.getHistoryPeople(peopleCode, date);
-        //PeopleData people = peopleService.getPeople(peopleCode);
-        model.addAttribute("people", people);
-        model.addAttribute("datetime", datetime);
-        model.addAttribute("peopleCode", peopleCode);
-        model.addAttribute("date", date == null? new Date() : date);
-        return AdminConstants.JSP_PEOPLEDATA + "/peopledata_detail.jsp";
+    @RequestMapping("/detail_tmpl/{peopleCode}")
+    public String detailTmpl(
+    		@PathVariable String peopleCode, 
+    		Long tmplId, 
+    		String datetime, 
+    		Long timestamp, 
+    		Model model){
+    	 Date date = null;
+         date = dateFormat.parse(datetime);
+         if(timestamp != null){
+         	date = new Date(timestamp);
+         }
+         UserIdentifier user = UserUtils.getCurrentUser();
+         PeopleTemplateData template = null;
+         if(tmplId == null){
+        	 template = dictService.getDefaultTemplate(user);
+         }else{
+        	 template = dictService.getTemplate(tmplId);
+         }
+         List<PeopleTemplateData> tmplList = dictService.getAllTemplateList(user, null, false);
+         PeopleData people = peopleService.getHistoryPeople(peopleCode, date);
+         PropertyParser parser = pojoService.createPropertyParser(people);
+         model.addAttribute("parser", parser);
+         model.addAttribute("people", people);
+         model.addAttribute("datetime", datetime);
+         model.addAttribute("peopleCode", peopleCode);
+         model.addAttribute("tmpl", template);	
+         model.addAttribute("date", date == null? new Date() : date);
+         model.addAttribute("tmplList", tmplList);
+         model.addAttribute("timestamp", timestamp);
+         return AdminConstants.JSP_PEOPLEDATA + "/peopledata_detail_tmpl.jsp";
     }
-
+    
 
     @RequestMapping("/smart/{peopleCode}")
     public String smart(@PathVariable String peopleCode, Model model){

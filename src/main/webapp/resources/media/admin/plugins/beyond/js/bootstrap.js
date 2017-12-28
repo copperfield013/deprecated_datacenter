@@ -2136,11 +2136,15 @@ if (typeof jQuery === 'undefined') {
         .end()
         .find('[data-toggle="tab"]')
           .attr('aria-expanded', false)
+        .end()
+        .trigger('cpf-inactivate')
 
       element
         .addClass('active')
         .find('[data-toggle="tab"]')
           .attr('aria-expanded', true)
+        .end()
+        .trigger('cpf-activate')
 
       if (transition) {
         element[0].offsetWidth // reflow for transition

@@ -5,7 +5,6 @@ import java.util.Map;
 
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.ExcelModelCriteria;
-import cn.sowell.datacenter.model.basepeople.pojo.BasePeopleDicInfomation;
 import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleInformationEntity;

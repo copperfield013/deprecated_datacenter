@@ -1,15 +1,21 @@
 package cn.sowell.datacenter.model.peopledata.service.impl;
 
+import javax.annotation.Resource;
+
 import org.springframework.expression.spel.SpelParserConfiguration;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Service;
 
+import cn.sowell.datacenter.common.property.PropertyParser;
+import cn.sowell.datacenter.common.property.PropertyValueTranslatorSet;
 import cn.sowell.datacenter.model.peopledata.service.PojoService;
 
 @Service
 public class PojoServiceImpl implements PojoService{
 	SpelExpressionParser parser;
-
+	@Resource
+	PropertyValueTranslatorSet translatorSet;
+	
 	public PojoServiceImpl() {
 		SpelParserConfiguration config = new SpelParserConfiguration(true, true);
 		this.parser = new SpelExpressionParser(config);
@@ -17,7 +23,7 @@ public class PojoServiceImpl implements PojoService{
 	
 	@Override
 	public PropertyParser createPropertyParser(Object pojo) {
-		return new PropertyParser(pojo, this.parser);
+		return new PropertyParser(pojo, this.parser, translatorSet);
 	}
 
 }

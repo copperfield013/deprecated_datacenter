@@ -43,6 +43,9 @@ define(function(require, exports, module){
 			width		: bodySize.width * 3/5,
 			height		: bodySize.height * 3/5,
 			top			: 0,//bodySize.top + bodySize.Height * 1/5,
+			events		: {
+				afterClose		: null
+			}
 		};
 		var param = $.extend({}, defaultParam, _param);
 		var id = String(param.id),
@@ -195,6 +198,7 @@ define(function(require, exports, module){
 		//关闭弹出框，并移除弹出框的dom
 		this.close = function(){
 			hideModal();
+			this.getEventCallbacks('afterClose').fire([this]);
 		};
 		//显示弹出框
 		this.show = function(){
@@ -225,6 +229,18 @@ define(function(require, exports, module){
 		this.destruct = function(){
 			Page.remove(id);
 		};
+		/**
+		 * 
+		 */
+		this.getEventCallbacks = function(eventName, flag){
+			if(eventName && typeof eventName === 'string'){
+				var event = param.events[eventName];
+				if(!event){
+					param.events[eventName] = event = $.Callbacks(flag || 'stopOnFalse');
+				}
+				return event;
+			}
+		}
 		/**
 		 * 内部函数，用于处理弹出框底部框中的按钮的事件
 		 */

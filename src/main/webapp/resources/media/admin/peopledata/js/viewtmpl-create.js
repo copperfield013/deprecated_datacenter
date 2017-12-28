@@ -1,4 +1,5 @@
-seajs.use(['utils', 'dialog', 'bloodhound', 'dialog', 'ajax'], function(Utils, Dialog, Bloodhound, Dialog, Ajax){
+seajs.use(['utils', 'dialog', 'bloodhound', 'ajax'], function(Utils, Dialog, Bloodhound, Ajax){
+	console.log('1111');
 	var $page = $('#viewtempl-create');
 	var $groupContainer = $('.group-container', $page);
 	var $tmplFieldGroup = $('#tmpl-field-group', $page),
@@ -6,7 +7,8 @@ seajs.use(['utils', 'dialog', 'bloodhound', 'dialog', 'ajax'], function(Utils, D
 	var events = {
 		afterRemoveGroup	: $.noop
 	}
-	var tmplData = {
+	var tmplData = {};
+	/*var tmplData = {
 		groups	: [
 		    {
 		    	id		: 1,
@@ -52,7 +54,7 @@ seajs.use(['utils', 'dialog', 'bloodhound', 'dialog', 'ajax'], function(Utils, D
 		    	]
 		    }
 		]
-	}
+	}*/
 	/**
 	 * 初始化某个字段组内的字段容器的拖拽事件
 	 */
@@ -141,7 +143,7 @@ seajs.use(['utils', 'dialog', 'bloodhound', 'dialog', 'ajax'], function(Utils, D
 		});
 	}
 	
-	var __fieldData = null, __compositeData = null, waitFnArray = null;
+	var __fieldData = null, __compositeData = null, __fieldKeyData = {}, waitFnArray = null;
 	/**
 	 * 初始化字段数据后执行callback方法
 	 */
@@ -158,37 +160,49 @@ seajs.use(['utils', 'dialog', 'bloodhound', 'dialog', 'ajax'], function(Utils, D
 			}, function(data){
 				if(data){
 					__compositeData = data;
-					__fieldData = transferInfoToFields(__compositeData);
+					__fieldData = transferInfoToFields(__compositeData, __fieldKeyData);
 					for(var i in waitFnArray){
-						(waitFnArray[i] || $.noop)(__fieldData, __compositeData);
+						(waitFnArray[i] || $.noop)(__fieldData, __compositeData, __fieldKeyData);
 					}
 					waitFnArray = null;
 				}
 			});
 		}else{
-			(callback || $.noop)(__fieldData, __compositeData);
+			(callback || $.noop)(__fieldData, __compositeData, __fieldKeyData);
 		}
 	}
-	
-	function transferInfoToFields(infoData){
+	function getFieldData(fieldId, callback){
+		afterLoadFieldData(function(fData, cData, fieldKeyData){
+			var field = fieldKeyData['id_' + fieldId];
+			if(field){
+				(callback || $.noop)(field);
+			}
+		});
+	}
+	/**
+	 * 将
+	 */
+	function transferInfoToFields(compositeData, fieldKeyData){
 		var fieldData = [];
-		for(var i in infoData){
-			var thisInfo = infoData[i];
-			for(var j in thisInfo.fields){
-				var thisField = thisInfo.fields[j];
-				fieldData.push({
-					id		: thisField.id,
-					name	: thisField.name,
-					cname	: thisField.cname,
-					type	: thisField.type,
-					c_id	: thisInfo.id,
-					c_name	: thisInfo.name,
-					c_cname	: thisInfo.cname
+		for(var i in compositeData){
+			var thisComposite = compositeData[i];
+			for(var j in thisComposite.fields){
+				var thisField = thisComposite.fields[j];
+				fieldData.push(
+				fieldKeyData['id_' + thisField.id] = {
+						id		: thisField.id,
+						name	: thisField.name,
+						cname	: thisField.cname,
+						type	: thisField.type,
+						c_id	: thisComposite.id,
+						c_name	: thisComposite.name,
+						c_cname	: thisComposite.cname
 				});
 			}
 		}
 		return fieldData;
 	}
+	
 	
 	/**
 	 * 初始化某个字段组的自动完成功能
@@ -210,21 +224,7 @@ seajs.use(['utils', 'dialog', 'bloodhound', 'dialog', 'ajax'], function(Utils, D
 					suggestion	: Handlebars.compile('<p><strong>{{cname}}</strong>-<i>{{c_cname}}</i></p>')
 				}
 			}).bind('typeahead:select', function(e, suggestion){
-				//判断字段在页面中是否存在
-				var $existsField = $page.find('.field-item[field-id="' + suggestion.id + '"]');
-				if($existsField.length > 0){
-					Dialog.notice('该字段已存在，不能重复添加', 'error');
-				}else{
-					//构造新字段的内容
-					var fieldData = {
-							title	: suggestion.cname,
-							name	: suggestion.cname,
-							fieldId	: suggestion.id,
-							dv		: 'XXXXX'
-					}
-					//将字段插入到字段组中
-					appendFieldToGroup(fieldData, $group);
-					//搜索后将输入框值置空
+				if(appendFieldToGroup(suggestion.id, $group)){
 					$search.typeahead('val', '');
 				}
 			});
@@ -240,19 +240,50 @@ seajs.use(['utils', 'dialog', 'bloodhound', 'dialog', 'ajax'], function(Utils, D
 		tolerance 	: 'pointer'
 	});
 	
-	function appendFieldToGroup(fieldData, $group){
-		var $fieldContainer = getFieldContainer($group);
-		var $field = $tmplField.tmpl(fieldData);
-		$field.data('field-data', fieldData).appendTo($fieldContainer);
-		adjustFieldTitle($field.find('.field-title'));
-		
+	function appendFieldToGroup(fieldId, $group){
+		//判断字段在页面中是否存在
+		var $existsField = $page.find('.field-item[field-id="' + fieldId + '"]');
+		if($existsField.length > 0){
+			Dialog.notice('该字段已存在，不能重复添加', 'error');
+			return false;
+		}else{
+			//构造新字段的内容
+			getFieldData(fieldId, function(field){
+				var fieldData = {
+						title	: field.cname,
+						name	: field.cname,
+						fieldId	: field.id,
+						dv		: 'XXXXX'
+				};
+				//将字段插入到字段组中
+				var $fieldContainer = getFieldContainer($group);
+				var $field = $tmplField.tmpl(fieldData);
+				$field.data('field-data', fieldData).appendTo($fieldContainer);
+				adjustFieldTitle($field.find('.field-title'));
+			});
+			fieldpickerHandler(function($fieldpicker){
+				var $toDisable = $('a.fieldpicker-field-item[data-id="' + fieldId + '"]', $fieldpicker);
+				$toDisable.addClass('disabled');
+			});
+			return true;
+		}
 	}
 	/**
-	 * 将字段选择器放到搜索框下
+	 * 切换字段选择器的显示状态
 	 */
-	function appendFieldPicker($group){
-		var $fieldSearch = $group.find('.field-search');
-		fieldpickerHandler(function($fieldPicker){$fieldSearch.append($fieldPicker.show())});
+	function toggleFieldPicker($group, toShow){
+		fieldpickerHandler(function($fieldPicker, free){
+			if($group === false){
+				$fieldPicker.hide();
+			}else{
+				if($fieldPicker.closest($group).length == 1){
+					$fieldPicker.toggle(toShow);
+				}else{
+					var $fieldSearch = $group.find('.field-search');
+					$fieldSearch.append($fieldPicker.show());
+				}
+			}
+		});
 	}
 	
 	var __$fieldPicker = null;
@@ -260,18 +291,37 @@ seajs.use(['utils', 'dialog', 'bloodhound', 'dialog', 'ajax'], function(Utils, D
 	 * 传入一个函数，获得字段选择器的dom，并对其进行处理
 	 */
 	function fieldpickerHandler(callback){
-		if(!__$fieldPicker){
-			afterLoadFieldData(function(fieldData, compositeData){
+		afterLoadFieldData(function(fieldData, compositeData){
+			if(!__$fieldPicker){
 				__$fieldPicker = $('#tmpl-fieldpicker', $page).tmpl({
 					composites	: compositeData
 				});
-				(callback || $.noop)(__$fieldPicker);
-			});
-		}else{
-			(callback || $.noop)(__$fieldPicker);
-		}
+				$('.fieldpicker-field-item', __$fieldPicker).click(function(){
+					var $this = $(this);
+					if(!$this.is('.disabled')){
+						var fieldId = $this.attr('data-id');
+						if(fieldId){
+							appendFieldToGroup(fieldId, getLocateGroup(this));
+						}
+					}
+				});
+				$('ul.dropdown-menu>li>a', __$fieldPicker).click(function(){
+					var $this = $(this);
+					var $li = $this.closest('li.dropdown');
+					$li.find('a.dropdown-toggle span').text($this.text());
+				});
+				(callback || $.noop)(__$fieldPicker, true);
+			}else{
+				(callback || $.noop)(__$fieldPicker, false);
+			}
+		});
 	}
 	
+	function enableFieldSelectable(fieldId){
+		fieldpickerHandler(function($fieldPicker){
+			$fieldPicker.find('.fieldpicker-field-item.disabled[data-id="' + fieldId + '"]').removeClass('disabled');
+		});
+	}
 	
 	
 	//初始化默认数据
@@ -282,7 +332,7 @@ seajs.use(['utils', 'dialog', 'bloodhound', 'dialog', 'ajax'], function(Utils, D
 			bindGroupFieldsDraggable($fieldContainer);
 			for(var j in tmplData.groups[i].fields){
 				var field = tmplData.groups[i].fields[j];
-				appendFieldToGroup(field, $group);
+				appendFieldToGroup(field.id, $group);
 			}
 			$group.data('group-data', tmplData.groups[i]).appendTo($groupContainer);
 			initGroupFieldSearchAutocomplete($group);
@@ -326,19 +376,84 @@ seajs.use(['utils', 'dialog', 'bloodhound', 'dialog', 'ajax'], function(Utils, D
 		return $('.field-container', $group);
 	}
 	
+	/**
+	 * 检查并整合页面中的模板数据
+	 */
+	function checkSaveData(callback){
+		var saveData = {
+			//id		: $('#tmplId', $page).val(),
+			//模板名
+			name	: $('#tmplName', $page).val(),
+			//字段组
+			groups	: []
+		};
+		//遍历所有字段组
+		$groupContainer.find('.field-group').each(function(){
+			var $group = $(this);
+			var group = {
+					id		: $group.attr('data-id'),
+					title	: $group.find('span.group-title').text(),
+					fields	: []								
+			};
+			saveData.groups.push(group);
+			//遍历所有字段
+			$group.find('.field-item').each(function(){
+				var $field = $(this);
+				var field = {
+					id		: $field.attr('data-id'),
+					fieldId	: $field.attr('field-id'),
+					title	: $field.find('label.field-title').text(),
+					viewVal	: $field.find('span.field-view').text(),
+					dbcol	: $field.is('.dbcol')
+				};
+				group.fields.push(field);
+			});
+		});
+		if(!saveData.name){
+			Dialog.notice('请填写模板名', 'error');
+		}else if(saveData.groups.length == 0){
+			Dialog.notice('请至少添加一个字段组', 'error');
+		}else{
+			Dialog.confirm('确认保存模板？', function(yes){
+				if(yes){
+					(callback || $.noop)(saveData);
+				}
+			});
+		}
+	}
+	
 	//绑定点击添加字段组按钮的事件
 	$('#add-group', $page).click(function(){
 		var $group = $tmplFieldGroup.tmpl({
 					title	: '新字段组'
 				}).appendTo($groupContainer);
 		//绑定字段组内字段的拖动动作
-		bindGroupFieldsDraggable($group)
+		bindGroupFieldsDraggable(getFieldContainer($group));
 		//初始化字段组的字段搜索自动完成功能
 		initGroupFieldSearchAutocomplete($group);
 		//页面滚动到底部
 		Utils.scrollTo($page.closest('.cpf-page-content'));
 		//触发字段组的标题修改功能
 		$group.find('.group-title').trigger('dblclick');
+	});
+	//绑定点击保存按钮时的回调
+	$('#save', $page).click(function(){
+		checkSaveData(function(saveData){
+			Ajax.postJson('admin/peopledata/viewtmpl/save', saveData, function(data){
+				if(data.status === 'suc'){
+					Dialog.notice('保存成功', 'success');
+				}else{
+					Dialog.notice('保存失败', 'error');
+				}
+			});
+		});
+	});
+	$('#tmplName', $page).keypress(function(e){
+		if(e.keyCode === 13){
+			if($groupContainer.children('.field-group').length === 0){
+				$('#add-group', $page).trigger('click');
+			}
+		}
 	});
 	
 	//切换字段的显示长度
@@ -355,6 +470,7 @@ seajs.use(['utils', 'dialog', 'bloodhound', 'dialog', 'ajax'], function(Utils, D
 			groupName = $group.find('.group-title').text();
 		Dialog.confirm('确认在字段组[' + groupName + ']中删除字段[' + fieldTitle + ']？', function(yes){
 			if(yes){
+				enableFieldSelectable($field.attr('field-id'));
 				$field.remove();
 			}
 		});
@@ -386,12 +502,28 @@ seajs.use(['utils', 'dialog', 'bloodhound', 'dialog', 'ajax'], function(Utils, D
 				//移除
 				$group.remove();
 				events.afterRemoveGroup([$group, $group.attr('data-id'), groupTitle]);
+				$('.field-item[field-id]', $group).each(function(){
+					enableFieldSelectable($(this).attr('field-id'));
+				});
 			}
 		});
 	});
-	
-	bindPageEvent('click', 'i.field-picker-button', function(e){
-		appendFieldPicker(getLocateGroup(e.target));
+	//切换字段选择框
+	$page.on('mousedown', function(e){
+		var $target = $(e.target);
+		if($target.closest('.field-picker-button').length == 1){
+			toggleFieldPicker(getLocateGroup($target));
+			return false;
+		}else if($target.closest('.fieldpicker-container').length === 0){
+			toggleFieldPicker(false);
+		}
+	});
+	//添加字段快捷键
+	$page.on('keydown', ':text', function(e){
+		if(e.altKey && e.keyCode == 78){
+			$('#add-group', $page).trigger('click');
+			return false;
+		}
 	});
 	
 	//双击编辑字段组标题
@@ -402,6 +534,7 @@ seajs.use(['utils', 'dialog', 'bloodhound', 'dialog', 'ajax'], function(Utils, D
 	//字段的标题初始化，需要延迟，等到页面加载完之后执行
 	setTimeout(function(){
 		$('.field-title', $page).each(function(){adjustFieldTitle($(this))});
+		$('#tmplName', $page).focus();
 	}, 50);
 
 });

@@ -39,7 +39,20 @@ define(function(require, exports, module){
 							eval(je.exec(href)[1]);
 						}catch(e){}
 					}else if(href && href !== '#'){
-						goPage(this, page);
+						var reg = /^page:(\w+)$/; 
+						if(reg.test(href)){
+							var action = reg.exec(href)[1];
+							switch(action){
+							case 'refresh'	:
+								$page.getLocatePage().refresh();
+								break;
+							case 'close'	:
+								$page.getLocatePage().close();
+								break;
+							}
+						}else{
+							goPage(this, page);
+						}
 					}
 				});
 			}else{
@@ -59,7 +72,20 @@ define(function(require, exports, module){
 									if(yes) goPage($this, page);
 								});
 							}else{
-								goPage($this, page);
+								var reg = /^page:(\w+)$/; 
+								if(reg.test(href)){
+									var action = reg.exec(href)[1];
+									switch(action){
+									case 'refresh'	:
+										$page.getLocatePage().refresh();
+										break;
+									case 'close'	:
+										$page.getLocatePage().close();
+										break;
+									}
+								}else{
+									goPage($this, page);
+								}
 							}
 						}
 					}
@@ -165,6 +191,14 @@ define(function(require, exports, module){
 		this.close = function(){
 			if(typeof pageObj.close === 'function'){
 				pageObj.close();
+			}
+		};
+		/**
+		 * 
+		 */
+		this.getEventCallbacks = function(){
+			if(typeof pageObj.getEventCallbacks === 'function'){
+				return pageObj.getEventCallbacks.apply(pageObj, arguments);
 			}
 		}
 	}

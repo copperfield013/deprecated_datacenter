@@ -39,18 +39,30 @@
 	<script type="jquery/tmpl" id="tmpl-fieldpicker">
 		<div class="fieldpicker-container">
 			<ul class="nav nav-tabs nav-justified">
-				{{each(i, composite) composites}}
-					<li class="{{if i==0}}active{{/if}}">
-						<a data-toggle="tab" href="#ctab_\${i }">\${composite.cname }</a>
+				<li class="active"><a data-toggle="tab" href="#ctab_0">\${composites[0].cname }</a></li>
+				<li><a data-toggle="tab" href="#ctab_1">\${composites[1].cname }</a></li>
+				<li><a data-toggle="tab" href="#ctab_2">\${composites[2].cname }</a></li>
+				{{if composites.length > 3}}
+					<li class="dropdown">
+						<a data-toggle="dropdown" class="fa dropdown-toggle" href="#">
+							<span>更多</span>
+						</a>
+						<ul class="dropdown-menu dropdown-blue">
+							{{each(i, composite) composites}}
+								{{if i > 3}}
+									<li><a data-toggle="tab" href="#ctab_\${i }">\${composite.cname }</a></li>
+								{{/if}}
+							{{/each}}
+						</ul>
 					</li>
-				{{/each}}
+				{{/if}}
 			</ul>
 			<div class="tab-content">
 				{{each(i, composite) composites}}
 					<div id="ctab_\${i }" class="tab-pane {{if i==0}}active{{/if}}">
 						<div class="fieldpicker-field-container">
 							{{each(i, field) composite.fields}}
-								<a href="#" class="fieldpicker-field-item">\${field.cname }</a>
+								<a href="#" data-id="\${field.id}" class="fieldpicker-field-item">\${field.cname }</a>
 							{{/each}}
 						</div>
 					</div>
@@ -58,6 +70,8 @@
 			</div>
 		</div>
 	</script>
+		
+		
 	<div class="page-header">
 		<div class="header-title">
 			<h1>创建人口信息模板</h1>
@@ -67,9 +81,11 @@
 		<div id="operate-area">
 			<div class="operate-area-cover"></div>
 			<a id="add-group" title="添加字段组"><i class="fa fa-plus-square"></i></a>
+			<a id="save" title="保存"><i class="fa fa-check-square"></i></a>
 		</div>
 		<div class="row header-row">
 			<div class="col-lg-10 col-lg-offset-1">
+				<input type="hidden" name="tmplId" value="" />
 				<input type="text" class="form-control" id="tmplName" placeholder="请输入模板名称">
 			</div>
 		</div>

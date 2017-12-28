@@ -68,7 +68,13 @@ define(function(require, exports, module){
 			onPageLoad		: $.noop,
 			onClose			: $.noop,
 			$title			: undefined,
-			$content		: undefined
+			$content		: undefined,
+			events			: {
+				afterClose		: null,
+				//调用该事件需要修改bootstrap的源码中的Tab.prototype.activate#next方法
+				//为$active触发一个事件.trigger('inactivate')
+				afterInactivate	: null
+			}
 		};
 		var param = $.extend({}, defaultParam, _param);
 		var id = param.id,
@@ -95,6 +101,8 @@ define(function(require, exports, module){
 		});
 		
 		tabDomObj.$title.data($CPF.getParam('tabTitleDataKey'), this);
+		tabDomObj.$title.on('cpf-activate', function(){_this.getEventCallbacks('afterActivate').fire([_this])});
+		tabDomObj.$title.on('cpf-inactivate', function(){_this.getEventCallbacks('afterInactivate').fire([_this])});
 		this.getId = function(){
 			return id;
 		};
@@ -157,7 +165,7 @@ define(function(require, exports, module){
 					$title.remove();
 					var __title = $title.text();
 					if(__title){
-						_title = title;
+						_title = __title;
 					}
 				}
 				this.getContent().html(content.html());
@@ -290,6 +298,7 @@ define(function(require, exports, module){
 			this.getTitleDom().remove();
 			this.getContent().remove();
 			this.destruct();
+			this.getEventCallbacks('afterClose').fire([this]);
 			if(finalWidth >= warpWidth){
 				if(ulLeft < 0){
 					ulDom.css("left",ulLeft+closeWidth)
@@ -323,6 +332,18 @@ define(function(require, exports, module){
 		this.destruct = function(){
 			Page.remove(id);
 		};
+		/**
+		 * 
+		 */
+		this.getEventCallbacks = function(eventName, flag){
+			if(eventName && typeof eventName === 'string'){
+				var event = param.events[eventName];
+				if(!event){
+					param.events[eventName] = event = $.Callbacks(flag || 'stopOnFalse');
+				}
+				return event;
+			}
+		}
 	
 	}
 	
@@ -390,7 +411,6 @@ define(function(require, exports, module){
 		$($page).on('click', 'a[href]', function(e){
 			e.preventDefault();
 		});
-		
 		/**
 		 * 将a标签天跳转页面修改为在标签页中打开
 		 */

@@ -19,4 +19,5 @@ public interface PeopleDataService {
 
 	List<Map<String, Object>> queryMap(PeopleDataCriteria criteria, PageInfo pageInfo, List<TBasePeopleDictionaryEntity> keys);
 
+
 }

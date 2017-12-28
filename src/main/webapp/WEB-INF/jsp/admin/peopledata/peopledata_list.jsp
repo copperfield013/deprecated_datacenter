@@ -15,7 +15,7 @@
 			<a class="btn btn-primary tab" href="admin/peopledata/add" title="创建人口" target="people_add" >创建</a>
 			<a class="btn btn-primary tab" href="admin/peopledata/import" title="导入人口" target="people_import">导入</a>
 			<a class="btn btn-primary tab" href="admin/peopledata/output" title="导出人口" target="people_output">导出</a>
-			<a class="btn tab" href="admin/peopledata/viewtmpl/to_create" title="字段管理模版" target="people_model">创建人口信息模板</a>
+			<a class="btn tab" href="admin/peopledata/viewtmpl/list" title="模板配置" target="viewtmpl_list">模板配置</a>
 			<a class="btn tab" href="admin/peopledata/model" title="字段管理模版" target="people_model">字段管理模版</a>
 		</form>
 	</nav>
@@ -35,7 +35,7 @@
 				<c:forEach items="${list }" var="item" varStatus="i">
 					<tr>
 						<td>${i.index + 1 }</td>
-						<td><a class="tab" href="admin/peopledata/detail/${item.peopleCode }" target="people_detail_${item.peopleCode }" title="详情-${item.name }">${item.name }</a></td>
+						<td><a class="tab" href="admin/peopledata/detail_tmpl/${item.peopleCode }" target="people_detail_${item.peopleCode }" title="详情-${item.name }">${item.name }</a></td>
 						<td>${item.idcode }</td>
 						<td>${item.address }</td>
 						<td>${item.contact }</td>

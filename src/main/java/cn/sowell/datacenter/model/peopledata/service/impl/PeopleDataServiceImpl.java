@@ -22,6 +22,7 @@ import com.abc.query.criteria.LikeQueryCriteria;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.spring.binder.FieldRefectUtils;
 import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.datacenter.common.property.PropertyParser;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.service.impl.FusionContextFactoryDC;

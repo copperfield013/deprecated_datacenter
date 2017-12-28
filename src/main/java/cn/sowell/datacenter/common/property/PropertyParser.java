@@ -1,4 +1,4 @@
-package cn.sowell.datacenter.model.peopledata.service.impl;
+package cn.sowell.datacenter.common.property;
 
 import java.util.Collection;
 import java.util.Map;
@@ -11,21 +11,32 @@ import org.springframework.util.Assert;
 public class PropertyParser implements Map<String, Object>{
 	private Object obj;
 	private ExpressionParser parser;
+	private PropertyValueTranslatorSet translatorSet;
 	
-	public PropertyParser(Object obj, ExpressionParser parser) {
+	public PropertyParser(Object obj, ExpressionParser parser, PropertyValueTranslatorSet translators) {
 		Assert.notNull(parser);
+		Assert.notNull(translators);
 		this.obj = obj;
 		this.parser = parser;
+		this.translatorSet = translators;
 	}
+	
 	
 	public Object getPropertyValue(String expEl){
 		Expression exp = parser.parseExpression(expEl);
-		return exp.getValue(obj);
+		GetPropertyValueComposite composite = new DefaultGetPropertyValueComposite(obj, exp);
+		PropertyValueTranslator translator = translatorSet.getTranslator(composite);
+		return translator != null? translator.getValue(composite): null;
 	}
 	
-	public void setPropertyValue(String expEl,Object value){
+
+	public void setPropertyValue(String expEl, Object value){
 		Expression exp = parser.parseExpression(expEl);
-		exp.setValue(obj, value);
+		SetPropertyValueComposite composite = new DefaultSetPropertyValueComposite(obj, exp, value);
+		PropertyValueTranslator translator = translatorSet.getTranslator(composite);
+		if(translator != null){
+			translator.setValue(composite);
+		}
 	}
 
 	@Override

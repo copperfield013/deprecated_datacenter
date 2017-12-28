@@ -59,5 +59,10 @@ public interface AdminConstants {
 	final String JSP_SPECIAL_POSITION = JSP_BASE + "/specialposition";
 
 	final String JSP_PEOPLEDATA_VIEWTMPL = JSP_PEOPLEDATA + "/viewtmpl";
+
+	/**
+	 * 默认的系统id
+	 */
+	final long SYS_DEF = 1;
 	
 }

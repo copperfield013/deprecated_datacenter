@@ -39,6 +39,7 @@ import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.excel.CellTypeUtils;
+import cn.sowell.datacenter.common.property.PropertyParser;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
 import cn.sowell.datacenter.model.basepeople.dao.PropertyDictionaryDao;
 import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
@@ -48,7 +49,6 @@ import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.service.PojoService;
 import cn.sowell.datacenter.model.peopledata.service.impl.EntityTransfer;
-import cn.sowell.datacenter.model.peopledata.service.impl.PropertyParser;
 import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
 
 import com.abc.application.FusionContext;

@@ -1,4 +1,4 @@
-.inforpage-wrap {
+/* .inforpage-wrap {
 	height: 100%;
 	width: 100%;
 	overflow:hidden;
@@ -232,7 +232,7 @@ div.tab-content {
 	border-color: #126def;
 }
 
-/* 自动补全样式 */
+锟皆讹拷锟斤拷全锟斤拷式
 .search-inforbox {
 	display: inline-block;
 	position: relative;
@@ -278,7 +278,7 @@ div.tab-content {
     height: 2px;
     background-color: #126def;
 }
-/* 查看模式和搜索模式不同样式 */
+锟介看模式锟斤拷锟斤拷锟斤拷模式锟斤拷同锟斤拷式
 .smartForm.search .selection-container {
 	display:none;
 }
@@ -310,4 +310,4 @@ div.tab-content {
 		display: inline-block;
 		padding-right: 0;
 	}
-}
+} */
