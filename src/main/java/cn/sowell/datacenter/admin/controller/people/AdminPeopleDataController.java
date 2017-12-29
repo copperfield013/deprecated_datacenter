@@ -40,7 +40,6 @@ import cn.sowell.copframe.common.property.PropertyPlaceholder;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
-import cn.sowell.copframe.utils.Assert;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
@@ -141,18 +140,6 @@ public class AdminPeopleDataController {
         return AdminConstants.JSP_PEOPLEDATA + "/peopledata_update_new.jsp";
     }
 
-    @ResponseBody
-    @RequestMapping("/do_update")
-    public AjaxPageResponse doUpdate(PeopleData people){
-        try {
-            Assert.notNull(people.getPeopleCode());
-            abcService.savePeople(people);
-            return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改成功", "peopledata_list");
-        } catch (Exception e) {
-            logger.error("添加失败", e);
-            return AjaxPageResponse.FAILD("修改失败");
-        }
-    }
 
 
 
@@ -256,6 +243,39 @@ public class AdminPeopleDataController {
         return jRes;
     }
 
+    
+    @RequestMapping("/update_tmpl/{peopleCode}")
+    public String updateTmpl(@PathVariable String peopleCode, Long tmplId, Model model){
+    	PeopleTemplateData template = null;
+    	UserIdentifier user = UserUtils.getCurrentUser();
+    	if(tmplId == null){
+			template = dictService.getDefaultTemplate(user);
+    	}else{
+    		template = dictService.getTemplate(tmplId);
+    	}
+    	List<PeopleTemplateData> tmplList = dictService.getAllTemplateList(user, null, false);
+    	PeopleData people = peopleService.getPeople(peopleCode);
+        PropertyParser parser = pojoService.createPropertyParser(people);
+        model.addAttribute("tmplList", tmplList);
+        model.addAttribute("parser", parser);
+        model.addAttribute("people", people);
+        model.addAttribute("tmpl", template);
+        model.addAttribute("peopleCode", peopleCode);
+    	return AdminConstants.JSP_PEOPLEDATA + "/peopledata_update_tmpl.jsp";
+    }
+    
+    @ResponseBody
+    @RequestMapping("/do_update")
+    public AjaxPageResponse doUpdate(@RequestParam String peopleCode, @RequestParam Map<String, String> map){
+    	 try {
+             buttService.updatePeople(peopleCode, map);
+             return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改成功", "peopledata_list");
+         } catch (Exception e) {
+             logger.error(e);
+             return AjaxPageResponse.FAILD("修改失败");
+         }
+    }
+    
 
     @RequestMapping("/detail_tmpl/{peopleCode}")
     public String detailTmpl(
@@ -342,17 +362,6 @@ public class AdminPeopleDataController {
         return jRes;
     }
 
-    @ResponseBody
-    @RequestMapping("/do_smart_update")
-    public AjaxPageResponse doUpdate(String peopleCode, @RequestParam Map<String,String> map){
-        try {
-            buttService.updatePeople(peopleCode, map);
-            return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改成功", "peopledata_list");
-        } catch (Exception e) {
-            logger.error(e);
-            return AjaxPageResponse.FAILD("修改失败");
-        }
-    }
 
 
 

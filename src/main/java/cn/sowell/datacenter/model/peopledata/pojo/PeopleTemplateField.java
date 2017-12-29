@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
@@ -46,6 +47,11 @@ public class PeopleTemplateField {
 	@Column(name="c_view_value")
 	@JSONField(name="dv")
 	private String viewValue;
+	
+	@Transient
+	@Column(name="c_type")
+	private String type;
+	
 	public Long getId() {
 		return id;
 	}
@@ -105,6 +111,12 @@ public class PeopleTemplateField {
 	}
 	public void setViewValue(String viewValue) {
 		this.viewValue = viewValue;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
 	}
 	
 }

@@ -26,13 +26,14 @@ public class PeopleFieldDictionaryItem {
 	@JSONField(name="cname")
 	private String cname;
 	
-	@Column(name="type")
+	@Column(name="c_type")
 	@JSONField(name="type")
-	private Integer type;
+	private String type;
 	
 	@Column(name="c_info_id")
 	@JSONField(name="c_id")
 	private Long compositeId;
+	
 
 	public Long getId() {
 		return id;
@@ -58,20 +59,20 @@ public class PeopleFieldDictionaryItem {
 		this.cname = cname;
 	}
 
-	public Integer getType() {
-		return type;
-	}
-
-	public void setType(Integer type) {
-		this.type = type;
-	}
-
 	public Long getCompositeId() {
 		return compositeId;
 	}
 
 	public void setCompositeId(Long compositeId) {
 		this.compositeId = compositeId;
+	}
+
+	protected String getType() {
+		return type;
+	}
+
+	protected void setType(String type) {
+		this.type = type;
 	}
 
 }

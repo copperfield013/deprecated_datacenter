@@ -6,6 +6,7 @@ import java.util.Set;
 
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.datacenter.model.basepeople.pojo.BasePeopleItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleCompositeDictionaryItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleFieldDictionaryItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleTemplateData;
@@ -62,6 +63,12 @@ public interface PeopleDictionaryDao {
 	 * @return
 	 */
 	boolean removeTemplate(Long tmplId);
+
+	/**
+	 * 
+	 * @return
+	 */
+	List<BasePeopleItem> getAllEnumList();
 
 
 }

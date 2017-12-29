@@ -15,6 +15,7 @@ import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
+import cn.sowell.datacenter.model.basepeople.pojo.BasePeopleItem;
 import cn.sowell.datacenter.model.common.dao.NormalOperateDao;
 import cn.sowell.datacenter.model.peopledata.dao.PeopleDictionaryDao;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleCompositeDictionaryItem;
@@ -221,6 +222,11 @@ public class PeopleDictionaryServiceImpl implements PeopleDictionaryService{
 		if(!dictDao.removeTemplate(tmplId)){
 			throw new RuntimeException("删除失败，没有找到id为[" + tmplId + "]的模板对象");
 		}
+	}
+
+	@Override
+	public List<BasePeopleItem> getAllEnumList() {
+		return dictDao.getAllEnumList();
 	}
 	
 }

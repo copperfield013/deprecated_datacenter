@@ -1,18 +1,56 @@
+
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <link type="text/css" rel="stylesheet" href="media/admin/peopledata/css/peopledata-detail-tmpl.css" />
+<style scoped="scoped">
+	.field-input>input, 
+	.field-input>select,
+	.field-input>textarea {
+	    height: 2.5em;
+	    line-height: 2.5em;
+	    padding: 10px 5px;
+	    width: 100%;
+	}
+	.field-input>select {
+	    line-height: 3em;
+	    height: 3em;
+	}
+	.peopledata-detail-tmpl #operate-area {
+	    font-size: 4em;
+	    line-height: 1.23em;
+	    padding-right: 1em;
+	    position: absolute;
+	    bottom: 20px;
+	    right: 1em;
+	    z-index: 1000;
+	    width: 1em;
+	}
+	.peopledata-detail-tmpl #operate-area a i{
+		cursor: pointer;
+		color: #65b951;
+		opacity: 0.5;
+	}
+	.peopledata-detail-tmpl #operate-area a i:HOVER{
+		opacity: 1;
+	}
+</style>
 <div class="detail peopledata-detail-tmpl" id="peopledata-update-tmpl-${peopleCode }">
 	<div class="page-header">
 		<div class="header-title">
-			<h1>${people.name }-修改</h1>
+			<h1>修改-${people.name }</h1>
 		</div>
 		<div class="template-container title-operate">
 			<a href="#" title="查看模板" class="toggle-template"><i class="iconfont icon-template"></i></a>
 		</div>
 	</div>
 	<div class="page-body">
+		<div id="operate-area">
+			<div class="operate-area-cover"></div>
+			<a id="save" title="保存"><i class="fa fa-check-square"></i></a>
+		</div>
 		<div class="col-lg-offset-1 col-lg-10">
-			<form class="form-horizontal group-container">
+			<form class="form-horizontal group-container" action="admin/peopledata/do_update">
+				<input type="hidden" name="peopleCode" value="${peopleCode }" />
 				<c:forEach var="tmplGroup" items="${tmpl.groups }">
 					<div class="widget field-group">
 						<div class="widget-header">
@@ -25,7 +63,13 @@
 								<div class="form-group field-item ${tmplField.colNum == 2? 'dbcol': '' }">
 									<label class="control-label field-title">${tmplField.title }</label>
 									<div class="field-value">
-										<span class="field-view">${parser[tmplField.fieldName] }</span>
+										<span class="field-input" 
+											fInp-type="${tmplField.type }"
+											fInp-name="${tmplField.fieldName }"
+											fInp-value="${parser[tmplField.fieldName] }"
+											fInp-optkey="${tmplField.fieldId }"
+										>
+										</span>
 									</div>
 								</div>
 							</c:forEach>
@@ -33,22 +77,6 @@
 					</div>
 				</c:forEach>
 			</form>
-		</div>
-	</div>
-	<div id="errors" style="display: none;">
-		<ul>
-			<c:forEach items="${people.errors }" var="error">
-				<li>${error.error_str }</li>
-			</c:forEach>
-		</ul>
-   </div>
-	<div id="timeline-area" class="cpf-static-view" style="display: none;">
-		<div class="timeline-wrapper">
-			<div class="VivaTimeline">
-				<dl>
-					<dt><a href="#" class="show-more-history">查看更多</a></dt>
-				</dl>
-			</div>
 		</div>
 	</div>
 	<div id="tmpl-list" style="display: none;">
@@ -80,8 +108,9 @@
 	</div>
 </div>
 <script>
-	seajs.use(['dialog', 'ajax', 'utils', 'peopledata/js/viewtmpl-update.js', '$CPF'], function(Dialog, Ajax, Utils, ViewTmpl, $CPF){
-		var $page = $('#peopledata-detail-tmpl-${peopleCode }');
+	seajs.use(['dialog', 'ajax', 'utils', 'peopledata/js/viewtmpl-update.js', '$CPF',
+	           'peopledata/js/field-input.js'], function(Dialog, Ajax, Utils, ViewTmpl, $CPF, FieldInput){
+		var $page = $('#peopledata-update-tmpl-${peopleCode }');
 		
 		$('.toggle-template i', $page).click(function(){
 			$('#tmpl-list', $page).toggle();
@@ -98,11 +127,18 @@
 		if('${tmpl == null}' == 'true'){
 			Dialog.notice('当前没有选择默认模板', 'error');
 		}
+		$CPF.showLoading();
+		FieldInput.loadGlobalOptions('admin/peopledata/dict/enum_json').done(function(){
+			FieldInput.appendTo($('.field-input', $page));
+			$CPF.closeLoading();
+		});
+		
+		$('#save i', $page).click(function(){
+			$('form', $page).submit();
+		});
 		
 		setTimeout(function(){
-			$CPF.showLoading();
 			$('.field-title', $page).each(function(){ViewTmpl.adjustFieldTitle($(this))});
-			$CPF.closeLoading();
 		}, 100);
 		
 	});

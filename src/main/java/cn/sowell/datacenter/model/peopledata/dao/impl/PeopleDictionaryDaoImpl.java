@@ -9,14 +9,17 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.SessionFactory;
 import org.hibernate.type.StandardBasicTypes;
 import org.springframework.stereotype.Repository;
 
 import cn.sowell.copframe.common.UserIdentifier;
+import cn.sowell.copframe.dao.deferedQuery.HibernateRefrectResultTransformer;
 import cn.sowell.copframe.dao.utils.QueryUtils;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.CollectionUtils;
+import cn.sowell.datacenter.model.basepeople.pojo.BasePeopleItem;
 import cn.sowell.datacenter.model.peopledata.dao.PeopleDictionaryDao;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleCompositeDictionaryItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleFieldDictionaryItem;
@@ -51,28 +54,6 @@ public class PeopleDictionaryDaoImpl implements PeopleDictionaryDao{
 		}
 	}
 	
-	/*@SuppressWarnings("unchecked")
-	@Override
-	public List<PeopleDictionaryField> queryAllField(String code) {
-		String sql = 
-				"	SELECT" +
-				"		d.c_id field_id," +
-				"		d.c_cn_english field_name," +
-				"		d.c_cn_name field_cname," +
-				"		d.type field_type," +
-				"		info.t_id c_id," +
-				"		info.t_info_enname c_name," +
-				"		info.t_info_cnname c_cname" +
-				"	FROM" +
-				"		t_base_people_dictionary d" +
-				"	LEFT JOIN t_base_people_information info ON d.c_info_id = info.t_id" +
-				"	WHERE" +
-				"		info.t_id IS NOT NULL";
-		SQLQuery query = sFactory.getCurrentSession().createSQLQuery(sql);
-		query.setResultTransformer(HibernateRefrectResultTransformer.getInstance(PeopleDictionaryField.class));
-		return query.list();
-		
-	}*/
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -88,9 +69,12 @@ public class PeopleDictionaryDaoImpl implements PeopleDictionaryDao{
 	public Map<Long, List<PeopleTemplateField>> getTemplateFieldsMap(
 			Set<Long> groupIdSet) {
 		if(groupIdSet != null && !groupIdSet.isEmpty()){
-			String hql = "from PeopleTemplateField f where f.groupId in (:groupIds) order by f.order asc";
-			Query query = sFactory.getCurrentSession().createQuery(hql);
+			String sql = "select f.*, d.c_type from t_people_view_template_field f "
+					+ "left join t_base_people_dictionary d on f.field_id = d.c_id where f.group_id in (:groupIds) order by f.c_order asc ";
+			SQLQuery query = sFactory.getCurrentSession().createSQLQuery(sql);
+			
 			query.setParameterList("groupIds", groupIdSet);
+			query.setResultTransformer(HibernateRefrectResultTransformer.getInstance(PeopleTemplateField.class));
 			List<PeopleTemplateField> fieldList = query.list();
 			return CollectionUtils.toListMap(fieldList, field->field.getGroupId());
 		}else{
@@ -127,6 +111,15 @@ public class PeopleDictionaryDaoImpl implements PeopleDictionaryDao{
 		data.setTmplId(tmplId);
 		sFactory.getCurrentSession().delete(data);
 		return true;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<BasePeopleItem> getAllEnumList() {
+		String hql = "from BasePeopleItem";
+		Query query = sFactory.getCurrentSession().createQuery(hql);
+		return query.list();
+		
 	}
 
 }
