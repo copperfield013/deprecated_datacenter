@@ -1,6 +1,5 @@
 package cn.sowell.datacenter.model.basepeople.dao;
 
-import java.sql.Savepoint;
 import java.util.List;
 import java.util.Map;
 
@@ -8,8 +7,13 @@ import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
 import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
 import cn.sowell.datacenter.model.basepeople.ExcelModelCriteria;
-import cn.sowell.datacenter.model.basepeople.pojo.*;
-import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
+import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
+import cn.sowell.datacenter.model.basepeople.pojo.BasePeopleItem;
+import cn.sowell.datacenter.model.basepeople.pojo.CityEntiy;
+import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleInformationEntity;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 
 public interface BasePeopleDao {
 	/**

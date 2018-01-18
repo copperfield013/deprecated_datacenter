@@ -6,8 +6,8 @@ import org.springframework.expression.spel.SpelParserConfiguration;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Service;
 
-import cn.sowell.datacenter.common.property.PropertyParser;
-import cn.sowell.datacenter.common.property.PropertyValueTranslatorSet;
+import cn.sowell.copframe.spring.propTranslator.PropertyParser;
+import cn.sowell.copframe.spring.propTranslator.PropertyValueTranslatorSet;
 import cn.sowell.datacenter.model.peopledata.service.PojoService;
 
 @Service

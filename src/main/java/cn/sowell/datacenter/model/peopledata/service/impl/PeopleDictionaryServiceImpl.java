@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.sowell.copframe.common.UserIdentifier;
+import cn.sowell.copframe.dao.utils.NormalOperateDao;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeopleItem;
-import cn.sowell.datacenter.model.common.dao.NormalOperateDao;
 import cn.sowell.datacenter.model.peopledata.dao.PeopleDictionaryDao;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleCompositeDictionaryItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleFieldDictionaryItem;
@@ -172,7 +172,7 @@ public class PeopleDictionaryServiceImpl implements PeopleDictionaryService{
 	@Override
 	public PeopleTemplateData getDefaultTemplate(UserIdentifier user) {
 		SystemAdmin admin = aService.getSystemAdminByUserId((long)user.getId());
-		Long defaultTmplId = admin.getDefaultTemplateId();
+		Long defaultTmplId = admin.getDefaultDetailTemplateId();
 		if(defaultTmplId != null){
 			return getTemplate(defaultTmplId);
 		}else{

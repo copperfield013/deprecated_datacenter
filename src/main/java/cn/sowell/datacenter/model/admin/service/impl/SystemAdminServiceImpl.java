@@ -7,9 +7,9 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import cn.sowell.copframe.common.UserIdentifier;
+import cn.sowell.copframe.dao.utils.NormalOperateDao;
 import cn.sowell.datacenter.model.admin.dao.SystemAdminDao;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
-import cn.sowell.datacenter.model.common.dao.NormalOperateDao;
 import cn.sowell.datacenter.model.system.pojo.SystemAdmin;
 
 @Service
@@ -25,6 +25,13 @@ public class SystemAdminServiceImpl implements SystemAdminService{
 	public void setTmplAsDefault(Long tmplId, UserIdentifier user) {
 		aDao.setTmplAsDefault(tmplId, (long) user.getId());
 	}
+	
+	@Override
+	public void setListTemplateAsDefault(Long ltmplId,
+			UserIdentifier user) {
+		aDao.setListTmplAsDefault(ltmplId, (long) user.getId());
+	}
+	
 	
 	@Override
 	public SystemAdmin getSystemAdminByUserId(Serializable userId) {

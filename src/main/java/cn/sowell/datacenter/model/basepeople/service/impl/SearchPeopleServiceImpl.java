@@ -3,8 +3,6 @@ package cn.sowell.datacenter.model.basepeople.service.impl;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -19,12 +17,11 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSONArray;
-
-
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.service.SearchPeopleService;
 import cn.sowell.datacenter.model.esbasic.SearchTransportClient;
+
+import com.alibaba.fastjson.JSONArray;
 
 @Service
 public class SearchPeopleServiceImpl implements SearchPeopleService{	

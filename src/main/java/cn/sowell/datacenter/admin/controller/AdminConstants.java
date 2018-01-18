@@ -21,6 +21,11 @@ public interface AdminConstants {
 	 * 人口模块
 	 */
 	final String URI_PEOPLEDATA = URI_BASE + "/peopledata";
+
+	/**
+	 * 模板模块
+	 */
+	final String URI_TMPL = URI_BASE + "/tmpl";
 	
 	/**
 	 * 管理端jsp资源的基本路径
@@ -60,9 +65,18 @@ public interface AdminConstants {
 
 	final String JSP_PEOPLEDATA_VIEWTMPL = JSP_PEOPLEDATA + "/viewtmpl";
 
+	final String JSP_PEOPLEDATA_TMPL = JSP_PEOPLEDATA + "/tmpl";
+	
+	final String JSP_TMPL = JSP_BASE + "/tmpl";
+
+	final String JSP_TMPL_LIST = JSP_TMPL + "/ltmpl";
+	
 	/**
 	 * 默认的系统id
 	 */
 	final long SYS_DEF = 1;
+
+
+	
 	
 }

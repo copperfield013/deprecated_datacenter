@@ -18,9 +18,21 @@ public class SystemAdminDaoImpl implements SystemAdminDao{
 	
 	@Override
 	public void setTmplAsDefault(long tmplId, long userId) {
-		String sql = "update t_sys_admin set def_tmpl_id = :tmplId where user_id = :userId";
+		String sql = "update t_sys_admin set def_dtmpl_id = :tmplId where user_id = :userId";
 		SQLQuery query = sFactory.getCurrentSession().createSQLQuery(sql);
 		int result = query.setLong("tmplId", tmplId)
+			.setLong("userId", userId)
+			.executeUpdate();
+		if(result != 1){
+			throw new RuntimeException("修改失败，修改了" + result + "条记录");
+		}
+	}
+	
+	@Override
+	public void setListTmplAsDefault(Long ltmplId, long userId) {
+		String sql = "update t_sys_admin set def_ltmpl_id = :ltmplId where user_id = :userId";
+		SQLQuery query = sFactory.getCurrentSession().createSQLQuery(sql);
+		int result = query.setLong("ltmplId", ltmplId)
 			.setLong("userId", userId)
 			.executeUpdate();
 		if(result != 1){

@@ -35,11 +35,11 @@ import org.apache.poi.ss.util.CellRangeAddressList;
 import org.springframework.stereotype.Service;
 
 import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.copframe.spring.propTranslator.PropertyParser;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.excel.CellTypeUtils;
-import cn.sowell.datacenter.common.property.PropertyParser;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
 import cn.sowell.datacenter.model.basepeople.dao.PropertyDictionaryDao;
 import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;

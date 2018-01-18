@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 
 import javax.annotation.Resource;
 
@@ -12,10 +11,7 @@ import cn.sowell.copframe.dao.deferedQuery.HibernateRefrectResultTransformer;
 import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
 import cn.sowell.datacenter.model.basepeople.ExcelModelCriteria;
 import cn.sowell.datacenter.model.basepeople.pojo.*;
-import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.SessionFactory;
@@ -81,6 +77,7 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 		sFactory.getCurrentSession().delete(pojo);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<TBasePeopleItemEntity> fieldList(String field) {
 		String sql ="SELECT" +
@@ -137,6 +134,7 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 		query.setString("id",id).executeUpdate();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<TBasePeopleDictionaryEntity> searchList(String txt) {
 		String hql = "from TBasePeopleDictionaryEntity p";
@@ -157,6 +155,7 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 		return sFactory.getCurrentSession().get(clazz, id);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<TBasePeopleDictionaryEntity> getColumns(Long modelId) {
 		String sql = "SELECT d.*"
@@ -174,6 +173,7 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 		return new ArrayList<TBasePeopleDictionaryEntity>();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<ExcelModel> queryExcelModel(ExcelModelCriteria criteria, PageInfo pageInfo,String type) {
 		String hql = "from ExcelModel e";
@@ -197,7 +197,7 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 
 
 
-	@SuppressWarnings("unlocked")
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<CityEntiy> getbystatus(String status) {
 		String sql ="SELECT\n" +
@@ -223,9 +223,9 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 		query.setLong("modelId", modelId).executeUpdate();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<TBasePeopleDictionaryEntity> getDicByModelId(Long modelId) {
-		// TODO Auto-generated method stub
 		String sql = "SELECT d.* FROM t_base_people_dictionary d"
 				+ " LEFT JOIN t_excel_model_order o ON d.c_id = o.c_dictionaryid"
 				+ " LEFT JOIN t_excel_model m ON o.c_modelid = m.c_id";
@@ -242,6 +242,7 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 	}
 
 
+	@SuppressWarnings("unchecked")
 	public  List<TBasePeopleDictionaryEntity> dicListByUser(){
 		String hql = "from TBasePeopleDictionaryEntity p";
 		DeferedParamQuery dQuery = new DeferedParamQuery(hql);
@@ -254,6 +255,7 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 		return new ArrayList<TBasePeopleDictionaryEntity>();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<BasePeopleItem> dicItemByUser() {
 		String hql = "from BasePeopleItem p";
@@ -267,6 +269,7 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 		return new ArrayList<BasePeopleItem>();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<TBasePeopleDictionaryEntity> getDicByInfoId(Long infoId) {
 		String hql = "from TBasePeopleDictionaryEntity p";
@@ -281,6 +284,7 @@ public class BasePeopleDaoImpl implements BasePeopleDao{
 		return new ArrayList<TBasePeopleDictionaryEntity>();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<TBasePeopleInformationEntity> infoList() {
 		String hql = "from TBasePeopleInformationEntity p";

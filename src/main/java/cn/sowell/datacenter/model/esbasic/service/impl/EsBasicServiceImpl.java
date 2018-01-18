@@ -3,27 +3,24 @@ package cn.sowell.datacenter.model.esbasic.service.impl;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.apache.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
-import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSONObject;
-
 import cn.sowell.datacenter.model.esbasic.SearchTransportClient;
 import cn.sowell.datacenter.model.esbasic.service.EsBasicService;
 
+import com.alibaba.fastjson.JSONObject;
+
 @Service
 public class EsBasicServiceImpl implements EsBasicService {
+	@SuppressWarnings("unused")
 	private Logger logger = Logger.getLogger(EsBasicService.class);
 	private TransportClient client = SearchTransportClient.getInstance().getTransportClient();
 	private String index = "ydd";
@@ -62,7 +59,7 @@ public class EsBasicServiceImpl implements EsBasicService {
 	
 	
 	public void eSearchUpdate(JSONObject json,String id){		 
-	    IndexResponse response = client
+	    client
 	    		.prepareIndex(index,type,id)
 	    		.setSource(json).execute().actionGet();
 	    System.out.println("update success");
@@ -70,7 +67,7 @@ public class EsBasicServiceImpl implements EsBasicService {
 	
 	
 	public void eSearchDelete(String id){
-		DeleteResponse response = client
+		client
 				.prepareDelete(index,type,id) 
 	    		.execute().actionGet();
 		System.out.println("delete success");

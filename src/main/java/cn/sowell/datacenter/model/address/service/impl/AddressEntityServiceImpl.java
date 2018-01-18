@@ -6,16 +6,12 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.abc.address.analysis.Tokenizer;
-import com.abc.address.analysis.TokenizerFactory;
-import com.abc.extface.dto.AddressCode;
-import com.abc.extface.dto.AddressElement;
-import com.abc.extface.dto.AddressEntity;
-import com.abc.extface.dto.SplitedAddressEntity;
-
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.address.dao.AddressDao;
 import cn.sowell.datacenter.model.address.service.AddressEntityService;
+
+import com.abc.extface.dto.AddressCode;
+import com.abc.extface.dto.SplitedAddressEntity;
 
 @Service
 public class AddressEntityServiceImpl implements AddressEntityService {

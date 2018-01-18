@@ -2,11 +2,10 @@ package cn.sowell.datacenter.model.address.dao;
 
 import java.util.List;
 
-import com.abc.extface.dto.AddressCode;
-import com.abc.extface.dto.AddressEntity;
-import com.abc.extface.dto.SplitedAddressEntity;
-
 import cn.sowell.copframe.dto.page.PageInfo;
+
+import com.abc.extface.dto.AddressCode;
+import com.abc.extface.dto.SplitedAddressEntity;
 
 
 public interface AddressDao {

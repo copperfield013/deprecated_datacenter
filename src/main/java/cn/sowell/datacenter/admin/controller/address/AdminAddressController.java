@@ -186,6 +186,7 @@ public class AdminAddressController {
 	public AjaxPageResponse doEditName(@RequestParam String oldName, @RequestParam String name) {
 		try {
 			addressEntityService.deleteAddressEntity(oldName);
+			@SuppressWarnings("unused")
 			SplitedAddressEntity sAddressEntity = addressService.queryEntity(name);
 			return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("修改成功！", "address_list");
 		}catch (Exception e) {
@@ -335,6 +336,7 @@ public class AdminAddressController {
 	@RequestMapping("/updateCategory")
 	public AjaxPageResponse updateCategory(SplitedAddressEntity splitedAddressEntity) {
 		try {
+			@SuppressWarnings("unused")
 			AddressEntity addressEntity = addressService.saveOrUpdate(splitedAddressEntity);
 			return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("操作成功！", "address_category_list");
 		}catch (Exception e) {

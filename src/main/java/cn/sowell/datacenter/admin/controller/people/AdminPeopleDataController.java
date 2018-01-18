@@ -37,13 +37,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.common.property.PropertyPlaceholder;
+import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.copframe.spring.propTranslator.PropertyParser;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.common.property.PropertyParser;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
 import cn.sowell.datacenter.model.basepeople.ExcelModelCriteria;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeopleItem;
@@ -53,7 +54,6 @@ import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleInformationEntity;
 import cn.sowell.datacenter.model.basepeople.service.BasePeopleService;
 import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
-import cn.sowell.datacenter.model.common.utils.UserUtils;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleTemplateData;
 import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
@@ -276,7 +276,6 @@ public class AdminPeopleDataController {
          }
     }
     
-
     @RequestMapping("/detail_tmpl/{peopleCode}")
     public String detailTmpl(
     		@PathVariable String peopleCode, 

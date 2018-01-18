@@ -20,8 +20,11 @@ public class SystemAdmin {
 	@Column(name="user_id")
 	private Long userId;
 	
-	@Column(name="def_tmpl_id")
-	private Long defaultTemplateId;
+	@Column(name="def_dtmpl_id")
+	private Long defaultDetailTemplateId;
+	
+	@Column(name="def_ltmpl_id")
+	private Long defaultListTemplateId;
 	
 	@Column(name="sys_id")
 	private Long systemId;
@@ -45,14 +48,6 @@ public class SystemAdmin {
 		this.userId = userId;
 	}
 
-	public Long getDefaultTemplateId() {
-		return defaultTemplateId;
-	}
-
-	public void setDefaultTemplateId(Long defaultTemplateId) {
-		this.defaultTemplateId = defaultTemplateId;
-	}
-
 	public Long getSystemId() {
 		return systemId;
 	}
@@ -67,6 +62,22 @@ public class SystemAdmin {
 
 	public void setUser(AdminUser user) {
 		this.user = user;
+	}
+
+	public Long getDefaultListTemplateId() {
+		return defaultListTemplateId;
+	}
+
+	public void setDefaultListTemplateId(Long defaultListTemplateId) {
+		this.defaultListTemplateId = defaultListTemplateId;
+	}
+
+	public Long getDefaultDetailTemplateId() {
+		return defaultDetailTemplateId;
+	}
+
+	public void setDefaultDetailTemplateId(Long defaultDetailTemplateId) {
+		this.defaultDetailTemplateId = defaultDetailTemplateId;
 	}
 	
 }

@@ -67,11 +67,11 @@ public class PeopleFieldDictionaryItem {
 		this.compositeId = compositeId;
 	}
 
-	protected String getType() {
+	public String getType() {
 		return type;
 	}
 
-	protected void setType(String type) {
+	public void setType(String type) {
 		this.type = type;
 	}
 

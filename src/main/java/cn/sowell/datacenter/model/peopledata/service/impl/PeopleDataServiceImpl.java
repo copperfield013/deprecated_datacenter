@@ -12,17 +12,10 @@ import javax.annotation.Resource;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import com.abc.application.FusionContext;
-import com.abc.dto.ErrorInfomation;
-import com.abc.mapping.entity.Entity;
-import com.abc.query.criteria.Criteria;
-import com.abc.query.criteria.CriteriaFactory;
-import com.abc.query.criteria.LikeQueryCriteria;
-
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.spring.binder.FieldRefectUtils;
+import cn.sowell.copframe.spring.propTranslator.PropertyParser;
 import cn.sowell.copframe.utils.TextUtils;
-import cn.sowell.datacenter.common.property.PropertyParser;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.service.impl.FusionContextFactoryDC;
@@ -30,6 +23,13 @@ import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
 import cn.sowell.datacenter.model.peopledata.service.PojoService;
+
+import com.abc.application.FusionContext;
+import com.abc.dto.ErrorInfomation;
+import com.abc.mapping.entity.Entity;
+import com.abc.query.criteria.Criteria;
+import com.abc.query.criteria.CriteriaFactory;
+import com.abc.query.criteria.LikeQueryCriteria;
 
 @Service
 public class PeopleDataServiceImpl implements PeopleDataService{
@@ -136,7 +136,6 @@ public class PeopleDataServiceImpl implements PeopleDataService{
         }
 		return listmap;
 	}
-
 
 
 }

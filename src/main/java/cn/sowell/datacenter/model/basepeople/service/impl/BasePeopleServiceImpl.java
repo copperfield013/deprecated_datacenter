@@ -8,34 +8,34 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
-import cn.sowell.datacenter.model.basepeople.dto.FieldDataDto;
-import cn.sowell.datacenter.model.basepeople.pojo.*;
-import com.alibaba.fastjson.JSONArray;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
-
-import org.apache.poi.ss.formula.functions.T;
 import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
-
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
-
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.stereotype.Service;
 
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
+import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
 import cn.sowell.datacenter.model.basepeople.dao.BasePeopleDao;
+import cn.sowell.datacenter.model.basepeople.dto.FieldDataDto;
+import cn.sowell.datacenter.model.basepeople.pojo.BasePeople;
+import cn.sowell.datacenter.model.basepeople.pojo.BasePeopleItem;
+import cn.sowell.datacenter.model.basepeople.pojo.CityEntiy;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 import cn.sowell.datacenter.model.basepeople.service.BasePeopleService;
 import cn.sowell.datacenter.model.esbasic.SearchTransportClient;
+
+import com.alibaba.fastjson.JSONArray;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 
@@ -140,11 +140,12 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 		return  list;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void addField(FieldDataDto field) {
 		try {
            long stime = System.currentTimeMillis();
-           boolean flag = false;//设置检查标记
+           //boolean flag = false;//设置检查标记
 
            Map<String, Object> json = new LinkedHashMap<String, Object>();
            ObjectMapper ob = new ObjectMapper();
@@ -155,7 +156,7 @@ public class BasePeopleServiceImpl implements BasePeopleService{
            json.put("check_rule",field.getCheck_rule());
 
 			String json1 = ob.writeValueAsString(json);
-			IndexResponse response = client
+			client
 					.prepareIndex("ydd", "demo", field.getId())
 					.setSource(json1).execute().actionGet();
                 long etime = System.currentTimeMillis();
