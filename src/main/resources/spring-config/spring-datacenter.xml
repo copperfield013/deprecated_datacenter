@@ -63,13 +63,15 @@
 		</property>
 	</bean>
 	
-	<bean class="cn.sowell.datacenter.common.property.PropertyValueTranslatorSet">
+	<bean class="cn.sowell.copframe.spring.propTranslator.PropertyValueTranslatorSet">
 		<property name="translatorSet">
 			<set>
-				<bean class="cn.sowell.datacenter.common.property.translator.DatePropertyValueTranlator" />
+				<bean class="cn.sowell.copframe.spring.propTranslator.translator.DatePropertyValueTranlator" />
 			</set>
 		</property>
 	</bean>
+	
+	<bean class="cn.sowell.copframe.dao.utils.NormalOperateDaoImpl" />
 	
 	<mvc:interceptors>
 		<!-- 用于在请求中设置一些常用的变量 -->

@@ -31,7 +31,7 @@
 <li>
 	<a href="#" class="menu-dropdown">
 		<i class="menu-icon fa fa-bookmark"></i>
-		<span class="menu-text"">ABC人口</span>
+		<span class="menu-text">ABC人口</span>
 		<i></i>
 	</a>
 	<ul class="submenu">
@@ -40,13 +40,36 @@
 	   			<span class="menu-text">ABC人口</span>
 	   		</a>
 	   	</li>
+	   	<li>
+	   		<a class="tab" href="admin/peopledata/tmpl/list" target="peopledata_list_tmpl" title="人口列表（模板）">
+	   			<span class="menu-text">人口列表（模板）</span>
+	   		</a>
+	   	</li>
 	</ul>
 </li>
-
 <li>
 	<a href="#" class="menu-dropdown">
 		<i class="menu-icon fa fa-bookmark"></i>
-		<span class="menu-text"">地址管理</span>
+		<span class="menu-text">模板管理</span>
+		<i></i>
+	</a>
+	<ul class="submenu">
+	   	<li>
+	   		<a class="tab" href="admin/peopledata/viewtmpl/list" target="viewtmpl_list" title="人口详情模板">
+	   			<span class="menu-text">人口详情模板</span>
+	   		</a>
+	   	</li>
+	   	<li>
+	   		<a class="tab" href="admin/tmpl/ltmpl/list" target="ltmpl_list" title="人口列表模板">
+	   			<span class="menu-text">人口列表模板</span>
+	   		</a>
+	   	</li>
+	</ul>
+</li>
+<li>
+	<a href="#" class="menu-dropdown">
+		<i class="menu-icon fa fa-bookmark"></i>
+		<span class="menu-text">地址管理</span>
 		<i></i>
 	</a>
 	<ul class="submenu">

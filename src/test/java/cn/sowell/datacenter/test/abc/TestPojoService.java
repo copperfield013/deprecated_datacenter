@@ -2,9 +2,7 @@ package cn.sowell.datacenter.test.abc;
 
 import javax.annotation.Resource;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -20,10 +18,5 @@ public class TestPojoService {
 	
 	@Resource
 	PojoService pojoService;
-	
-	@Test
-	public void test() {
-		pojoService.test();
-	}
 	
 }

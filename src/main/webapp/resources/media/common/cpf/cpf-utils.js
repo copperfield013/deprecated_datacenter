@@ -2,9 +2,12 @@ define(function(require, exports){
 	var CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
 	var SEQUENCE_MAP = {}
 	var sFocus;
+	var bindOrTriggerMap = {};
+	var eventFieldMap = {};
+
 	$.extend(exports, {
 		/**
-		 * 判断一个是否是整数
+		 * 判断一个是否是整数，不包含判断类型
 		 */
 		isInteger	: function(o){
 			return (o | 0) == o;
@@ -129,6 +132,23 @@ define(function(require, exports){
 				}catch(e){}
 			}
 			return this;
+		},
+		/**
+		 * 切换对象的一般属性。
+		 * @param attrName 属性名
+		 * @param value1 优先属性，当属性不存在，或者属性值不是value1和value2中的一个，那么将会变成value1
+		 * @param value2 切换属性
+		 */
+		toggleAttr	: function(jqObj, attrName, value1, value2){
+			$(jqObj).each(function(){
+				var $jqObj = $(this);
+				var value = $jqObj.attr(attrName);
+				if(value === value1){
+					$jqObj.attr(attrName, value2);
+				}else{
+					$jqObj.attr(attrName, value1);
+				}
+			});
 		},
 		/**
 		 * 将dom元素的内容设置为数字编辑器
@@ -304,7 +324,303 @@ define(function(require, exports){
 				sFocus = $(this);
 			});
 		},
+		daterangepicker: function($dom, _param){
+			var defaultParam = {
+					format 				: 'YYYY-MM-DD HH:mm:ss',
+					timePicker			: true,
+					timePicker12Hour	: false,
+					timePickerIncrement : 5,
+					separator			: '~',
+					locale				: {
+						applyLabel	: '确定',
+		                cancelLabel: '取消',
+		                fromLabel: '从',
+		                toLabel: '到',
+						daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],  
+		                monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月',  
+	                        '七月', '八月', '九月', '十月', '十一月', '十二月' ]
+				}
+			};
+			var param = $.extend({}, defaultParam, _param);
+			return $dom.daterangepicker(param);
+		},
+		triggerInField	: function(fieldName, eventName, args, target){
+			if(typeof fieldName === 'string' && typeof eventName === 'string'){
+				var eventMap = eventFieldMap[fieldName];
+				if(eventMap){
+					var callbackStack = eventMap[eventName];
+					if(callbackStack){
+						var event = {
+								fieldName	: fieldName,
+								eventName	: eventName
+						};
+						var eventArgs = [event];
+						if($.isArray(args)){
+							eventArgs = $.merge(eventArgs, args);
+						}else{
+							eventArgs.push(args);
+						}
+						if(!target){
+							target = this;
+						}
+						for(var i = callbackStack.length - 1; i >= 0; i--){
+							try{
+								if(callbackStack[i].apply(target, eventArgs) === false){
+									return false;
+								}
+							}catch(e){
+								console.error(e);
+							}
+						}
+					}
+				}
+			}
+		},
+		bindInField		: function(fieldName, eventName, callback){
+			if(typeof fieldName === 'string' && typeof eventName === 'string'){
+				if(typeof callback === 'function'){
+					var eventMap = eventFieldMap[fieldName];
+					if(!eventMap){
+						eventFieldMap[fieldName] = eventMap = {};
+					}
+					var callbackStack = eventMap[eventName];
+					if(!callbackStack){
+						eventMap[eventName] = callbackStack = [];
+					}
+					callbackStack.push(callback);
+				}
+			}
+		},
+		trigger		: function(eventName, args){
+			return this.triggerInField('defaultField', eventName, args);
+		},
+		bind		: function(eventName, callback){
+			return this.bindInField('defaultField', eventName, callback);
+		},
+		/**
+		 * 绑定和触发
+		 * 当A使用bindOrTrigger(event, callback)方法绑定了一个事件，必须等待B用bindOrTrigger(event)触发该事件。
+		 * 与普通的bind-trigger方法不同的是：用该方法绑定事件时，如果已经有方法调用了触发的方法，那么在绑定之后将会立刻触发事件。
+		 * 之后，如果有其他方法再次调用触发方法，将会直接触发。如果重新绑定了事件，那么也会在绑定之后立刻触发重新绑定的回调。
+		 * 如果想要重新绑定并令其重新触发，只能传入callback为false，那么将会重新初始化该事件
+		 */
+		bindOrTrigger	: function(event, callback){
+			if(typeof event === 'string'){
+				if(callback === false){
+					bindOrTriggerMap['event_' + event] = undefined;
+					return this;
+				}
+				var obj = bindOrTriggerMap['event_' + event];
+				if(!obj){
+					bindOrTriggerMap['event_' + event] = obj = {};
+				}
+				if(callback === undefined || $.isArray(callback)){
+					if(typeof obj.callback === 'function'){
+						obj.callback.apply(this, callback);
+					}
+					obj.param = callback;
+					obj.flag = true;
+				}else if(typeof callback === 'function'){
+					obj.callback = callback;
+					if(obj.flag){
+						this.bindOrTrigger(event, obj.param);
+					}
+				}
+			}
+		},
+		bindTap		: function(target, handler){
+			$(target).on('cpf-tap', handler);
+			//自定义tap
+			$(target).on("touchstart", function(e) {
+			    if(!$(e.target).hasClass("disable")) $(e.target).data("isMoved", 0);
+			});
+			$(target).on("touchmove", function(e) {
+			    if(!$(e.target).hasClass("disable")) $(e.target).data("isMoved", 1);
+			});
+			$(target).on("touchend", function(e) {
+			    if(!$(e.target).hasClass("disable") && $(e.target).data("isMoved") == 0) $(e.target).trigger("cpf-tap");
+			});
+		},
+		/**
+		 * 计算地球上两个坐标的直线距离， 单位公里
+		 */
+		distanceBetween	: function(posA, posB){
+			var lngA = posA.lng, latA = posA.lat,
+				lngB = posB.lng, latB = posB.lat;
+			var R = 6371.004;//地球半径
+			var c = Math.sin(latA) * Math.sin(latB) * Math.cos(lngA - lngB) + Math.cos(latA) * Math.cos(latB);
+			return R * Math.acos(c) * Math.PI / 180;
+		},
+		/**
+		 * 将元素插入到$parent的索引为index的子元素后面，
+		 * 如果$parent内没有子元素，或者不传入index，则直接插入
+		 */
+		appendTo		: function($target, $parent, index, childrenFilter){
+			if($target instanceof $ && $parent instanceof $){
+				var $siblings = $parent.children().filter(childrenFilter);
+				if(index === undefined || $siblings.length <= index){
+					$parent.append($target);
+				}else{
+					$target.insertAfter($siblings[index]);
+				}
+			}
+		},
+		/**
+		 * 将元素插入到$parent的索引为index的子元素前面，
+		 * 如果$parent内没有子元素，或者不传入index，则直接插入
+		 */
+		prependTo		: function($target, $parent, index, childrenFilter){
+			if($target instanceof $ && $parent instanceof $){
+				var $siblings = $parent.children().filter(childrenFilter);
+				if(index === undefined || $siblings.length <= index){
+					$parent.prepend($target);
+				}else{
+					$target.insertBefore($siblings[index]);
+				}
+			}
+		},
+		/**
+		 * 替换元素内容为文本框，用于编辑元素内容
+		 * @param inputClass 文本框要添加的样式
+		 */
+		toEditContent	: function($target, inputClass){
+			var callbackMap = {
+				confirmed	: 	$.Callbacks('stopOnFalse')
+			};
+			var $this = $($target);
+			var title = $this.text();
+			var $input = 
+				$('<input type="text" class="dblclicked" />')
+				.addClass(inputClass)
+				.val(title)
+				.keypress(function(e){
+					if(e.keyCode === 13){
+						confirmTitle();
+					}
+				})
+				.blur(confirmTitle);
+			$input.appendTo($this.empty()).select();
+			function confirmTitle(){
+				var newTitle = $input.val();
+				var blankExp = /^\s*$/;
+				if(blankExp.test(newTitle)){
+					newTitle = title;
+				}
+				$input.remove();
+				$this.text(newTitle);
+				callbackMap['confirmed'].fire(newTitle, $this);
+			}
+			var result = {
+					bind	: function(eventName, callback){
+						callbackMap[eventName].add(callback);
+						return result;
+					}
+			}
+			return result;
+		},
+		CallbacksMap		: function(context){
+			return new CallbacksMap(context);
+		},
+		/**
+		 * 继承方法。
+		 * 寄生式的继承，将父类的原型传递给子类。
+		 * 子类的构造函数还另外需要调用父类的构造函数(superClass.apply(this, arguments)，来完成完整的继承
+		 */
+		extendClass			: function(subClass, superClass){
+			if(typeof superClass === 'function' && typeof subClass === 'function'){
+				var f = function(){};
+				f.prototype = superClass.prototype;
+				subClass.prototype = new f();
+				subClass.prototype.constructor = subClass;
+			}
+		},
+		/**
+		 * 将json字符串转换为对象。
+		 * 如果不能转换或者转换时报错，那么将返回null
+		 */
+		parseJSON			: function(_json){
+			var json = null;
+			try{
+				json = $.parseJSON(_json);
+			}catch(e){}
+			return json;
+		}
 	});
+	
+	/**
+	 * 封装jquery的回调列表，使其支持多个事件
+	 */
+	function CallbacksMap(_context){
+		var context = null
+		if(typeof _context === 'object'){
+			context = _context;
+			this.bindMethod(context);
+		}else{
+			context = this;
+		}
+		var map = {};
+		/**
+		 * 获得回调
+		 */
+		this.get = function(eventName){
+			if(eventName || eventName === 0){
+				var callback = map[eventName.toString()];
+				if(!callback){
+					callback = map[eventName.toString()] = $.Callbacks();
+				}
+				return callback;
+			}
+		};
+		/**
+		 * 添加回调
+		 */
+		this.put = function(eventName, callback){
+			try{
+				this.get(eventName).add(callback);
+			}catch(e){}
+		};
+		/**
+		 * 重新添加回调，如果传入的callback为null，那么直接把原来的回调清空
+		 */
+		this.replace = function(eventName, callback){
+			if(eventName || eventName === 0){
+				if(typeof callback === 'function' || callback === null){
+					var callbacks = map[eventName.toString()] = $.Callbacks();
+					callbacks.add(callback);
+				}
+			}
+		}
+		/**
+		 * 执行回调
+		 */
+		this.fire = function(eventName, args){
+			this.fireWith(context, eventName, args);
+		};
+		
+		this.fireWith = function(_context, eventName, args){
+			try{
+				this.get(eventName).fireWith(_context, args);
+			}catch(e){console.error(e)}
+		};
+		
+	}
+	
+	CallbacksMap.prototype.bindMethod = function(target){
+		var _this = this;
+		target.addCallback = function(eventName, callback){
+			if(typeof eventName === 'object'){
+				for(var key in eventName){
+					if(typeof eventName[key] === 'function'){
+						target.addCallback(key, eventName[key]);
+					}
+				}
+			}else if(typeof eventName === 'string' && typeof callback === 'function'){
+				_this.put(eventName, callback);
+			}
+			return target;
+		}
+	};
+	
 	
 	function returnTrue(){return true;}
 	function returnFalse(){return false;}

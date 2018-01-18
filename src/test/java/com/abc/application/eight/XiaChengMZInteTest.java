@@ -2,8 +2,6 @@ package com.abc.application.eight;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -18,7 +16,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.abc.application.FusitionContext;
+import com.abc.application.FusionContext;
 import com.abc.mapping.entity.Entity;
 import com.abc.panel.Discoverer;
 import com.abc.panel.Integration;
@@ -28,7 +26,7 @@ import com.abc.panel.PanelFactory;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class XiaChengMZInteTest {
 	private static Logger logger = Logger.getLogger(XiaChengMZInteTest.class);
-	private ExecutorService pool = Executors.newFixedThreadPool(20);
+	//private ExecutorService pool = Executors.newFixedThreadPool(20);
 	protected String mapperName = "xiachengMZ";
 	protected String writeMappingName = "xiachengMZ";
 	protected String dictionaryMappingName="default_dm";
@@ -93,9 +91,9 @@ public class XiaChengMZInteTest {
 			Entity relatetion = createPeopleEntity(mapperName, headerRow, row);
 			entity.putRelationEntity("使用关系", "房屋居住人", relatetion);
 
-			FusitionContext context = new FusitionContext();
+			FusionContext context = new FusionContext();
 			context.setMappingName(writeMappingName);
-			context.setSource(FusitionContext.SOURCE_COMMON);
+			context.setSource(FusionContext.SOURCE_COMMON);
 			context.setDictionaryMappingName(dictionaryMappingName);
 			Integration integration = PanelFactory.getIntegration();
 			logger.debug(entity.toJson());

@@ -19,6 +19,13 @@ define(function(require, exports, module){
 	
 	$CPF.putPageInitSequeue(4, function($page){
 		$('form', $page).not('.nform').submit(function(e){
+			if(typeof CKEDITOR === 'object'){
+				for (var key in CKEDITOR.instances){
+					if($(CKEDITOR.instances[key].element.$).closest(this).length > 0){
+						CKEDITOR.instances[key].updateElement();
+					}
+				}
+			}
 			var $this = $(this),
 				page = $this.getLocatePage(),
 				formData = new FormData(this)
@@ -38,26 +45,48 @@ define(function(require, exports, module){
 					return false;
 				}
 			}
-			var url = $this.attr('action')
-				;
-			//构造提交事件
-			var submitEvent = $.Event('cpf-submit');
-			var canceled = false;
-			submitEvent.doCancel = function(){canceled = true};
-			var result = $this.trigger(submitEvent, [formData, $this, page]);
-			try{
-				if(!canceled){
-					page.loadContent(url, undefined, formData);
-					$this.trigger('cpf-submitting', [formData, $this, page]);
+			var url = $this.attr('action'),
+				confirm = $this.attr('confirm'),
+				Dialog = require('dialog'),
+				_submit = function(){
+				//构造提交事件
+				var submitEvent = $.Event('cpf-submit');
+				var canceled = false;
+				submitEvent.doCancel = function(){canceled = true};
+				var result = $this.trigger(submitEvent, [formData, $this, page]);
+				try{
+					if(!canceled){
+						page.loadContent(url, undefined, formData);
+						$this.trigger('cpf-submitting', [formData, $this, page]);
+					}
+				}catch(e){
+					console.error(e);
+				}finally{
+					return false;
 				}
-			}catch(e){
-				console.error(e);
-			}finally{
-				return false;
+			};
+			if(confirm && Dialog){
+				Dialog.confirm(confirm, function(yes){
+					if(yes){
+						_submit();
+					}
+				});
+			}else{
+				return _submit();
 			}
 		}).filter('.validate-form').each(function(){
 			//初始化验证插件
 			$(this).bootstrapValidator();
+			//绑定重新校验表单事件
+			$(':input', this).on('cpf-revalidate', function(){
+				var $thisInput = $(this);
+				var fieldName = $thisInput.attr('name');
+				var bv = $thisInput.closest('form').data('bootstrapValidator');
+				if(bv && fieldName){
+					bv.updateStatus(fieldName, 'NOT_VALIDATED', null);
+					bv.validateField(fieldName);
+				}
+			});
 		}).end().submit(function(e){
 			//阻止跳转
 			  e.preventDefault();

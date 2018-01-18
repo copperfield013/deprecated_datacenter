@@ -50,35 +50,14 @@ define(function(require, exports, module){
 		 */
 		function bindDblClickEdit(selector, inputClass){
 			$page.on('dblclick', selector, function(e){
-				var $this = $(e.target);
-				var title = $this.text();
-				var $input = 
-					$('<input type="text" />')
-					.addClass(inputClass)
-					.val(title)
-					.keypress(function(e){
-						if(e.keyCode === 13){
-							confirmTitle();
-						}
-					})
-					.blur(confirmTitle);
-				$input.appendTo($this.empty()).select();
-				function confirmTitle(){
-					var newTitle = $input.val();
-					var blankExp = /^\s*$/;
-					if(blankExp.test(newTitle)){
-						newTitle = title;
-					}
-					$input.remove();
-					$this.text(newTitle);
+				require('utils').toEditContent(e.target, inputClass).bind('confirmed', function(text, $this){
 					if($this.is('.field-title')){
 						adjustFieldTitle($this);
 					}else if($this.is('.group-title')){
 						//焦点放到字段搜索框中
 						getLocateGroup($this).find('.search-text-input').select();
-						
 					}
-				}
+				});
 			});
 		}
 		

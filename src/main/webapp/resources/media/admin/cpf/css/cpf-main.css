@@ -186,6 +186,8 @@ li.main-tab-title>a{
 .detail {
     display: table;
     width: 100%;
+    min-height: 95%;
+    font-size: 15px;
 }
 .detail .row {
     margin-top: 9px;
@@ -391,4 +393,164 @@ div#cpf-staticview-area {
     right: 0;
     bottom: 0;
     z-index: -1;
+}
+
+.float-operate-area {
+    font-size: 3em;
+    line-height: 1.23em;
+    padding-right: 1em;
+    position: absolute;
+    bottom: 20px;
+    right: 1em;
+    z-index: 1000;
+    width: 1em;
+}
+.float-operate-area a i{
+	cursor: pointer;
+	color: #57b5e3;
+	opacity: 0.5;
+}
+
+.float-operate-area a i:HOVER{
+	opacity: 1;
+}
+.float-operate-area a.btn-save i{
+	color: #53a93f;
+}
+
+input[type="text"].dblclicked{
+	height: 2em;
+	line-height: 2em;
+}
+
+
+
+
+
+
+div.detail-toggle-sublist {
+    position: absolute;
+    right: 2em;
+    width: 350px;
+    background-color: #fff;
+    top: 40px;
+    height: 323px;
+    border: 1px solid #ccc;
+    font-size: 17px;
+    padding: 10px 0;
+    padding-bottom: 30px;
+    overflow: hidden;
+}
+
+div.detail-toggle-sublist div.detail-toggle-sublist-wrapper {
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    width: 370px;
+}
+.detail-toggle-sublist div.detail-toggle-sublist-wrapper>a {
+	display: block;
+    list-style: none;
+    list-style-type: none;
+    height: 70px;
+    line-height: 3em;
+    border-bottom: 1px solid #eee;
+    padding: 10px 20px;
+    cursor: pointer;
+    position: relative;
+}
+.detail-toggle-sublist div.detail-toggle-sublist-wrapper>a:hover{
+    background-color: #FFEC8B;
+}
+
+div.detail-toggle-sublist div.detail-toggle-sublist-wrapper {
+    padding: 0;
+    margin: 0;
+}
+
+div.detail-toggle-sublist div.detail-toggle-sublist-wrapper>a span.detail-toggle-sublist-icon {
+    font-size: 22px;
+    display: inline-block;
+    width: 45px;
+    height: 45px;
+    line-height: 45px;
+    text-align: center;
+    background-color: #6495ED;
+    color: #fff;
+    border-radius: 50%;
+    float: left;
+}
+div.detail-toggle-sublist div.detail-toggle-sublist-wrapper>a:hover span.detail-toggle-sublist-icon {
+    background-color: #1E90FF;
+}
+
+
+div.detail-toggle-sublist span.detail-toggle-sublist-item-body {
+    display: inline-block;
+    width: 250px;
+    height: 45px;
+    margin-left: 10px;
+}
+
+.detail-toggle-sublist div.detail-toggle-sublist-wrapper>a:hover span.detail-toggle-sublist-item-body {
+    font-weight: bold;
+}
+
+div.detail-toggle-sublist span.detail-toggle-sublist-item-name {
+    height: 25px;
+    margin: 0;
+    font-size: 16px;
+    line-height: 25px;
+}
+
+div.detail-toggle-sublist span.detail-toggle-sublist-item-date {
+    height: 20px;
+    line-height: 20px;
+    font-size: 13px;
+    text-indent: 5px;
+    color: #acacac;
+}
+
+.detail-toggle-sublist div.detail-toggle-sublist-wrapper>a.active .detail-toggle-sublist-icon {
+    background-color: #ed4e2a !important;
+}
+
+.detail-toggle-sublist .detail-toggle-sublist-item-body>span {
+    display: inline-block;
+    width: 100%;
+    margin: 0;
+    float: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.detail-toggle-sublist div.detail-toggle-sublist-wrapper>a.active .detail-toggle-sublist-item-body>span {
+    font-weight: normal !important;
+}
+
+.detail-toggle-sublist div.detail-toggle-sublist-wrapper>a.active {
+    cursor: initial;
+    background-color: #f8f8f8;
+}
+
+.detail-toggle-sublist .detail-toggle-sublist-operate {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    text-align: right;
+    padding-right: 10px;
+    padding-bottom: 5px;
+    font-size: 20px;
+    height: 30px;
+    border-top: 1px solid #eee;
+    line-height: 30px;
+}
+.detail-toggle-sublist .detail-toggle-sublist-operate i{
+	cursor: pointer;
+	color: #888;
+}
+.detail-toggle-sublist .detail-toggle-sublist-operate i:HOVER{
+	color: #ccc;
 }

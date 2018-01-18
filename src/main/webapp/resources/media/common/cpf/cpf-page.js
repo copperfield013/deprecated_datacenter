@@ -39,7 +39,8 @@ define(function(require, exports, module){
 							eval(je.exec(href)[1]);
 						}catch(e){}
 					}else if(href && href !== '#'){
-						var reg = /^page:(\w+)$/; 
+						var reg = /^page:(\w+)$/;
+						var regJquery = /^page:#([\w\-_]+)\.([\w_]+)$/;
 						if(reg.test(href)){
 							var action = reg.exec(href)[1];
 							switch(action){
@@ -50,6 +51,13 @@ define(function(require, exports, module){
 								$page.getLocatePage().close();
 								break;
 							}
+						}else if(regJquery.test(href)){
+							var exec = regJquery.exec(href);
+							var id = exec[1],
+								method = exec[2];
+							try{
+								$('#' + id, $page)[method]();
+							}catch(e){}
 						}else{
 							goPage(this, page);
 						}
@@ -73,6 +81,7 @@ define(function(require, exports, module){
 								});
 							}else{
 								var reg = /^page:(\w+)$/; 
+								var regJquery = /^page:#([\w\-_]+)\.([\w_]+)$/;
 								if(reg.test(href)){
 									var action = reg.exec(href)[1];
 									switch(action){
@@ -83,6 +92,13 @@ define(function(require, exports, module){
 										$page.getLocatePage().close();
 										break;
 									}
+								}else if(regJquery.test(href)){
+									var exec = regJquery.exec(href);
+									var id = exec[1],
+										method = exec[2];
+									try{
+										$('#' + id, $page)[method]();
+									}catch(e){}
 								}else{
 									goPage($this, page);
 								}
@@ -165,7 +181,9 @@ define(function(require, exports, module){
 		$content
 			.addClass($CPF.getParam('pageContentClass'))
 			.data($CPF.getParam('pageDataKey'), this);
-		
+		this.getId = function(){
+			return id;
+		};
 		this.getContent = function(){
 			return $content;
 		};
@@ -193,6 +211,22 @@ define(function(require, exports, module){
 				pageObj.close();
 			}
 		};
+		var eventMap = {};
+		this.bind = function(eventName, callback){
+			if(typeof eventName === 'string' && typeof callback === 'function'){
+				eventMap[eventName] = callback;
+			}
+		};
+		this.trigger = function(eventName, args){
+			if(typeof eventName === 'string'){
+				var callback = eventMap[eventName];
+				if(typeof callback === 'function'){
+					try{
+						return callback.apply(this, args);
+					}catch(e){}
+				}
+			}
+		}
 		/**
 		 * 
 		 */

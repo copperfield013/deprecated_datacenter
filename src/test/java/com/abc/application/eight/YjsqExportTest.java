@@ -1,8 +1,6 @@
 package com.abc.application.eight;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -10,7 +8,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.abc.application.FusitionContext;
+import com.abc.application.FusionContext;
 import com.abc.dto.ErrorInfomation;
 import com.abc.panel.Discoverer;
 import com.abc.panel.PanelFactory;
@@ -20,7 +18,7 @@ import com.abc.record.Tracker;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class YjsqExportTest {
 	private static Logger logger = Logger.getLogger(YjsqExportTest.class);
-	private ExecutorService pool = Executors.newFixedThreadPool(20);
+	//private ExecutorService pool = Executors.newFixedThreadPool(20);
 	protected String mapperName = "yjsq_people";
 	protected String writeMappingName = "yjsq_people";
 	protected String dictionaryMappingName="yjsq_people";
@@ -32,7 +30,7 @@ public class YjsqExportTest {
 	@Test
 	public void discoverTrack() {
 		
-		FusitionContext context=new FusitionContext();
+		FusionContext context=new FusionContext();
 		context.setMappingName(writeMappingName);
 		context.setDictionaryMappingName(dictionaryMappingName);
 		Discoverer discoverer = PanelFactory.getDiscoverer(context);

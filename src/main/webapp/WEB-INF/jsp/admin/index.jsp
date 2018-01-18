@@ -101,8 +101,8 @@
 					'console'	: 'COMMON/cpf/cpf-console.js?v=${cpfVersion}',
 					'control'	: 'COMMON/cpf/cpf-control.js?v=${cpfVersion}',
 					'innerpage'	: 'COMMON/cpf/cpf-innerpage.js?v=$${cpfVersion}',
-					//'staticview': 'COMMON/cpf/cpf-staticview.js?v=$${cpfVersion}',
-					'bloodhound': '${basePath}media/admin/plugins/typeahead/dist/typeahead.bundle.js?v=$${cpfVersion}'
+					'bloodhound': '${basePath}media/admin/plugins/typeahead/dist/typeahead.bundle.js?v=$${cpfVersion}',
+					'tmpl'		: 'COMMON/cpf/cpf-tmpl.js?v=${cpfVersion}'
 				}
 	    		});
 	    		

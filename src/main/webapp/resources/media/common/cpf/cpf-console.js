@@ -2,6 +2,9 @@ define(function(require, exports){
 	$.extend(exports, {
 		log		: function(){
 			doInConsole('log', arguments);
+		},
+		error	: function(){
+			doInConsole('error', arguments);
 		}
 	});
 	

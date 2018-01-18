@@ -47,7 +47,7 @@
 									删除
 								</a>
 								<c:choose>
-									<c:when test="${tmpl.tmplId != sysAdmin.defaultTemplateId }">
+									<c:when test="${tmpl.tmplId != sysAdmin.defaultDetailTemplateId }">
 										<a href="admin/peopledata/viewtmpl/as_default/${tmpl.tmplId }" class="btn btn-warning btn-xs">
 											<i class="glyphicon glyphicon-star"></i>
 											设为默认

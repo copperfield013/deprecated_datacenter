@@ -38,7 +38,7 @@
 			this.element.on({
 				focus: $.proxy(this.show, this),
 				//blur: $.proxy(this.hide, this),
-				keyup: $.proxy(this.update, this),
+				keyup: $.proxy(this.update, this)
 			});
 		} else {
 			if (this.component){

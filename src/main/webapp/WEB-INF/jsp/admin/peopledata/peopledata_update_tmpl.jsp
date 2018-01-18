@@ -109,7 +109,7 @@
 </div>
 <script>
 	seajs.use(['dialog', 'ajax', 'utils', 'peopledata/js/viewtmpl-update.js', '$CPF',
-	           'peopledata/js/field-input.js'], function(Dialog, Ajax, Utils, ViewTmpl, $CPF, FieldInput){
+	           'field/js/field-input.js'], function(Dialog, Ajax, Utils, ViewTmpl, $CPF, FieldInput){
 		var $page = $('#peopledata-update-tmpl-${peopleCode }');
 		
 		$('.toggle-template i', $page).click(function(){

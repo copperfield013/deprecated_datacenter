@@ -29,7 +29,7 @@
     	position: static;
     }
 </style>
-<div id="people-update${peopleMap["peopleCode"]}">
+<div id="people-update${peopleMap[peopleCode]}">
     <div class="zpage-body zclear search">
     	<h1 class="zpage-title">动态字段修改人口</h1>
         <div class="integratedForm-button zclear">
@@ -41,7 +41,7 @@
                 <form id="integratedForm" class="search"
                       action="admin/peopledata/do_smart_update" autocomplete="off">
                     <input type="hidden" name="peopleCode"
-                           value="${peopleMap["peopleCode"]}">
+                           value="${peopleMap[peopleCode]}">
                     <div class="zitem-group zclear" data-group="basic">
                         <c:forEach items="${dic}" var="item" varStatus="i">
                             <c:set var="keys" value="${item.cCnEnglish}"></c:set>

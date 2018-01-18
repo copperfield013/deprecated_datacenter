@@ -20,6 +20,7 @@
 <link href="media/admin/cpf/css/cpf-main.css" rel="stylesheet" type="text/css" />
 <!-- cover beyond styles -->
 <link href="media/admin/main/css/datacenter-cover.css" rel="stylesheet" type="text/css" />
+<link href="media/admin/field/css/field-search.css" rel="stylesheet" type="text/css" />
 <!-- jQuery -->
 <script src="${basePath }media/jquery-1.11.3.js"></script>
 <script src="${basePath }media/jquery.fix.clone.js"></script>
@@ -29,4 +30,5 @@
 <script src="${basePath }media/admin/plugins/timeline/jquery.eeyellow.Timeline.js"></script>
 <!-- SeaJS -->
 <script src="${basePath }media/sea-debug.js"></script>
+<script src="${basePath }media/seajs-css-debug.js"></script>
 <script src="${basePath }media/admin/plugins/typeahead/dist/handlebars.js"></script>

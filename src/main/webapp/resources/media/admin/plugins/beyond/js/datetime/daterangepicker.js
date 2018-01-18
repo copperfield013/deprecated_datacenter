@@ -537,8 +537,10 @@
         updateInputText: function() {
             if (this.element.is('input') && !this.singleDatePicker) {
                 this.element.val(this.startDate.format(this.format) + this.separator + this.endDate.format(this.format));
+                $(this.element).trigger('cpf-revalidate');
             } else if (this.element.is('input')) {
                 this.element.val(this.startDate.format(this.format));
+                $(this.element).trigger('cpf-revalidate');
             }
 
         },

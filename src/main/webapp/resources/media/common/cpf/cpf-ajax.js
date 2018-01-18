@@ -122,7 +122,7 @@ define(function(require, exports, module){
 	
 	
 	
-	function ajax(url, formData, _param){
+	function ajax(url, formData, whenSuc, _param){
 		var defaultParam = {
 			//提交类型
 			method		: 'POST',
@@ -133,16 +133,29 @@ define(function(require, exports, module){
 			//提交请求无论成功或者失败都会执行
 			afterLoad	: $.noop,
 			//当前页面
-			page		: undefined
+			page		: undefined,
+			//
+			interval	: 0
 		};
-		var param = {};
-		if(typeof _param === 'function'){
-			_param = {
-				whenSuc	: _param
-			};
+		if(typeof formData === 'function'){
+			if($.isPlainObject(whenSuc)){
+				_param = whenSuc;
+			}else{
+				_param = {};
+			}
+			whenSuc = formData;
+			formData = _param.whenSuc;
+		}else if($.isPlainObject(whenSuc)){
+			_param = whenSuc;
+			whenSuc = _param.whenSuc;
+		}else{
+			_param = {} || _param;
+		}
+		if($.isPlainObject(_param)){
+			_param.whenSuc = whenSuc;
 		}
 		//继承获得参数
-		$.extend(param, defaultParam, _param);
+		var param = $.extend({}, defaultParam, _param);
 		
 		var fData = new FormData();
 		if($.isPlainObject(formData)){
@@ -167,6 +180,9 @@ define(function(require, exports, module){
 		    data: 		fData,
 		    processData: false,
 		    contentType: false,
+		    beforeSend	: function(){
+		    	console.log(arguments);
+		    },
 		    headers		: {
 		    	'request-category'	: 'cpf-ajax'
 		    },
@@ -195,6 +211,9 @@ define(function(require, exports, module){
 		    	}else if(/^.+\/html;.+$/.test(resContentType)){
 		    		//返回的数据是html
 		    		param.whenSuc(data, 'html');
+		    	}else{
+		    		console.log(resContentType);
+		    		param.whenSuc(data, jqXHR);
 		    	}
 		    },
 		    error		: function(jqXHR, textStatus, errorThrown){
@@ -245,6 +264,23 @@ define(function(require, exports, module){
 		});
 	}
 	
+	/**
+	 * 
+	 */
+	function loadResource(url, reqParam, ajaxParam){
+		var deferred = $.Deferred();
+		ajax(url, reqParam, $.extend({}, {
+			method	: 'get',
+			whenSuc	: function(data){
+				try{
+					data = $.parseJSON(data);
+				}catch(e){}
+				deferred.resolve(data);
+			}
+		}, ajaxParam));
+		return deferred.promise();
+	}
+	
 	function commonHandleSucAjax(data, textStatus, jqXHR){
 		//处理session超时
 		if($CPF.getParam('ajaxSessionValid')){
@@ -272,4 +308,5 @@ define(function(require, exports, module){
 	exports.postJson = postJson;
 	exports.AjaxPageResponse = AjaxPageResponse;
 	exports.download = download;
+	exports.loadResource = loadResource;
 });

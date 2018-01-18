@@ -1,0 +1,32 @@
+<div class="fieldpicker-container">
+	<ul class="nav nav-tabs nav-justified">
+		<li class="active"><a data-toggle="tab" href="#ctab_${pickerKey }_0">${composites[0].cname }</a></li>
+		<li><a data-toggle="tab" href="#ctab_${pickerKey }_1">${composites[1].cname }</a></li>
+		<li><a data-toggle="tab" href="#ctab_${pickerKey }_2">${composites[2].cname }</a></li>
+		{{if composites.length > 3}}
+			<li class="dropdown">
+				<a data-toggle="dropdown" class="fa dropdown-toggle" href="#">
+					<span>更多</span>
+				</a>
+				<ul class="dropdown-menu dropdown-blue">
+					{{each(i, composite) composites}}
+						{{if i > 3}}
+							<li><a data-toggle="tab" href="#ctab_${pickerKey }_${i }">${composite.cname }</a></li>
+						{{/if}}
+					{{/each}}
+				</ul>
+			</li>
+		{{/if}}
+	</ul>
+	<div class="tab-content">
+		{{each(i, composite) composites}}
+			<div id="ctab_${pickerKey }_${i }" class="tab-pane {{if i==0}}active{{/if}}">
+				<div class="fieldpicker-field-container">
+					{{each(i, field) composite.fields}}
+						<a href="#" data-id="${field.id}" class="fieldpicker-field-item">${field.cname }</a>
+					{{/each}}
+				</div>
+			</div>
+		{{/each}}
+	</div>
+</div>
