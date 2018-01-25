@@ -33,16 +33,19 @@ public class ListTemplateDaoImpl implements ListTemplateDao{
 	@SuppressWarnings("unchecked")
 	@Override
 	public Set<TemplateListColumn> getColumnsByTmplId(Long ltmplId) {
-		String hql = "from TemplateListColumn c where c.templateId = :ltmplId";
+		String hql = "from TemplateListColumn c where c.templateId = :ltmplId order by c.order asc";
 		Query query = sFactory.getCurrentSession().createQuery(hql);
 		query.setLong("ltmplId", ltmplId);
 		return new LinkedHashSet<TemplateListColumn>(query.list());
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public Set<TemplateListCriteria> getCriteriaByTmplId(Long ltmplId) {
-		// TODO Auto-generated method stub
-		return null;
+		String hql = "from TemplateListCriteria c where c.templateId = :ltmplId order by c.order asc";
+		Query query = sFactory.getCurrentSession().createQuery(hql);
+		query.setLong("ltmplId", ltmplId);
+		return new LinkedHashSet<TemplateListCriteria>(query.list());
 	}
 	
 	

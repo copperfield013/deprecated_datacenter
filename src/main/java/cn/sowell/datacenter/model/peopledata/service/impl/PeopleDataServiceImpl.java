@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -23,6 +24,8 @@ import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
 import cn.sowell.datacenter.model.peopledata.service.PojoService;
+import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateListCriteria;
 
 import com.abc.application.FusionContext;
 import com.abc.dto.ErrorInfomation;
@@ -47,9 +50,27 @@ public class PeopleDataServiceImpl implements PeopleDataService{
 	
 	EntityTransfer eTransfer = new EntityTransfer();
 	
-	public PeopleDataServiceImpl() {
-	}
 	
+	@Override
+	public List<PeopleData> query(Set<NormalCriteria> nCriterias,
+			PageInfo pageInfo) {
+		FusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
+		CriteriaFactory criteriaFactory = new CriteriaFactory(context);
+		List<Entity> list = abcService.queryPeopleList(mapperName->{
+			ArrayList<Criteria> cs = new ArrayList<Criteria>();
+			nCriterias.forEach(nCriteria->{
+				TemplateListCriteria criteria = nCriteria.getCriteria();
+				if("s1".equals(criteria.getComparator()) && TextUtils.hasText(nCriteria.getValue())){
+					LikeQueryCriteria like = criteriaFactory.createLikeQueryCriteria(nCriteria.getAttributeName(), nCriteria.getValue());
+					cs.add(like);
+				}
+			});
+			return cs;
+		}, pageInfo);
+		List<PeopleData> result = new ArrayList<PeopleData>();
+		list.forEach(p->result.add(transfer(p)));
+		return result;
+	}
 	
 	@Override
 	public List<PeopleData> query(PeopleDataCriteria criteria, PageInfo pageInfo) {

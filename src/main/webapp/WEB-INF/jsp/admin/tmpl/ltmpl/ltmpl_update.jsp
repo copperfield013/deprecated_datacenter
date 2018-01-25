@@ -26,6 +26,7 @@
 				<span>\${fieldTitle}</span>
 			</div>
 			<div class="criteria-partitions-container"></div>
+			<span class="btn-remove-criteria"></span>
 		</div>
 	</script>
 	<script type="jquery/tmpl" id="criteria-partition-tmpl">
@@ -97,7 +98,7 @@
 											<div class="row criteria-show-toggle-row">
 												<div class="col-lg-12">
 													<label>
-														<input id="toggle-show-criteria" class="checkbox-slider slider-icon colored-blue" checked="checked" type="checkbox">
+														<input disabled="disabled" id="toggle-show-criteria" class="checkbox-slider slider-icon colored-blue" checked="checked" type="checkbox">
 														<span class="text">显示(勾选时将条件显示在列表上方，供用户查询)</span>
 													</label>
 												</div>
@@ -129,15 +130,15 @@
 													<div>
 														<label>显示控件</label>
 														<div>
-															<select>
-																<option>文本框</option>
+															<select id="field-input-type">
+																<option value="text">文本框</option>
 															</select>
 														</div>
 													</div>
 													<div>
 														<label>关系</label>
 														<div>
-															<select>
+															<select id="criteria-detail-comparator">
 																<option>包含</option>
 																<option>开头为</option>
 																<option>结尾为</option>
@@ -147,14 +148,13 @@
 													</div>
 													<div>
 														<label>默认值</label>
-														<div>
-															<input type="text">
+														<div id="criteria-default-value-container">
 														</div>
 													</div>
 													<div>
 														<label>占位文本</label>
 														<div>
-															<input type="text">
+															<input id="criteria-detail-placeholder" type="text">
 														</div>
 													</div>
 												</div>

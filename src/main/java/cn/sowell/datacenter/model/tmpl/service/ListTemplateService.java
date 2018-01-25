@@ -1,10 +1,13 @@
 package cn.sowell.datacenter.model.tmpl.service;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
+import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTmpl;
 
 public interface ListTemplateService {
@@ -42,7 +45,7 @@ public interface ListTemplateService {
 	 * @param pageInfo
 	 * @return
 	 */
-	List<PeopleData> queryPeopleList(Object object, PageInfo pageInfo);
+	List<PeopleData> queryPeopleList(Set<NormalCriteria> criterias, PageInfo pageInfo);
 
 	/**
 	 * 删除模板

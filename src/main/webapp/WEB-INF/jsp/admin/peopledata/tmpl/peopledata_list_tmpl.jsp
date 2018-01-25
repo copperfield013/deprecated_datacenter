@@ -15,8 +15,19 @@
 		</div>
 	</div>
 	<div class="page-body">
-		<form action="admin/peopledata/tmpl/list">
+		<form class="form-inline"  action="admin/peopledata/tmpl/list">
 			<input type="hidden" id="tmplId" name="tmplId" value="${ltmpl.id }" />
+			<c:if test="${not empty ltmpl.criterias }">
+				<c:forEach var="criteriaItem" items="${ltmpl.criterias }">
+					<c:if test="${criteriaItem.inputType == 'text' }">
+						<div class="form-group">
+							<label class="control-label">${criteriaItem.title }</label>
+							<input class="form-control" type="text" name="criteria_${criteriaItem.id }" value="${vCriteriaMap[criteriaItem.id].value}" placeholder="${criteriaItem.placeholder }" />
+						</div>
+					</c:if>
+				</c:forEach>
+				<button type="submit" class="btn btn-default">查询</button>
+			</c:if>
 		</form>
 		<%-- <nav>
 			<form class="form-inline" action="admin/peopledata/tmpl/list">

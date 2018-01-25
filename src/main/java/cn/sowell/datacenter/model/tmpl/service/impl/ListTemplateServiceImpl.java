@@ -16,9 +16,9 @@ import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
-import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
 import cn.sowell.datacenter.model.system.pojo.SystemAdmin;
+import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
 import cn.sowell.datacenter.model.tmpl.dao.ListTemplateDao;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListColumn;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListCriteria;
@@ -44,15 +44,26 @@ public class ListTemplateServiceImpl implements ListTemplateService{
 	@Override
 	public void saveListTemplate(TemplateListTmpl tmpl) {
 		if(tmpl != null){
+			Date now = new Date();
 			if(tmpl.getId() == null){
 				//创建
+				tmpl.setCreateTime(now);
+				tmpl.setUpdateTime(now);
 				Long tmplId = nDao.save(tmpl);
 				Set<TemplateListColumn> columns = tmpl.getColumns();
 				for (TemplateListColumn column : columns) {
 					column.setTemplateId(tmplId);
+					column.setCreateTime(now);
+					column.setUpdateTime(now);
 					nDao.save(column);
 				}
-				
+				Set<TemplateListCriteria> criterias = tmpl.getCriterias();
+				for (TemplateListCriteria criteria : criterias) {
+					criteria.setTemplateId(tmplId);
+					criteria.setCreateTime(now);
+					criteria.setUpdateTime(now);
+					nDao.save(criteria);
+				}
 			}else{
 				//修改
 				updateListTempate(tmpl);
@@ -69,39 +80,50 @@ public class ListTemplateServiceImpl implements ListTemplateService{
 			origin.setDefaultPageSize(tmpl.getDefaultPageSize());
 			origin.setDefaultOrderFieldId(tmpl.getDefaultOrderFieldId());
 			origin.setDefaultOrderDirection(tmpl.getDefaultOrderDirection());
-			Map<Long, TemplateListColumn> originColumnMap = CollectionUtils.toMap(origin.getColumns(), column->column.getId());
-			Set<Long> toRemove = new HashSet<Long>(originColumnMap.keySet());
 			
 			Date now = new Date();
-			if(tmpl.getColumns() != null){
-				for (TemplateListColumn column : tmpl.getColumns()) {
-					if(column.getId() != null){
-						toRemove.remove(column.getId());
-						//修改
-						TemplateListColumn originColumn = originColumnMap.get(column.getId());
-						originColumn.setTitle(column.getTitle());
-						originColumn.setFieldKey(column.getFieldKey());
-						originColumn.setFieldId(column.getFieldId());
-						originColumn.setOrder(column.getOrder());
-						originColumn.setOrderable(column.getOrderable());
-						originColumn.setSpecialField(column.getSpecialField());
-						originColumn.setUpdateTime(now);
-						originColumn.setViewOption(column.getViewOption());
-						nDao.update(originColumn);
-					}else{
-						//添加
+			
+			NormalDaoSetUpdateStrategy.build(
+					TemplateListColumn.class, nDao,
+					column->column.getId(),
+					(oColumn, column)->{
+						oColumn.setTitle(column.getTitle());
+						oColumn.setFieldKey(column.getFieldKey());
+						oColumn.setFieldId(column.getFieldId());
+						oColumn.setOrder(column.getOrder());
+						oColumn.setOrderable(column.getOrderable());
+						oColumn.setSpecialField(column.getSpecialField());
+						oColumn.setUpdateTime(now);
+						oColumn.setViewOption(column.getViewOption());
+					},column->{
 						column.setCreateTime(now);
 						column.setUpdateTime(now);
 						column.setTemplateId(origin.getId());
-						nDao.save(column);
-					}
-				}
-			}
-			toRemove.forEach(columnId->{
-				nDao.remove(originColumnMap.get(columnId));
-			});
+					})
+				.doUpdate(origin.getColumns(), tmpl.getColumns());
 			
-			
+			NormalDaoSetUpdateStrategy.build(
+				TemplateListCriteria.class, nDao, 
+				criteria->criteria.getId(), 
+				(originCriteria, criteria)->{
+					originCriteria.setTitle(criteria.getTitle());
+					originCriteria.setFieldId(criteria.getFieldId());
+					originCriteria.setFieldKey(criteria.getFieldKey());
+					originCriteria.setRelation(criteria.getRelation());
+					originCriteria.setQueryShow(criteria.getQueryShow());
+					originCriteria.setComparator(criteria.getComparator());
+					originCriteria.setInputType(criteria.getInputType());
+					originCriteria.setOrder(criteria.getOrder());
+					originCriteria.setViewOption(criteria.getViewOption());
+					originCriteria.setDefaultValue(criteria.getDefaultValue());
+					originCriteria.setPlaceholder(criteria.getPlaceholder());
+					originCriteria.setUpdateTime(now);
+				}, criteria->{
+					criteria.setCreateTime(now);
+					criteria.setUpdateTime(now);
+					criteria.setTemplateId(origin.getId());
+				})
+			.doUpdate(origin.getCriterias(), tmpl.getCriterias());
 		}else{
 			throw new RuntimeException("列表模板[id=" + tmpl.getId() + "]不存在");
 		}
@@ -131,8 +153,8 @@ public class ListTemplateServiceImpl implements ListTemplateService{
 	PeopleDataService peopleService;
 	
 	@Override
-	public List<PeopleData> queryPeopleList(Object object, PageInfo pageInfo) {
-		return peopleService.query(new PeopleDataCriteria(), pageInfo);
+	public List<PeopleData> queryPeopleList(Set<NormalCriteria> criterias, PageInfo pageInfo) {
+		return peopleService.query(criterias, pageInfo);
 	}
 	
 	

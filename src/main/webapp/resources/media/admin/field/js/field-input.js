@@ -185,7 +185,7 @@ define(function(require, exports, module){
 			switch(param.type){
 				case 'select':
 				default: 
-					param.$dom.val(val);
+					this.getDom().val(val);
 			}
 		}
 		

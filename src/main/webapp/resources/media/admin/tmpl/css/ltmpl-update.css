@@ -249,10 +249,41 @@
     margin-top: 10px;
     cursor: default !important;
     min-height: 70px;
+    position: relative;
+    overflow: hidden;
 }
 .ltmpl-update .criteria-item.criteria-selected {
     border: 2px solid #5db2ff;
 }
+
+
+.ltmpl-update .criteria-item:hover span.btn-remove-criteria{
+    display: inline;
+}
+.ltmpl-update span.btn-remove-criteria {
+    display: none;
+    position: absolute;
+    right: -25px;
+    top: -25px;
+    width: 50px;
+    height: 50px;
+    background-color: #5db2ff;
+    border-radius: 50%;
+    line-height: 73px;
+    vertical-align: bottom;
+    text-indent: 10px;
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.ltmpl-update span.btn-remove-criteria:hover {
+    background-color: #87CEFF;
+}
+.ltmpl-update span.btn-remove-criteria:before {
+    content: "×";
+}
+
 
 .ltmpl-update .criteria-property-name {
     display: flex;

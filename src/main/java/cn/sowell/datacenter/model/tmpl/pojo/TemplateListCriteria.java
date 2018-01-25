@@ -13,6 +13,13 @@ import javax.persistence.Table;
 @Table(name="t_tmpl_list_criteria")
 public class TemplateListCriteria {
 	
+	public TemplateListCriteria() {}
+	
+	public TemplateListCriteria(Long id) {
+		super();
+		this.id = id;
+	}
+
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
@@ -29,6 +36,15 @@ public class TemplateListCriteria {
 	@Column(name="c_field_key")
 	private String fieldKey;
 	
+	@Column(name="c_relation")
+	private String relation;
+	
+	@Column(name="c_query_show")
+	private Integer queryShow;
+	
+	@Column(name="c_comparator")
+	private String comparator;
+	
 	@Column(name="c_input_type")
 	private String inputType;
 	
@@ -39,7 +55,10 @@ public class TemplateListCriteria {
 	private String viewOption;
 	
 	@Column(name="c_def_val")
-	private String defaultValuel;
+	private String defaultValue;
+	
+	@Column(name="c_placeholder")
+	private String placeholder;
 	
 	@Column(name="create_time")
 	private Date createTime;
@@ -79,12 +98,6 @@ public class TemplateListCriteria {
 	public void setInputType(String inputType) {
 		this.inputType = inputType;
 	}
-	public String getDefaultValuel() {
-		return defaultValuel;
-	}
-	public void setDefaultValuel(String defaultValuel) {
-		this.defaultValuel = defaultValuel;
-	}
 	public Date getCreateTime() {
 		return createTime;
 	}
@@ -120,6 +133,36 @@ public class TemplateListCriteria {
 	}
 	public void setViewOption(String viewOption) {
 		this.viewOption = viewOption;
+	}
+	public String getRelation() {
+		return relation;
+	}
+	public void setRelation(String relation) {
+		this.relation = relation;
+	}
+	public String getComparator() {
+		return comparator;
+	}
+	public void setComparator(String comparator) {
+		this.comparator = comparator;
+	}
+	public String getPlaceholder() {
+		return placeholder;
+	}
+	public void setPlaceholder(String placeholder) {
+		this.placeholder = placeholder;
+	}
+	public String getDefaultValue() {
+		return defaultValue;
+	}
+	public void setDefaultValue(String defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+	public Integer getQueryShow() {
+		return queryShow;
+	}
+	public void setQueryShow(Integer queryShow) {
+		this.queryShow = queryShow;
 	}
 	
 	

@@ -4,18 +4,18 @@ define(function(require, exports, module){
 	exports.init = function($page, tmplData, criteriaData, columnData){
 		console.log($page);
 		initTmpl($page, tmplData);
-		initCriteria($page);
+		initCriteria($page, criteriaData);
 		initListTable($page, tmplData, columnData);
 		var Dialog = require('dialog');
 		$('#save', $page).click(function(){
 			var tmplTitle = getTmplTitle();
 			if(tmplTitle){
 				var columnData = getColumnData();
-				var criteriaData = null;
+				var criteriaData = getCriteriaData();
 				require('ajax').postJson('admin/tmpl/ltmpl/save', {
 					tmplId		: tmplData? tmplData.id: null,
 					title		: tmplTitle,
-					criteriData	: criteriaData,
+					criteriaData: criteriaData,
 					columnData	: columnData,
 					defPageSize	: $('#pageSize', $page).val(),
 					defOrderFieldId: $('#order-field-search', $page).attr('order-field-id'),
@@ -70,6 +70,43 @@ define(function(require, exports, module){
 			});
 			return columnData;
 		}
+		
+		function getCriteriaData(){
+			var criteriaData = [];
+			$('.criterias-container', $page).children('.criteria-item').each(function(){
+				var criteria = $(this).data('criteria-data');
+				var field = criteria.getField();
+				if(!field){
+					require('dialog').notice('条件必须选择一个字段', 'error');
+					$.error();
+				}
+				var itemData = {
+					id			: criteria.getId(),
+					title		: criteria.getTitle(),
+					fieldId		: field.id,
+					fieldKey	: field.name,
+					relation	: 'and',
+					comparator	: 's1',
+					inputType	: criteria.getDefaultValueInput().getType(),
+					defVal		: criteria.getDefaultValueInput().getValue(),
+					placeholder	: criteria.getPlaceholder(),
+					partitions	: [],
+					queryShow	: criteria.isQueryShow()
+				};
+				var partitions = criteria.getPartitions();
+				for(var i in partitions){
+					var partition = partitions[i];
+					itemData.push({
+						relation	: partition.getRelation(),
+						comparator	: partition.getComparatorName(),
+						val			: partition.getValue()
+					});
+				}
+				criteriaData.push(itemData);
+			});
+			return criteriaData;
+		}
+		
 	};
 	
 	function initTmpl($page, tmplData){
@@ -78,7 +115,7 @@ define(function(require, exports, module){
 		}
 	}
 	
-	function initCriteria($page){
+	function initCriteria($page, criteriaData){
 		
 		var cField = null
 		var $fieldSearch = $('.criteria-field-search-row .field-search', $page);
@@ -112,6 +149,7 @@ define(function(require, exports, module){
 		var $criteriaItemTmpl = $('#criteria-item-tmpl', $page),
 			$criteriaPartitionTmpl = $('#criteria-partition-tmpl', $page);
 		
+		var currentCriteria = null;
 		/**
 		 * 显示条件详情
 		 */
@@ -125,8 +163,10 @@ define(function(require, exports, module){
 			}
 			$selectedCriteriaItem = $item.addClass('criteria-selected');
 			var criteria = $item.data('criteria-data');
+			currentCriteria = criteria;
 			showCriteria(criteria);
-			$('.criteria-detail-area', $page).show();
+			var $detailArea = $('.criteria-detail-area', $page);
+			$detailArea.show();
 		}
 		
 		function showCriteria(criteria){
@@ -134,7 +174,20 @@ define(function(require, exports, module){
 			if(field){
 				$fieldSearchInput.typeahead('val', field.cname);
 				criteriaSearcher.enableField(field.id, false);
+			}else{
+				$fieldSearchInput.typeahead('val', '');
 			}
+			var queryShow = criteria.isQueryShow();
+			$('#toggle-show-criteria', $page).prop('checked', queryShow).trigger('change');
+			if(queryShow){
+				criteria.detailHandler(function($$){
+					$$('#field-input-type').val(criteria.getDefaultValueInput().getType());
+					$$('#criteria-comparator').val(criteria.getComparatorName());
+					$$('#criteria-default-value-container').empty().append(criteria.getDefaultValueInput().getInput());
+					$$('#criteria-detail-placeholder').val(criteria.getPlaceholder());
+				});
+			}
+			
 			var $partitionsContainer = $('.criteria-detail-partitions-container', $page)
 					.find('.criteria-detail-partition').remove().end(); 
 			var partitions = criteria.getPartitions();
@@ -160,17 +213,38 @@ define(function(require, exports, module){
 		/**
 		 * 添加条件
 		 */
-		function addCriteria(){
+		function addCriteria(_criteriaData, ignoreShow){
 			var $criteria = $criteriaItemTmpl.tmpl({
-				fieldTitle	: null
+				fieldTitle	: '选择字段'
 			});
-			var criteria = new Criteria();
+			var criteria = new Criteria({
+				checkIsCurrent	: function(){
+					return currentCriteria == this;
+				},
+				$detailArea		: $('.criteria-detail-area', $page)
+			});
+			$criteria.find('.criteria-property-name span').dblclick(function(){
+				require('utils').toEditContent(this).bind('confirmed', function(title){
+					criteria.setTitle(title);
+				});
+			});
 			criteria.addCallback({
+				afterSetTitle		: function(title){
+					$criteria.find('.criteria-property-name span').text(title);
+				},
 				afterSetField		: function(field){
 					$criteria.find('.criteria-property-name span').text(field.cname);
 				},
+				afterSetPlaceholder	: function(placeholder){
+					$('#criteria-detail-placeholder', $page).val(placeholder);
+				},
 				afterToggleQueryShow: function(toShow){
 					
+				},
+				afterSetComparatorName:	function(comparatorName){
+					criteria.detailHandler(function($$){
+						$$('#critreia-detail-comparator').val(comparatorName)
+					});
 				},
 				afterAddPartition	: function(partition){
 					var $partitionItem = $('#criteria-partition-tmpl', $page).tmpl({
@@ -198,12 +272,30 @@ define(function(require, exports, module){
 				}
 			});
 			$criteria.appendTo($criteriaContainer).data('criteria-data', criteria);
-			showCriteriaDetail($criteria);
+			criteria.initFromData(_criteriaData);
+			if(ignoreShow !== true){
+				showCriteriaDetail($criteria);
+			}
 		}
 		
 		//点击条件节点时的回调
 		$page.on('click', '.criteria-item:not(.criteria-selected)', function(){
 			showCriteriaDetail($(this));
+		});
+		$page.on('click', '.btn-remove-criteria', function(){
+			var $criteriaItem = $(this).closest('.criteria-item');
+			require('dialog').confirm('确定删除该条件？', function(yes){
+				$criteriaItem.remove();
+				if($criteriaItem.is($selectedCriteriaItem)){
+					if(currentCriteria.getField()){
+						criteriaSearcher.enableField(currentCriteria.getField().id, true);
+					}
+					$selectedCriteriaItem = null;
+					currentCriteria = null;
+					$('.criteria-detail-area', $page).hide();
+				}
+			});
+			return false;
 		});
 		
 		/**
@@ -211,7 +303,6 @@ define(function(require, exports, module){
 		 */
 		$('#add-criteria', $page).click(function(){
 			addCriteria();
-			$('#toggle-show-criteria', $page).prop('checked', false).trigger('change');
 		});
 		
 		//切换条件显示状态
@@ -228,6 +319,12 @@ define(function(require, exports, module){
 				this.addPartition();
 			});
 		});
+		$('#criteria-detail-placeholder', $page).change(function(){
+			var placeholder = $(this).val();
+			handleSelectedItem(function(){
+				this.setPlaceholder(placeholder);
+			});
+		});
 		$page.on('click', '.criteria-detail-partition-operate-remove', function(){
 			var $partition = $(this).closest('.criteria-detail-partition');
 			var index = $partition.index();
@@ -235,6 +332,23 @@ define(function(require, exports, module){
 				this.removePartition(index);
 			});
 		});
+		
+		if($.isArray(criteriaData) && criteriaData.length > 0){
+			+function addCriteriaItem(index){
+				var item = criteriaData[index];
+				if(item){
+					criteriaSearcher.getFieldData(item.fieldId, function(field){
+						addCriteria($.extend({
+							fieldData	: field
+						}, item), true);
+						addCriteriaItem(index + 1)
+					});
+				}
+			}(0);
+		}
+		
+		
+		
 	}
 	
 	/**
@@ -242,13 +356,35 @@ define(function(require, exports, module){
 	 */
 	function Criteria(_param){
 		var defaultParam = {
-			field		: null
+			field		: null,
+			queryShow	: true,
+			title		: '',
+			field		: null,
+			
 		};
 		
 		var param = $.extend({}, defaultParam, _param);
 		
 		var callbackMap = require('utils').CallbacksMap(this);
 		
+		var defaultValueInput = new ValueInput();
+		
+		this.initFromData = function(data){
+			if(data.fieldData){
+				param.id = data.id;
+				this.setField(data.fieldData);
+				this.toggleQueryShow(data.queryShow == 1);
+				this.setTitle(data.title);
+				//this.setRelation(data.relation);
+				this.setComparatorName(data.comparator);
+				this.setPlaceholder(data.placeholder);
+				defaultValueInput = new ValueInput(data.inputType);
+				defaultValueInput.setValue(data.defaultValue);
+			}else{
+				$.error();
+			}
+			
+		}
 		
 		this.addPartition = function(partition){
 			if(!partition){
@@ -256,6 +392,10 @@ define(function(require, exports, module){
 			}
 			param.partitions.push(partition);
 			callbackMap.fire('afterAddPartition', [partition]);
+		}
+		
+		this.getId = function(){
+			return param.id;
 		}
 		
 		/**
@@ -268,9 +408,25 @@ define(function(require, exports, module){
 		 * 设置条件的字段对象，并重新设置所有条件的所有部分
 		 */
 		this.setField = function(field){
-			param.field = field
+			param.field = field;
+			param.title = field.cname;
 			callbackMap.fire('afterSetField', [field]);
 		};
+		
+		/**
+		 * 获得条件字段的标题（可以自定义）
+		 */
+		this.getTitle = function(){
+			return param.title;
+		}
+		
+		/**
+		 * 设置条件字段的标题
+		 */
+		this.setTitle = function(_title){
+			param.title = _title;
+			callbackMap.fire('afterSetTitle', [_title]);
+		}
 		
 		/**
 		 * 获得条件的所有部分
@@ -305,24 +461,37 @@ define(function(require, exports, module){
 		
 		/**
 		 * 获得条件在查询中显示时，会用什么比较关系来进行查询
+		 * @return {String}
 		 */
-		this.getComparetor = function(){
-			return param.comparator;
+		this.getComparatorName = function(){
+			return param.comparatorName;
+		};
+		
+		/**
+		 * 获得比较关系的名称
+		 */
+		this.setComparatorName = function(comparatorName){
+			param.comparatorName = comparatorName;
+			callbackMap.fire('afterSetComparatorName', [comparatorName]);
 		}
 		
 		/**
 		 * 获得条件在查询中显示时，会以什么控件来显示(依赖于field-input.js)
+		 * @return 
 		 */
-		this.getFieldInput = function(){
-			return param.fieldInput;
+		this.getDefaultValueInput = function(){
+			return defaultValueInput;
 		};
 		
-		/**
-		 * 获得条件的默认值
-		 */
-		this.getDefaultValue = function(){
-			return param.defaultValue;
+		this.getPlaceholder = function(){
+			return param.placeholder;
 		}
+		
+		this.setPlaceholder = function(placeholder){
+			param.placeholder = placeholder;
+			callbackMap.fire('afterSetPlaceholder', [placeholder]);
+		}
+		
 		/**
 		 * 移除部分
 		 */
@@ -331,7 +500,27 @@ define(function(require, exports, module){
 				var removePartition = param.partitions.splice(index, 1);
 				callbackMap.fire('afterRemovePartition', [removePartition, index]);
 			}
-		}
+		};
+		/**
+		 * 用于处理详情的展示
+		 */
+		this.detailHandler = function(callback){
+			if(typeof param.checkIsCurrent === 'function' 
+				&& param.checkIsCurrent.apply(this, [])
+				&& param.$detailArea instanceof $){
+				callback.apply(this, [function(selector, context){
+					if(context){
+						if(typeof context === 'string'){
+							return $(selector, $(context, param.$detailArea));
+						}else{
+							return $(selector, context);
+						}
+					}else{
+						return $(selector, param.$detailArea);
+					}
+				}, param.$detailArea]);
+			}
+		};
 		
 		if(!param.partitions || param.partitions.length == 0){
 			param.partitions = [];
@@ -476,12 +665,14 @@ define(function(require, exports, module){
 	
 	function ValueInput(field){
 		var fieldInput = null;
+		var defaultValue = null,
+			placeholder = null;
 		//if(field){
 			fieldInput = new FieldInput({
 				type	: 'text'
 			});
 		//}
-		var viewTransfer = function(val, fieldInput){
+		function viewTransfer(val, fieldInput){
 			if(fieldInput){
 				switch(fieldInput.getType()){
 				case 'select':
@@ -503,6 +694,11 @@ define(function(require, exports, module){
 		this.getFieldInput = function(){
 			return fieldInput;
 		};
+		this.getType = function(){
+			if(fieldInput){
+				return fieldInput.getType();
+			}
+		}
 		this.setViewTransfer = function(_viewTransfer){
 			viewTransfer = _viewTransfer;
 		}
@@ -516,6 +712,12 @@ define(function(require, exports, module){
 			if(fieldInput){
 				return fieldInput.getDom();
 			}
+		}
+		this.setValue = function(val){
+			if(fieldInput){
+				fieldInput.setValue(val);
+			}
+			return this;
 		}
 	}
 	

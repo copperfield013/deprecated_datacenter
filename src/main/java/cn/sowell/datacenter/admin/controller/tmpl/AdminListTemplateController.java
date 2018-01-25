@@ -23,9 +23,11 @@ import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListColumn;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTmpl;
 import cn.sowell.datacenter.model.tmpl.service.ListTemplateService;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -73,12 +75,23 @@ public class AdminListTemplateController {
 		TemplateListTmpl ltmpl = tService.getListTemplate(ltmplId);
 		JSONArray columnDataJSON = toColumnData(ltmpl.getColumns());
 		JSONObject tmplDataJSON = toLtmplData(ltmpl);
+		JSONArray criteriaDataJSON = toCriteriaData(ltmpl.getCriterias());
 		model.addAttribute("ltmpl", ltmpl);
 		model.addAttribute("tmplDataJSON", tmplDataJSON);
 		model.addAttribute("columnDataJSON", columnDataJSON);
+		model.addAttribute("criteriaDataJSON", criteriaDataJSON);
 		return AdminConstants.JSP_TMPL_LIST + "/ltmpl_update.jsp";
 	}
 	
+	private JSONArray toCriteriaData(Set<TemplateListCriteria> criterias) {
+		JSONArray array = new JSONArray();
+		for (TemplateListCriteria criteria : criterias) {
+			Object item = JSON.toJSON(criteria);
+			array.add(item);
+		}
+		return array;
+	}
+
 	@ResponseBody
 	@RequestMapping("/remove/{ltmplId}")
 	public AjaxPageResponse remove(@PathVariable Long ltmplId){
@@ -173,6 +186,46 @@ public class AdminListTemplateController {
 				}
 				tmpl.setColumns(columns);
 			}
+			
+			JSONArray criteriaData = json.getJSONArray("criteriaData");
+			if(criteriaData != null){
+				Set<TemplateListCriteria> criterias = new LinkedHashSet<TemplateListCriteria>();
+				int order = 0;
+				for (Object e : criteriaData) {
+					JSONObject item = (JSONObject) e;
+					TemplateListCriteria criteria = new TemplateListCriteria();
+					criteria.setRelation("and");
+					criteria.setId(item.getLong("id"));
+					criteria.setTitle(item.getString("title"));
+					criteria.setFieldId(item.getLong("fieldId"));
+					criteria.setFieldKey(item.getString("fieldKey"));
+					criteria.setCreateUserId(tmpl.getCreateUserId());
+					criteria.setOrder(order);
+					Boolean queryShow = item.getBoolean("queryShow");
+					if(queryShow != null && queryShow){
+						criteria.setQueryShow(1);
+						//条件需要显示
+						criteria.setComparator(item.getString("comparator"));
+						criteria.setInputType(item.getString("inputType"));
+						criteria.setDefaultValue(item.getString("defVal"));
+						criteria.setPlaceholder(item.getString("placeholder"));
+						criteria.setTitle(item.getString("title"));
+						
+					}else{
+						//隐藏条件
+						/*
+						JSONArray partitions = item.getJSONArray("partitions");
+						for (Object p : partitions) {
+							JSONObject partition = (JSONObject) p;
+							criteria.setRelation(relation);
+						}*/
+						
+					}
+					criterias.add(criteria);
+				}
+				tmpl.setCriterias(criterias);
+			}
+			
 		}
 		return tmpl;
 	}
