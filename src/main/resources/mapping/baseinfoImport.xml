@@ -117,7 +117,7 @@
 		</ABC>
 	</relation>
 
-	<record name="家庭信息">
+	<relation name="家庭信息">
 		<label subdomain="家庭信息" />
 		<ABC name="familyInfomation" abcattr="家庭信息">
 			<attribute name="家庭人数" alias="家庭人数" datatype="int" abcattr="家庭人数" />
@@ -136,13 +136,13 @@
 				abcattr="家庭失业人数" datatype="INT" />
 
 			<label name="家庭类型" alias="家庭类型" subdomain="户籍家庭,非户籍家庭" />
-			<record name="家庭成员">
+			<relation name="家庭成员">
 				<label subdomain="户主,成员" />
 				<ABC name="member" abcattr="人口信息">
 					<attribute name="姓名" alias="姓名" abcattr="姓名" />
 					<attribute name="身份证号码" alias="证件号码" abcattr="证件号码" />
 				</ABC>
-			</record>
+			</relation>
 		</ABC>
-	</record>
+	</relation>
 </ABC>

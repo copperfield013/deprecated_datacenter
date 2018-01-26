@@ -69,7 +69,7 @@
 	</relation>
 	
 	
-	<record name="家庭信息">
+	<relation name="家庭信息">
 		<label subdomain="家庭信息" />
 		<ABC name="familyInfomation" abcattr="家庭信息">
 			<attribute name="家庭人数" alias="家庭人数" datatype="int" abcattr="家庭人数" />
@@ -83,6 +83,6 @@
 				</ABC>
 			</record>
 		</ABC>
-	</record>
+	</relation>
 
 </ABC>

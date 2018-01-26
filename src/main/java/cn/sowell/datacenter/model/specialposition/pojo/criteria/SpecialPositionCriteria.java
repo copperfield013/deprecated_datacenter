@@ -1,9 +1,8 @@
 package cn.sowell.datacenter.model.specialposition.pojo.criteria;
 
-import com.abc.extface.dto.SpecialPosition;
 
-public class SpecialPositionCriteria extends SpecialPosition{
-	
+public class SpecialPositionCriteria /*extends SpecialPosition*/{
+	/*
 	private Long specialPositionId;
 
 	public Long getSpecialPositionId() {
@@ -16,6 +15,6 @@ public class SpecialPositionCriteria extends SpecialPosition{
 			super.setId(specialPositionId);
 		}
 	}
-
+*/
 	
 }

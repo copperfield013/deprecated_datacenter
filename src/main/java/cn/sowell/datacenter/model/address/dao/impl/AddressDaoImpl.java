@@ -1,30 +1,10 @@
 package cn.sowell.datacenter.model.address.dao.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 
-import com.abc.extface.dto.AddressCode;
-import com.abc.extface.dto.SplitedAddressEntity;
-
-import cn.sowell.copframe.dao.deferedQuery.DeferedParamQuery;
-import cn.sowell.copframe.dao.deferedQuery.DeferedParamSnippet;
-import cn.sowell.copframe.dao.deferedQuery.HibernateRefrectResultTransformer;
-import cn.sowell.copframe.dao.deferedQuery.sqlFunc.WrapForCountFunction;
-import cn.sowell.copframe.dao.utils.QueryUtils;
-import cn.sowell.copframe.dto.page.PageInfo;
-import cn.sowell.copframe.utils.FormatUtils;
-import cn.sowell.datacenter.model.address.dao.AddressDao;
-
 @Repository
-public class AddressDaoImpl implements AddressDao {
-
+public class AddressDaoImpl/* implements AddressDao*/ {
+/*
 	@Resource
 	SessionFactory sessionFactory;
 	
@@ -67,9 +47,9 @@ public class AddressDaoImpl implements AddressDao {
 			QueryUtils.setPagingParamWithCriteria(query, pageInfo);
 			return query.list();
 		}
-		/*SQLQuery query = dQuery.createSQLQuery(session, false, null);
+		SQLQuery query = dQuery.createSQLQuery(session, false, null);
 		query.setResultTransformer(HibernateRefrectResultTransformer.getInstance(AddressEntity.class));
-		return query.list();*/
+		return query.list();
 		return new ArrayList<SplitedAddressEntity>();
 	}
 	
@@ -112,6 +92,6 @@ public class AddressDaoImpl implements AddressDao {
 	public void delete(SplitedAddressEntity splitedAddressEntity) {
 		Session session = sessionFactory.getCurrentSession();
 		session.delete(splitedAddressEntity);
-	}
+	}*/
 
 }

@@ -3,7 +3,7 @@ package cn.sowell.datacenter.model.basepeople.service.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.abc.application.FusionContext;
+import com.abc.application.BizFusionContext;
 
 public class FusionContextFactoryDC {
 	public static final String KEY_BASE = "base";
@@ -19,7 +19,7 @@ public class FusionContextFactoryDC {
 		return configMap.get(configName);
 	}
 	
-	public FusionContext getContext(String configName){
+	public BizFusionContext getContext(String configName){
 		if(configMap.containsKey(configName)){
 			return getContext(configMap.get(configName));
 		}else{
@@ -27,8 +27,8 @@ public class FusionContextFactoryDC {
 		}
 	}
 	
-	public FusionContext getContext(FusionContextConfig config){
-		FusionContext context = new FusionContext();
+	public BizFusionContext getContext(FusionContextConfig config){
+		BizFusionContext context = new BizFusionContext();
 		context.setMappingName(config.getMappingName());
 		context.setDictionaryMappingName(config.getDictionaryMappingName());
 		return context;

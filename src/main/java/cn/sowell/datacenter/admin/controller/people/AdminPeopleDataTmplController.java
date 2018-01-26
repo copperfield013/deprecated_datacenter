@@ -6,36 +6,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-
-
-
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-
-
-
-
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.ServletRequestParameterPropertyValues;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.support.WebRequestDataBinder;
-
-
-
-
-
-import com.abc.a.c;
-import com.abc.record.constant.l;
-
-
-
-
 
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.UserUtils;
@@ -43,6 +22,7 @@ import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.spring.propTranslator.PropertyParser;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.FormatUtils;
+import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
@@ -108,12 +88,22 @@ public class AdminPeopleDataTmplController {
 				 TemplateListCriteria criteria = criteriaMap.get(criteriaId);
 				 if(criteria != null){
 					 NormalCriteria ncriteria = new NormalCriteria(criteria);
+					 //TODO: 需要将fieldKey转换成attributeName
 					 ncriteria.setAttributeName(criteria.getFieldKey());
 					 ncriteria.setValue(FormatUtils.toString(pv.getValue()));
 					 map.put(criteriaId, ncriteria);
 				 }
 			 }
 		 });
+		 criteriaMap.forEach((criteriaId, criteria)->{
+			 if(TextUtils.hasText(criteria.getDefaultValue()) && !map.containsKey(criteriaId)){
+				 NormalCriteria nCriteria = new NormalCriteria(criteria);
+				 //TODO: 需要将fieldKey转换成attributeName
+				 nCriteria.setAttributeName(criteria.getFieldKey());
+				 nCriteria.setValue(criteria.getDefaultValue());
+				 map.put(criteriaId, nCriteria);
+			 }
+		 });;
 		return map;
 	}
 

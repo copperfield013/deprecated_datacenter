@@ -51,6 +51,7 @@ import cn.sowell.datacenter.model.peopledata.service.PojoService;
 import cn.sowell.datacenter.model.peopledata.service.impl.EntityTransfer;
 import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
 
+import com.abc.application.BizFusionContext;
 import com.abc.application.FusionContext;
 import com.abc.application.RemovedFusionContext;
 import com.abc.dto.ErrorInfomation;
@@ -113,7 +114,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public List<Entity> queryPeopleList(List<Criteria> criterias, PageInfo pageInfo){
-		FusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
+		BizFusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
 		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		
 		EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(criterias, "编辑时间");
@@ -131,7 +132,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public Entity getPeople(String peopleCode) {
-		FusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
+		BizFusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
 		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		Entity result=discoverer.discover(peopleCode);
 		return result;
@@ -162,7 +163,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		Row headerRow = sheet.getRow(1);
 		String configKey = importConfigKeyMap.get(dataType);
 		if(configKey != null){
-			FusionContext context = fFactory.getContext(configKey);
+			BizFusionContext context = fFactory.getContext(configKey);
 			if(context != null){
 				context.setSource(FusionContext.SOURCE_COMMON);
 				execute(sheet, headerRow, fFactory.getConfig(configKey).getMappingName(), context, importStatus);
@@ -176,7 +177,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	private NumberFormat numberFormat = new DecimalFormat("0.000");
 	
 	
-	protected void execute(Sheet sheet, Row headerRow, String mapperName, FusionContext context, ImportStatus importStatus) throws ImportBreakException {
+	protected void execute(Sheet sheet, Row headerRow, String mapperName, BizFusionContext context, ImportStatus importStatus) throws ImportBreakException {
 		importStatus.appendMessage("正在计算总行数");
 		importStatus.setTotal(colculateRowCount(sheet));
 		int rownum = 2;
@@ -288,7 +289,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public Entity getHistoryPeople(String peopleCode, Date date, List<ErrorInfomation> errors) {
-		FusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
+		BizFusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
 		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		
 		HistoryTracker tracker = discoverer.track(peopleCode, date);
@@ -328,7 +329,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public Entity savePeople(PeopleData people) {
-		FusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
+		BizFusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
 		context.setSource(FusionContext.SOURCE_COMMON);
 		Entity entity = new Entity(fFactory.getConfig(FusionContextFactoryDC.KEY_BASE).getMappingName());
 		eTransfer.bind(people, entity);
@@ -452,7 +453,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	@Override
 	public List<PeopleDataHistoryItem> queryHistory(String peopleCode,
 			Integer pageNo, Integer pageSize) {
-		FusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
+		BizFusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
 		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		
 		List<RecordHistory> historyList = discoverer.trackHistory(peopleCode, pageNo, pageSize);

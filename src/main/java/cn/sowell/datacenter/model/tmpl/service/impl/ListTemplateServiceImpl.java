@@ -1,9 +1,7 @@
 package cn.sowell.datacenter.model.tmpl.service.impl;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -13,7 +11,6 @@ import org.springframework.stereotype.Service;
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.NormalOperateDao;
 import cn.sowell.copframe.dto.page.PageInfo;
-import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;

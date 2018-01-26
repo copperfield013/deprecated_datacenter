@@ -74,24 +74,20 @@ public class EntityTransfer {
 								break;
 							case TYPE_RECORD:
 							case TYPE_RELATION:
-								List<RecordEntity> records = null;
-								if(fieldType == TYPE_RECORD){
-									records = source.getRecords(propName);
-								}else{
-									records = source.getRelations(propName);
-								}
-								if(records != null && records.size() > 0){
+								List<RecordEntity> relations = null;
+								relations = source.getRelations(propName);
+								if(relations != null && relations.size() > 0){
 									//检测字段要设置的值是否是集合，如果是集合，返回集合对象；如果不是集合，返回实例对象
 									Object o = checkCollection(composite);
 									if(o instanceof Collection){
-										for (RecordEntity recordEntity : records) {
+										for (RecordEntity recordEntity : relations) {
 											//实例化字段对象
 											Object recordData = instantiateRecordData(composite);
 											bind(recordEntity.getEntity(), recordData);
 											((Collection) o).add(recordData);
 										}
 									}else{
-										bind(records.get(0).getEntity(), o);
+										bind(relations.get(0).getEntity(), o);
 									}
 									value = o;
 								}
@@ -232,7 +228,7 @@ public class EntityTransfer {
 							Object entityValue = transferNormalEntityValue(value, composite);
 							target.putValue(propName, entityValue);
 							break;
-						case TYPE_RECORD:
+						/*case TYPE_RECORD:
 							EntityRecord annoRecord = composite.getFieldAnno(EntityRecord.class);
 							//如果是集合的话，那么要对集合的元素进行转换
 							if(value instanceof Collection) {
@@ -246,7 +242,7 @@ public class EntityTransfer {
 								Entity rEntity = bindData(value, new Entity(annoRecord.entityName()));
 								target.putRecordEntity(propName, annoRecord.domainName(), rEntity);
 							}
-							break;
+							break;*/
 						case TYPE_RELATION:
 							EntityRelation annoRelation = composite.getFieldAnno(EntityRelation.class);
 							//如果是集合的话，那么要对集合的元素进行转换
@@ -255,7 +251,7 @@ public class EntityTransfer {
 									//构造集合内的一个元素对应的entity
 									//将pojo的数据绑定到entity
 									Entity rEntity = bindData(ele, new Entity(annoRelation.entityName()));
-									target.putRecordEntity(propName, annoRelation.domainName(), rEntity);
+									target.putRelationEntity(propName, annoRelation.domainName(), rEntity);
 								}
 							}else {
 								Entity rEntity = bindData(value, new Entity(annoRelation.entityName()));

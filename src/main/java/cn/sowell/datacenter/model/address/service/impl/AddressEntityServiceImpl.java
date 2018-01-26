@@ -1,21 +1,12 @@
 package cn.sowell.datacenter.model.address.service.impl;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
 import org.springframework.stereotype.Service;
 
-import cn.sowell.copframe.dto.page.PageInfo;
-import cn.sowell.datacenter.model.address.dao.AddressDao;
 import cn.sowell.datacenter.model.address.service.AddressEntityService;
-
-import com.abc.extface.dto.AddressCode;
-import com.abc.extface.dto.SplitedAddressEntity;
 
 @Service
 public class AddressEntityServiceImpl implements AddressEntityService {
-
+/*
 	@Resource
 	AddressDao addressDao;
 	
@@ -45,5 +36,5 @@ public class AddressEntityServiceImpl implements AddressEntityService {
 		SplitedAddressEntity splitedAddressEntity = new SplitedAddressEntity();
 		splitedAddressEntity.setName(addressStr);
 		addressDao.delete(splitedAddressEntity);
-	}
+	}*/
 }

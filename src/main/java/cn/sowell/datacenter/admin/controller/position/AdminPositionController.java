@@ -1,29 +1,15 @@
 package cn.sowell.datacenter.admin.controller.position;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.abc.extface.dto.Position;
-import com.abc.position.constant.PositionLevel;
-
-import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
-import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.model.position.pojo.criteria.PositionCriteria;
-import cn.sowell.datacenter.model.position.service.PositionService;
+
 
 @Controller
 @RequestMapping(AdminConstants.URI_BASE + "/position")
 public class AdminPositionController {
-	
+	/*
 	@Resource
 	PositionService positionService;
 	
@@ -93,6 +79,6 @@ public class AdminPositionController {
 			logger.error("删除失败", e);
 			return AjaxPageResponse.FAILD("删除失败！");
 		}
-	}
+	}*/
 
 }

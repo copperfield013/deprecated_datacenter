@@ -1,21 +1,12 @@
 package cn.sowell.datacenter.model.position.service.impl;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
 import org.springframework.stereotype.Service;
 
-import com.abc.extface.dto.Position;
-
-import cn.sowell.copframe.dto.page.PageInfo;
-import cn.sowell.datacenter.model.position.dao.PositionDao;
-import cn.sowell.datacenter.model.position.pojo.criteria.PositionCriteria;
 import cn.sowell.datacenter.model.position.service.PositionService;
 
 @Service
 public class PositionServiceImpl implements PositionService{
-	
+	/*
 	@Resource
 	PositionDao positionDao;
 
@@ -44,6 +35,6 @@ public class PositionServiceImpl implements PositionService{
 		Position position = new Position();
 		position.setCode(id);
 		positionDao.delete(position);
-	}
+	}*/
 
 }

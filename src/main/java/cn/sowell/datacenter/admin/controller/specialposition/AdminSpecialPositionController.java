@@ -12,12 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.abc.address.service.AddressService;
-import com.abc.address.service.AddressServiceFactory;
-import com.abc.extface.dto.SpecialPosition;
-import com.abc.position.SpecialPositionIndex;
-import com.abc.position.constant.PositionLevel;
-
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
@@ -25,15 +19,16 @@ import cn.sowell.datacenter.model.specialposition.pojo.SpecialPositionEntity;
 import cn.sowell.datacenter.model.specialposition.pojo.criteria.SpecialPositionCriteria;
 import cn.sowell.datacenter.model.specialposition.service.SpecialPositionService;
 
+
 @Controller
 @RequestMapping(AdminConstants.URI_BASE + "/special_position")
 public class AdminSpecialPositionController {
-	@Resource
-	SpecialPositionService specialPositionService;
+	/*@Resource
+	//SpecialPositionService specialPositionService;
 	
 	Logger logger = Logger.getLogger(AdminSpecialPositionController.class);
 	
-	private static AddressService addressService = AddressServiceFactory.getInstance();
+	//private static AddressService addressService = AddressServiceFactory.getInstance();
 
 	@RequestMapping("/special_position_list")
 	public String list(SpecialPositionCriteria specialPositionCriteria, PageInfo pageInfo, Model model) {
@@ -112,6 +107,6 @@ public class AdminSpecialPositionController {
 			logger.error("删除失败", e);
 			return AjaxPageResponse.FAILD("删除失败！");
 		}
-	}
+	}*/
 	
 }

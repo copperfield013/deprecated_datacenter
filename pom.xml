@@ -38,8 +38,13 @@
 		</dependency>
 		<dependency>
 			<groupId>com.abc</groupId>
-			<artifactId>it</artifactId>
-			<version>${version.abc}</version>
+			<artifactId>item</artifactId>
+			<version>2.0.12</version>
+		</dependency>
+		<dependency>
+			<groupId>com.abc</groupId>
+			<artifactId>bizz</artifactId>
+			<version>2.0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.sowell.copframe</groupId>

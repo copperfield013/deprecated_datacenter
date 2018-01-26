@@ -1,9 +1,8 @@
 package cn.sowell.datacenter.model.specialposition.pojo;
 
-import com.abc.extface.dto.SpecialPosition;
 
 public class SpecialPositionEntity {
-	
+	/*
 	private SpecialPosition specialPosition;
 	
 	private String belongPositionName;
@@ -23,7 +22,7 @@ public class SpecialPositionEntity {
 	public void setBelongPositionName(String belongPositionName) {
 		this.belongPositionName = belongPositionName;
 	}
-	
+	*/
 	
 
 }

@@ -1,30 +1,12 @@
 package cn.sowell.datacenter.model.position.dao.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 
-import com.abc.extface.dto.Position;
-
-import cn.sowell.copframe.dao.deferedQuery.DeferedParamQuery;
-import cn.sowell.copframe.dao.deferedQuery.DeferedParamSnippet;
-import cn.sowell.copframe.dao.deferedQuery.sqlFunc.WrapForCountFunction;
-import cn.sowell.copframe.dao.utils.QueryUtils;
-import cn.sowell.copframe.dto.page.PageInfo;
-import cn.sowell.copframe.utils.FormatUtils;
-import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.model.position.dao.PositionDao;
-import cn.sowell.datacenter.model.position.pojo.criteria.PositionCriteria;
 
 @Repository
 public class PositionDaoImpl implements PositionDao {
-	
+	/*
 	@Resource
 	SessionFactory sessionFactory;
 	
@@ -80,5 +62,5 @@ public class PositionDaoImpl implements PositionDao {
 		Session session = sessionFactory.getCurrentSession();
 		session.update(position);;
 	}
-
+*/
 }
