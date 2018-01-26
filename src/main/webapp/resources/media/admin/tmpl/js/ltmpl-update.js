@@ -86,7 +86,7 @@ define(function(require, exports, module){
 					fieldId		: field.id,
 					fieldKey	: field.name,
 					relation	: 'and',
-					comparator	: 's1',
+					comparator	: criteria.getComparatorName(),
 					inputType	: criteria.getDefaultValueInput().getType(),
 					defVal		: criteria.getDefaultValueInput().getValue(),
 					placeholder	: criteria.getPlaceholder(),
@@ -285,14 +285,16 @@ define(function(require, exports, module){
 		$page.on('click', '.btn-remove-criteria', function(){
 			var $criteriaItem = $(this).closest('.criteria-item');
 			require('dialog').confirm('确定删除该条件？', function(yes){
-				$criteriaItem.remove();
-				if($criteriaItem.is($selectedCriteriaItem)){
-					if(currentCriteria.getField()){
-						criteriaSearcher.enableField(currentCriteria.getField().id, true);
+				if(yes){
+					$criteriaItem.remove();
+					if($criteriaItem.is($selectedCriteriaItem)){
+						if(currentCriteria.getField()){
+							criteriaSearcher.enableField(currentCriteria.getField().id, true);
+						}
+						$selectedCriteriaItem = null;
+						currentCriteria = null;
+						$('.criteria-detail-area', $page).hide();
 					}
-					$selectedCriteriaItem = null;
-					currentCriteria = null;
-					$('.criteria-detail-area', $page).hide();
 				}
 			});
 			return false;
@@ -334,6 +336,8 @@ define(function(require, exports, module){
 		});
 		
 		if($.isArray(criteriaData) && criteriaData.length > 0){
+			var $CPF = require('$CPF');
+			$CPF.showLoading();
 			+function addCriteriaItem(index){
 				var item = criteriaData[index];
 				if(item){
@@ -343,12 +347,11 @@ define(function(require, exports, module){
 						}, item), true);
 						addCriteriaItem(index + 1)
 					});
+				}else{
+					$CPF.closeLoading();
 				}
 			}(0);
 		}
-		
-		
-		
 	}
 	
 	/**
@@ -913,7 +916,7 @@ define(function(require, exports, module){
 		//绑定移除列事件
 		$page.on('click', '.col-delete', function(){
 			var fieldId = $(this).closest('.row[field-id]').attr('field-id');
-			colTable.removeColumn(fieldId);
+			colTable.Column(fieldId);
 			addColSearcher.enableField(fieldId);
 		});
 		

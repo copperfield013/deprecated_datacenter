@@ -139,10 +139,10 @@
 														<label>关系</label>
 														<div>
 															<select id="criteria-detail-comparator">
-																<option>包含</option>
-																<option>开头为</option>
-																<option>结尾为</option>
-																<option>等于</option>
+																<option value="s1">包含</option>
+																<option value="s2">开头为</option>
+																<option value="s3">结尾为</option>
+																<option value="s4">等于</option>
 															</select>
 														</div>
 													</div>
