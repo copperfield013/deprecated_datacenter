@@ -554,3 +554,22 @@ div.detail-toggle-sublist span.detail-toggle-sublist-item-date {
 .detail-toggle-sublist .detail-toggle-sublist-operate i:HOVER{
 	color: #ccc;
 }
+
+
+.page-header .header-buttons a.import:before {
+    background-color: #53a93f;
+}
+
+.page-header .header-buttons a.import:hover, 
+.page-header .header-buttons a.import.active {
+    color: #53a93f;
+}
+
+.page-header .header-buttons a.export:before {
+    background-color: #ed4e2a;
+}
+
+.page-header .header-buttons a.export:hover, 
+.page-header .header-buttons a.export.active {
+    color: #ed4e2a;
+}

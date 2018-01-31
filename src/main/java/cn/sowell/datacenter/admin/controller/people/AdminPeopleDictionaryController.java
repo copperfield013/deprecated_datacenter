@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.model.basepeople.pojo.BasePeopleItem;
+import cn.sowell.datacenter.model.dict.pojo.DictionaryOption;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDictionaryService;
 
 import com.alibaba.fastjson.JSONArray;
@@ -28,19 +28,19 @@ public class AdminPeopleDictionaryController {
 	@RequestMapping("/enum_json")
 	public ResponseJSON enumJson(){
 		JSONObjectResponse jRes = new JSONObjectResponse();
-		List<BasePeopleItem> itemList = dictService.getAllEnumList();
+		List<DictionaryOption> itemList = dictService.getAllEnumList();
 		if(itemList != null){
 			JSONObject jo = jRes.getJsonObject();
 			itemList.forEach(item->{
-				String key = item.getcDictionaryId();
+				String key = item.getGroupId().toString();
 				JSONArray array = jo.getJSONArray(key);	
 				if(array == null){
 					array = new JSONArray();
 					jo.put(key, array);
 				}
 				JSONObject jItem = new JSONObject();
-				jItem.put("view", item.getcEnumCnName());
-				jItem.put("value", item.getcEnumValue());
+				jItem.put("view", item.getTitle());
+				jItem.put("value", item.getTitle());
 				array.add(jItem);
 			});
 		}

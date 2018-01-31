@@ -173,7 +173,7 @@ define(function(require, exports, module){
 			fData = formData;
 		}
 		
-		$.ajax({
+		return $.ajax({
 		    url: 		url,
 		    type: 		param.method,
 		    cache: 		false,
@@ -265,7 +265,7 @@ define(function(require, exports, module){
 	}
 	
 	/**
-	 * 
+	 * 用get方法ajax获取资源
 	 */
 	function loadResource(url, reqParam, ajaxParam){
 		var deferred = $.Deferred();
@@ -279,6 +279,64 @@ define(function(require, exports, module){
 			}
 		}, ajaxParam));
 		return deferred.promise();
+	}
+	
+	/**
+	 * 轮询查询当前进度
+	 */
+	function poll(_param){
+		var defaultParam = {
+			startupURL				: '',
+			progressURL				: '',
+			startupReqParameters	: {},
+			uuidResponseName		: 'uuid',
+			uuidRequestName			: 'uuid',
+			//提交进度获取时的方法
+			progressReqParameters	: function(startupRes, uuid){},
+			//进度值的获取方法
+			progressGetter			: function(res){
+				return res.current/res.totalCount;
+			},
+			//进度值的最大值
+			progressMax				: 1,
+			//进度完成时调用
+			whenComplete			: function(res){},
+			//当
+			whenUnsuccess			: function(res){}
+		};
+		var param = $.extend({}, defaultParam , _param);
+		Ajax.ajax(param.startupURL, param.startupParameters, function(data){
+			var uuid = data[uuidName];
+			if(uuid){
+				var statusTimer = setInterval(function(){
+					var parameters = {};
+					if(typeof param.progressReqParameters === 'function'){
+						var p = param.progressReqParameters.apply(param, [data, uuid]);
+						
+					}
+					Ajax.ajax(param.progressURL, parameters, function(res){
+						if(res.status === 'suc'){
+							var progress = param.progressGetter.apply(param, [res]);
+							progress = progress > param.progressMax? param.progressMax: progress;
+							try{
+								param.propgressHandler.apply(param, [progress, res]);
+							}catch(e){}
+							if(progress == param.progressMax){
+								clearInterval(statusTimer);
+								param.whenComplete.apply(param, [res]);
+							}
+						}else{
+							try{
+								if(param.param.whenUnsuccess.apply(param, [res]) !== false){
+									clearInterval(statusTimer);
+								}
+							}catch(e){clearInterval(statusTimer)}
+						}
+					});
+				}, 1000);
+			}
+		});
+		
 	}
 	
 	function commonHandleSucAjax(data, textStatus, jqXHR){

@@ -458,6 +458,9 @@ define(function(require, exports){
 		appendTo		: function($target, $parent, index, childrenFilter){
 			if($target instanceof $ && $parent instanceof $){
 				var $siblings = $parent.children().filter(childrenFilter);
+				if(typeof childrenFilter === 'string'){
+					$siblings = $siblings.filter(childrenFilter);
+				}
 				if(index === undefined || $siblings.length <= index){
 					$parent.append($target);
 				}else{
@@ -471,9 +474,14 @@ define(function(require, exports){
 		 */
 		prependTo		: function($target, $parent, index, childrenFilter){
 			if($target instanceof $ && $parent instanceof $){
-				var $siblings = $parent.children().filter(childrenFilter);
-				if(index === undefined || $siblings.length <= index){
+				var $siblings = $parent.children();
+				if(typeof childrenFilter === 'string'){
+					$siblings = $siblings.filter(childrenFilter);
+				}
+				if(index === undefined){
 					$parent.prepend($target);
+				}else if($siblings.length <= index){
+					$parent.append($target);
 				}else{
 					$target.insertBefore($siblings[index]);
 				}

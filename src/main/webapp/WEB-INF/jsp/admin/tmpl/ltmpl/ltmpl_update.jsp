@@ -95,7 +95,7 @@
 													</div>
 												</div>
 											</div>
-											<div class="row criteria-show-toggle-row">
+											<div class="row criteria-show-toggle-row hide-when-no-field">
 												<div class="col-lg-12">
 													<label>
 														<input disabled="disabled" id="toggle-show-criteria" class="checkbox-slider slider-icon colored-blue" checked="checked" type="checkbox">
@@ -103,7 +103,7 @@
 													</label>
 												</div>
 											</div>
-											<div class="row">
+											<div class="row hide-when-no-field">
 												<div class="col-lg-12 criteria-detail-partitions-container">
 													<div class="criteria-detail-partition">
 														<div class="criteria-detail-relation">
@@ -132,6 +132,7 @@
 														<div>
 															<select id="field-input-type">
 																<option value="text">文本框</option>
+																<option value="select">单选下拉框</option>
 															</select>
 														</div>
 													</div>
@@ -233,9 +234,13 @@
 									<div id="show-operate" class="row" style="display: block;">
 										<div class="col-lg-12 col-xs-12">
 											<div class="row">
-												<label class="col-lg-3 col-xs-6">操作按钮</label>
+												<label class="col-lg-3 col-xs-3">操作按钮</label>
 												<label class="col-lg-3 col-xs-3">
-													<input id="show-operate-edit" type="checkbox" class="colored-blue" checked="checked">
+													<input id="show-operate-detail" type="checkbox" class="colored-blue" checked="checked">
+													<span class="text">详情</span>
+												</label>
+												<label class="col-lg-3 col-xs-3">
+													<input id="show-operate-update" type="checkbox" class="colored-blue" checked="checked">
 													<span class="text">修改</span>
 												</label>
 												<label class="col-lg-3 col-xs-3">
@@ -248,7 +253,7 @@
 									<div id="page-size" class="row">
 										<div class="col-lg-12">
 											<div class="row">
-												<label class="col-lg-3 col-xs-6">默认每页条数</label>
+												<label class="col-lg-3 col-xs-3">默认每页条数</label>
 												<div class="col-lg-9 col-xs-6">
 													<input type="number" id="pageSize" max="100" min="5" value="10">
 												</div>

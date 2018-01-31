@@ -202,6 +202,13 @@ define(function(require, exports, module){
 		this.validate = function(){
 			param.validator.apply(this, [this.getValue()]);
 		}
+		
+		/**
+		 * 
+		 */
+		this.getComparatorMap = function(callback){
+			return FieldInput.getGlobalComparators(param.type, callback);
+		}
 	}
 	
 	$.extend(FieldInput, {
@@ -235,21 +242,41 @@ define(function(require, exports, module){
 			var originOptions = FieldInput.GLOBAL_OPTIONS;
 			if(typeof url === 'string'){
 				require('ajax').ajax(url, reqParam, function(data){
-					FieldInput.loadGlobalOptions(data);
-					deferred.resolve([data, originOptions]);
+					FieldInput.loadGlobalOptions(data).done(function(){
+						deferred.resolve([data, originOptions]);
+					});
 				});
 			}else if(typeof url === 'object'){
 				FieldInput.GLOBAL_OPTIONS = url;
+				FieldInput.globalOptionsLoaded = true;
 				deferred.resolve([url, originOptions]);
 			}
 			return deferred.promise();
 		},
+		globalOptionsLoaded		: false,
 		//全局选项，
 		GLOBAL_OPTIONS			: {},
-		loadGlobalComparatorMap	: function(url){
-			
-		},
-		GLOBAL_COMPARATOR_MAP	: {}
+		GLOBAL_COMPARATOR_MAP	: null,
+		getGlobalComparators	: function(inputType, callback){
+			function _callback(){
+				(callback || $.noop)(FieldInput.GLOBAL_COMPARATOR_MAP[inputType].comparators);
+			}
+			if(FieldInput.GLOBAL_COMPARATOR_MAP == null){
+				FieldInput.GLOBAL_COMPARATOR_MAP = $.Callbacks();
+				FieldInput.GLOBAL_COMPARATOR_MAP.add(_callback);
+				require('ajax')
+					.loadResource('media/admin/field/json/comparator-map.json')
+					.done(function(data){
+						var callbacks = FieldInput.GLOBAL_COMPARATOR_MAP;
+						FieldInput.GLOBAL_COMPARATOR_MAP = data;
+						callbacks.fire();
+					});
+			}else if(typeof FieldInput.GLOBAL_COMPARATOR_MAP.fire === 'function'){
+				FieldInput.GLOBAL_COMPARATOR_MAP.add(_callback);
+			}else{
+				_callback();
+			}
+		}
 	});
 	
 	module.exports = FieldInput;

@@ -74,7 +74,7 @@ http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 	    </property>
 	</bean>
 	<!-- 开启注解功能 -->
-	<mvc:annotation-driven conversion-service="conversionService" />
+	<mvc:annotation-driven />
 	
 	
 	<!-- 装载全局Controller的异常处理，这个类将所有异常显示到控制台，并且将异常信息返回到客户端 -->

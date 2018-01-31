@@ -1,0 +1,30 @@
+@CHARSET "UTF-8";
+
+#export-window .export-window-title h3 {
+    margin: 5px 10px;
+    font-size: 18px;
+}
+
+.export-window-title {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+div#export-window {
+	height: auto;
+}
+
+#export-window>div>.row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+#export-window * {
+    font-size: 15px;
+}
+
+#export-window input#export-range-start,#export-window input#export-range-end {
+    width: 6em;
+}
+
+#export-window .data-range>div {
+}

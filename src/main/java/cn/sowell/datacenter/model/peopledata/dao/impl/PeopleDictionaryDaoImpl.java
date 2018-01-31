@@ -19,7 +19,7 @@ import cn.sowell.copframe.dao.deferedQuery.HibernateRefrectResultTransformer;
 import cn.sowell.copframe.dao.utils.QueryUtils;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.CollectionUtils;
-import cn.sowell.datacenter.model.basepeople.pojo.BasePeopleItem;
+import cn.sowell.datacenter.model.dict.pojo.DictionaryOption;
 import cn.sowell.datacenter.model.peopledata.dao.PeopleDictionaryDao;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleCompositeDictionaryItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleFieldDictionaryItem;
@@ -115,8 +115,8 @@ public class PeopleDictionaryDaoImpl implements PeopleDictionaryDao{
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<BasePeopleItem> getAllEnumList() {
-		String hql = "from BasePeopleItem";
+	public List<DictionaryOption> getAllEnumList() {
+		String hql = "from DictionaryOption";
 		Query query = sFactory.getCurrentSession().createQuery(hql);
 		return query.list();
 		

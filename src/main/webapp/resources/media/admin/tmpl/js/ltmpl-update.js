@@ -52,10 +52,14 @@ define(function(require, exports, module){
 				if(fieldId === 'row-number'){
 					col.specField = 'number';
 				}else if(fieldId === 'row-operates'){
-					var hasEdit = $('#show-operate-edit', $page).prop('checked'),
+					var hasDetail = $('#show-operate-detail', $page).prop('checked'),
+						hasUpdate = $('#show-operate-update', $page).prop('checked'),
 						hasRemove = $('#show-operate-remove', $page).prop('checked');
 					col.specField = 'operate';
-					if(hasEdit){
+					if(hasDetail){
+						col.specField += '-d';
+					}
+					if(hasUpdate){
 						col.specField += '-u';
 					}
 					if(hasRemove){
@@ -140,6 +144,7 @@ define(function(require, exports, module){
 				cField = field;
 				handleSelectedItem(function($item){
 					this.setField(field);
+					$('.hide-when-no-field', $page).show();
 				});
 			}
 		});
@@ -174,8 +179,10 @@ define(function(require, exports, module){
 			if(field){
 				$fieldSearchInput.typeahead('val', field.cname);
 				criteriaSearcher.enableField(field.id, false);
+				$('.hide-when-no-field', $page).show();
 			}else{
 				$fieldSearchInput.typeahead('val', '');
+				$('.hide-when-no-field', $page).hide();
 			}
 			var queryShow = criteria.isQueryShow();
 			$('#toggle-show-criteria', $page).prop('checked', queryShow).trigger('change');
@@ -269,6 +276,23 @@ define(function(require, exports, module){
 				afterRemovePartition: function(partition, index){
 					$criteria.find('.criteria-partitions-container').children('.criteria-partition').eq(index).remove();
 					$('.criteria-detail-partitions-container', $page).children('.criteria-detail-partition').eq(index).remove();
+				},
+				afterSetDefaultInputType	: function(valueInput){
+					var fieldInput = valueInput.getFieldInput();
+					if(fieldInput){
+						fieldInput.getComparatorMap(function(comparators){
+							if(comparators){
+								var $comparator = $('#criteria-detail-comparator', $page).empty();
+								for(var i in comparators){
+									var comparator = comparators[i];
+									if(comparator['class'] !== 'negative'){
+										$comparator.append('<option value="' + comparator.key + '">' + comparator.title + '</option>');
+									}
+								}
+							}
+						});
+						$('#criteria-default-value-container', $page).empty().append(valueInput.getInput());
+					}
 				}
 			});
 			$criteria.appendTo($criteriaContainer).data('criteria-data', criteria);
@@ -334,23 +358,35 @@ define(function(require, exports, module){
 				this.removePartition(index);
 			});
 		});
+		//切换显示控件
+		$('#field-input-type', $page).change(function(){
+			var inputType = $(this).val();
+			handleSelectedItem(function(){
+				try{
+					this.setDefaultInputType(inputType);
+				}catch(e){}
+			});
+		});
 		
 		if($.isArray(criteriaData) && criteriaData.length > 0){
 			var $CPF = require('$CPF');
 			$CPF.showLoading();
-			+function addCriteriaItem(index){
-				var item = criteriaData[index];
-				if(item){
-					criteriaSearcher.getFieldData(item.fieldId, function(field){
-						addCriteria($.extend({
-							fieldData	: field
-						}, item), true);
-						addCriteriaItem(index + 1)
-					});
-				}else{
-					$CPF.closeLoading();
-				}
-			}(0);
+			FieldInput.loadGlobalOptions('admin/peopledata/dict/enum_json').done(function(){
+				+function addCriteriaItem(index){
+					var item = criteriaData[index];
+					if(item){
+						criteriaSearcher.getFieldData(item.fieldId, function(field){
+							addCriteria($.extend({
+								fieldData	: field
+							}, item), true);
+							addCriteriaItem(index + 1)
+						});
+					}else{
+						$CPF.closeLoading();
+					}
+				}(0);
+			});
+			
 		}
 	}
 	
@@ -411,9 +447,14 @@ define(function(require, exports, module){
 		 * 设置条件的字段对象，并重新设置所有条件的所有部分
 		 */
 		this.setField = function(field){
-			param.field = field;
-			param.title = field.cname;
-			callbackMap.fire('afterSetField', [field]);
+			if(typeof field === 'object'){
+				param.field = field;
+				param.title = field.cname;
+				this.setDefaultInputType(field);
+				callbackMap.fire('afterSetField', [field]);
+			}else{
+				$.error('setField方法只能从传入field数据对象');
+			}
 		};
 		
 		/**
@@ -462,6 +503,16 @@ define(function(require, exports, module){
 			callbackMap.fire('afterToggleQueryShow', [toShow]);
 		};
 		
+		
+		/**
+		 * 切换表单的类型
+		 * @param inputType 可以是string，也可以是字段数组对象field
+		 */
+		this.setDefaultInputType = function(inputType){
+			defaultValueInput = new ValueInput(inputType);
+			callbackMap.fire('afterSetDefaultInputType', [defaultValueInput]);
+		}
+		
 		/**
 		 * 获得条件在查询中显示时，会用什么比较关系来进行查询
 		 * @return {String}
@@ -471,7 +522,7 @@ define(function(require, exports, module){
 		};
 		
 		/**
-		 * 获得比较关系的名称
+		 * 设置比较关系的名称
 		 */
 		this.setComparatorName = function(comparatorName){
 			param.comparatorName = comparatorName;
@@ -670,11 +721,23 @@ define(function(require, exports, module){
 		var fieldInput = null;
 		var defaultValue = null,
 			placeholder = null;
-		//if(field){
+		if(typeof field === 'string'){
+			fieldInput = new FieldInput({
+				type	: field
+			});
+		}else if(typeof field === 'object'){
+			console.log(field);
+			var fParam = {
+				type		: field.type,
+				optionsKey	: field.id
+			};
+			
+			fieldInput = new FieldInput(fParam);
+		}else{
 			fieldInput = new FieldInput({
 				type	: 'text'
 			});
-		//}
+		}
 		function viewTransfer(val, fieldInput){
 			if(fieldInput){
 				switch(fieldInput.getType()){
@@ -759,8 +822,9 @@ define(function(require, exports, module){
 		var $colRowTmpl = $('#col-row-tmpl', $page);
 		
 		var $operateMap = {
-				edit	: $('<a href="#" class="btn btn-info btn-xs edit operate-edit"><i class="fa fa-edit"></i>修改</a>'),
-				remove	: $('<a href="#" class="btn btn-danger btn-xs delete operate-remove"><i class="fa fa-trash-o"></i>删除</a>')
+				update	: $('<a href="#" class="btn btn-info btn-xs edit operate-update"><i class="fa fa-edit"></i>修改</a>'),
+				remove	: $('<a href="#" class="btn btn-danger btn-xs delete operate-remove"><i class="fa fa-trash-o"></i>删除</a>'),
+				detail	: $('<a href="#" class="btn btn-success btn-xs operate-detail"><i class="fa fa-book"></i>详情</a>')
 		};
 		
 		var $previewTable = $('.table-preview-area table', $page);
@@ -790,8 +854,11 @@ define(function(require, exports, module){
 				if(column.getId() === 'row-number'){
 					$td.text(i + 1);
 				}else if(column.getId() === 'row-operates'){
-					if(isOperateChecked('edit')){
-						$td.append($operateMap['edit'].clone());
+					if(isOperateChecked('detail')){
+						$td.append($operateMap['detail'].clone());
+					}
+					if(isOperateChecked('update')){
+						$td.append($operateMap['update'].clone());
 					}
 					if(isOperateChecked('remove')){
 						$td.append($operateMap['remove'].clone());
@@ -805,10 +872,10 @@ define(function(require, exports, module){
 		
 		/**
 		 * 判断某个操作是否被勾选
-		 * 当前可用操作包括(edit、remove)
+		 * 当前可用操作包括(update、remove)
 		 */
 		function isOperateChecked(operateName){
-			return $('#show-operate-' + operateName).prop('checked');
+			return $('#show-operate-' + operateName, $page).prop('checked');
 		}
 		/**
 		 * 切换
@@ -820,11 +887,12 @@ define(function(require, exports, module){
 				if(flag){
 					if($origin.length == 0){
 						var Utils = require('utils');
-						if(operateName === 'remove'){
-							Utils.appendTo($operateMap[operateName].clone(), $cell);
-						}else{
-							Utils.prependTo($operateMap[operateName].clone(), $cell);
-						}
+						var indexMap = {
+							detail	: 0,
+							update	: 1,
+							remove	: 2
+						};
+						Utils.prependTo($operateMap[operateName].clone(), $cell, indexMap[operateName]);
 					}
 				}else{
 					$origin.remove();
@@ -906,11 +974,14 @@ define(function(require, exports, module){
 			$('#show-operate', $page).toggle(operateShow);
 		}).trigger('change');
 		
-		$('#show-operate-edit', $page).change(function(){
-			toggleOperate('edit', isOperateChecked('edit'));
+		$('#show-operate-update', $page).change(function(){
+			toggleOperate('update', isOperateChecked('update'));
 		});
 		$('#show-operate-remove', $page).change(function(){
 			toggleOperate('remove',isOperateChecked('remove'));
+		});
+		$('#show-operate-detail', $page).change(function(){
+			toggleOperate('detail',isOperateChecked('detail'));
 		});
 		
 		//绑定移除列事件
@@ -937,7 +1008,7 @@ define(function(require, exports, module){
 			}
 			
 			if($.isArray(columnData)){
-				var operateReg = /^operate(\-u)?(\-r)?$/;
+				var operateReg = /^operate(\-d)?(\-u)?(\-r)?$/;
 				for(var i in columnData){
 					var column = columnData[i];
 					if(column.specialField === 'number'){
@@ -945,8 +1016,9 @@ define(function(require, exports, module){
 					}else if(operateReg.test(column.specialField)){
 						$('#toggle-operate-col', $page).prop('checked', true).trigger('change');
 						var res = operateReg.exec(column.specialField);
-						$('#show-operate-edit', $page).prop('checked', !!res[1]).trigger('change');
-						$('#show-operate-remove', $page).prop('checked', !!res[2]).trigger('change');
+						$('#show-operate-detail', $page).prop('checked', !!res[1]).trigger('change');
+						$('#show-operate-update', $page).prop('checked', !!res[2]).trigger('change');
+						$('#show-operate-remove', $page).prop('checked', !!res[3]).trigger('change');
 					}else{
 						addColumn({
 							columnId 	: column.id,

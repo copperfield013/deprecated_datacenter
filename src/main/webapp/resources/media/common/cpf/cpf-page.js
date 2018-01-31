@@ -181,6 +181,8 @@ define(function(require, exports, module){
 		$content
 			.addClass($CPF.getParam('pageContentClass'))
 			.data($CPF.getParam('pageDataKey'), this);
+		
+		var callbackMap = require('utils').CallbacksMap(this);
 		this.getId = function(){
 			return id;
 		};
