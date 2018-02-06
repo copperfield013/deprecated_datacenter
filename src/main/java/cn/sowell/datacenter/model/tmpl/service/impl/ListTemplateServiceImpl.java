@@ -1,16 +1,21 @@
 package cn.sowell.datacenter.model.tmpl.service.impl;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.stereotype.Service;
 
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.NormalOperateDao;
 import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.copframe.utils.FormatUtils;
+import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
@@ -162,5 +167,34 @@ public class ListTemplateServiceImpl implements ListTemplateService{
 		nDao.remove(ltmpl);
 	}
 	
+	
+	@Override
+	public Map<Long, NormalCriteria> getCriteriasFromRequest(
+			MutablePropertyValues pvs, Map<Long, TemplateListCriteria> criteriaMap) {
+		 Map<Long, NormalCriteria> map = new HashMap<Long, NormalCriteria>();
+		 pvs.getPropertyValueList().forEach(pv->{
+			 Long criteriaId = FormatUtils.toLong(pv.getName());
+			 if(criteriaId != null){
+				 TemplateListCriteria criteria = criteriaMap.get(criteriaId);
+				 if(criteria != null){
+					 NormalCriteria ncriteria = new NormalCriteria(criteria);
+					 //TODO: 需要将fieldKey转换成attributeName
+					 ncriteria.setAttributeName(criteria.getFieldKey());
+					 ncriteria.setValue(FormatUtils.toString(pv.getValue()));
+					 map.put(criteriaId, ncriteria);
+				 }
+			 }
+		 });
+		 criteriaMap.forEach((criteriaId, criteria)->{
+			 if(TextUtils.hasText(criteria.getDefaultValue()) && !map.containsKey(criteriaId)){
+				 NormalCriteria nCriteria = new NormalCriteria(criteria);
+				 //TODO: 需要将fieldKey转换成attributeName
+				 nCriteria.setAttributeName(criteria.getFieldKey());
+				 nCriteria.setValue(criteria.getDefaultValue());
+				 map.put(criteriaId, nCriteria);
+			 }
+		 });;
+		return map;
+	}
 	
 }

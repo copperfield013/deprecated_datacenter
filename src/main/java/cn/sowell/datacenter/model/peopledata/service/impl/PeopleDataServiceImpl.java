@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.annotation.Resource;
 
@@ -16,8 +17,11 @@ import org.springframework.stereotype.Service;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.spring.binder.FieldRefectUtils;
 import cn.sowell.copframe.spring.propTranslator.PropertyParser;
+import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.datacenter.admin.controller.people.ExportDataPageInfo;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
+import cn.sowell.datacenter.model.basepeople.EntityPagingQueryProxy;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.service.impl.FusionContextFactoryDC;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
@@ -54,30 +58,68 @@ public class PeopleDataServiceImpl implements PeopleDataService{
 	@Override
 	public List<PeopleData> query(Set<NormalCriteria> nCriterias,
 			PageInfo pageInfo) {
-		FusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
-		CriteriaFactory criteriaFactory = new CriteriaFactory(context);
-		List<Entity> list = abcService.queryPeopleList(mapperName->{
-			ArrayList<Criteria> cs = new ArrayList<Criteria>();
-			nCriterias.forEach(nCriteria->{
-				TemplateListCriteria criteria = nCriteria.getCriteria();
-				if(TextUtils.hasText(nCriteria.getValue())){
-					String comparator = criteria.getComparator();
-					if("s1".equals(comparator)){
-						cs.add(criteriaFactory.createLikeQueryCriteria(nCriteria.getAttributeName(), nCriteria.getValue()));
-					}else if("s2".equals(comparator)){
-						cs.add(criteriaFactory.createLeftLikeQueryCriteria(nCriteria.getAttributeName(), nCriteria.getValue()));
-					}else if("s3".equals(comparator)){
-						cs.add(criteriaFactory.createRightLikeQueryCriteria(nCriteria.getAttributeName(), nCriteria.getValue()));
-					}else if("s4".equals(comparator)){
-						cs.add(criteriaFactory.createQueryCriteria(nCriteria.getAttributeName(), nCriteria.getValue()));
-					}
-				}
-			});
-			return cs;
-		}, pageInfo);
+		List<Criteria> cs = toCriterias(nCriterias);
+		List<Entity> list = abcService.queryPeopleList(cs, pageInfo);
 		List<PeopleData> result = new ArrayList<PeopleData>();
 		list.forEach(p->result.add(transfer(p)));
 		return result;
+	}
+	
+	private List<Criteria> toCriterias(Set<NormalCriteria> nCriterias){
+		FusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
+		CriteriaFactory criteriaFactory = new CriteriaFactory(context);
+		ArrayList<Criteria> cs = new ArrayList<Criteria>();
+		nCriterias.forEach(nCriteria->{
+			TemplateListCriteria criteria = nCriteria.getCriteria();
+			if(TextUtils.hasText(nCriteria.getValue())){
+				String comparator = criteria.getComparator();
+				if("s1".equals(comparator)){
+					cs.add(criteriaFactory.createLikeQueryCriteria(nCriteria.getAttributeName(), nCriteria.getValue()));
+				}else if("s2".equals(comparator)){
+					cs.add(criteriaFactory.createLeftLikeQueryCriteria(nCriteria.getAttributeName(), nCriteria.getValue()));
+				}else if("s3".equals(comparator)){
+					cs.add(criteriaFactory.createRightLikeQueryCriteria(nCriteria.getAttributeName(), nCriteria.getValue()));
+				}else if("s4".equals(comparator)){
+					cs.add(criteriaFactory.createQueryCriteria(nCriteria.getAttributeName(), nCriteria.getValue()));
+				}
+			}
+		});
+		return cs;
+	}
+	
+	@Override
+	public PeopleDataPagingIterator queryIterator(Set<NormalCriteria> nCriterias,
+			ExportDataPageInfo ePageInfo) {
+		PageInfo pageInfo = ePageInfo.getPageInfo();
+		List<Criteria> cs = toCriterias(nCriterias);
+		EntityPagingQueryProxy proxy = abcService.getQueryProxy(cs, ePageInfo);
+		Function<Integer, Set<PeopleData>> dataGetter = new Function<Integer, Set<PeopleData>>() {
+
+			@Override
+			public Set<PeopleData> apply(Integer pageNo) {
+				Set<Entity> entities = proxy.load(pageNo);
+				return CollectionUtils.toSet(entities, entity->transfer(entity));
+			}
+		};
+		int dataCount = pageInfo.getPageSize();
+		int startPageNo = pageInfo.getPageNo();
+		int totalCount = proxy.getTotalCount();
+		int ignoreCount = 0;
+		if("all".equals(ePageInfo.getScope())){
+			dataCount = proxy.getTotalCount();
+			startPageNo = 1;
+			if(ePageInfo.getRangeStart() != null){
+				ignoreCount = ePageInfo.getRangeStart() - 1;
+				if(ePageInfo.getRangeEnd() != null){
+					dataCount = ePageInfo.getRangeEnd() - ePageInfo.getRangeStart() + 1;
+				}else{
+					dataCount -= ePageInfo.getRangeStart() - 1;
+				}
+			}else if(ePageInfo.getRangeEnd() != null){
+				dataCount = ePageInfo.getRangeEnd();
+			}
+		}
+		return new PeopleDataPagingIterator(totalCount, dataCount, ignoreCount, startPageNo, dataGetter);
 	}
 	
 	@Override

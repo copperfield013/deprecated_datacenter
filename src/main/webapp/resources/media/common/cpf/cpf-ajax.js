@@ -149,7 +149,7 @@ define(function(require, exports, module){
 			_param = whenSuc;
 			whenSuc = _param.whenSuc;
 		}else{
-			_param = {} || _param;
+			_param = _param || {};
 		}
 		if($.isPlainObject(_param)){
 			_param.whenSuc = whenSuc;
@@ -281,17 +281,21 @@ define(function(require, exports, module){
 		return deferred.promise();
 	}
 	
+	
+	
 	/**
 	 * 轮询查询当前进度
+	 * @return 返回一个操作对象
 	 */
 	function poll(_param){
 		var defaultParam = {
 			startupURL				: '',
 			progressURL				: '',
 			startupReqParameters	: {},
+			startupReqMethod		: 'postJson',
 			uuidResponseName		: 'uuid',
 			uuidRequestName			: 'uuid',
-			//提交进度获取时的方法
+			//构造进度获取值参数的方法
 			progressReqParameters	: function(startupRes, uuid){},
 			//进度值的获取方法
 			progressGetter			: function(res){
@@ -299,43 +303,141 @@ define(function(require, exports, module){
 			},
 			//进度值的最大值
 			progressMax				: 1,
+			whenStartupResponse		: function(dara, uuid){},
+			progressHandler			: function(progress, res){},
 			//进度完成时调用
 			whenComplete			: function(res){},
 			//当
-			whenUnsuccess			: function(res){}
+			whenUnsuccess			: function(res){},
+			//当轮询被主动中断的时候
+			whenBreaked				: function(res){},
+			checkCompleted			: function(res, progress){
+				return res.completed ==  true;
+			}
 		};
 		var param = $.extend({}, defaultParam , _param);
-		Ajax.ajax(param.startupURL, param.startupParameters, function(data){
-			var uuid = data[uuidName];
-			if(uuid){
-				var statusTimer = setInterval(function(){
-					var parameters = {};
-					if(typeof param.progressReqParameters === 'function'){
-						var p = param.progressReqParameters.apply(param, [data, uuid]);
-						
+		var pId = null;
+		var callbacksMap = utils.CallbacksMap();
+		var interrupted = false;
+		var disconnected = false;
+		var pollUUID = null, pollDataContext = null;
+		var handler = {
+			getId		: function(){
+				return pId;
+			},
+			start		: function(reqParam){
+				interrupted = false;
+				pId = utils.uuid();
+				console.log('开始轮询[pId=' + pId + ']');
+				startPoll(reqParam);
+			},
+			
+			pollWith	: function(uuid, data){
+				pollUUID = uuid;
+				pollDataContext = data;
+				data = data || {};
+				function _(){
+					if(disconnected){
+						return;
 					}
-					Ajax.ajax(param.progressURL, parameters, function(res){
+					checkIntrupt();
+					var parameters = {};
+					parameters[param.uuidRequestName] = uuid;
+					parameters.interrupted = interrupted;
+					if(typeof param.progressReqParameters === 'function'){
+						$.extend(parameters, param.progressReqParameters.apply(param, [data, uuid]));
+					}
+					ajax(param.progressURL, parameters, function(res){
+						checkIntrupt();
 						if(res.status === 'suc'){
 							var progress = param.progressGetter.apply(param, [res]);
 							progress = progress > param.progressMax? param.progressMax: progress;
 							try{
-								param.propgressHandler.apply(param, [progress, res]);
-							}catch(e){}
-							if(progress == param.progressMax){
-								clearInterval(statusTimer);
-								param.whenComplete.apply(param, [res]);
+								param.progressHandler.apply(param, [progress, res]);
+							}catch(e){console.error(e)}
+							if(param.checkCompleted.apply(param, [res, progress])){
+								param.whenComplete.apply(param, [res, data]);
+							}else{
+								setTimeout(_, 1000);
+								return;
 							}
+						}else if(res.status === 'breaked'){
+							param.whenBreaked.apply(param, [res]);
 						}else{
 							try{
-								if(param.param.whenUnsuccess.apply(param, [res]) !== false){
-									clearInterval(statusTimer);
+								if(param.whenUnsuccess.apply(param, [res]) === true){
+									setTimeout(_, 1000);
+									return;
 								}
-							}catch(e){clearInterval(statusTimer)}
+							}catch(e){}
+						}
+						pollUUID = null;
+						pollDataContext = null;
+					}, {
+						whenErr		: function(){
+							param.whenRequestError.apply(param, arrguments);
 						}
 					});
-				}, 1000);
+				}
+				_();
+			},
+			//暂停轮询
+			pause 		: function(){
+				
+			},
+			//继续轮询
+			continues	: function(){
+				
+			},
+			//中断轮询
+			breaks		: function(){
+				var hasInterrupt = interrupted;
+				interrupted = true;
+				return {
+					done	: function(callback){
+						if(typeof callback === 'function'){
+							if(hasInterrupt){
+								callback();
+							}else{
+								callbacksMap.put('break', callback);
+							}
+						}
+					}
+				};
+			},
+			//断开轮询
+			disconnect	: function(){
+				disconnected = true;
+			},
+			//重新连接
+			reconnect	: function(){
+				disconnected = false;
+				handler.pollWith(pollUUID, pollDataContext);
 			}
-		});
+		};
+		function checkIntrupt(whenInterrupt){
+			if(interrupted === true){
+				try{
+					(whenInterrupt || $.noop)();
+					callbacksMap.fire('break', []);
+					callbacksMap.empty('break');
+				}catch(e){}
+			}
+		}
+		function startPoll(reqParam){
+			exports[param.startupReqMethod](param.startupURL, $.extend({}, param.startupReqParameters, reqParam), function(data){
+				var uuid = data[param.uuidResponseName];
+				var r = null;
+				try{
+					r = param.whenStartupResponse.apply(param, [data, uuid]);
+				}catch(e){console.error(e)}
+				if(r !== false && uuid){
+					checkIntrupt();
+					handler.pollWith(uuid, data);
+				}
+			});
+		}
+		return handler;
 		
 	}
 	
@@ -367,4 +469,5 @@ define(function(require, exports, module){
 	exports.AjaxPageResponse = AjaxPageResponse;
 	exports.download = download;
 	exports.loadResource = loadResource;
+	exports.poll = poll;
 });

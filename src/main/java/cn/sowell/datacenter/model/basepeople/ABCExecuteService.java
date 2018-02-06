@@ -9,6 +9,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.datacenter.admin.controller.people.ExportDataPageInfo;
 import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
 import cn.sowell.datacenter.model.basepeople.pojo.PeopleDataHistoryItem;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
@@ -91,7 +92,13 @@ public interface ABCExecuteService {
 	List<PeopleDataHistoryItem> queryHistory(String peopleCode, Integer pageNo,
 			Integer pageSize);
 
-	
+	/**
+	 * 
+	 * @param cs
+	 * @param pageInfo
+	 * @return
+	 */
+	EntityPagingQueryProxy getQueryProxy(List<Criteria> cs,
+			ExportDataPageInfo pageInfo);
 
-	
 }

@@ -40,7 +40,10 @@ import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.excel.CellTypeUtils;
+import cn.sowell.datacenter.admin.controller.people.ExportDataPageInfo;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
+import cn.sowell.datacenter.model.basepeople.EntityPagingQueryProxy;
+import cn.sowell.datacenter.model.basepeople.EntityQueryAdapter;
 import cn.sowell.datacenter.model.basepeople.dao.PropertyDictionaryDao;
 import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
 import cn.sowell.datacenter.model.basepeople.pojo.PeopleDataHistoryItem;
@@ -85,32 +88,22 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	@Resource
 	PropertyDictionaryDao dictionartDao;
 	
-	/*@Override
-	public Entity createEntity(Map<String, String> data) {
-		Assert.notNull(data);
-		Entity entity = new Entity(BASE_NODE_NAME);
-		for (Entry<String, String> entry : data.entrySet()) {
-			entity.putValue(entry.getKey(), entry.getValue());
-		}
-		Entity workExperience = new Entity("workExperience");
-		workExperience.putValue("companyName", data.get("companyName"));
-		
-		entity.putRecordEntity("workExperience", "工作经历", workExperience);
-		return entity;
-	}
 	
 	@Override
-	public Entity mergePeople(Map<String, String> data) throws IOException {
-		Entity entity = createEntity(data);
+	public EntityPagingQueryProxy getQueryProxy(List<Criteria> cs,
+			ExportDataPageInfo ePageInfo) {
+		BizFusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
+		Discoverer discoverer=PanelFactory.getDiscoverer(context);
+		EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(cs, "编辑时间");
 		
-		ApplicationInfo appInfo=new ApplicationInfo();
-		appInfo.setWriteMappingName(BASE_NODE_NAME);
-		appInfo.setSource(ApplicationInfo.SOURCE_COMMON);
-		Integration integration=PanelFactory.getIntegration();
-		integration.integrate(entity, appInfo);
-		return entity;
-		
-	}*/
+		PageInfo pageInfo = ePageInfo.getPageInfo();
+		if("all".equals(ePageInfo.getScope())){
+			return new EntityQueryAdapter(sortedPagedQuery, ePageInfo.getQueryCacheCount());
+		}else{
+			return new EntityQueryAdapter(sortedPagedQuery, pageInfo.getPageSize());
+		}
+	}
+	
 	
 	@Override
 	public List<Entity> queryPeopleList(List<Criteria> criterias, PageInfo pageInfo){

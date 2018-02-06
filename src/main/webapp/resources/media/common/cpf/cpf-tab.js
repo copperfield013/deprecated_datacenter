@@ -168,6 +168,11 @@ define(function(require, exports, module){
 						_title = __title;
 					}
 				}
+				try{
+					var beforeReloadEvent = this.getEventCallbacks('beforeReload');
+					beforeReloadEvent.fire(this);
+					beforeReloadEvent.empty();
+				}catch(e){}
 				this.getContent().html(content.html());
 				$CPF.initPage(_this.getContent());
 				param.onPageLoad.apply(this);
@@ -301,13 +306,13 @@ define(function(require, exports, module){
 			this.getEventCallbacks('afterClose').fire([this]);
 			if(finalWidth >= warpWidth){
 				if(ulLeft < 0){
-					ulDom.css("left",ulLeft+closeWidth)
+					ulDom.css("left", ulLeft+closeWidth)
 				}				
 			}
 			if(finalWidth < warpWidth){
-				ulDom.css("left",0);
+				ulDom.css("left", 0);
 				$('a.move').css("display","none");
-				ulDom.css("marginLeft",0);
+				ulDom.css("marginLeft", 0);
 			}
 			return this;
 		};
@@ -335,13 +340,20 @@ define(function(require, exports, module){
 		/**
 		 * 
 		 */
-		this.getEventCallbacks = function(eventName, flag){
-			if(eventName && typeof eventName === 'string'){
-				var event = param.events[eventName];
-				if(!event){
-					param.events[eventName] = event = $.Callbacks(flag || 'stopOnFalse');
+		this.getEventCallbacks = function(eventName, flag, fn){
+			if(eventName){
+				if(typeof eventName === 'string'){
+					var event = param.events[eventName];
+					if(!event){
+						param.events[eventName] = event = $.Callbacks(flag || 'stopOnFalse');
+					}
+					(fn || $.noop)(event);
+					return event;
+				}else if($.isArray(eventName)){
+					for(var i in eventName){
+						this.getEventCallbacks(eventName[i], flag, fn);
+					}
 				}
-				return event;
 			}
 		}
 	

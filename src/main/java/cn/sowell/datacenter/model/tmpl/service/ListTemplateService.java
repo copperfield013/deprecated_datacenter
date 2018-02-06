@@ -1,13 +1,16 @@
 package cn.sowell.datacenter.model.tmpl.service;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import org.springframework.beans.MutablePropertyValues;
 
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTmpl;
 
 public interface ListTemplateService {
@@ -52,5 +55,9 @@ public interface ListTemplateService {
 	 * @param ltmplId
 	 */
 	void removeListTemplate(Long ltmplId);
+
+	Map<Long, NormalCriteria> getCriteriasFromRequest(
+			MutablePropertyValues pvs,
+			Map<Long, TemplateListCriteria> criteriaMap);
 
 }

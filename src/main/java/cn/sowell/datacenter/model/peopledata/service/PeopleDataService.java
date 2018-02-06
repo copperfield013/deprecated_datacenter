@@ -6,9 +6,11 @@ import java.util.Map;
 import java.util.Set;
 
 import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.datacenter.admin.controller.people.ExportDataPageInfo;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
+import cn.sowell.datacenter.model.peopledata.service.impl.PeopleDataPagingIterator;
 import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
 
 public interface PeopleDataService {
@@ -22,6 +24,9 @@ public interface PeopleDataService {
 	PeopleData getHistoryPeople(String peopleCode, Date date);
 
 	List<Map<String, Object>> queryMap(PeopleDataCriteria criteria, PageInfo pageInfo, List<TBasePeopleDictionaryEntity> keys);
+
+	PeopleDataPagingIterator queryIterator(Set<NormalCriteria> criteria,
+			ExportDataPageInfo ePageInfo);
 
 
 

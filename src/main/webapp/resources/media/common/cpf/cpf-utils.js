@@ -269,6 +269,27 @@ define(function(require, exports){
 			}
 			return date;
 		},
+		converteFormdata: function(formdata){
+			if(formdata instanceof $){
+				formdata = formdata[0];
+			}
+			if(!(formdata instanceof FormData)){
+				formdata = new FormData(formdata);
+			}
+			var result = {};
+			formdata.forEach(function(val, key){
+				if(val !== undefined){
+					if($.isArray(result[key])){
+						result[key].push(val);
+					}else if(result[key] !== undefined){
+						result[key] = [result[key], val];
+					}else{
+						result[key] = val;
+					}
+				}
+			});
+			return result;
+		},
 		/**
 		 * 获得选择框选择的选项option
 		 */
@@ -610,6 +631,14 @@ define(function(require, exports){
 				this.get(eventName).fireWith(_context, args);
 			}catch(e){console.error(e)}
 		};
+		/**
+		 * 清空某个事件的回调
+		 */
+		this.empty = function(eventName){
+			try{
+				this.get(eventName).empty();
+			}catch(e){}
+		}
 		
 	}
 	

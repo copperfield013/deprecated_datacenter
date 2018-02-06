@@ -76,6 +76,8 @@ public interface AdminConstants {
 	 */
 	final long SYS_DEF = 1;
 
+	final String EXPORT_PEOPLE_STATUS_UUID = "export_people_status_uuid";
+
 
 	
 	

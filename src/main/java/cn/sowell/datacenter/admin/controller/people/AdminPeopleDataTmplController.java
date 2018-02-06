@@ -2,13 +2,13 @@ package cn.sowell.datacenter.admin.controller.people;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,17 +21,16 @@ import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.spring.propTranslator.PropertyParser;
 import cn.sowell.copframe.utils.CollectionUtils;
-import cn.sowell.copframe.utils.FormatUtils;
-import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.model.admin.pojo.ExportStatus;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleTemplateData;
+import cn.sowell.datacenter.model.peopledata.service.PeopleDataExportService;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDictionaryService;
 import cn.sowell.datacenter.model.peopledata.service.PojoService;
 import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
-import cn.sowell.datacenter.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTmpl;
 import cn.sowell.datacenter.model.tmpl.service.ListTemplateService;
 
@@ -54,8 +53,11 @@ public class AdminPeopleDataTmplController {
 	@Resource
 	FrameDateFormat dateFormat;
 	
+	@Resource
+	PeopleDataExportService eService;
+	
 	@RequestMapping("/list")
-	public String list(Long tmplId, PageInfo pageInfo, Model model, HttpServletRequest request){
+	public String list(Long tmplId, PageInfo pageInfo, Model model, HttpServletRequest request, HttpSession session){
 		TemplateListTmpl ltmpl = null;
 		UserIdentifier user = UserUtils.getCurrentUser();
 		if(tmplId == null){
@@ -63,13 +65,24 @@ public class AdminPeopleDataTmplController {
 		}else{
 			ltmpl = ltmplService.getListTemplate(tmplId);
 		}
-		Map<Long, NormalCriteria> vCriteriaMap = getCriteriasFromRequest(request, CollectionUtils.toMap(ltmpl.getCriterias(), c->c.getId())); 
+		Map<Long, NormalCriteria> vCriteriaMap = ltmplService.getCriteriasFromRequest(
+				new ServletRequestParameterPropertyValues(request, "criteria", "_"), 
+				CollectionUtils.toMap(ltmpl.getCriterias(), c->c.getId())); 
 		if(ltmpl != null){
 			List<PeopleData> srcList = ltmplService.queryPeopleList(new HashSet<NormalCriteria>(vCriteriaMap.values()), pageInfo);
 			List<PropertyParser> parserList = new ArrayList<PropertyParser>();
 			srcList.forEach(src->parserList.add(pojoService.createPropertyParser(src)));
 			model.addAttribute("parserList", parserList);
+			
+			String uuid = (String) session.getAttribute(AdminConstants.EXPORT_PEOPLE_STATUS_UUID);
+			if(uuid != null){
+				ExportStatus exportStatus = eService.getExportStatus(uuid);
+				if(exportStatus != null && !exportStatus.isBreaked() && !exportStatus.isCompleted()){
+					model.addAttribute("exportStatus", exportStatus);
+				}
+			}
 		}
+		
 		model.addAttribute("vCriteriaMap", vCriteriaMap);
 		model.addAttribute("ltmpl", ltmpl);
 		model.addAttribute("pageInfo", pageInfo);
@@ -78,34 +91,6 @@ public class AdminPeopleDataTmplController {
 	}
 	
 	
-	 private Map<Long, NormalCriteria> getCriteriasFromRequest(
-			HttpServletRequest request, Map<Long, TemplateListCriteria> criteriaMap) {
-		 ServletRequestParameterPropertyValues pvs = new ServletRequestParameterPropertyValues(request, "criteria", "_");
-		 Map<Long, NormalCriteria> map = new HashMap<Long, NormalCriteria>();
-		 pvs.getPropertyValueList().forEach(pv->{
-			 Long criteriaId = FormatUtils.toLong(pv.getName());
-			 if(criteriaId != null){
-				 TemplateListCriteria criteria = criteriaMap.get(criteriaId);
-				 if(criteria != null){
-					 NormalCriteria ncriteria = new NormalCriteria(criteria);
-					 //TODO: 需要将fieldKey转换成attributeName
-					 ncriteria.setAttributeName(criteria.getFieldKey());
-					 ncriteria.setValue(FormatUtils.toString(pv.getValue()));
-					 map.put(criteriaId, ncriteria);
-				 }
-			 }
-		 });
-		 criteriaMap.forEach((criteriaId, criteria)->{
-			 if(TextUtils.hasText(criteria.getDefaultValue()) && !map.containsKey(criteriaId)){
-				 NormalCriteria nCriteria = new NormalCriteria(criteria);
-				 //TODO: 需要将fieldKey转换成attributeName
-				 nCriteria.setAttributeName(criteria.getFieldKey());
-				 nCriteria.setValue(criteria.getDefaultValue());
-				 map.put(criteriaId, nCriteria);
-			 }
-		 });;
-		return map;
-	}
 
 
 	@RequestMapping("/detail_tmpl/{peopleCode}")
