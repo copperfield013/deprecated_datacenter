@@ -18,4 +18,6 @@ public interface PeopleDataExportService {
 	
 	AbstractResource getDownloadResource(String uuid);
 
+	void clearExportCache();
+
 }

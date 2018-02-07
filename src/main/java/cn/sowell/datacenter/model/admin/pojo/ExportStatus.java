@@ -16,6 +16,8 @@ public class ExportStatus {
 	private ExportDataPageInfo exportPageInfo;
 	private String message;
 	
+	private long lastCheckTime = System.currentTimeMillis();
+	
 	public ExportStatus(String uuid) {
 		this.uuid = uuid;
 	}
@@ -81,6 +83,19 @@ public class ExportStatus {
 
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+	public long getLastCheckTime() {
+		return lastCheckTime;
+	}
+
+	public void setLastCheckTime(long lastCheckTime) {
+		this.lastCheckTime = lastCheckTime;
+	}
+	
+	public long check(){
+		this.lastCheckTime = System.currentTimeMillis();
+		return this.lastCheckTime;
 	}
 
 }

@@ -405,7 +405,7 @@ define(function(require, exports, module){
 					}
 				};
 			},
-			//断开轮询
+			//断开轮询，但不会结束后台的导出线程
 			disconnect	: function(){
 				disconnected = true;
 			},

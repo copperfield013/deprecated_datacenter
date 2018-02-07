@@ -100,7 +100,7 @@ define(function(require, exports, module){
 						$option.text(option.view);
 						//设置属性
 						if(typeof option.attrs === 'object'){
-							$option.attr('attr', option.attrs);
+							$option.attr(option.attrs);
 						}
 						//设置选项值
 						if(option.value){

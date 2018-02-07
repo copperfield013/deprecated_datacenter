@@ -296,7 +296,9 @@ define(function(require, exports, module){
 				}
 			});
 			$criteria.appendTo($criteriaContainer).data('criteria-data', criteria);
-			criteria.initFromData(_criteriaData);
+			if(_criteriaData){
+				criteria.initFromData(_criteriaData);
+			}
 			if(ignoreShow !== true){
 				showCriteriaDetail($criteria);
 			}
@@ -363,15 +365,19 @@ define(function(require, exports, module){
 			var inputType = $(this).val();
 			handleSelectedItem(function(){
 				try{
-					this.setDefaultInputType(inputType);
+					if(inputType === 'select'){
+						this.setDefaultInputType(this.getField());
+					}else{
+						this.setDefaultInputType(inputType);
+					}
 				}catch(e){}
 			});
 		});
 		
-		if($.isArray(criteriaData) && criteriaData.length > 0){
-			var $CPF = require('$CPF');
-			$CPF.showLoading();
-			FieldInput.loadGlobalOptions('admin/peopledata/dict/enum_json').done(function(){
+		var $CPF = require('$CPF');
+		$CPF.showLoading();
+		FieldInput.loadGlobalOptions('admin/peopledata/dict/enum_json').done(function(){
+			if($.isArray(criteriaData) && criteriaData.length > 0){
 				+function addCriteriaItem(index){
 					var item = criteriaData[index];
 					if(item){
@@ -379,15 +385,15 @@ define(function(require, exports, module){
 							addCriteria($.extend({
 								fieldData	: field
 							}, item), true);
-							addCriteriaItem(index + 1)
+							addCriteriaItem(index + 1);
 						});
-					}else{
-						$CPF.closeLoading();
 					}
+					$CPF.closeLoading();
 				}(0);
-			});
-			
-		}
+			}else{
+				$CPF.closeLoading();
+			}
+		});
 	}
 	
 	/**
@@ -409,7 +415,7 @@ define(function(require, exports, module){
 		var defaultValueInput = new ValueInput();
 		
 		this.initFromData = function(data){
-			if(data.fieldData){
+			if(data && data.fieldData){
 				param.id = data.id;
 				this.setField(data.fieldData);
 				this.toggleQueryShow(data.queryShow == 1);

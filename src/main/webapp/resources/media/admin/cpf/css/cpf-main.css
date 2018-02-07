@@ -431,7 +431,7 @@ input[type="text"].dblclicked{
 div.detail-toggle-sublist {
     position: absolute;
     right: 2em;
-    width: 350px;
+    width: 400px;
     background-color: #fff;
     top: 40px;
     height: 323px;
@@ -446,7 +446,7 @@ div.detail-toggle-sublist div.detail-toggle-sublist-wrapper {
     height: 100%;
     overflow-y: scroll;
     overflow-x: hidden;
-    width: 370px;
+    width: 420px;
 }
 .detail-toggle-sublist div.detail-toggle-sublist-wrapper>a {
 	display: block;

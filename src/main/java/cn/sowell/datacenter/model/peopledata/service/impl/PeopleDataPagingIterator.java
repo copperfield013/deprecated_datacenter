@@ -46,12 +46,18 @@ public class PeopleDataPagingIterator implements Iterator<PeopleData>{
 		return current < dataCount;
 	}
 
+	
+	private long lastCacheDataTime = System.currentTimeMillis();
+	private float speed = 0;
 	@Override
 	public synchronized PeopleData next() {
 		if(hasNext() && (cacheItr == null || !cacheItr.hasNext())){
 			Set<PeopleData> set = dataGetter.apply(startPageNo + (pageNoInc++));
 			if(set != null){
 				cacheItr = set.iterator();
+				long currentTime = System.currentTimeMillis();
+				speed = set.size() / ((float)(currentTime - lastCacheDataTime) / 1000);
+				lastCacheDataTime = currentTime;;
 			}
 		}
 		if(cacheItr != null && cacheItr.hasNext()){
@@ -78,6 +84,26 @@ public class PeopleDataPagingIterator implements Iterator<PeopleData>{
 	public int getDataCount() {
 		return dataCount;
 	}
+
+	/**
+	 * 调用next方法的速度，单位条/秒
+	 * @return
+	 */
+	public float getSpeed() {
+		return speed;
+	}
+
+	/**
+	 * 根据速度计算获得剩余的条数所需要的时间
+	 * @return
+	 */
+	public float getRemainSecond() {
+		if(speed > 0){
+			return (dataCount - current) / speed;
+		}
+		return 0;
+	}
+	
 	
 
 }

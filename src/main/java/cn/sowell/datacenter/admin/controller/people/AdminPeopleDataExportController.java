@@ -105,8 +105,10 @@ public class AdminPeopleDataExportController {
 	public ResponseJSON statusOfExport(String uuid, Boolean interrupted){
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		jRes.setStatus("error");
+		jRes.put("uuid", uuid);
 		ExportStatus exportStatus = eService.getExportStatus(uuid);
 		if(exportStatus != null){
+			exportStatus.check();
 			if(Boolean.TRUE.equals(interrupted)){
 				exportStatus.setBreaked();
 				jRes.setStatus("breaked");
@@ -115,11 +117,12 @@ public class AdminPeopleDataExportController {
 				jRes.put("totalCount", exportStatus.getTotalCount());
 				jRes.put("currentData", exportStatus.getCurrentData());
 				jRes.put("totalData", exportStatus.getTotalData());
-				jRes.put("uuid", uuid);
 				jRes.put("completed", exportStatus.isCompleted());
 				jRes.put("statusMsg", exportStatus.getMessage());
 				jRes.setStatus("suc");
 			}
+		}else{
+			jRes.put("statusMsg", "导出已超时，请重新导出");
 		}
 		return jRes;
 	}

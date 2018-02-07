@@ -208,5 +208,4 @@ public class PeopleDataServiceImpl implements PeopleDataService{
 		return listmap;
 	}
 
-
 }

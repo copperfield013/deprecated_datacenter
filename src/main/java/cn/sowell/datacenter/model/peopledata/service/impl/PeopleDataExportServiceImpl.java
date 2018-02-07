@@ -3,8 +3,11 @@ package cn.sowell.datacenter.model.peopledata.service.impl;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -48,6 +51,54 @@ public class PeopleDataExportServiceImpl implements PeopleDataExportService{
 	
 	@Resource
 	PojoService pojoService;
+	
+	private Long exportCacheTimeout = null;
+	
+	@Override
+	public void clearExportCache(){
+		if(exportCacheTimeout == null){
+			try {
+				exportCacheTimeout = FormatUtils.toLong(PropertyPlaceholder.getProperty("export_cache_timeout")) * 1000;
+			} catch (Exception e) {
+				exportCacheTimeout = Long.MAX_VALUE;
+			}
+		}
+		FileSystemResource folder = new FileSystemResource(PropertyPlaceholder.getProperty("export_cache_path"));
+		File[] fs = folder.getFile().listFiles();
+		Map<String, File> fMap = new HashMap<String, File>();
+		for (File file : fs) {
+			fMap.put(file.getName().split("\\.")[0], file);
+		}
+		Iterator<Entry<String, ExportStatus>> itr = statusMap.entrySet().iterator();
+		while(itr.hasNext()){
+			Entry<String, ExportStatus> entry = itr.next();
+			ExportStatus status = entry.getValue();
+			fMap.remove(status.getUuid());
+			if(status != null && (status.isBreaked() || status.isCompleted())){
+				if(System.currentTimeMillis() - status.getLastCheckTime() > exportCacheTimeout){
+					FileSystemResource resource = new FileSystemResource(PropertyPlaceholder.getProperty("export_cache_path") + status.getUuid() + ".xlsx");
+					if(resource.exists()){
+						try {
+							if(resource.getFile().delete()){
+								itr.remove();
+								logger.info("清除成功,uuid=" + status.getUuid());
+							}
+						} catch (Exception e) {
+						}
+					}
+				}
+			}
+		}
+		fMap.forEach((uuid, file)->{
+			try {
+				file.delete();
+				logger.info("删除statusMap中不存在的缓存文件，uuid=" + uuid);
+			} catch (Exception e) {
+			}
+		});
+	}
+	
+	DecimalFormat df = new DecimalFormat("0.00");
 	@Override
 	public void startExport(String uuid, TemplateListTmpl ltmpl, Set<NormalCriteria> criteria, ExportDataPageInfo ePageInfo) {
 		ExportStatus status = new ExportStatus(uuid);
@@ -87,7 +138,6 @@ public class PeopleDataExportServiceImpl implements PeopleDataExportService{
 						XSSFRow row = sheet.createRow(i);
 						float dataProgress = ((float)i)/itr.getDataCount();
 						status.setCurrent(20 + (int)(dataProgress * 50));
-						status.setMessage("已处理数据(" + i + "/" + itr.getDataCount() + ")");
 						int j = 0;
 						for (TemplateListColumn column : ltmpl.getColumns()) {
 							if("number".equals(column.getSpecialField()) || column.getSpecialField() == null){
@@ -101,6 +151,8 @@ public class PeopleDataExportServiceImpl implements PeopleDataExportService{
 							}
 						}
 						status.setCurrentData(i);
+						status.setMessage("已处理数据(" + i + "/" + itr.getDataCount() + ")，速度" + df.format(itr.getSpeed()) 
+								+ "条/秒，预计还需要" + df.format(itr.getRemainSecond()) + "秒");
 						i++;
 					}
 					status.setMessage("数据处理完成，开始生成文件");
@@ -138,7 +190,17 @@ public class PeopleDataExportServiceImpl implements PeopleDataExportService{
 		});
 	}
 	
+	Long exportCheckPollTimeout = null;
+	
 	private void checkBreaked(ExportStatus status) throws ExportBreakException {
+		if(exportCheckPollTimeout == null){
+			try{
+				exportCheckPollTimeout = FormatUtils.toLong(PropertyPlaceholder.getProperty("export_check_poll_timeout")) * 1000;
+			}catch(Exception e){exportCheckPollTimeout = Long.MAX_VALUE;}
+		}
+		if(System.currentTimeMillis() - status.getLastCheckTime() > exportCheckPollTimeout){
+			throw new ExportBreakException("超过" + exportCheckPollTimeout + "毫秒没有检测导入状态，将关闭该导出");
+		}
 		if(status.isBreaked()){
 			throw new ExportBreakException();
 		}

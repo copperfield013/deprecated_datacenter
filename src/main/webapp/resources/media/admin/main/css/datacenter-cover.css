@@ -475,9 +475,6 @@ input.search-input:hover {
 .search-wrap .search-button:hover {
 	background-color: #4b90f3;
 }
-.form-group {
-	margin-bottom: 0;
-}
 .zform-group {
 	margin-bottom: 15px;
 }
@@ -493,7 +490,8 @@ input.search-input:hover {
 	vertical-align: middle;
 }
 .form-horizontal .form-group {
-	margin: 0;
+	margin-left: 0;
+	margin-right: 0;
 }
 .form-inline .zform-group {
 	margin-bottom: 0;
