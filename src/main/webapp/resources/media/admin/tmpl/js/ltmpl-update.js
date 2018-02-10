@@ -342,7 +342,7 @@ define(function(require, exports, module){
 				this.toggleQueryShow(toShow);
 			});
 		}).trigger('change');
-		$('.criteria-partition-add', $page).click(function(){
+		$('.criteria-partition-add', $page).click(function(){k
 			handleSelectedItem(function(){
 				this.addPartition();
 			});
@@ -378,6 +378,7 @@ define(function(require, exports, module){
 		$CPF.showLoading();
 		FieldInput.loadGlobalOptions('admin/peopledata/dict/enum_json').done(function(){
 			if($.isArray(criteriaData) && criteriaData.length > 0){
+				$CPF.showLoading();
 				+function addCriteriaItem(index){
 					var item = criteriaData[index];
 					if(item){
@@ -387,8 +388,9 @@ define(function(require, exports, module){
 							}, item), true);
 							addCriteriaItem(index + 1);
 						});
+					}else{
+						$CPF.closeLoading();
 					}
-					$CPF.closeLoading();
 				}(0);
 			}else{
 				$CPF.closeLoading();

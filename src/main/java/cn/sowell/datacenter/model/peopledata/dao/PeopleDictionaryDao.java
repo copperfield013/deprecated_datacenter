@@ -6,8 +6,8 @@ import java.util.Set;
 
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dto.page.PageInfo;
-import cn.sowell.datacenter.model.basepeople.pojo.BasePeopleItem;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryOption;
+import cn.sowell.datacenter.model.peopledata.pojo.OptionItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleCompositeDictionaryItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleFieldDictionaryItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleTemplateData;
@@ -70,6 +70,13 @@ public interface PeopleDictionaryDao {
 	 * @return
 	 */
 	List<DictionaryOption> getAllEnumList();
+
+	/**
+	 * 根据字段id获得对应的所有选项
+	 * @param fieldIds
+	 * @return
+	 */
+	Map<Long, List<OptionItem>> getFieldOptionsMap(Set<Long> fieldIds);
 
 
 }

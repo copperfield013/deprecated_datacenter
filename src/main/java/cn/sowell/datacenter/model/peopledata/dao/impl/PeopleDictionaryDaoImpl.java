@@ -15,12 +15,15 @@ import org.hibernate.type.StandardBasicTypes;
 import org.springframework.stereotype.Repository;
 
 import cn.sowell.copframe.common.UserIdentifier;
+import cn.sowell.copframe.dao.deferedQuery.ColumnMapResultTransformer;
 import cn.sowell.copframe.dao.deferedQuery.HibernateRefrectResultTransformer;
+import cn.sowell.copframe.dao.deferedQuery.SimpleMapWrapper;
 import cn.sowell.copframe.dao.utils.QueryUtils;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryOption;
 import cn.sowell.datacenter.model.peopledata.dao.PeopleDictionaryDao;
+import cn.sowell.datacenter.model.peopledata.pojo.OptionItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleCompositeDictionaryItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleFieldDictionaryItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleTemplateData;
@@ -122,5 +125,43 @@ public class PeopleDictionaryDaoImpl implements PeopleDictionaryDao{
 		
 	}
 
+	@Override
+	public Map<Long, List<OptionItem>> getFieldOptionsMap(Set<Long> fieldIds) {
+		String sql = 
+				"	SELECT" +
+				"		f.id field_id, o.c_title" +
+				"	FROM" +
+				"		t_dictionary_field f" +
+				"	LEFT JOIN t_dictionary_optiongroup og ON f.optgroup_id = og.id" +
+				"	LEFT JOIN t_dictionary_option o ON og.id = o.group_id" +
+				"	where f.id in (:fieldIds)" +
+				"	and o.c_disabled is null" +
+				"	and o.c_deleted is NULL" +
+				"	and og.c_deleted is null" +
+				"	and og.c_disabled is null" +
+				"	order by o.c_order asc";
+		SQLQuery query = sFactory.getCurrentSession().createSQLQuery(sql);
+		query.setParameterList("fieldIds", fieldIds);
+		Map<Long, List<OptionItem>> map = new HashMap<Long, List<OptionItem>>();
+		query.setResultTransformer(new ColumnMapResultTransformer<byte[]>() {
+			private static final long serialVersionUID = -392302880551548725L;
+
+			@Override
+			protected byte[] build(SimpleMapWrapper mapWrapper) {
+				OptionItem item = new OptionItem();
+				item.setTitle(mapWrapper.getString("c_title"));
+				item.setValue(mapWrapper.getString("c_title"));
+				Long fieldId = mapWrapper.getLong("field_id");
+				if(!map.containsKey(fieldId)){
+					map.put(fieldId, new ArrayList<OptionItem>());
+				}
+				map.get(fieldId).add(item);
+				return null;
+			}
+		});
+		query.list();
+		return map;
+	}
+	
 }
 

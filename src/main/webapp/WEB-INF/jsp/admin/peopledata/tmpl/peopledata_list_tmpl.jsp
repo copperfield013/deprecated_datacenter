@@ -26,12 +26,24 @@
 			<input type="hidden" id="tmplId" name="tmplId" value="${ltmpl.id }" />
 			<c:if test="${not empty ltmpl.criterias }">
 				<c:forEach var="criteriaItem" items="${ltmpl.criterias }">
-					<c:if test="${criteriaItem.inputType == 'text' }">
-						<div class="form-group">
-							<label class="control-label">${criteriaItem.title }</label>
-							<input class="form-control" type="text" name="criteria_${criteriaItem.id }" value="${vCriteriaMap[criteriaItem.id].value}" placeholder="${criteriaItem.placeholder }" />
-						</div>
-					</c:if>
+					<c:choose>
+						<c:when test="${criteriaItem.inputType == 'text' }">
+							<div class="form-group">
+								<label class="control-label">${criteriaItem.title }</label>
+								<input class="form-control" type="text" name="criteria_${criteriaItem.id }" value="${vCriteriaMap[criteriaItem.id].value}" placeholder="${criteriaItem.placeholder }" />
+							</div>
+						</c:when>
+						<c:when test="${criteriaItem.inputType == 'select' }">
+							<div class="form-group">
+								<label class="control-label">${criteriaItem.title }</label>
+								<select class="form-control" name="criteria_${criteriaItem.id }" data-value="${vCriteriaMap[criteriaItem.id].value}">
+									<c:forEach var="option" items="${criteriaOptionsMap[criteriaItem.fieldId]}">
+										<option value="${option.value }">${option.title}</option>
+									</c:forEach>								
+								</select>
+							</div>
+						</c:when>
+					</c:choose>
 				</c:forEach>
 				<button type="submit" class="btn btn-default">查询</button>
 			</c:if>

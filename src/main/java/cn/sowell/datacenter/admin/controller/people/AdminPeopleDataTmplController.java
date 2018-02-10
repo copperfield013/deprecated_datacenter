@@ -82,7 +82,9 @@ public class AdminPeopleDataTmplController {
 				}
 			}
 		}
-		
+		if(ltmpl.getCriterias() != null){
+			model.addAttribute("criteriaOptionsMap", dictService.getOptionsMap(CollectionUtils.toSet(ltmpl.getCriterias(), criteria->criteria.getFieldId())));
+		}
 		model.addAttribute("vCriteriaMap", vCriteriaMap);
 		model.addAttribute("ltmpl", ltmpl);
 		model.addAttribute("pageInfo", pageInfo);

@@ -3,29 +3,38 @@
 		"comparators"		: [
 			{
 				"title"	: "包含",
-				"key"	: "s1"
+				"key"	: "t1"
 			},
 			{
 				"title"	: "开头为",
-				"key"	: "s2"
+				"key"	: "t2"
 			},
 			{
 				"title"	: "结尾为",
-				"key"	: "s3"
+				"key"	: "t3"
+			},
+			{
+				"title"	: "等于",
+				"key"	: "t4"
 			},
 			{
 				"title"	: "不包含",
-				"key"	: "s1n",
+				"key"	: "t1n",
 				"class"	: "negative"
 			},
 			{
 				"title"	: "开头不为",
-				"key"	: "s2n",
+				"key"	: "t2n",
 				"class"	: "negative"
 			},
 			{
 				"title"	: "结尾不为",
-				"key"	: "s3n",
+				"key"	: "t3n",
+				"class"	: "negative"
+			},
+			{
+				"title"	: "不等于",
+				"key"	: "t4n",
 				"class"	: "negative"
 			}
 		]

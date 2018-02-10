@@ -18,6 +18,7 @@ import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryOption;
 import cn.sowell.datacenter.model.peopledata.dao.PeopleDictionaryDao;
+import cn.sowell.datacenter.model.peopledata.pojo.OptionItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleCompositeDictionaryItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleFieldDictionaryItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleTemplateData;
@@ -227,6 +228,11 @@ public class PeopleDictionaryServiceImpl implements PeopleDictionaryService{
 	@Override
 	public List<DictionaryOption> getAllEnumList() {
 		return dictDao.getAllEnumList();
+	}
+	
+	@Override
+	public Map<Long, List<OptionItem>> getOptionsMap(Set<Long> fieldIds) {
+		return dictDao.getFieldOptionsMap(fieldIds);
 	}
 	
 }

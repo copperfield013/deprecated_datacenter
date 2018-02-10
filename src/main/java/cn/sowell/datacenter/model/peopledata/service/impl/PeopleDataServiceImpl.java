@@ -73,13 +73,15 @@ public class PeopleDataServiceImpl implements PeopleDataService{
 			TemplateListCriteria criteria = nCriteria.getCriteria();
 			if(TextUtils.hasText(nCriteria.getValue())){
 				String comparator = criteria.getComparator();
-				if("s1".equals(comparator)){
+				if("t1".equals(comparator)){
 					cs.add(criteriaFactory.createLikeQueryCriteria(nCriteria.getAttributeName(), nCriteria.getValue()));
-				}else if("s2".equals(comparator)){
+				}else if("t2".equals(comparator)){
 					cs.add(criteriaFactory.createLeftLikeQueryCriteria(nCriteria.getAttributeName(), nCriteria.getValue()));
-				}else if("s3".equals(comparator)){
+				}else if("t3".equals(comparator)){
 					cs.add(criteriaFactory.createRightLikeQueryCriteria(nCriteria.getAttributeName(), nCriteria.getValue()));
-				}else if("s4".equals(comparator)){
+				}else if("t4".equals(comparator)){
+					cs.add(criteriaFactory.createQueryCriteria(nCriteria.getAttributeName(), nCriteria.getValue()));
+				}else if("s1".equals(comparator)){
 					cs.add(criteriaFactory.createQueryCriteria(nCriteria.getAttributeName(), nCriteria.getValue()));
 				}
 			}
