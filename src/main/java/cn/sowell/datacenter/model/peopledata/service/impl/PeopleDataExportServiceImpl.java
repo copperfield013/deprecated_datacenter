@@ -66,8 +66,10 @@ public class PeopleDataExportServiceImpl implements PeopleDataExportService{
 		FileSystemResource folder = new FileSystemResource(PropertyPlaceholder.getProperty("export_cache_path"));
 		File[] fs = folder.getFile().listFiles();
 		Map<String, File> fMap = new HashMap<String, File>();
-		for (File file : fs) {
-			fMap.put(file.getName().split("\\.")[0], file);
+		if(fs != null){
+			for (File file : fs) {
+				fMap.put(file.getName().split("\\.")[0], file);
+			}
 		}
 		Iterator<Entry<String, ExportStatus>> itr = statusMap.entrySet().iterator();
 		while(itr.hasNext()){
