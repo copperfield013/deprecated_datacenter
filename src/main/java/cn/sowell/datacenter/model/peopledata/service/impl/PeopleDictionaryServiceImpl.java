@@ -16,16 +16,16 @@ import cn.sowell.copframe.dao.utils.NormalOperateDao;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
+import cn.sowell.datacenter.model.dict.pojo.DictionaryField;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryOption;
 import cn.sowell.datacenter.model.peopledata.dao.PeopleDictionaryDao;
 import cn.sowell.datacenter.model.peopledata.pojo.OptionItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleCompositeDictionaryItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleFieldDictionaryItem;
-import cn.sowell.datacenter.model.peopledata.pojo.PeopleTemplateData;
-import cn.sowell.datacenter.model.peopledata.pojo.PeopleTemplateField;
-import cn.sowell.datacenter.model.peopledata.pojo.PeopleTemplateGroup;
+import cn.sowell.datacenter.model.peopledata.pojo.TemplateDetailField;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDictionaryService;
-import cn.sowell.datacenter.model.system.pojo.SystemAdmin;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailFieldGroup;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
 
 @Service
 public class PeopleDictionaryServiceImpl implements PeopleDictionaryService{
@@ -52,7 +52,7 @@ public class PeopleDictionaryServiceImpl implements PeopleDictionaryService{
 	
 	@Override
 	@Transactional
-	public void mergeTemplate(PeopleTemplateData data) {
+	public void mergeTemplate(TemplateDetailTemplate data) {
 		if(data.getTmplId() != null){
 			updateTemplate(data);
 		}else{
@@ -61,8 +61,8 @@ public class PeopleDictionaryServiceImpl implements PeopleDictionaryService{
 		
 	}
 	
-	private void updateTemplate(PeopleTemplateData data) {
-		PeopleTemplateData origin = getTemplate(data.getTmplId());
+	private void updateTemplate(TemplateDetailTemplate data) {
+		TemplateDetailTemplate origin = getTemplate(data.getTmplId());
 		if(origin != null){
 			Set<Long> addFieldIds = new HashSet<Long>();
 			data.getGroups().forEach(group->
@@ -74,7 +74,7 @@ public class PeopleDictionaryServiceImpl implements PeopleDictionaryService{
 			);
 			Set<Long> originGroupFieldIds = new HashSet<Long>();
 			origin.getGroups().forEach(group->group.getFields().forEach(field->originGroupFieldIds.add(field.getId())));
-			Map<Long, PeopleFieldDictionaryItem> fieldMap = dictDao.getFieldMap(addFieldIds);
+			Map<Long, DictionaryField> fieldMap = dictDao.getFieldMap(addFieldIds);
 			
 			Date now = new Date();
 			origin.setName(data.getName());
@@ -82,23 +82,23 @@ public class PeopleDictionaryServiceImpl implements PeopleDictionaryService{
 			nDao.update(origin);
 			Set<Long> toDeleteGroupId = CollectionUtils.toSet(origin.getGroups(), group->group.getId());
 			Set<Long> toDeleteFieldId = new HashSet<Long>(originGroupFieldIds);
-			Map<Long, PeopleTemplateGroup> originGroupMap = CollectionUtils.toMap(origin.getGroups(), group->group.getId());
-			for (PeopleTemplateGroup group : data.getGroups()) {
+			Map<Long, TemplateDetailFieldGroup> originGroupMap = CollectionUtils.toMap(origin.getGroups(), group->group.getId());
+			for (TemplateDetailFieldGroup group : data.getGroups()) {
 				if(group.getId() != null){
 					if(originGroupMap.containsKey(group.getId())){
-						PeopleTemplateGroup originGroup = originGroupMap.get(group.getId());
+						TemplateDetailFieldGroup originGroup = originGroupMap.get(group.getId());
 						toDeleteGroupId.remove(group.getId());
 						originGroup.setTitle(group.getTitle());
 						originGroup.setOrder(group.getOrder());
 						originGroup.setUpdateTime(now);
 						nDao.update(originGroup);
 						
-						Map<Long, PeopleTemplateField> originFieldMap = CollectionUtils.toMap(originGroup.getFields(), field->field.getId());
-						for (PeopleTemplateField field : group.getFields()) {
+						Map<Long, TemplateDetailField> originFieldMap = CollectionUtils.toMap(originGroup.getFields(), field->field.getId());
+						for (TemplateDetailField field : group.getFields()) {
 							if(field.getId() != null){
 								if(originFieldMap.containsKey(field.getId())){
 									toDeleteFieldId.remove(field.getId());
-									PeopleTemplateField originField = originFieldMap.get(field.getId());
+									TemplateDetailField originField = originFieldMap.get(field.getId());
 									originField.setTitle(field.getTitle());
 									originField.setColNum(field.getColNum());
 									originField.setOrder(field.getOrder());
@@ -110,7 +110,7 @@ public class PeopleDictionaryServiceImpl implements PeopleDictionaryService{
 								}
 							}else{
 								if(fieldMap.containsKey(field.getFieldId())){
-									field.setFieldName(fieldMap.get(field.getFieldId()).getName());
+									field.setFieldName(fieldMap.get(field.getFieldId()).getTitle());
 									field.setGroupId(group.getId());
 									field.setUpdateTime(now);
 									nDao.save(field);
@@ -126,9 +126,9 @@ public class PeopleDictionaryServiceImpl implements PeopleDictionaryService{
 					group.setTmplId(origin.getTmplId());
 					group.setUpdateTime(now);
 					Long groupId = nDao.save(group);
-					for (PeopleTemplateField field : group.getFields()) {
+					for (TemplateDetailField field : group.getFields()) {
 						if(fieldMap.containsKey(field.getFieldId())){
-							field.setFieldName(fieldMap.get(field.getFieldId()).getName());
+							field.setFieldName(fieldMap.get(field.getFieldId()).getTitle());
 							field.setGroupId(groupId);
 							field.setUpdateTime(now);
 							nDao.save(field);
@@ -138,28 +138,28 @@ public class PeopleDictionaryServiceImpl implements PeopleDictionaryService{
 					}
 				}
 			}
-			nDao.remove(PeopleTemplateGroup.class, toDeleteGroupId);
-			nDao.remove(PeopleTemplateField.class, toDeleteFieldId);
+			nDao.remove(TemplateDetailFieldGroup.class, toDeleteGroupId);
+			nDao.remove(TemplateDetailField.class, toDeleteFieldId);
 		}else{
 			throw new RuntimeException("找不到id为[" + data.getTmplId() + "]的模板，无法更新");
 		}
 	}
 
-	private void createTemplate(PeopleTemplateData data) {
+	private void createTemplate(TemplateDetailTemplate data) {
 		Set<Long> fieldIds = new HashSet<Long>();
 		data.getGroups().forEach(group->group.getFields().forEach(field->fieldIds.add(field.getFieldId())));
-		Map<Long, PeopleFieldDictionaryItem> fieldMap = dictDao.getFieldMap(fieldIds);
+		Map<Long, DictionaryField> fieldMap = dictDao.getFieldMap(fieldIds);
 		Date now = new Date();
 		data.setCreateTime(now);
 		data.setUpdateTime(now);
 		Long tmplId = nDao.save(data);
-		for (PeopleTemplateGroup group : data.getGroups()) {
+		for (TemplateDetailFieldGroup group : data.getGroups()) {
 			group.setTmplId(tmplId);
 			group.setUpdateTime(now);
 			Long groupId = nDao.save(group);
-			for (PeopleTemplateField field : group.getFields()) {
+			for (TemplateDetailField field : group.getFields()) {
 				if(fieldMap.containsKey(field.getFieldId())){
-					field.setFieldName(fieldMap.get(field.getFieldId()).getName());
+					field.setFieldName(fieldMap.get(field.getFieldId()).getTitle());
 					field.setGroupId(groupId);
 					field.setUpdateTime(now);
 					nDao.save(field);
@@ -171,9 +171,8 @@ public class PeopleDictionaryServiceImpl implements PeopleDictionaryService{
 	}
 
 	@Override
-	public PeopleTemplateData getDefaultTemplate(UserIdentifier user) {
-		SystemAdmin admin = aService.getSystemAdminByUserId((long)user.getId());
-		Long defaultTmplId = admin.getDefaultDetailTemplateId();
+	public TemplateDetailTemplate getDefaultTemplate(UserIdentifier user, String module, String type) {
+		Long defaultTmplId = aService.getDefaultTemplateId((long)user.getId(), module, type);
 		if(defaultTmplId != null){
 			return getTemplate(defaultTmplId);
 		}else{
@@ -182,10 +181,10 @@ public class PeopleDictionaryServiceImpl implements PeopleDictionaryService{
 	}
 	
 	@Override
-	public PeopleTemplateData getTemplate(Long tmplId) {
-		PeopleTemplateData data = nDao.get(PeopleTemplateData.class, tmplId);
+	public TemplateDetailTemplate getTemplate(Long tmplId) {
+		TemplateDetailTemplate data = nDao.get(TemplateDetailTemplate.class, tmplId);
 		if(data != null){
-			List<PeopleTemplateGroup> groups = getTemplateGroup(data.getTmplId());
+			List<TemplateDetailFieldGroup> groups = getTemplateGroup(data.getTmplId());
 			if(groups != null){
 				data.setGroups(groups);
 			}
@@ -194,10 +193,12 @@ public class PeopleDictionaryServiceImpl implements PeopleDictionaryService{
 	}
 	
 	@Override
-	public List<PeopleTemplateData> getAllTemplateList(UserIdentifier user,
+	public List<TemplateDetailTemplate> getAllTemplateList(
+			String module,
+			UserIdentifier user,
 			PageInfo pageInfo,
 			boolean loadDetail) {
-		List<PeopleTemplateData> list = dictDao.getTemplateList(user, pageInfo);
+		List<TemplateDetailTemplate> list = dictDao.getTemplateList(module, user, pageInfo);
 		if(loadDetail){
 			list.forEach(data->{
 				data.setGroups(getTemplateGroup(data.getTmplId()));
@@ -206,11 +207,11 @@ public class PeopleDictionaryServiceImpl implements PeopleDictionaryService{
 		return list;
 	}
 
-	private List<PeopleTemplateGroup> getTemplateGroup(Long tmplId) {
-		List<PeopleTemplateGroup> groups = dictDao.getTemplateGroups(tmplId);
-		Map<Long, List<PeopleTemplateField>> fieldMap = dictDao.getTemplateFieldsMap(CollectionUtils.toSet(groups, group->group.getId()));
+	private List<TemplateDetailFieldGroup> getTemplateGroup(Long tmplId) {
+		List<TemplateDetailFieldGroup> groups = dictDao.getTemplateGroups(tmplId);
+		Map<Long, List<TemplateDetailField>> fieldMap = dictDao.getTemplateFieldsMap(CollectionUtils.toSet(groups, group->group.getId()));
 		groups.forEach(group->{
-			List<PeopleTemplateField> fields = fieldMap.get(group.getId());
+			List<TemplateDetailField> fields = fieldMap.get(group.getId());
 			if(fields != null){
 				group.setFields(fields);
 			}

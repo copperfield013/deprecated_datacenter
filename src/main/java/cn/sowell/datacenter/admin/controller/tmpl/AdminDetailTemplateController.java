@@ -1,4 +1,4 @@
-package cn.sowell.datacenter.admin.controller.people;
+package cn.sowell.datacenter.admin.controller.tmpl;
 
 import java.util.List;
 
@@ -16,12 +16,11 @@ import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
-import cn.sowell.copframe.dto.ajax.JsonArrayResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.admin.controller.people.AdminPeopleViewTemplateController;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
-import cn.sowell.datacenter.model.peopledata.pojo.PeopleCompositeDictionaryItem;
 import cn.sowell.datacenter.model.peopledata.pojo.TemplateDetailField;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDictionaryService;
 import cn.sowell.datacenter.model.system.pojo.SystemAdmin;
@@ -33,8 +32,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 @Controller
-@RequestMapping(AdminConstants.URI_PEOPLEDATA + "/viewtmpl")
-public class AdminPeopleViewTemplateController {
+@RequestMapping(AdminConstants.URI_TMPL + "/dtmpl")
+public class AdminDetailTemplateController {
 
 	@Resource
 	PeopleDictionaryService dictService;
@@ -44,20 +43,10 @@ public class AdminPeopleViewTemplateController {
 	
 	Logger logger = Logger.getLogger(AdminPeopleViewTemplateController.class);
 	
-	@RequestMapping("/to_create")
-	public String toCreate(){
-		return AdminConstants.JSP_PEOPLEDATA_VIEWTMPL + "/viewtmpl_update.jsp";
-	}
-	
-	@ResponseBody
-	@RequestMapping("/field_json")
-	public ResponseJSON fieldJson(){
-		List<PeopleCompositeDictionaryItem> infoList = dictService.getAllInfo(null);
-		JsonArrayResponse jRes = new JsonArrayResponse();
-		for (PeopleCompositeDictionaryItem info : infoList) {
-			jRes.add(JSON.toJSON(info));
-		}
-		return jRes;
+	@RequestMapping("/to_create/{module}")
+	public String toCreate(@PathVariable String module, Model model){
+		model.addAttribute("module", module);
+		return AdminConstants.JSP_TMPL_DETAIL + "/dtmpl_update.jsp";
 	}
 	
 	@RequestMapping("/list/{module}")
@@ -67,7 +56,7 @@ public class AdminPeopleViewTemplateController {
 		SystemAdmin sysAdmin = adminService.getSystemAdminByUserId((Long) user.getId());
 		model.addAttribute("tmplList", tmplList);
 		model.addAttribute("sysAdmin", sysAdmin);
-		return AdminConstants.JSP_PEOPLEDATA_VIEWTMPL + "/viewtmpl_list.jsp";
+		return AdminConstants.JSP_TMPL_DETAIL + "/dtmpl_list.jsp";
 	}
 	
 	@ResponseBody
@@ -91,7 +80,8 @@ public class AdminPeopleViewTemplateController {
 		JSONObject tmplJson = (JSONObject) JSON.toJSON(tmpl);
 		model.addAttribute("tmpl", tmpl);
 		model.addAttribute("tmplJson", tmplJson);
-		return AdminConstants.JSP_PEOPLEDATA_VIEWTMPL + "/viewtmpl_update.jsp";
+		model.addAttribute("module", tmpl.getModule());
+		return AdminConstants.JSP_TMPL_DETAIL + "/dtmpl_update.jsp";
 	}
 	
 	@ResponseBody
@@ -126,6 +116,7 @@ public class AdminPeopleViewTemplateController {
 			TemplateDetailTemplate data = new TemplateDetailTemplate();
 			data.setTmplId(jo.getLong("tmplId"));
 			data.setName(jo.getString("name"));
+			data.setModule(jo.getString("module"));
 			JSONArray jGroups = jo.getJSONArray("groups");
 			if(jGroups != null && !jGroups.isEmpty()){
 				int i = 0;
@@ -164,6 +155,5 @@ public class AdminPeopleViewTemplateController {
 		}
 		return null;
 	}
-	
 	
 }

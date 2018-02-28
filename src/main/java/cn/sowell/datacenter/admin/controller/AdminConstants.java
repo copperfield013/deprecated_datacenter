@@ -71,12 +71,16 @@ public interface AdminConstants {
 
 	final String JSP_TMPL_LIST = JSP_TMPL + "/ltmpl";
 	
+	final String JSP_TMPL_DETAIL = JSP_TMPL + "/dtmpl";
+	
 	/**
 	 * 默认的系统id
 	 */
 	final long SYS_DEF = 1;
 
 	final String EXPORT_PEOPLE_STATUS_UUID = "export_people_status_uuid";
+
+	
 
 
 	

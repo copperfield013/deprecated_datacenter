@@ -25,9 +25,11 @@ public class ListTemplateDaoImpl implements ListTemplateDao{
 	SessionFactory sFactory;
 	
 	@Override
-	public List<TemplateListTmpl> queryLtmplList(Serializable userId,
+	public List<TemplateListTmpl> queryLtmplList(String module, Serializable userId,
 			PageInfo pageInfo) {
-		return QueryUtils.pagingQuery("from TemplateListTmpl t order by t.updateTime desc", sFactory.getCurrentSession(), pageInfo, null);
+		return QueryUtils.pagingQuery("from TemplateListTmpl t where t.module = :module order by t.updateTime desc", sFactory.getCurrentSession(), pageInfo, dQuery->{
+			dQuery.setParam("module", module);
+		});
 	}
 	
 	@SuppressWarnings("unchecked")

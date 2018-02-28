@@ -1,6 +1,7 @@
 package cn.sowell.datacenter.model.dict.pojo;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,28 +9,44 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import com.alibaba.fastjson.annotation.JSONField;
 
 @Entity
 @Table(name="t_dictionary_composite")
 public class DictionaryComposite {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@JSONField(name="c_id")
 	private Long id;
 	
 	@Column(name="c_full_key")
+	@JSONField(name="name")
 	private String fullKey;
 	
 	@Column(name="c_title")
+	@JSONField(name="cname")
 	private String title;
 	
+	@Column(name="c_module")
+	@JSONField(serialize=false)
+	private String module;
+	
 	@Column(name="create_time")
+	@JSONField(serialize=false)
 	private Date createTime;
 	
 	@Column(name="update_time")
+	@JSONField(serialize=false)
 	private Date updateTime;
 	
 	@Column(name="c_authority")
+	@JSONField(serialize=false)
 	private String authority;
+	
+	@Transient
+	private List<DictionaryField> fields;
 	
 	public Long getId() {
 		return id;
@@ -66,6 +83,18 @@ public class DictionaryComposite {
 	}
 	public void setAuthority(String authority) {
 		this.authority = authority;
+	}
+	public List<DictionaryField> getFields() {
+		return fields;
+	}
+	public void setFields(List<DictionaryField> fields) {
+		this.fields = fields;
+	}
+	public String getModule() {
+		return module;
+	}
+	public void setModule(String module) {
+		this.module = module;
 	}
 	
 }

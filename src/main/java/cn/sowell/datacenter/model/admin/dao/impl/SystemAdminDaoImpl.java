@@ -49,4 +49,19 @@ public class SystemAdminDaoImpl implements SystemAdminDao{
 		return (SystemAdmin) query.uniqueResult();
 	}
 	
+	@Override
+	public Long getDefaultTemplateId(long adminId, String module, String type) {
+		String sql = 
+				"	SELECT dt.tmpl_id" +
+				"	FROM t_system_admin_deftmpl dt" +
+				"	WHER dt.admin_id = :adminId" +
+				"	AND dt.c_module = :module" +
+				"	AND dt.c_type = :type";
+		SQLQuery query = sFactory.getCurrentSession().createSQLQuery(sql);
+		query.setLong("adminId", adminId);
+		query.setString("module", module);
+		query.setString("type", type);
+		return (Long) query.uniqueResult();
+	}
+	
 }

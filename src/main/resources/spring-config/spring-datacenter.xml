@@ -53,6 +53,11 @@
 		<property name="dictionaryMappingName" value="default_dm" />
 	</bean>
 	
+	<bean id="addressBaseContextConfig" class="cn.sowell.datacenter.model.basepeople.service.impl.FusionContextConfig"  >
+		<property name="mappingName" value="addressBase" />
+		<property name="dictionaryMappingName" value="default_dm" />
+	</bean>
+	
 	<bean class="cn.sowell.datacenter.model.basepeople.service.impl.FusionContextFactoryDC">
 		<property name="configMap">
 			<map>
@@ -61,6 +66,7 @@
 				<entry key="importHandicapped" value-ref="importHandicappedNodeContextConfig" />
 				<entry key="importLowincome" value-ref="importLowincomeNodeContextConfig" />
 				<entry key="importFamilyPlanning" value-ref="importFamilyPlanningNodeContextConfig" />
+				<entry key="addressBase" value-ref="addressBaseContextConfig" />
 			</map>
 		</property>
 	</bean>

@@ -1,10 +1,10 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <link type="text/css" rel="stylesheet" href="media/admin/peopledata/css/peopledata-list-tmpl.css" />
-<div id="peopledata-list-tmpl" class="detail">
+<div id="address-list-tmpl" class="detail">
 	<div class="page-header">
 		<div class="header-title">
-			<h1>人口列表</h1>
+			<h1>地址列表</h1>
 		</div>
 		<div class="header-buttons">
 			<a title="切换模板" class="btn-toggle" href="page:#tmpl-list.toggle">
@@ -16,13 +16,13 @@
 			<a class="export btn-toggle" title="导出" id="btn-export " href="page:#export-window.toggle">
 				<i class="glyphicon glyphicon-export"></i>
 			</a>
-			<a class="import tab" href="admin/peopledata/import" title="导入" target="people_import">
+			<a class="import tab" href="admin/address/import" title="导入" target="address_import">
 				<i class="glyphicon glyphicon-import"></i>
 			</a>
 		</div>
 	</div>
 	<div class="page-body">
-		<form class="form-inline"  action="admin/peopledata/tmpl/list">
+		<form class="form-inline"  action="admin/address/tmpl/list">
 			<input type="hidden" id="tmplId" name="tmplId" value="${ltmpl.id }" />
 			<c:if test="${not empty ltmpl.criterias }">
 				<c:forEach var="criteriaItem" items="${ltmpl.criterias }">
@@ -39,7 +39,7 @@
 								<select class="form-control" name="criteria_${criteriaItem.id }" data-value="${vCriteriaMap[criteriaItem.id].value}">
 									<c:forEach var="option" items="${criteriaOptionsMap[criteriaItem.fieldId]}">
 										<option value="${option.value }">${option.title}</option>
-									</c:forEach>								
+									</c:forEach>
 								</select>
 							</div>
 						</c:when>
@@ -68,24 +68,24 @@
 										</c:when>
 										<c:when test="${fn:startsWith(column.specialField, 'operate')}">
 											<c:if test="${fn:contains(column.specialField, '-d') }">
-												<a href="admin/peopledata/detail_tmpl/${parser['peopleCode']}" 
-													target="people_detail_${parser['peopleCode'] }" 
-													title="详情-${item.name }"
+												<a href="admin/address/tmpl/detail/${parser['code']}" 
+													target="address_detail_${parser['code'] }" 
+													title="详情-${item.shortName }"
 													class="tab btn btn-success btn-xs">
 													<i class="fa fa-book"></i>详情
 												</a>
 											</c:if>
 											<c:if test="${fn:contains(column.specialField, '-u') }">
-												<a target="people_update_${parser['peopleCode'] }" 
-													title="修改-${parser['name'] }" 
-													href="admin/peopledata/update_tmpl/${parser['peopleCode'] }" 
+												<a target="address_update_${parser['code'] }" 
+													title="修改-${parser['shortName'] }" 
+													href="admin/address/tmpl/update/${parser['code'] }" 
 													class="tab btn btn-info btn-xs edit">
 													<i class="fa fa-edit"></i>修改
 												</a>
 											</c:if>
 											<c:if test="${fn:contains(column.specialField, '-r') }">
 												<a confirm="确认删除？"
-													href="admin/peopledata/do_delete/${parser['peopleCode'] }" 
+													href="admin/address/do_delete/${parser['code'] }" 
 													class="btn btn-danger btn-xs delete">
 													<i class="fa fa-trash-o"></i>删除
 												</a>
@@ -168,7 +168,7 @@
 </div>
 <script>
 	seajs.use(['utils', 'ajax'], function(Utils, Ajax){
-		var $page = $('#peopledata-list-tmpl');
+		var $page = $('#address-list-tmpl');
 		console.log($page);
 		$('#tmpl-list a[data-id]:not(.active)', $page).click(function(){
 			var $this = $(this);
@@ -211,8 +211,8 @@
 			var $exportProgress = $('#export-progress', $page);
 			//轮询处理对象
 			var handler = Ajax.poll({
-				startupURL			: 'admin/peopledata/export/do_export',
-				progressURL			: 'admin/peopledata/export/status_export',
+				startupURL			: 'admin/address/export/do_export',
+				progressURL			: 'admin/address/export/status_export',
 				whenStartupResponse	: function(data, uuid){
 					$msg.text('开始导出');
 				},
@@ -227,7 +227,7 @@
 					if(res.uuid){
 						$msg.text('导出完成');
 						$btnDownload.removeAttr('disabled').off('click').click(function(){
-							Ajax.download('admin/peopledata/export/download/' + res.uuid);
+							Ajax.download('admin/address/export/download/' + res.uuid);
 						}).show();
 						$btnBreak.off('click').click(function(){
 							resetExport(res.uuid);

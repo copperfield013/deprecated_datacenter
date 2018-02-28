@@ -46,6 +46,9 @@ public class TemplateListTmpl {
 	@Column(name="c_authority")
 	private String authority;
 	
+	@Column(name="c_module")
+	private String module;
+	
 	@Transient
 	private Set<TemplateListColumn> columns = new LinkedHashSet<TemplateListColumn>();
 	
@@ -122,6 +125,12 @@ public class TemplateListTmpl {
 	}
 	public void setDefaultOrderDirection(String defaultOrderDirection) {
 		this.defaultOrderDirection = defaultOrderDirection;
+	}
+	public String getModule() {
+		return module;
+	}
+	public void setModule(String module) {
+		this.module = module;
 	}
 	
 }

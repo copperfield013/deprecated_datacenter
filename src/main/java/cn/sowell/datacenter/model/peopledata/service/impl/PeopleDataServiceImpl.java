@@ -29,7 +29,7 @@ import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
 import cn.sowell.datacenter.model.peopledata.service.PojoService;
 import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
-import cn.sowell.datacenter.model.tmpl.pojo.TemplateListCriteria;
+import cn.sowell.datacenter.model.tmpl.service.ListTemplateService;
 
 import com.abc.application.FusionContext;
 import com.abc.dto.ErrorInfomation;
@@ -54,46 +54,25 @@ public class PeopleDataServiceImpl implements PeopleDataService{
 	
 	EntityTransfer eTransfer = new EntityTransfer();
 	
+	@Resource
+	ListTemplateService ltmplService;
 	
 	@Override
 	public List<PeopleData> query(Set<NormalCriteria> nCriterias,
 			PageInfo pageInfo) {
-		List<Criteria> cs = toCriterias(nCriterias);
+		List<Criteria> cs =  ltmplService.toCriterias(nCriterias);
 		List<Entity> list = abcService.queryPeopleList(cs, pageInfo);
 		List<PeopleData> result = new ArrayList<PeopleData>();
 		list.forEach(p->result.add(transfer(p)));
 		return result;
 	}
 	
-	private List<Criteria> toCriterias(Set<NormalCriteria> nCriterias){
-		FusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
-		CriteriaFactory criteriaFactory = new CriteriaFactory(context);
-		ArrayList<Criteria> cs = new ArrayList<Criteria>();
-		nCriterias.forEach(nCriteria->{
-			TemplateListCriteria criteria = nCriteria.getCriteria();
-			if(TextUtils.hasText(nCriteria.getValue())){
-				String comparator = criteria.getComparator();
-				if("t1".equals(comparator)){
-					cs.add(criteriaFactory.createLikeQueryCriteria(nCriteria.getAttributeName(), nCriteria.getValue()));
-				}else if("t2".equals(comparator)){
-					cs.add(criteriaFactory.createLeftLikeQueryCriteria(nCriteria.getAttributeName(), nCriteria.getValue()));
-				}else if("t3".equals(comparator)){
-					cs.add(criteriaFactory.createRightLikeQueryCriteria(nCriteria.getAttributeName(), nCriteria.getValue()));
-				}else if("t4".equals(comparator)){
-					cs.add(criteriaFactory.createQueryCriteria(nCriteria.getAttributeName(), nCriteria.getValue()));
-				}else if("s1".equals(comparator)){
-					cs.add(criteriaFactory.createQueryCriteria(nCriteria.getAttributeName(), nCriteria.getValue()));
-				}
-			}
-		});
-		return cs;
-	}
 	
 	@Override
 	public PeopleDataPagingIterator queryIterator(Set<NormalCriteria> nCriterias,
 			ExportDataPageInfo ePageInfo) {
 		PageInfo pageInfo = ePageInfo.getPageInfo();
-		List<Criteria> cs = toCriterias(nCriterias);
+		List<Criteria> cs = ltmplService.toCriterias(nCriterias);
 		EntityPagingQueryProxy proxy = abcService.getQueryProxy(cs, ePageInfo);
 		Function<Integer, Set<PeopleData>> dataGetter = new Function<Integer, Set<PeopleData>>() {
 

@@ -14,10 +14,11 @@ public interface ListTemplateDao {
 	/**
 	 * 查询所有列表模板
 	 * @param userId
+	 * @param serializable 
 	 * @param pageInfo
 	 * @return
 	 */
-	List<TemplateListTmpl> queryLtmplList(Serializable userId, PageInfo pageInfo);
+	List<TemplateListTmpl> queryLtmplList(String module, Serializable userId, PageInfo pageInfo);
 
 	/**
 	 * 根据模板id获得所有列数据

@@ -21,14 +21,15 @@ import cn.sowell.copframe.dao.deferedQuery.SimpleMapWrapper;
 import cn.sowell.copframe.dao.utils.QueryUtils;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.CollectionUtils;
+import cn.sowell.datacenter.model.dict.pojo.DictionaryField;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryOption;
 import cn.sowell.datacenter.model.peopledata.dao.PeopleDictionaryDao;
 import cn.sowell.datacenter.model.peopledata.pojo.OptionItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleCompositeDictionaryItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleFieldDictionaryItem;
-import cn.sowell.datacenter.model.peopledata.pojo.PeopleTemplateData;
-import cn.sowell.datacenter.model.peopledata.pojo.PeopleTemplateField;
-import cn.sowell.datacenter.model.peopledata.pojo.PeopleTemplateGroup;
+import cn.sowell.datacenter.model.peopledata.pojo.TemplateDetailField;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailFieldGroup;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
 
 @Repository
 public class PeopleDictionaryDaoImpl implements PeopleDictionaryDao{
@@ -60,8 +61,8 @@ public class PeopleDictionaryDaoImpl implements PeopleDictionaryDao{
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<PeopleTemplateGroup> getTemplateGroups(Long tmplId) {
-		String hql = "from PeopleTemplateGroup g where g.tmplId = :tmplId order by g.order asc";
+	public List<TemplateDetailFieldGroup> getTemplateGroups(Long tmplId) {
+		String hql = "from TemplateDetailFieldGroup g where g.tmplId = :tmplId order by g.order asc";
 		Query query = sFactory.getCurrentSession().createQuery(hql);
 		query.setLong("tmplId", tmplId);
 		return query.list();
@@ -69,48 +70,49 @@ public class PeopleDictionaryDaoImpl implements PeopleDictionaryDao{
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public Map<Long, List<PeopleTemplateField>> getTemplateFieldsMap(
+	public Map<Long, List<TemplateDetailField>> getTemplateFieldsMap(
 			Set<Long> groupIdSet) {
 		if(groupIdSet != null && !groupIdSet.isEmpty()){
-			String sql = "select f.*, d.c_type from t_people_view_template_field f "
-					+ "left join t_base_people_dictionary d on f.field_id = d.c_id where f.group_id in (:groupIds) order by f.c_order asc ";
+			String sql = "select f.*, df.c_type from t_tmpl_detail_field f "
+					+ "left join t_dictionary_field df on f.field_id = df.id where f.group_id in (:groupIds) order by f.c_order asc ";
 			SQLQuery query = sFactory.getCurrentSession().createSQLQuery(sql);
 			
 			query.setParameterList("groupIds", groupIdSet);
-			query.setResultTransformer(HibernateRefrectResultTransformer.getInstance(PeopleTemplateField.class));
-			List<PeopleTemplateField> fieldList = query.list();
+			query.setResultTransformer(HibernateRefrectResultTransformer.getInstance(TemplateDetailField.class));
+			List<TemplateDetailField> fieldList = query.list();
 			return CollectionUtils.toListMap(fieldList, field->field.getGroupId());
 		}else{
-			return new HashMap<Long, List<PeopleTemplateField>>();
+			return new HashMap<Long, List<TemplateDetailField>>();
 		}
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<PeopleTemplateData> getTemplateList(UserIdentifier user, PageInfo pageInfo) {
-		String hql = "from PeopleTemplateData t ";
+	public List<TemplateDetailTemplate> getTemplateList(String module, UserIdentifier user, PageInfo pageInfo) {
+		String hql = "from TemplateDetailTemplate t where t.module = :module";
 		Query query = sFactory.getCurrentSession().createQuery(hql);
+		query.setString("module", module);
 		QueryUtils.setPagingParamWithCriteria(query, pageInfo);
 		return query.list();
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public Map<Long, PeopleFieldDictionaryItem> getFieldMap(Set<Long> fieldIds) {
+	public Map<Long, DictionaryField> getFieldMap(Set<Long> fieldIds) {
 		if(fieldIds != null && !fieldIds.isEmpty()){
-			String hql = "from PeopleFieldDictionaryItem f where f.id in (:fieldIds)";
+			String hql = "from DictionaryField f where f.id in (:fieldIds)";
 			Query query = sFactory.getCurrentSession().createQuery(hql);
 			query.setParameterList("fieldIds", fieldIds, StandardBasicTypes.LONG);
-			List<PeopleFieldDictionaryItem> list = query.list();
+			List<DictionaryField> list = query.list();
 			return CollectionUtils.toMap(list, item->item.getId());
 		}else{
-			return new HashMap<Long, PeopleFieldDictionaryItem>();
+			return new HashMap<Long, DictionaryField>();
 		}
 	}
 	
 	@Override
 	public boolean removeTemplate(Long tmplId) {
-		PeopleTemplateData data = new PeopleTemplateData();
+		TemplateDetailTemplate data = new TemplateDetailTemplate();
 		data.setTmplId(tmplId);
 		sFactory.getCurrentSession().delete(data);
 		return true;

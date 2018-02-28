@@ -44,6 +44,7 @@ import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.spring.propTranslator.PropertyParser;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
+import cn.sowell.datacenter.DataCenterConstants;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
 import cn.sowell.datacenter.model.basepeople.ExcelModelCriteria;
@@ -55,13 +56,13 @@ import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleInformationEntity;
 import cn.sowell.datacenter.model.basepeople.service.BasePeopleService;
 import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
-import cn.sowell.datacenter.model.peopledata.pojo.PeopleTemplateData;
 import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 import cn.sowell.datacenter.model.peopledata.service.PeopleButtService;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDictionaryService;
 import cn.sowell.datacenter.model.peopledata.service.PojoService;
 import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
 
 import com.alibaba.fastjson.JSON;
 
@@ -246,14 +247,14 @@ public class AdminPeopleDataController {
     
     @RequestMapping("/update_tmpl/{peopleCode}")
     public String updateTmpl(@PathVariable String peopleCode, Long tmplId, Model model){
-    	PeopleTemplateData template = null;
+    	TemplateDetailTemplate template = null;
     	UserIdentifier user = UserUtils.getCurrentUser();
     	if(tmplId == null){
-			template = dictService.getDefaultTemplate(user);
+			template = dictService.getDefaultTemplate(user, DataCenterConstants.TEMPLATE_MODULE_PEOPLE, DataCenterConstants.TEMPLATE_TYPE_DETAIL);
     	}else{
     		template = dictService.getTemplate(tmplId);
     	}
-    	List<PeopleTemplateData> tmplList = dictService.getAllTemplateList(user, null, false);
+    	List<TemplateDetailTemplate> tmplList = dictService.getAllTemplateList("people", user, null, false);
     	PeopleData people = peopleService.getPeople(peopleCode);
         PropertyParser parser = pojoService.createPropertyParser(people);
         model.addAttribute("tmplList", tmplList);
@@ -289,13 +290,13 @@ public class AdminPeopleDataController {
          	date = new Date(timestamp);
          }
          UserIdentifier user = UserUtils.getCurrentUser();
-         PeopleTemplateData template = null;
+         TemplateDetailTemplate template = null;
          if(tmplId == null){
-        	 template = dictService.getDefaultTemplate(user);
+        	 template = dictService.getDefaultTemplate(user, DataCenterConstants.TEMPLATE_MODULE_PEOPLE, DataCenterConstants.TEMPLATE_TYPE_DETAIL);
          }else{
         	 template = dictService.getTemplate(tmplId);
          }
-         List<PeopleTemplateData> tmplList = dictService.getAllTemplateList(user, null, false);
+         List<TemplateDetailTemplate> tmplList = dictService.getAllTemplateList("people", user, null, false);
          PeopleData people = peopleService.getHistoryPeople(peopleCode, date);
          PropertyParser parser = pojoService.createPropertyParser(people);
          model.addAttribute("parser", parser);

@@ -1,11 +1,11 @@
 define(function(require, exports, module){
 	var FieldSearch = require('field/js/field-search.js');
 	var FieldInput = require('field/js/field-input.js');
-	exports.init = function($page, tmplData, criteriaData, columnData){
+	exports.init = function($page, tmplData, criteriaData, columnData, module){
 		console.log($page);
 		initTmpl($page, tmplData);
-		initCriteria($page, criteriaData);
-		initListTable($page, tmplData, columnData);
+		initCriteria($page, criteriaData, module);
+		initListTable($page, tmplData, columnData, module);
 		var Dialog = require('dialog');
 		$('#save', $page).click(function(){
 			var tmplTitle = getTmplTitle();
@@ -14,6 +14,7 @@ define(function(require, exports, module){
 				var criteriaData = getCriteriaData();
 				require('ajax').postJson('admin/tmpl/ltmpl/save', {
 					tmplId		: tmplData? tmplData.id: null,
+					module		: module,
 					title		: tmplTitle,
 					criteriaData: criteriaData,
 					columnData	: columnData,
@@ -119,7 +120,7 @@ define(function(require, exports, module){
 		}
 	}
 	
-	function initCriteria($page, criteriaData){
+	function initCriteria($page, criteriaData, module){
 		
 		var cField = null
 		var $fieldSearch = $('.criteria-field-search-row .field-search', $page);
@@ -137,6 +138,7 @@ define(function(require, exports, module){
 		var criteriaSearcher = FieldSearch.bind($fieldSearch, {
 			single			: true,
 			textPicked		: true,
+			module			: module,
 			afterChoose		: function(field){
 				if(cField){
 					criteriaSearcher.enableField(cField.id);
@@ -795,11 +797,12 @@ define(function(require, exports, module){
 		}
 	}
 	
-	function initListTable($page, tmplData, columnData){
+	function initListTable($page, tmplData, columnData, module){
 		
 		
 		var addColSearcher = FieldSearch.bind($('#addcol-field-search', $page), {
-			afterChoose		: addColumn
+			afterChoose		: addColumn,
+			module			: module
 		});
 		var $orderFieldSearch = $('#order-field-search', $page);
 		var orderField = null;
@@ -807,6 +810,7 @@ define(function(require, exports, module){
 		var orderColFieldSearcher = FieldSearch.bind($orderFieldSearch, {
 			single			: true,
 			textPicked		: true,
+			module			: module,
 			afterChoose		: function(field){
 				if(orderField){
 					orderColFieldSearcher.enableField(orderField.id);

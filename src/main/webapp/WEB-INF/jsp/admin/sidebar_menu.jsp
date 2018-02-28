@@ -55,13 +55,23 @@
 	</a>
 	<ul class="submenu">
 	   	<li>
-	   		<a class="tab" href="admin/peopledata/viewtmpl/list" target="viewtmpl_list" title="人口详情模板">
+	   		<a class="tab" href="admin/tmpl/dtmpl/list/people" target="people_dtmpl_list" title="人口详情模板">
 	   			<span class="menu-text">人口详情模板</span>
 	   		</a>
 	   	</li>
 	   	<li>
-	   		<a class="tab" href="admin/tmpl/ltmpl/list" target="ltmpl_list" title="人口列表模板">
+	   		<a class="tab" href="admin/tmpl/ltmpl/list/people" target="ltmpl_list" title="人口列表模板">
 	   			<span class="menu-text">人口列表模板</span>
+	   		</a>
+	   	</li>
+	   	<li>
+	   		<a class="tab" href="admin/tmpl/dtmpl/list/address" target="address_dtmpl_list" title="地址列表模板">
+	   			<span class="menu-text">地址详情模板</span>
+	   		</a>
+	   	</li>
+	   	<li>
+	   		<a class="tab" href="admin/tmpl/ltmpl/list/address" target="address_ltmpl_list" title="地址列表模板">
+	   			<span class="menu-text">地址列表模板</span>
 	   		</a>
 	   	</li>
 	</ul>
@@ -73,6 +83,11 @@
 		<i></i>
 	</a>
 	<ul class="submenu">
+		<li>
+	   		<a class="tab" href="admin/address/tmpl/list?tmplId=14" target="tmpladdr_list" title="地址信息">
+	   			<span class="menu-text">地址列表</span>
+	   		</a>
+	   	</li>
 	   	<li>
 	   		<a class="tab" href="admin/address/list" target="address_list" title="地址信息">
 	   			<span class="menu-text">地址信息</span>

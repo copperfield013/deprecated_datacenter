@@ -9,26 +9,31 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 @Entity
 @Table(name="t_dictionary_field")
 public class DictionaryField {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@JSONField(name="id")
 	private Long id;
 	
 	@Column(name="composite_id")
+	@JSONField(name="c_id")
 	private Long compositeId;
 	
 	@Column(name="c_full_key")
+	@JSONField(name="name")
 	private String fullKey;
 	
-	@Column(name="c_keyname")
-	private String keyname;
 	
 	@Column(name="c_title")
+	@JSONField(name="cname")
 	private String title;
 	
 	@Column(name="c_type")
+	@JSONField(name="type")
 	private String type;
 	
 	@Column(name="c_input_type")
@@ -65,12 +70,6 @@ public class DictionaryField {
 	}
 	public void setFullKey(String fullKey) {
 		this.fullKey = fullKey;
-	}
-	public String getKeyname() {
-		return keyname;
-	}
-	public void setKeyname(String keyname) {
-		this.keyname = keyname;
 	}
 	public String getTitle() {
 		return title;

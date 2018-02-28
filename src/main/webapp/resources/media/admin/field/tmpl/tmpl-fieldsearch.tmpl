@@ -1,8 +1,12 @@
 <div class="fieldpicker-container">
 	<ul class="nav nav-tabs nav-justified">
 		<li class="active"><a data-toggle="tab" href="#ctab_${pickerKey }_0">${composites[0].cname }</a></li>
-		<li><a data-toggle="tab" href="#ctab_${pickerKey }_1">${composites[1].cname }</a></li>
-		<li><a data-toggle="tab" href="#ctab_${pickerKey }_2">${composites[2].cname }</a></li>
+		{{if composites.length > 1}}
+			<li><a data-toggle="tab" href="#ctab_${pickerKey }_1">${composites[1].cname }</a></li>
+			{{if composites.length > 2}}
+				<li><a data-toggle="tab" href="#ctab_${pickerKey }_2">${composites[2].cname }</a></li>
+			{{/if}}
+		{{/if}}
 		{{if composites.length > 3}}
 			<li class="dropdown">
 				<a data-toggle="dropdown" class="fa dropdown-toggle" href="#">

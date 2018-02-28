@@ -8,7 +8,7 @@ define(function(require, exports, module){
 			//是否单选.未完成
 			single			: false,
 			$container		: $(),
-			reqDataURL		: 'admin/peopledata/viewtmpl/field_json',
+			reqDataURL		: 'admin/field/json/people',
 			reqDataParam	: {},
 			disablePicked	: true,
 			afterPicked		: $.noop,
@@ -275,11 +275,18 @@ define(function(require, exports, module){
 		},
 		bind	: function($search, param){
 			var $textInput = $search.find('.search-text-input');
+			var reqDataURL = undefined;
+			if(param.module === 'people'){
+				reqDataURL = 'admin/field/json/people';
+			}else if(param.module === 'address'){
+				reqDataURL = 'admin/field/json/address';
+			}
 			var search = new FieldSearch($.extend({}, {
 				$container		: $search,
 				afterChoose		: undefined,
 				afterPicked		: undefined,
 				afterSelected	: undefined,
+				reqDataURL		: reqDataURL
 			}, param));
 			(param.textInputHandler || $.noop).apply(search, [$textInput]);
 			search.bindTypeahead($textInput, param);

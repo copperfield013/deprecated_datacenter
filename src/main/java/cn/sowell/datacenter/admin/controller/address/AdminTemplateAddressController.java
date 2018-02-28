@@ -1,4 +1,4 @@
-package cn.sowell.datacenter.admin.controller.people;
+package cn.sowell.datacenter.admin.controller.address;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,8 +21,9 @@ import cn.sowell.copframe.spring.propTranslator.PropertyParser;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.model.address.pojo.AddressData;
+import cn.sowell.datacenter.model.address.service.TemplateAddressService;
 import cn.sowell.datacenter.model.admin.pojo.ExportStatus;
-import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataExportService;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDictionaryService;
@@ -33,9 +34,8 @@ import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.datacenter.model.tmpl.service.ListTemplateService;
 
 @Controller
-@RequestMapping(AdminConstants.URI_PEOPLEDATA + "/tmpl")
-public class AdminPeopleDataTmplController {
-	
+@RequestMapping(AdminConstants.URI_BASE + "/address/tmpl")
+public class AdminTemplateAddressController {
 	@Resource
 	PeopleDictionaryService dictService;
 	
@@ -49,6 +49,9 @@ public class AdminPeopleDataTmplController {
     PeopleDataService peopleService;
 
 	@Resource
+	TemplateAddressService addressService;
+	
+	@Resource
 	FrameDateFormat dateFormat;
 	
 	@Resource
@@ -58,7 +61,7 @@ public class AdminPeopleDataTmplController {
 	public String list(Long tmplId, PageInfo pageInfo, Model model, HttpServletRequest request, HttpSession session){
 		ListTemplateParameter param = ltmplService.exractTemplateParameter(tmplId, request);
 		if(param.getListTemplate() != null){
-			List<PeopleData> srcList = ltmplService.queryPeopleList(new HashSet<NormalCriteria>(param.getNormalCriteriaMap().values()), pageInfo);
+			List<AddressData> srcList = addressService.queryAddressList(new HashSet<NormalCriteria>(param.getNormalCriteriaMap().values()), pageInfo);
 			List<PropertyParser> parserList = new ArrayList<PropertyParser>();
 			srcList.forEach(src->parserList.add(pojoService.createPropertyParser(src)));
 			model.addAttribute("parserList", parserList);
@@ -77,44 +80,44 @@ public class AdminPeopleDataTmplController {
 		model.addAttribute("vCriteriaMap", param.getNormalCriteriaMap());
 		model.addAttribute("ltmpl", param.getListTemplate());
 		model.addAttribute("pageInfo", pageInfo);
-		model.addAttribute("ltmplList", ltmplService.queryLtmplList("people", param.getUser()));
-		return AdminConstants.JSP_PEOPLEDATA_TMPL + "/peopledata_list_tmpl.jsp";
+		model.addAttribute("ltmplList", ltmplService.queryLtmplList("address", param.getUser()));
+		return AdminConstants.JSP_ADDRESS + "/tmpl/address_list_tmpl.jsp";
 	}
 	
 	
-
-
-	@RequestMapping("/detail_tmpl/{peopleCode}")
-	    public String detailTmpl(
-	    		@PathVariable String peopleCode, 
+	@RequestMapping("/detail/{code}")
+	public String detail(
+	    		@PathVariable String code,
 	    		Long tmplId, 
 	    		String datetime, 
 	    		Long timestamp, 
 	    		Model model){
-	    	 Date date = null;
-	         date = dateFormat.parse(datetime);
-	         if(timestamp != null){
-	         	date = new Date(timestamp);
-	         }
-	         UserIdentifier user = UserUtils.getCurrentUser();
-	         TemplateDetailTemplate template = null;
-	         if(tmplId == null){
-	        	 template = dictService.getDefaultTemplate(user);
-	         }else{
-	        	 template = dictService.getTemplate(tmplId);
-	         }
-	         List<TemplateDetailTemplate> tmplList = dictService.getAllTemplateList("people", user, null, false);
-	         PeopleData people = peopleService.getHistoryPeople(peopleCode, date);
-	         PropertyParser parser = pojoService.createPropertyParser(people);
-	         model.addAttribute("parser", parser);
-	         model.addAttribute("people", people);
-	         model.addAttribute("datetime", datetime);
-	         model.addAttribute("peopleCode", peopleCode);
-	         model.addAttribute("tmpl", template);	
-	         model.addAttribute("date", date == null? new Date() : date);
-	         model.addAttribute("tmplList", tmplList);
-	         model.addAttribute("timestamp", timestamp);
-	         return AdminConstants.JSP_PEOPLEDATA + "/peopledata_detail_tmpl.jsp";
-	    }
+    	 Date date = null;
+         date = dateFormat.parse(datetime);
+         if(timestamp != null){
+         	date = new Date(timestamp);
+         }
+         UserIdentifier user = UserUtils.getCurrentUser();
+         TemplateDetailTemplate template = null;
+         if(tmplId == null){
+        	 template = dictService.getDefaultTemplate(user);
+         }else{
+        	 template = dictService.getTemplate(tmplId);
+         }
+         List<TemplateDetailTemplate> tmplList = dictService.getAllTemplateList("address", user, null, false);
+         AddressData address = addressService.getHistoryAddress(code, date);
+         PropertyParser parser = pojoService.createPropertyParser(address);
+         model.addAttribute("parser", parser);
+         model.addAttribute("address", address);
+         model.addAttribute("code", code);
+         model.addAttribute("datetime", datetime);
+         model.addAttribute("tmpl", template);	
+         model.addAttribute("date", date == null? new Date() : date);
+         model.addAttribute("tmplList", tmplList);
+         model.addAttribute("timestamp", timestamp);
+         return AdminConstants.JSP_ADDRESS + "/address_detail_tmpl.jsp";
+    }
+	
+	
 	
 }

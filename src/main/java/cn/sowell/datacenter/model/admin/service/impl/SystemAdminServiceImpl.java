@@ -1,7 +1,5 @@
 package cn.sowell.datacenter.model.admin.service.impl;
 
-import java.io.Serializable;
-
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -34,7 +32,13 @@ public class SystemAdminServiceImpl implements SystemAdminService{
 	
 	
 	@Override
-	public SystemAdmin getSystemAdminByUserId(Serializable userId) {
-		return aDao.getSystemAdminByUserId((long) userId);
+	public Long getDefaultTemplateId(long adminId, String module, String type) {
+		return aDao.getDefaultTemplateId(adminId, module, type);
 	}
+	
+	@Override
+	public SystemAdmin getSystemAdminByUserId(long userId) {
+		return aDao.getSystemAdminByUserId(userId);
+	}
+	
 }

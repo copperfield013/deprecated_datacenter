@@ -44,12 +44,13 @@ public class AdminListTemplateController {
 	Logger logger = Logger.getLogger(AdminListTemplateController.class);
 	
 	
-	@RequestMapping("/list")
-	public String list(Model model){
+	@RequestMapping("/list/{module}")
+	public String list(Model model, @PathVariable String module){
 		UserIdentifier user = UserUtils.getCurrentUser();
-		List<TemplateListTmpl> ltmplList = tService.queryLtmplList(user);
+		List<TemplateListTmpl> ltmplList = tService.queryLtmplList(module, user);
 		model.addAttribute("ltmplList", ltmplList);
 		model.addAttribute("sysAdmin", adminService.getSystemAdminByUserId(user.getId()));
+		model.addAttribute("module", module);
 		return AdminConstants.JSP_TMPL_LIST + "/ltmpl_list.jsp";
 	}
 	
@@ -65,8 +66,9 @@ public class AdminListTemplateController {
 		return AjaxPageResponse.FAILD("操作失败");
 	}
 	
-	@RequestMapping("/add")
-	public String add(){
+	@RequestMapping("/add/{module}")
+	public String add(@PathVariable String module, Model model){
+		model.addAttribute("module", module);
 		return AdminConstants.JSP_TMPL_LIST + "/ltmpl_update.jsp";
 	}
 	
@@ -80,6 +82,7 @@ public class AdminListTemplateController {
 		model.addAttribute("tmplDataJSON", tmplDataJSON);
 		model.addAttribute("columnDataJSON", columnDataJSON);
 		model.addAttribute("criteriaDataJSON", criteriaDataJSON);
+		model.addAttribute("module", ltmpl.getModule());
 		return AdminConstants.JSP_TMPL_LIST + "/ltmpl_update.jsp";
 	}
 	
@@ -165,6 +168,7 @@ public class AdminListTemplateController {
 			tmpl.setDefaultOrderDirection(json.getString("defOrderDir"));
 			tmpl.setCreateUserId((Long) UserUtils.getCurrentUser().getId());
 			tmpl.setUnmodifiable(null);
+			tmpl.setModule(json.getString("module"));
 			JSONArray columnData = json.getJSONArray("columnData");
 			if(columnData != null){
 				Set<TemplateListColumn> columns = new LinkedHashSet<TemplateListColumn>();

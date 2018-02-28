@@ -32,23 +32,22 @@ public interface ABCExecuteService {
 	//Entity mergePeople(Map<String, String> data) throws IOException;
 
 	/**
-	 * 查询人口数据
-	 * @param criterias
-	 * @param pageInfo
-	 * @return
-	 */
-	List<Entity> queryPeopleList(List<Criteria> criterias, PageInfo pageInfo);
-
-	/**
 	 * 根据peopleCode获得人口数据
 	 * @param peopleCode
 	 * @return
 	 */
 	Entity getPeople(String peopleCode);
 
+	List<Entity> queryPeopleList(List<Criteria> criterias, PageInfo pageInfo);
+	
 	List<Entity> queryPeopleList(Function<String, List<Criteria>> handler,
 			PageInfo pageInfo);
 
+	List<Entity> queryAddressList(List<Criteria> criterias, PageInfo pageInfo);
+	
+	List<Entity> queryAddressList(Function<String, List<Criteria>> handler,
+			PageInfo pageInfo);
+	
 	/**
 	 * 导入人口
 	 * @param sheet
@@ -78,6 +77,15 @@ public interface ABCExecuteService {
 	 */
 	Entity getHistoryPeople(String peopleCode, Date date, List<ErrorInfomation> errors);
 
+	/**
+	 * 
+	 * @param code
+	 * @param date
+	 * @param errors
+	 * @return
+	 */
+	Entity getHistoryAddress(String code, Date date, List<ErrorInfomation> errors);
+	
 	Entity savePeople(PeopleData people);
 
 	Workbook downloadPeople(List<Map<String, Object>> listmap, List<TBasePeopleDictionaryEntity> keys, List<String[]> columnLists, ExcelModel model, String path);
@@ -100,5 +108,12 @@ public interface ABCExecuteService {
 	 */
 	EntityPagingQueryProxy getQueryProxy(List<Criteria> cs,
 			ExportDataPageInfo pageInfo);
+
+	/**
+	 * 根据code获得统一地址entity对象
+	 * @param code
+	 * @return
+	 */
+	Entity getAddressEntity(String code);
 
 }

@@ -105,9 +105,8 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	}
 	
 	
-	@Override
-	public List<Entity> queryPeopleList(List<Criteria> criterias, PageInfo pageInfo){
-		BizFusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
+	private List<Entity> queryEntityList(String entityConfig, List<Criteria> criterias, PageInfo pageInfo){
+		BizFusionContext context = fFactory.getContext(entityConfig);
 		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		
 		EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(criterias, "编辑时间");
@@ -118,9 +117,25 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	}
 	
 	@Override
-	public List<Entity> queryPeopleList(Function<String, List<Criteria>> handler, PageInfo pageInfo){
-		return queryPeopleList(handler.apply(fFactory.getConfig(FusionContextFactoryDC.KEY_BASE).getMappingName()), pageInfo);
+	public List<Entity> queryPeopleList(List<Criteria> criterias, PageInfo pageInfo){
+		return queryEntityList(FusionContextFactoryDC.KEY_BASE, criterias, pageInfo);
 	}
+	
+	@Override
+	public List<Entity> queryPeopleList(Function<String, List<Criteria>> handler, PageInfo pageInfo){
+		return queryEntityList(FusionContextFactoryDC.KEY_BASE, handler.apply(fFactory.getConfig(FusionContextFactoryDC.KEY_BASE).getMappingName()), pageInfo);
+	}
+	
+	@Override
+	public List<Entity> queryAddressList(List<Criteria> criterias, PageInfo pageInfo){
+		return queryEntityList(FusionContextFactoryDC.KEY_ADDRESS_BASE, criterias, pageInfo);
+	}
+	
+	@Override
+	public List<Entity> queryAddressList(Function<String, List<Criteria>> handler, PageInfo pageInfo) {
+		return queryEntityList(FusionContextFactoryDC.KEY_ADDRESS_BASE, handler.apply(FusionContextFactoryDC.KEY_ADDRESS_BASE), pageInfo);
+	}
+	
 	
 	
 	@Override
@@ -280,18 +295,34 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		}
 	}
 	
-	@Override
-	public Entity getHistoryPeople(String peopleCode, Date date, List<ErrorInfomation> errors) {
-		BizFusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
+	
+	private Entity getHistoryEntity(String configKey, String code,
+			Date date, List<ErrorInfomation> errors) {
+		BizFusionContext context = fFactory.getContext(configKey);
 		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		
-		HistoryTracker tracker = discoverer.track(peopleCode, date);
+		HistoryTracker tracker = discoverer.track(code, date);
 		List<ErrorInfomation> errorInfomations = tracker.getErrorInfomations();
 		if(errors != null && errorInfomations != null && !errorInfomations.isEmpty()){
 			errors.addAll(errorInfomations);
 		}
 		return tracker.getEntity();
 	}
+	
+	@Override
+	public Entity getHistoryPeople(String peopleCode, Date date, List<ErrorInfomation> errors) {
+		return getHistoryEntity(FusionContextFactoryDC.KEY_BASE, peopleCode, date, errors);
+		
+	}
+	
+
+
+	@Override
+	public Entity getHistoryAddress(String code, Date date,
+			List<ErrorInfomation> errors) {
+		return getHistoryEntity(FusionContextFactoryDC.KEY_ADDRESS_BASE, code, date, errors);
+	}
+	
 	
 	private String getStringWithBlank(Cell cell){
 		//如果有覆盖至
@@ -465,6 +496,14 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 
 	private String toUserName(String usergroupId) {
 		return "户户户";
+	}
+	
+	@Override
+	public Entity getAddressEntity(String code) {
+		BizFusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_ADDRESS_BASE);
+		Discoverer discoverer=PanelFactory.getDiscoverer(context);
+		Entity result=discoverer.discover(code);
+		return result;
 	}
 	
 

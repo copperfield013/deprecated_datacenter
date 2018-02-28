@@ -11,6 +11,8 @@ public interface SystemAdminDao {
 	
 	SystemAdmin getSystemAdminByUserId(long userId);
 
+	Long getDefaultTemplateId(long userId, String module, String type);
+
 
 	
 

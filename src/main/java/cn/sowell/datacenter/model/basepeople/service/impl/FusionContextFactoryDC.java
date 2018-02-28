@@ -11,6 +11,7 @@ public class FusionContextFactoryDC {
 	public static final String KEY_IMPORT_HANDICAPPED = "importHandicapped";
 	public static final String KEY_IMPORT_LOWINCOME = "importLowincome";
 	public static final String KEY_IMPORT_FAMILYPLANNING = "importFamilyPlanning";
+	public static final String KEY_ADDRESS_BASE = "addressBase";
 	
 	
 	private Map<String, FusionContextConfig> configMap = new HashMap<String, FusionContextConfig>();

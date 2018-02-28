@@ -6,10 +6,11 @@ import java.util.Set;
 
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.datacenter.DataCenterConstants;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryOption;
 import cn.sowell.datacenter.model.peopledata.pojo.OptionItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleCompositeDictionaryItem;
-import cn.sowell.datacenter.model.peopledata.pojo.PeopleTemplateData;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
 
 
 public interface PeopleDictionaryService {
@@ -21,29 +22,35 @@ public interface PeopleDictionaryService {
 	 * 保存模板
 	 * @param data
 	 */
-	void mergeTemplate(PeopleTemplateData data);
+	void mergeTemplate(TemplateDetailTemplate data);
 	/**
 	 * 获得当前用户的默认模板
-	 * @param user
+	 * @param user 用户对象
+	 * @param module 模块名({@linkplain DataCenterConstants#TEMPLATE_MODULE_PEOPLE people}, 
+	 * {@linkplain DataCenterConstants#TEMPLATE_MODULE_ADDRESS address})
+	 * @param type 模板类型({@linkplain DataCenterConstants#TEMPLATE_TYPE_LIST list}, 
+	 * {@linkplain DataCenterConstants#TEMPLATE_TYPE_DETAIL detail})
 	 * @return
 	 */
-	PeopleTemplateData getDefaultTemplate(UserIdentifier user);
+	public TemplateDetailTemplate getDefaultTemplate(UserIdentifier user, String module, String type);
 
 	/**
 	 * 根据模板id获得模板
 	 * @param tmplId
 	 * @return
 	 */
-	PeopleTemplateData getTemplate(Long tmplId);
+	TemplateDetailTemplate getTemplate(Long tmplId);
 
 	/**
 	 * 加载所有模板数据
+	 * @param module 模块
 	 * @param user
 	 * @param pageInfo 分页数据
 	 * @param loadDetail 是否加载模板的详情数据
 	 * @return
 	 */
-	List<PeopleTemplateData> getAllTemplateList(UserIdentifier user, PageInfo pageInfo, boolean loadDetail);
+	List<TemplateDetailTemplate> getAllTemplateList(String module,
+			UserIdentifier user, PageInfo pageInfo, boolean loadDetail);
 
 	/**
 	 * 删除一个模板

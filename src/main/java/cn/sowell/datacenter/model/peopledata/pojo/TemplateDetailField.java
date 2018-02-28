@@ -1,8 +1,6 @@
 package cn.sowell.datacenter.model.peopledata.pojo;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,15 +10,24 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 @Entity
-@Table(name="t_people_view_template_fieldgroup")
-public class PeopleTemplateGroup {
+@Table(name="t_tmpl_detail_field")
+public class TemplateDetailField {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(name="tmpl_id")
-	private Long tmplId;
+	@Column(name="field_id")
+	private Long fieldId;
+	
+	@Column(name="group_id")
+	private Long groupId;
+
+	@Column(name="c_field_name")
+	@JSONField(name="name")
+	private String fieldName;
 	
 	@Column(name="c_title")
 	private String title;
@@ -28,25 +35,46 @@ public class PeopleTemplateGroup {
 	@Column(name="c_order")
 	private Integer order;
 	
+	@Column(name="c_col_num")
+	private Integer colNum;
+	
 	@Column(name="c_unmodifiable")
 	private Integer unmodifiable;
 	
 	@Column(name="update_time")
 	private Date updateTime;
 	
+	@Column(name="c_view_value")
+	@JSONField(name="dv")
+	private String viewValue;
+	
 	@Transient
-	private List<PeopleTemplateField> fields = new ArrayList<PeopleTemplateField>();
+	@Column(name="c_type")
+	private String type;
+	
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public Long getTmplId() {
-		return tmplId;
+	public Long getFieldId() {
+		return fieldId;
 	}
-	public void setTmplId(Long tmplId) {
-		this.tmplId = tmplId;
+	public void setFieldId(Long fieldId) {
+		this.fieldId = fieldId;
+	}
+	public Long getGroupId() {
+		return groupId;
+	}
+	public void setGroupId(Long groupId) {
+		this.groupId = groupId;
+	}
+	public String getFieldName() {
+		return fieldName;
+	}
+	public void setFieldName(String fieldName) {
+		this.fieldName = fieldName;
 	}
 	public String getTitle() {
 		return title;
@@ -60,6 +88,12 @@ public class PeopleTemplateGroup {
 	public void setOrder(Integer order) {
 		this.order = order;
 	}
+	public Integer getColNum() {
+		return colNum;
+	}
+	public void setColNum(Integer colNum) {
+		this.colNum = colNum;
+	}
 	public Integer getUnmodifiable() {
 		return unmodifiable;
 	}
@@ -72,10 +106,17 @@ public class PeopleTemplateGroup {
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
 	}
-	public List<PeopleTemplateField> getFields() {
-		return fields;
+	public String getViewValue() {
+		return viewValue;
 	}
-	public void setFields(List<PeopleTemplateField> fields) {
-		this.fields = fields;
+	public void setViewValue(String viewValue) {
+		this.viewValue = viewValue;
 	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+	
 }

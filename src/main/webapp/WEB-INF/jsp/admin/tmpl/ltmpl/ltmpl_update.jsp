@@ -1,14 +1,20 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
+<c:set var="moduleTitle">
+	<c:choose>
+		<c:when test="${module == 'people' }">人口</c:when>
+		<c:when test="${module == 'address' }">地址</c:when>
+	</c:choose>
+</c:set>
 <c:set var="title">
 	<c:choose>
-		<c:when test="${ltmpl != null }">修改列表模板-${ltmpl.title }</c:when>
-		<c:otherwise>创建列表模板</c:otherwise>
+		<c:when test="${ltmpl != null }">修改${moduleTitle }列表模板-${ltmpl.title }</c:when>
+		<c:otherwise>创建${moduleTitle }列表模板</c:otherwise>
 	</c:choose>
 </c:set>
 <title>${title }</title>
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/ltmpl-update.css" />
-<div class="ltmpl-update detail" id="ltmpl-update-${ltmpl.id }">
+<div class="ltmpl-update detail" id="ltmpl-update-${module }-${ltmpl.id }">
 	<script type="jquery/tmpl" id="col-row-tmpl">
 		<div class="row" column-id="\${columnId}" field-id="\${id}" field-key="\${(c_name?(c_name + '.'):'') + name}">
 			<span class="col-name">\${cname}</span>
@@ -285,11 +291,11 @@
 </div>
 <script>
 	seajs.use(['tmpl/js/ltmpl-update.js', 'utils'], function(LtmplUpdate, Utils){
-		var $page = $('#ltmpl-update-${ltmpl.id }');
+		var $page = $('#ltmpl-update-${module }-${ltmpl.id }');
 		var tmplData = Utils.parseJSON('${tmplDataJSON}'),
 			criteriaData = Utils.parseJSON('${criteriaDataJSON}'),
 			columnData = Utils.parseJSON('${columnDataJSON}')
 			;
-		LtmplUpdate.init($page, tmplData, criteriaData, columnData);
+		LtmplUpdate.init($page, tmplData, criteriaData, columnData, '${module}');
 	});
 </script>

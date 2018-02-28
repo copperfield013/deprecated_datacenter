@@ -1,4 +1,4 @@
-package cn.sowell.datacenter.model.peopledata.pojo;
+package cn.sowell.datacenter.model.tmpl.pojo;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,8 +13,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
-@Table(name="t_people_view_template")
-public class PeopleTemplateData {
+@Table(name="t_tmpl_detail_template")
+public class TemplateDetailTemplate {
 	@Id
 	@Column(name="id")
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -22,6 +22,9 @@ public class PeopleTemplateData {
 	
 	@Column(name="c_name")
 	private String name;
+	
+	@Column(name="c_module")
+	private String module;
 	
 	@Column(name="create_time")
 	private Date createTime;
@@ -36,7 +39,7 @@ public class PeopleTemplateData {
 	private String authority;
 	
 	@Transient
-	private List<PeopleTemplateGroup> groups = new ArrayList<PeopleTemplateGroup>();
+	private List<TemplateDetailFieldGroup> groups = new ArrayList<TemplateDetailFieldGroup>();
 	public Long getTmplId() {
 		return tmplId;
 	}
@@ -73,10 +76,16 @@ public class PeopleTemplateData {
 	public void setAuthority(String authority) {
 		this.authority = authority;
 	}
-	public List<PeopleTemplateGroup> getGroups() {
+	public List<TemplateDetailFieldGroup> getGroups() {
 		return groups;
 	}
-	public void setGroups(List<PeopleTemplateGroup> groups) {
+	public void setGroups(List<TemplateDetailFieldGroup> groups) {
 		this.groups = groups;
+	}
+	public String getModule() {
+		return module;
+	}
+	public void setModule(String module) {
+		this.module = module;
 	}
 }
