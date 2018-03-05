@@ -4,16 +4,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import cn.sowell.copframe.common.UserIdentifier;
-import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryField;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryOption;
 import cn.sowell.datacenter.model.peopledata.pojo.OptionItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleCompositeDictionaryItem;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleFieldDictionaryItem;
-import cn.sowell.datacenter.model.peopledata.pojo.TemplateDetailField;
-import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailFieldGroup;
-import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
 
 public interface PeopleDictionaryDao {
 
@@ -29,29 +24,7 @@ public interface PeopleDictionaryDao {
 	 */
 	List<PeopleFieldDictionaryItem> queryAllField(Set<Long> list);
 
-	/**
-	 * 根据模板id获得所有字段组（经过排序）
-	 * @param tmplId
-	 * @return
-	 */
-	List<TemplateDetailFieldGroup> getTemplateGroups(Long tmplId);
-
-	/**
-	 * 根据字段组的id集合获得对应的所有字段（经过排序）
-	 * @param groupIdSet
-	 * @return
-	 */
-	Map<Long, List<TemplateDetailField>> getTemplateFieldsMap(
-			Set<Long> groupIdSet);
-
-	/**
-	 * 获得所有模板
-	 * @param module 
-	 * @param user
-	 * @param pageInfo 
-	 * @return
-	 */
-	List<TemplateDetailTemplate> getTemplateList(String module, UserIdentifier user, PageInfo pageInfo);
+	
 
 	/**
 	 * 根据字段id集合获得所有字段映射
@@ -59,13 +32,6 @@ public interface PeopleDictionaryDao {
 	 * @return
 	 */
 	Map<Long, DictionaryField> getFieldMap(Set<Long> fieldIds);
-
-	/**
-	 * 从数据库中删除一个模板记录
-	 * @param tmplId
-	 * @return
-	 */
-	boolean removeTemplate(Long tmplId);
 
 	/**
 	 * 

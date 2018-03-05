@@ -20,6 +20,7 @@ import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.spring.propTranslator.PropertyParser;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
+import cn.sowell.datacenter.DataCenterConstants;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.address.pojo.AddressData;
 import cn.sowell.datacenter.model.address.service.TemplateAddressService;
@@ -32,6 +33,7 @@ import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
 import cn.sowell.datacenter.model.tmpl.param.ListTemplateParameter;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.datacenter.model.tmpl.service.ListTemplateService;
+import cn.sowell.datacenter.model.tmpl.service.TemplateService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_BASE + "/address/tmpl")
@@ -57,9 +59,13 @@ public class AdminTemplateAddressController {
 	@Resource
 	PeopleDataExportService eService;
 	
+	@Resource
+	TemplateService tService;
+	
+	
 	@RequestMapping("/list")
 	public String list(Long tmplId, PageInfo pageInfo, Model model, HttpServletRequest request, HttpSession session){
-		ListTemplateParameter param = ltmplService.exractTemplateParameter(tmplId, request);
+		ListTemplateParameter param = ltmplService.exractTemplateParameter(tmplId, DataCenterConstants.TEMPLATE_MODULE_ADDRESS, request);
 		if(param.getListTemplate() != null){
 			List<AddressData> srcList = addressService.queryAddressList(new HashSet<NormalCriteria>(param.getNormalCriteriaMap().values()), pageInfo);
 			List<PropertyParser> parserList = new ArrayList<PropertyParser>();
@@ -100,11 +106,11 @@ public class AdminTemplateAddressController {
          UserIdentifier user = UserUtils.getCurrentUser();
          TemplateDetailTemplate template = null;
          if(tmplId == null){
-        	 template = dictService.getDefaultTemplate(user);
+        	 template = tService.getDefaultDetailTemplate(user, DataCenterConstants.TEMPLATE_MODULE_PEOPLE);
          }else{
-        	 template = dictService.getTemplate(tmplId);
+        	 template = tService.getDetailTemplate(tmplId);
          }
-         List<TemplateDetailTemplate> tmplList = dictService.getAllTemplateList("address", user, null, false);
+         List<TemplateDetailTemplate> tmplList = tService.getAllDetailTemplateList("address", user, null, false);
          AddressData address = addressService.getHistoryAddress(code, date);
          PropertyParser parser = pojoService.createPropertyParser(address);
          model.addAttribute("parser", parser);

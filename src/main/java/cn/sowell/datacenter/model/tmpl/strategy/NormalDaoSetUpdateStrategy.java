@@ -1,4 +1,4 @@
-package cn.sowell.datacenter.model.tmpl.service.impl;
+package cn.sowell.datacenter.model.tmpl.strategy;
 
 import java.util.Map;
 import java.util.function.BiConsumer;

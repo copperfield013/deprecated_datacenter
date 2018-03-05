@@ -4,16 +4,16 @@ import java.util.Map;
 
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
-import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTmpl;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTempalte;
 
 public class ListTemplateParameter {
-	private TemplateListTmpl listTemplate;
+	private TemplateListTempalte listTemplate;
 	private Map<Long, NormalCriteria> normalCriteriaMap;
 	private UserIdentifier user;
-	public TemplateListTmpl getListTemplate() {
+	public TemplateListTempalte getListTemplate() {
 		return listTemplate;
 	}
-	public void setListTemplate(TemplateListTmpl listTemplate) {
+	public void setListTemplate(TemplateListTempalte listTemplate) {
 		this.listTemplate = listTemplate;
 	}
 	public Map<Long, NormalCriteria> getNormalCriteriaMap() {

@@ -35,7 +35,7 @@ import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
 import cn.sowell.datacenter.model.peopledata.service.PojoService;
 import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListColumn;
-import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTmpl;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTempalte;
 
 @Service
 public class PeopleDataExportServiceImpl implements PeopleDataExportService{
@@ -102,7 +102,7 @@ public class PeopleDataExportServiceImpl implements PeopleDataExportService{
 	
 	DecimalFormat df = new DecimalFormat("0.00");
 	@Override
-	public void startExport(String uuid, TemplateListTmpl ltmpl, Set<NormalCriteria> criteria, ExportDataPageInfo ePageInfo) {
+	public void startExport(String uuid, TemplateListTempalte ltmpl, Set<NormalCriteria> criteria, ExportDataPageInfo ePageInfo) {
 		ExportStatus status = new ExportStatus(uuid);
 		status.setExportPageInfo(ePageInfo);
 		statusMap.put(uuid, status);

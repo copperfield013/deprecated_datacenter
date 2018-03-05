@@ -10,6 +10,10 @@ public interface DataCenterConstants {
 	
 	final String TEMPLATE_MODULE_PEOPLE = "people";
 	final String TEMPLATE_MODULE_ADDRESS = "address";
+	static String mapTemplateType(Class<?> templateClass) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 
 }

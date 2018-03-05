@@ -16,7 +16,7 @@ import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
 import cn.sowell.datacenter.model.tmpl.param.ListTemplateParameter;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListCriteria;
-import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTmpl;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTempalte;
 
 public interface ListTemplateService {
 
@@ -26,27 +26,7 @@ public interface ListTemplateService {
 	 * @param user
 	 * @return
 	 */
-	List<TemplateListTmpl> queryLtmplList(String module, UserIdentifier user);
-
-	/**
-	 * 保存列表模板
-	 * @param tmpl
-	 */
-	void saveListTemplate(TemplateListTmpl tmpl);
-
-	/**
-	 * 获得用户的默认列表模板
-	 * @param user
-	 * @return
-	 */
-	TemplateListTmpl getDefaultListTemplate(UserIdentifier user, String module);
-
-	/**
-	 * 
-	 * @param tmplId
-	 * @return
-	 */
-	TemplateListTmpl getListTemplate(Long tmplId);
+	List<TemplateListTempalte> queryLtmplList(String module, UserIdentifier user);
 
 	/**
 	 * 
@@ -56,20 +36,17 @@ public interface ListTemplateService {
 	 */
 	List<PeopleData> queryPeopleList(Set<NormalCriteria> criterias, PageInfo pageInfo);
 
-	/**
-	 * 删除模板
-	 * @param ltmplId
-	 */
-	void removeListTemplate(Long ltmplId);
 
 	Map<Long, NormalCriteria> getCriteriasFromRequest(
 			MutablePropertyValues pvs,
 			Map<Long, TemplateListCriteria> criteriaMap);
 
 	ListTemplateParameter exractTemplateParameter(Long tmplId,
+			String module,
 			HttpServletRequest request);
 
 	List<Criteria> toCriterias(Set<NormalCriteria> nCriterias);
+
 
 	
 }

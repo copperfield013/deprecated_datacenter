@@ -35,20 +35,20 @@
 					<c:forEach items="${tmplList }" var="tmpl" varStatus="i" >
 						<tr>
 							<td>${i.index + 1 }</td>
-							<td>${tmpl.name }</td>
+							<td>${tmpl.title }</td>
 							<td><fmt:formatDate value="${tmpl.updateTime }" pattern="yyyy-MM-dd HH:mm:ss" /> </td>
 							<td>
-								<a target="dtmpl_update_${tmpl.tmplId }" href="admin/tmpl/dtmpl/update/${tmpl.tmplId }" class="tab btn btn-info btn-xs edit">
+								<a target="dtmpl_update_${tmpl.id }" href="admin/tmpl/dtmpl/update/${tmpl.id }" class="tab btn btn-info btn-xs edit">
 									<i class="fa fa-edit"></i>
 									修改
 								</a>
-								<a confirm="确认删除模板(${tmpl.name })?" href="admin/tmpl/dtmpl/remove/${tmpl.tmplId }" class="btn btn-danger btn-xs delete">
+								<a confirm="确认删除模板(${tmpl.title })?" href="admin/tmpl/dtmpl/remove/${tmpl.id }" class="btn btn-danger btn-xs delete">
 									<i class="fa fa-trash-o"></i>
 									删除
 								</a>
 								<c:choose>
-									<c:when test="${tmpl.tmplId != sysAdmin.defaultDetailTemplateId }">
-										<a href="admin/tmpl/dtmpl/as_default/${tmpl.tmplId }" class="btn btn-warning btn-xs">
+									<c:when test="${tmpl.id != defaultTemplate.id }">
+										<a href="admin/tmpl/dtmpl/as_default/${tmpl.id }" class="btn btn-warning btn-xs">
 											<i class="glyphicon glyphicon-star"></i>
 											设为默认
 										</a>

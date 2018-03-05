@@ -46,7 +46,7 @@
 									删除
 								</a>
 								<c:choose>
-									<c:when test="${ltmpl.id != sysAdmin.defaultListTemplateId }">
+									<c:when test="${ltmpl.id != defListTtemplate.id }">
 										<a href="admin/tmpl/ltmpl/as_default/${ltmpl.id }" class="btn btn-warning btn-xs">
 											<i class="glyphicon glyphicon-star"></i>
 											设为默认

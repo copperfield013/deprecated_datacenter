@@ -63,6 +63,7 @@ import cn.sowell.datacenter.model.peopledata.service.PeopleDictionaryService;
 import cn.sowell.datacenter.model.peopledata.service.PojoService;
 import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
+import cn.sowell.datacenter.model.tmpl.service.TemplateService;
 
 import com.alibaba.fastjson.JSON;
 
@@ -89,7 +90,8 @@ public class AdminPeopleDataController {
     @Resource
     BasePeopleService basePeopleService;
 
-
+    @Resource
+    TemplateService tService;
 
 
     Logger logger = Logger.getLogger(AdminPeopleDataController.class);
@@ -250,11 +252,11 @@ public class AdminPeopleDataController {
     	TemplateDetailTemplate template = null;
     	UserIdentifier user = UserUtils.getCurrentUser();
     	if(tmplId == null){
-			template = dictService.getDefaultTemplate(user, DataCenterConstants.TEMPLATE_MODULE_PEOPLE, DataCenterConstants.TEMPLATE_TYPE_DETAIL);
+			template = tService.getDefaultDetailTemplate(user, DataCenterConstants.TEMPLATE_MODULE_PEOPLE);
     	}else{
-    		template = dictService.getTemplate(tmplId);
+    		template = tService.getDetailTemplate(tmplId);
     	}
-    	List<TemplateDetailTemplate> tmplList = dictService.getAllTemplateList("people", user, null, false);
+    	List<TemplateDetailTemplate> tmplList = tService.getAllDetailTemplateList("people", user, null, false);
     	PeopleData people = peopleService.getPeople(peopleCode);
         PropertyParser parser = pojoService.createPropertyParser(people);
         model.addAttribute("tmplList", tmplList);
@@ -292,11 +294,11 @@ public class AdminPeopleDataController {
          UserIdentifier user = UserUtils.getCurrentUser();
          TemplateDetailTemplate template = null;
          if(tmplId == null){
-        	 template = dictService.getDefaultTemplate(user, DataCenterConstants.TEMPLATE_MODULE_PEOPLE, DataCenterConstants.TEMPLATE_TYPE_DETAIL);
+        	 template = tService.getDefaultDetailTemplate(user, DataCenterConstants.TEMPLATE_MODULE_PEOPLE);
          }else{
-        	 template = dictService.getTemplate(tmplId);
+        	 template = tService.getDetailTemplate(tmplId);
          }
-         List<TemplateDetailTemplate> tmplList = dictService.getAllTemplateList("people", user, null, false);
+         List<TemplateDetailTemplate> tmplList = tService.getAllDetailTemplateList("people", user, null, false);
          PeopleData people = peopleService.getHistoryPeople(peopleCode, date);
          PropertyParser parser = pojoService.createPropertyParser(people);
          model.addAttribute("parser", parser);

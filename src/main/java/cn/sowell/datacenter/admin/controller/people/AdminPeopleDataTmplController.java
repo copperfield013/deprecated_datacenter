@@ -20,6 +20,7 @@ import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.spring.propTranslator.PropertyParser;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
+import cn.sowell.datacenter.DataCenterConstants;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.admin.pojo.ExportStatus;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
@@ -31,6 +32,7 @@ import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
 import cn.sowell.datacenter.model.tmpl.param.ListTemplateParameter;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.datacenter.model.tmpl.service.ListTemplateService;
+import cn.sowell.datacenter.model.tmpl.service.TemplateService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_PEOPLEDATA + "/tmpl")
@@ -54,9 +56,12 @@ public class AdminPeopleDataTmplController {
 	@Resource
 	PeopleDataExportService eService;
 	
+	@Resource
+	TemplateService tService;
+	
 	@RequestMapping("/list")
 	public String list(Long tmplId, PageInfo pageInfo, Model model, HttpServletRequest request, HttpSession session){
-		ListTemplateParameter param = ltmplService.exractTemplateParameter(tmplId, request);
+		ListTemplateParameter param = ltmplService.exractTemplateParameter(tmplId, DataCenterConstants.TEMPLATE_MODULE_PEOPLE, request);
 		if(param.getListTemplate() != null){
 			List<PeopleData> srcList = ltmplService.queryPeopleList(new HashSet<NormalCriteria>(param.getNormalCriteriaMap().values()), pageInfo);
 			List<PropertyParser> parserList = new ArrayList<PropertyParser>();
@@ -99,11 +104,11 @@ public class AdminPeopleDataTmplController {
 	         UserIdentifier user = UserUtils.getCurrentUser();
 	         TemplateDetailTemplate template = null;
 	         if(tmplId == null){
-	        	 template = dictService.getDefaultTemplate(user);
+	        	 template = tService.getDefaultDetailTemplate(user, DataCenterConstants.TEMPLATE_MODULE_PEOPLE);
 	         }else{
-	        	 template = dictService.getTemplate(tmplId);
+	        	 template = tService.getDetailTemplate(tmplId);
 	         }
-	         List<TemplateDetailTemplate> tmplList = dictService.getAllTemplateList("people", user, null, false);
+	         List<TemplateDetailTemplate> tmplList = tService.getAllDetailTemplateList("people", user, null, false);
 	         PeopleData people = peopleService.getHistoryPeople(peopleCode, date);
 	         PropertyParser parser = pojoService.createPropertyParser(people);
 	         model.addAttribute("parser", parser);

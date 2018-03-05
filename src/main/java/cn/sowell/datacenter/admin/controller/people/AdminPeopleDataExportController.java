@@ -32,8 +32,9 @@ import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.admin.pojo.ExportStatus;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataExportService;
 import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
-import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTmpl;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTempalte;
 import cn.sowell.datacenter.model.tmpl.service.ListTemplateService;
+import cn.sowell.datacenter.model.tmpl.service.TemplateService;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -51,6 +52,9 @@ public class AdminPeopleDataExportController {
 	@Resource
 	ListTemplateService ltmplService;
 	
+	@Resource
+	TemplateService tService;
+	
 	Logger logger = Logger.getLogger(AdminPeopleDataExportController.class);
 	
 	@ResponseBody
@@ -66,7 +70,7 @@ public class AdminPeopleDataExportController {
 			JSONObject parameters = json.getJSONObject("parameters");
 			Long tmplId = parameters.getLong("tmplId");
 			if(tmplId != null){
-				TemplateListTmpl ltmpl = ltmplService.getListTemplate(tmplId);
+				TemplateListTempalte ltmpl = tService.getListTemplate(tmplId);
 				if(ltmpl != null){
 					MutablePropertyValues pvs = new MutablePropertyValues();
 					String prefix = "criteria_";

@@ -304,7 +304,7 @@ define(function(require, exports, module){
 			var saveData = {
 					tmplId	: param.tmplId,
 					//模板名
-					name	: $('#tmplName', $page).val(),
+					title	: $('#tmplName', $page).val(),
 					//字段组
 					groups	: [],
 					//模板模块
@@ -332,7 +332,7 @@ define(function(require, exports, module){
 					group.fields.push(field);
 				});
 			});
-			if(!saveData.name){
+			if(!saveData.title){
 				Dialog.notice('请填写模板名', 'error');
 			}else if(saveData.groups.length == 0){
 				Dialog.notice('请至少添加一个字段组', 'error');

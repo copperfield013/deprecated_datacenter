@@ -81,6 +81,7 @@
 	
 	<bean class="cn.sowell.copframe.dao.utils.NormalOperateDaoImpl" />
 	
+	
 	<mvc:interceptors>
 		<!-- 用于在请求中设置一些常用的变量 -->
 		<bean class="cn.sowell.datacenter.common.interceptor.CommonRequestAttributeSetInterceptor" />

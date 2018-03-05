@@ -8,7 +8,7 @@
 </c:set>
 <c:set var="title">
 	<c:choose>
-		<c:when test="${tmpl != null }">修改${moduleTitle }详情模板-${tmpl.name }</c:when>
+		<c:when test="${tmpl != null }">修改${moduleTitle }详情模板-${tmpl.title }</c:when>
 		<c:otherwise>创建${moduleTitle }详情模板</c:otherwise>
 	</c:choose>
 </c:set>
@@ -16,7 +16,7 @@
 
 <title>${title }</title>
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/dtmpl-update.css" />
-<div id="dtmpl-update-${tmpl.tmplId }" class="dtmpl-update">
+<div id="dtmpl-update-${tmpl.id }" class="dtmpl-update">
 	<script type="jquery/tmpl" id="tmpl-field-group">
 		<div class="widget field-group" data-id="\${id}">
 			<div class="widget-header">
@@ -105,7 +105,7 @@
 		<div class="row header-row">
 			<div class="col-lg-10 col-lg-offset-1">
 				<input type="hidden" name="tmplId" value="" />
-				<input type="text" class="form-control" id="tmplName" placeholder="请输入模板名称" value="${tmpl.name }">
+				<input type="text" class="form-control" id="tmplName" placeholder="请输入模板名称" value="${tmpl.title }">
 			</div>
 		</div>
 		<div class="row">
@@ -118,11 +118,11 @@
 </div>
 <script>
 	seajs.use(['tmpl/js/dtmpl-update.js', 'ajax'], function(ViewTmpl, Ajax){
-		var $page = $('#dtmpl-update-${tmpl.tmplId }');
+		var $page = $('#dtmpl-update-${tmpl.id }');
 		console.log($page);
 		var updateMode = '${tmplJson != null}' == 'true';
 		ViewTmpl.init($page, {
-			tmplId		: '${tmpl.tmplId}',
+			tmplId		: '${tmpl.id}',
 			tmplData	: updateMode && $.parseJSON('${tmplJson}'),
 			mode		: updateMode? 'update': 'create',
 			module		: '${module}'

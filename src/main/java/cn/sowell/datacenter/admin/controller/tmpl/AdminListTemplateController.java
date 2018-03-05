@@ -24,8 +24,9 @@ import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListColumn;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListCriteria;
-import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTmpl;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTempalte;
 import cn.sowell.datacenter.model.tmpl.service.ListTemplateService;
+import cn.sowell.datacenter.model.tmpl.service.TemplateService;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -36,10 +37,13 @@ import com.alibaba.fastjson.JSONObject;
 public class AdminListTemplateController {
 	
 	@Resource
-	ListTemplateService tService;
+	ListTemplateService ltService;
 	
 	@Resource
 	SystemAdminService adminService;
+	
+	@Resource
+	TemplateService tService;
 	
 	Logger logger = Logger.getLogger(AdminListTemplateController.class);
 	
@@ -47,9 +51,10 @@ public class AdminListTemplateController {
 	@RequestMapping("/list/{module}")
 	public String list(Model model, @PathVariable String module){
 		UserIdentifier user = UserUtils.getCurrentUser();
-		List<TemplateListTmpl> ltmplList = tService.queryLtmplList(module, user);
+		List<TemplateListTempalte> ltmplList = ltService.queryLtmplList(module, user);
+		TemplateListTempalte defListTtemplate = tService.getDefaultListTemplate(user, module);
 		model.addAttribute("ltmplList", ltmplList);
-		model.addAttribute("sysAdmin", adminService.getSystemAdminByUserId(user.getId()));
+		model.addAttribute("defListTtemplate", defListTtemplate);
 		model.addAttribute("module", module);
 		return AdminConstants.JSP_TMPL_LIST + "/ltmpl_list.jsp";
 	}
@@ -58,7 +63,7 @@ public class AdminListTemplateController {
 	@RequestMapping("/as_default/{ltmplId}")
 	public AjaxPageResponse asDefault(@PathVariable Long ltmplId){
 		try {
-			adminService.setListTemplateAsDefault(ltmplId, UserUtils.getCurrentUser());
+			tService.setTemplateAsDefault(UserUtils.getCurrentUser(), ltmplId);
 			return AjaxPageResponse.REFRESH_LOCAL("操作成功");
 		} catch (Exception e) {
 			logger.error("设置默认列表模板时发生错误", e);
@@ -74,7 +79,7 @@ public class AdminListTemplateController {
 	
 	@RequestMapping("/update/{ltmplId}")
 	public String update(@PathVariable Long ltmplId, Model model){
-		TemplateListTmpl ltmpl = tService.getListTemplate(ltmplId);
+		TemplateListTempalte ltmpl = tService.getListTemplate(ltmplId);
 		JSONArray columnDataJSON = toColumnData(ltmpl.getColumns());
 		JSONObject tmplDataJSON = toLtmplData(ltmpl);
 		JSONArray criteriaDataJSON = toCriteriaData(ltmpl.getCriterias());
@@ -99,7 +104,7 @@ public class AdminListTemplateController {
 	@RequestMapping("/remove/{ltmplId}")
 	public AjaxPageResponse remove(@PathVariable Long ltmplId){
 		try {
-			tService.removeListTemplate(ltmplId);
+			tService.removeTemplate(UserUtils.getCurrentUser(), ltmplId);
 			return AjaxPageResponse.REFRESH_LOCAL("删除成功");
 		} catch (Exception e) {
 			logger.error("删除模板时发生错误", e);
@@ -108,7 +113,7 @@ public class AdminListTemplateController {
 	}
 	
 	
-	private JSONObject toLtmplData(TemplateListTmpl ltmpl) {
+	private JSONObject toLtmplData(TemplateListTempalte ltmpl) {
 		JSONObject json = new JSONObject();
 		json.put("title", ltmpl.getTitle());
 		json.put("unmodifiable", ltmpl.getUnmodifiable());
@@ -145,9 +150,10 @@ public class AdminListTemplateController {
 	@RequestMapping("/save")
 	public ResponseJSON save(@RequestBody JsonRequest jReq){
 		JSONObjectResponse jRes = new JSONObjectResponse();
-		TemplateListTmpl tmpl = generateLtmplData(jReq);
+		TemplateListTempalte tmpl = generateLtmplData(jReq);
 		try {
-			tService.saveListTemplate(tmpl);
+			tService.mergeTemplate(tmpl);
+			//ltService.saveListTemplate(tmpl);
 			jRes.setStatus("suc");
 		} catch (Exception e) {
 			logger.error("保存列表模板时发生错误", e);
@@ -156,11 +162,11 @@ public class AdminListTemplateController {
 		return jRes;
 	}
 
-	private TemplateListTmpl generateLtmplData(JsonRequest jReq) {
-		TemplateListTmpl tmpl = null;
+	private TemplateListTempalte generateLtmplData(JsonRequest jReq) {
+		TemplateListTempalte tmpl = null;
 		if(jReq != null && jReq.getJsonObject() != null){
 			JSONObject json = jReq.getJsonObject();
-			tmpl = new TemplateListTmpl();
+			tmpl = new TemplateListTempalte();
 			tmpl.setId(json.getLong("tmplId"));
 			tmpl.setTitle(json.getString("title"));
 			tmpl.setDefaultPageSize(json.getInteger("defPageSize"));

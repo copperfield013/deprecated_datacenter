@@ -8,13 +8,13 @@ import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.admin.controller.people.ExportDataPageInfo;
 import cn.sowell.datacenter.model.admin.pojo.ExportStatus;
 import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
-import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTmpl;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTempalte;
 
 public interface PeopleDataExportService {
 
 	ExportStatus getExportStatus(String uuid);
 
-	void startExport(String uuid, TemplateListTmpl ltmpl, Set<NormalCriteria> criteria, ExportDataPageInfo ePageInfo);
+	void startExport(String uuid, TemplateListTempalte ltmpl, Set<NormalCriteria> criteria, ExportDataPageInfo ePageInfo);
 	
 	AbstractResource getDownloadResource(String uuid);
 
