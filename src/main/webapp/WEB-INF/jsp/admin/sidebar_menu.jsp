@@ -41,7 +41,7 @@
 	   		</a>
 	   	</li>
 	   	<li>
-	   		<a class="tab" href="admin/peopledata/tmpl/list" target="peopledata_list_tmpl" title="人口列表（模板）">
+	   		<a class="tab" href="admin/modules/list/people" target="people_list_tmpl" title="人口列表（模板）">
 	   			<span class="menu-text">人口列表（模板）</span>
 	   		</a>
 	   	</li>
@@ -84,7 +84,7 @@
 	</a>
 	<ul class="submenu">
 		<li>
-	   		<a class="tab" href="admin/address/tmpl/list?tmplId=14" target="tmpladdr_list" title="地址信息">
+	   		<a class="tab" href="admin/modules/list/address" target="address_list_tmpl" title="地址列表">
 	   			<span class="menu-text">地址列表</span>
 	   		</a>
 	   	</li>
