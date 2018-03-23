@@ -12,7 +12,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cn.sowell.copframe.utils.date.FrameDateFormat;
-import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
+import cn.sowell.datacenter.model.abc.service.ABCExecuteService;
 import cn.sowell.datacenter.model.peopledata.service.PeopleButtService;
 
 @ContextConfiguration(locations = "classpath*:spring-config/spring-junit.xml")
@@ -46,7 +46,7 @@ public class TestABCExecuteService {
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("name", "修改后");
 		String peopleCode = "765ddd7710d14b3fb807f01077df3c01";
-		buttService.updatePeople(peopleCode, map);
+		buttService.mergePeople(peopleCode, map);
 	}
 	
 	
