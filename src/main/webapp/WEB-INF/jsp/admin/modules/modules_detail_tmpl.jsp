@@ -1,25 +1,25 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
-<link type="text/css" rel="stylesheet" href="media/admin/peopledata/css/peopledata-detail-tmpl.css" />
-<div class="detail entity-detail-tmpl" id="entity-detail-tmpl-${module }-${code }">
+<link type="text/css" rel="stylesheet" href="media/admin/modules/css/modules-detail-tmpl.css" />
+<div class="detail entity-detail-tmpl" id="entity-detail-tmpl-${entity.code }">
 	<div class="page-header">
 		<div class="header-title">
-			<h1>${address.shortName }-详情</h1>
-			<c:if test="${address.errors != null && fn:length(address.errors) > 0 }">
+			<h1>${module.title}-${entity.title }-详情</h1>
+			<c:if test="${entity.errors != null && fn:length(entity.errors) > 0 }">
 			    <h1 id="showErrors" class="fa fa-info-circle" style="cursor: pointer;color: #CD5C5C;"></h1>
 			</c:if>
 		</div>
 		<div class="history-container title-operate">
-			<a href="#" title="查看历史" class="toggle-timeline"><i class="iconfont icon-historyrecord"></i></a>
+			<a href="page:#timeline-area.toggle" title="查看历史" class="toggle-timeline btn-toggle"><i class="iconfont icon-historyrecord"></i></a>
 		</div>
 		<div class="template-container title-operate">
-			<a href="#" title="查看模板" class="toggle-template"><i class="iconfont icon-template"></i></a>
+			<a class="btn-toggle toggle-template" title="查看模板" href="page:#tmpl-list.toggle" ><i class="iconfont icon-template"></i></a>
 		</div>
 	</div>
 	<div class="page-body">
 		<div class="col-lg-offset-1 col-lg-10">
 			<form class="form-horizontal group-container">
-				<c:forEach var="tmplGroup" items="${tmpl.groups }">
+				<c:forEach var="tmplGroup" items="${dtmpl.groups }">
 					<div class="widget field-group">
 						<div class="widget-header">
 							<span class="widget-caption">
@@ -31,7 +31,7 @@
 								<div class="form-group field-item ${tmplField.colNum == 2? 'dbcol': '' }">
 									<label class="control-label field-title">${tmplField.title }</label>
 									<div class="field-value">
-										<span class="field-view">${parser[tmplField.fieldName] }</span>
+										<span class="field-view">${entity.map[tmplField.fieldName] }</span>
 									</div>
 								</div>
 							</c:forEach>
@@ -41,14 +41,14 @@
 			</form>
 		</div>
 	</div>
-	<div id="errors" style="display: none;">
+	<div id="errors" class="blur-hidden" style="display: none;">
 		<ul>
-			<c:forEach items="${address.errors }" var="error">
+			<c:forEach items="${entity.errors }" var="error">
 				<li>${error.error_str }</li>
 			</c:forEach>
 		</ul>
    </div>
-	<div id="timeline-area" class="cpf-static-view" style="display: none;">
+	<div id="timeline-area" class="blur-hidden" style="display: none;">
 		<div class="timeline-wrapper">
 			<div class="VivaTimeline">
 				<dl>
@@ -57,63 +57,56 @@
 			</div>
 		</div>
 	</div>
-	<div id="tmpl-list" style="display: none;">
+	<div id="tmpl-list" class="blur-hidden" style="display: none;">
 		<ul class="tmpl-list-wrapper">
-			<c:if test="${tmpl != null }">
-				<li data-id="${tmpl.id }" class="active">
+			<c:if test="${dtmpl != null }">
+				<li data-id="${dtmpl.id }" class="active">
 					<span class="tmpl-icon"><i class="fa fa-lightbulb-o"></i></span>
 					<span class="tmpl-item-body">
-						<span class="tmpl-name">${tmpl.title }</span>
-						<span class="tmpl-date"><fmt:formatDate value="${tmpl.updateTime }" pattern="yyyy-MM-dd HH:mm:ss" /> </span>
+						<span class="tmpl-name">${dtmpl.title }</span>
+						<span class="tmpl-date"><fmt:formatDate value="${dtmpl.updateTime }" pattern="yyyy-MM-dd HH:mm:ss" /> </span>
 					</span>
 				</li>
 			</c:if>
-			<c:forEach var="tmplItem" items="${tmplList }">
-				<c:if test="${tmplItem.id != tmpl.id }">
-					<li data-id="${tmplItem.id }">
+			<c:forEach var="dtmplItem" items="${dtmpls }">
+				<c:if test="${dtmplItem.id != dtmpl.id }">
+					<li data-id="${dtmplItem.id }">
 						<span class="tmpl-icon"><i class="fa fa-lightbulb-o"></i></span>
 						<span class="tmpl-item-body">
-							<span class="tmpl-name">${tmplItem.title }</span>
-							<span class="tmpl-date"><fmt:formatDate value="${tmplItem.updateTime }" pattern="yyyy-MM-dd HH:mm:ss" /> </span>
+							<span class="tmpl-name">${dtmplItem.title }</span>
+							<span class="tmpl-date"><fmt:formatDate value="${dtmplItem.updateTime }" pattern="yyyy-MM-dd HH:mm:ss" /> </span>
 						</span>
 					</li>
 				</c:if>
 			</c:forEach>
 		</ul>
 		<div class="tmpl-operate">
-			<a class="tab" title="配置模板" target="detail-tmpl-list-${module }" href="admin/peopledata/viewtmpl/list"><i class="icon glyphicon glyphicon-cog"></i></a>
+			<a class="tab" title="配置模板" target="viewtmpl_list" href="admin/tmpl/dtmpl/list/people"><i class="icon glyphicon glyphicon-cog"></i></a>
 		</div>
 	</div>
 </div>
-<!-- <script type="text/javascript" src="media/admin/peopledata/js/peopledata-detail-tmpl.js"></script> -->
 <script>
-	seajs.use(['dialog', 'ajax', 'utils', 'peopledata/js/viewtmpl-update.js', '$CPF'], function(Dialog, Ajax, Utils, ViewTmpl, $CPF){
-		var $page = $('#entity-detail-tmpl-${module}-${code }');
-		var hasRecord = '${address != null}';
+	seajs.use(['dialog', 'ajax', 'utils', 'modules/js/modules-update.js', '$CPF'], function(Dialog, Ajax, Utils, ViewTmpl, $CPF){
+		var $page = $('#entity-detail-tmpl-${entity.code }');
+		var hasRecord = '${entity != null}';
 		if(hasRecord != 'true'){
 			Dialog.notice('数据不存在', 'warning');
 			$('.header-title h1').text('数据不存在');
 		}
-		$('a.toggle-history', $page).click(function(){
-			$(this).closest('.toggle-history').hide();
-			$('.header-buttons', $page).show();
-		});
-		var $timelineArea = $('#timeline-area');
 		var timelineInited = false;
 		$('a.toggle-timeline', $page).click(function(){
-			$timelineArea.show();
 			if(!timelineInited){
-				$('.show-more-history', $timelineArea).trigger('click');
+				$('.show-more-history', $page).trigger('click');
 			}
 		});
 		
 		//下一页
 		var curPageNo = 0;
-		$('.show-more-history', $timelineArea).click(function(){
+		$('.show-more-history', $page).click(function(){
 			var $this = $(this);
 			if(!$this.is('.disabled')){
 				$this.addClass('disabled').text('加载中');
-				Ajax.ajax('admin/peopledata/paging_history/${code}', {
+				Ajax.ajax('admin/modules/paging_history/${module.key}/${entity.code}', {
 					pageNo	: curPageNo + 1
 				}, function(data){
 					if(data.status === 'suc'){
@@ -131,13 +124,13 @@
 		});
 		$page.on('click', '.circ', function(){
 			var time = parseInt($(this).closest('dd').attr('data-time'));
-			$page.getLocatePage().loadContent('admin/peopledata/detail_tmpl/${code}?tmplId=${tmpl.id}', null, {timestamp:time});
+			$page.getLocatePage().loadContent('admin/modules/detail/${module.key}/${entity.code}?tmplId=${tmpl.id}', null, {timestamp:time});
 			
 		});
 		var theTime = parseInt('${date.time}');
 		function appendHistory(history){
 			if(history.length > 0){
-				var $dl = $('dl', $timelineArea);
+				var $dl = $('dl', $page);
 				
 				for(var i in history){
 					var item = history[i];
@@ -155,7 +148,7 @@
 							}
 						});
 						if(!inserted){
-							$('.show-more-history', $timelineArea).parent('dt').before($month);
+							$('.show-more-history', $page).parent('dt').before($month);
 							//$dl.append($month);
 						}
 					}
@@ -205,7 +198,6 @@
 						}
 					}
 					Utils.switchClass($this, 'pos-right', 'pos-left', i % 2 == 0);
-					
 				});
 				
 			}
@@ -219,7 +211,7 @@
 			autoclose	: true,
 			startView	: 'day'
 		}).on('changeDate', function(e){
-			$page.getLocatePage().loadContent('admin/peopledata/detail_tmpl/${code }', undefined, {
+			$page.getLocatePage().loadContent('admin/modules/detail/${module.key}/${entity.code }', undefined, {
 				datetime	: $(this).val(),
 				tmplId		: '${tmpl.id}'
 			});
@@ -228,34 +220,15 @@
 		$('#showErrors', $page).mouseenter(function(e){
 			$errors.show();
 		});
-		$page.click(function(e){
-			var $target = $(e.target);
-			if(!$target.is('#showErrors') && $target.closest('#errors').length == 0){
-				$errors.hide();
-			}
-			if($target.closest('#tmpl-list').length == 0){
-				$('#tmpl-list', $page).hide();
-			}
-			if($target.closest('#timeline-area').length == 0
-				&& $target.closest('.toggle-timeline').length == 0 ){
-				$timelineArea.hide();
-			}
-		});
-		
-		
-		$('.toggle-template i', $page).click(function(){
-			$('#tmpl-list', $page).toggle();
-			return false;
-		});
 		$('#tmpl-list li[data-id]:not(.active)', $page).click(function(){
 			var tmplId = $(this).attr('data-id');
-			$page.getLocatePage().loadContent('admin/peopledata/detail_tmpl/${code}', undefined, {
+			$page.getLocatePage().loadContent('admin/modules/detail/${module.key}/${entity.code}', undefined, {
 				timestamp	: '${timestamp}',
 				tmplId		: tmplId
 			});
 		});
 		
-		if('${tmpl == null}' == 'true'){
+		if('${dtmpl == null}' == 'true'){
 			Dialog.notice('当前没有选择默认模板', 'error');
 		}
 		
