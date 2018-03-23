@@ -10,13 +10,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonArrayResponse;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryComposite;
+import cn.sowell.datacenter.model.dict.pojo.DictionaryOption;
 import cn.sowell.datacenter.model.dict.service.DictionaryService;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDictionaryService;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 @Controller
 @RequestMapping("/admin/field")
@@ -37,6 +41,29 @@ public class AdminFieldController {
 		JsonArrayResponse jRes = new JsonArrayResponse();
 		for (DictionaryComposite info : infoList) {
 			jRes.add(JSON.toJSON(info));
+		}
+		return jRes;
+	}
+    
+	@ResponseBody
+	@RequestMapping("/enum_json")
+	public ResponseJSON enumJson(){
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		List<DictionaryOption> itemList = dService.getAllOptions();
+		if(itemList != null){
+			JSONObject jo = jRes.getJsonObject();
+			itemList.forEach(item->{
+				String key = item.getGroupId().toString();
+				JSONArray array = jo.getJSONArray(key);	
+				if(array == null){
+					array = new JSONArray();
+					jo.put(key, array);
+				}
+				JSONObject jItem = new JSONObject();
+				jItem.put("view", item.getTitle());
+				jItem.put("value", item.getTitle());
+				array.add(jItem);
+			});
 		}
 		return jRes;
 	}

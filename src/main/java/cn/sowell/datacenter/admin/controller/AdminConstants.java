@@ -28,6 +28,11 @@ public interface AdminConstants {
 	final String URI_TMPL = URI_BASE + "/tmpl";
 	
 	/**
+	 * 各个数据模块的
+	 */
+	final String URI_MODULES = URI_BASE + "/modules";
+	
+	/**
 	 * 管理端jsp资源的基本路径
 	 */
 	final String JSP_BASE = "/admin";
@@ -73,12 +78,15 @@ public interface AdminConstants {
 	
 	final String JSP_TMPL_DETAIL = JSP_TMPL + "/dtmpl";
 	
+	final String JSP_MODULES = JSP_BASE + "/modules";
+	
 	/**
 	 * 默认的系统id
 	 */
 	final long SYS_DEF = 1;
 
 	final String EXPORT_PEOPLE_STATUS_UUID = "export_people_status_uuid";
+
 
 	
 

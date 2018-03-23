@@ -33,7 +33,7 @@ public interface PeopleButtService {
 	 * @param peopleCode
 	 * @param map
 	 */
-	void updatePeople(String peopleCode, Map<String, String> map);
+	void mergePeople(String peopleCode, Map<String, String> map);
 
 
       List<TBasePeopleDictionaryEntity> titleSearch (String txt);

@@ -21,6 +21,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
@@ -30,14 +33,12 @@ import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.admin.pojo.ExportStatus;
+import cn.sowell.datacenter.model.modules.service.ModulesService;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataExportService;
 import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTempalte;
 import cn.sowell.datacenter.model.tmpl.service.ListTemplateService;
 import cn.sowell.datacenter.model.tmpl.service.TemplateService;
-
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 
 @Controller
 @RequestMapping(AdminConstants.URI_PEOPLEDATA + "/export")
@@ -54,6 +55,9 @@ public class AdminPeopleDataExportController {
 	
 	@Resource
 	TemplateService tService;
+	
+	@Resource
+	ModulesService mService;
 	
 	Logger logger = Logger.getLogger(AdminPeopleDataExportController.class);
 	
@@ -94,7 +98,7 @@ public class AdminPeopleDataExportController {
 					ePageInfo.setRangeEnd(json.getInteger("rangeEnd"));
 					pageInfo.setPageNo(parameters.getInteger("pageNo"));
 					pageInfo.setPageSize(parameters.getInteger("pageSize"));
-					Map<Long, NormalCriteria> vCriteriaMap = ltmplService.getCriteriasFromRequest(pvs, CollectionUtils.toMap(ltmpl.getCriterias(), c->c.getId()));
+					Map<Long, NormalCriteria> vCriteriaMap = mService.getCriteriasFromRequest(pvs, CollectionUtils.toMap(ltmpl.getCriterias(), c->c.getId()));
 					eService.startExport(uuid, ltmpl, new HashSet<NormalCriteria>(vCriteriaMap.values()), ePageInfo);
 				}
 			}

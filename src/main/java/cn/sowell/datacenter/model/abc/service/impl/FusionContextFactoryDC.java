@@ -1,9 +1,11 @@
-package cn.sowell.datacenter.model.basepeople.service.impl;
+package cn.sowell.datacenter.model.abc.service.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import com.abc.application.BizFusionContext;
+
+import cn.sowell.datacenter.DataCenterConstants;
 
 public class FusionContextFactoryDC {
 	public static final String KEY_BASE = "base";
@@ -15,6 +17,13 @@ public class FusionContextFactoryDC {
 	
 	
 	private Map<String, FusionContextConfig> configMap = new HashMap<String, FusionContextConfig>();
+	
+	private Map<String, String> defaultModuleEntityConfigMap = new HashMap<String, String>();
+	
+	public FusionContextFactoryDC() {
+		defaultModuleEntityConfigMap.put(DataCenterConstants.MODULE_KEY_PEOPLE, KEY_BASE);
+		defaultModuleEntityConfigMap.put(DataCenterConstants.MODULE_KEY_ADDRESS, KEY_ADDRESS_BASE);
+	}
 	
 	public FusionContextConfig getConfig(String configName){
 		return configMap.get(configName);
@@ -31,7 +40,6 @@ public class FusionContextFactoryDC {
 	public BizFusionContext getContext(FusionContextConfig config){
 		BizFusionContext context = new BizFusionContext();
 		context.setMappingName(config.getMappingName());
-		context.setDictionaryMappingName(config.getDictionaryMappingName());
 		return context;
 	}
 	public Map<String, FusionContextConfig> getConfigMap() {
@@ -39,5 +47,9 @@ public class FusionContextFactoryDC {
 	}
 	public void setConfigMap(Map<String, FusionContextConfig> configMap) {
 		this.configMap = configMap;
+	}
+
+	public String mapDefaultModuleEntityConfig(String module) {
+		return defaultModuleEntityConfigMap.get(module);
 	}
 }

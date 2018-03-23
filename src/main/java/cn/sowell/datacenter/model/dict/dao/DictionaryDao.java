@@ -6,6 +6,8 @@ import java.util.Set;
 
 import cn.sowell.datacenter.model.dict.pojo.DictionaryComposite;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryField;
+import cn.sowell.datacenter.model.dict.pojo.DictionaryOption;
+import cn.sowell.datacenter.model.peopledata.pojo.OptionItem;
 
 public interface DictionaryDao {
 
@@ -23,4 +25,15 @@ public interface DictionaryDao {
 	 */
 	Map<Long, List<DictionaryField>> getAllFields(Set<Long> compositeIds);
 
+	public List<DictionaryOption> getAllOptions();
+
+	Map<Long, List<OptionItem>> getFieldOptionsMap(Set<Long> fieldIds);
+
+	/**
+	 * 获得该模块的所有字段
+	 * @param module
+	 * @return
+	 */
+	List<DictionaryField> getAllFields(String module);
+	
 }

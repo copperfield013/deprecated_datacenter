@@ -21,12 +21,12 @@ public class SearchTransportClient {
 		// 设置集群名称 5.x
 		Settings settings = Settings.builder().put("cluster.name", name).build();
 		// 创建client
-		try {
+		/*try {
 			client = new PreBuiltTransportClient(settings)
 					.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), port));
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	/*

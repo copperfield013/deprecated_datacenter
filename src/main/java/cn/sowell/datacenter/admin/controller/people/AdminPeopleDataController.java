@@ -35,22 +35,21 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
-import cn.sowell.copframe.common.UserIdentifier;
+import com.alibaba.fastjson.JSON;
+
 import cn.sowell.copframe.common.property.PropertyPlaceholder;
-import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.spring.propTranslator.PropertyParser;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
-import cn.sowell.datacenter.DataCenterConstants;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
+import cn.sowell.datacenter.model.abc.service.ABCExecuteService;
 import cn.sowell.datacenter.model.basepeople.ExcelModelCriteria;
 import cn.sowell.datacenter.model.basepeople.pojo.BasePeopleItem;
 import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
-import cn.sowell.datacenter.model.basepeople.pojo.PeopleDataHistoryItem;
+import cn.sowell.datacenter.model.basepeople.pojo.EntityHistoryItem;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleInformationEntity;
 import cn.sowell.datacenter.model.basepeople.service.BasePeopleService;
@@ -62,10 +61,7 @@ import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDictionaryService;
 import cn.sowell.datacenter.model.peopledata.service.PojoService;
 import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
-import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.datacenter.model.tmpl.service.TemplateService;
-
-import com.alibaba.fastjson.JSON;
 
 @Controller
 @RequestMapping(AdminConstants.URI_PEOPLEDATA)
@@ -247,7 +243,7 @@ public class AdminPeopleDataController {
     }
 
     
-    @RequestMapping("/update_tmpl/{peopleCode}")
+    /*@RequestMapping("/update_tmpl/{peopleCode}")
     public String updateTmpl(@PathVariable String peopleCode, Long tmplId, Model model){
     	TemplateDetailTemplate template = null;
     	UserIdentifier user = UserUtils.getCurrentUser();
@@ -265,9 +261,9 @@ public class AdminPeopleDataController {
         model.addAttribute("tmpl", template);
         model.addAttribute("peopleCode", peopleCode);
     	return AdminConstants.JSP_PEOPLEDATA + "/peopledata_update_tmpl.jsp";
-    }
+    }*/
     
-    @ResponseBody
+    /*@ResponseBody
     @RequestMapping("/do_update")
     public AjaxPageResponse doUpdate(@RequestParam String peopleCode, @RequestParam Map<String, String> map){
     	 try {
@@ -277,8 +273,8 @@ public class AdminPeopleDataController {
              logger.error(e);
              return AjaxPageResponse.FAILD("修改失败");
          }
-    }
-    
+    }*/
+    /*
     @RequestMapping("/detail_tmpl/{peopleCode}")
     public String detailTmpl(
     		@PathVariable String peopleCode, 
@@ -310,7 +306,7 @@ public class AdminPeopleDataController {
          model.addAttribute("tmplList", tmplList);
          model.addAttribute("timestamp", timestamp);
          return AdminConstants.JSP_PEOPLEDATA + "/peopledata_detail_tmpl.jsp";
-    }
+    }*/
     
 
     @RequestMapping("/smart/{peopleCode}")
@@ -557,7 +553,7 @@ public class AdminPeopleDataController {
     		@RequestParam(defaultValue="100") Integer pageSize){
     	JSONObjectResponse response = new JSONObjectResponse();
     	try {
-			List<PeopleDataHistoryItem> historyItems = abcService.queryHistory(peopleCode, pageNo, pageSize);
+			List<EntityHistoryItem> historyItems = abcService.queryHistory(peopleCode, pageNo, pageSize);
 			response.put("history", JSON.toJSON(historyItems));
 			response.setStatus("suc");
 			if(historyItems.size() < pageSize){

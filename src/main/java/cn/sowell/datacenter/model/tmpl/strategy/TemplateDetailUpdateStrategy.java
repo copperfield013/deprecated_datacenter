@@ -77,7 +77,7 @@ public class TemplateDetailUpdateStrategy implements TemplateUpdateStrategy<Temp
 								}
 							}else{
 								if(fieldMap.containsKey(field.getFieldId())){
-									field.setFieldName(fieldMap.get(field.getFieldId()).getTitle());
+									field.setFieldName(fieldMap.get(field.getFieldId()).getFullKey());
 									field.setGroupId(group.getId());
 									field.setUpdateTime(now);
 									nDao.save(field);
@@ -95,7 +95,7 @@ public class TemplateDetailUpdateStrategy implements TemplateUpdateStrategy<Temp
 					Long groupId = nDao.save(group);
 					for (TemplateDetailField field : group.getFields()) {
 						if(fieldMap.containsKey(field.getFieldId())){
-							field.setFieldName(fieldMap.get(field.getFieldId()).getTitle());
+							field.setFieldName(fieldMap.get(field.getFieldId()).getFullKey());
 							field.setGroupId(groupId);
 							field.setUpdateTime(now);
 							nDao.save(field);
@@ -127,7 +127,7 @@ public class TemplateDetailUpdateStrategy implements TemplateUpdateStrategy<Temp
 			Long groupId = nDao.save(group);
 			for (TemplateDetailField field : group.getFields()) {
 				if(fieldMap.containsKey(field.getFieldId())){
-					field.setFieldName(fieldMap.get(field.getFieldId()).getTitle());
+					field.setFieldName(fieldMap.get(field.getFieldId()).getFullKey());
 					field.setGroupId(groupId);
 					field.setUpdateTime(now);
 					nDao.save(field);

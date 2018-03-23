@@ -29,8 +29,8 @@ public interface TemplateService {
 	/**
 	 * 获得用户在某个模块某个类型的默认模板
 	 * @param userId 用户id
-	 * @param module 模块名({@linkplain DataCenterConstants#TEMPLATE_MODULE_PEOPLE people}, 
-	 * {@linkplain DataCenterConstants#TEMPLATE_MODULE_ADDRESS address})
+	 * @param module 模块名({@linkplain DataCenterConstants#MODULE_KEY_PEOPLE people}, 
+	 * {@linkplain DataCenterConstants#MODULE_KEY_ADDRESS address})
 	 * @param type 模板类型({@linkplain DataCenterConstants#TEMPLATE_TYPE_LIST list}, 
 	 * {@linkplain DataCenterConstants#TEMPLATE_TYPE_DETAIL detail})
 	 * @return

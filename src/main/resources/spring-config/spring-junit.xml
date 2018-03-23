@@ -31,6 +31,58 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 	
+	<bean id="baseNodeContextConfig" class="cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig"  >
+		<property name="mappingName" value="baseinfoImport" />
+		<property name="module" value="people" />
+	</bean>
+	
+	<bean id="importBaseNodeContextConfig" class="cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig"  >
+		<property name="mappingName" value="importBase" />
+		<property name="module" value="people" />
+	</bean>
+	
+	<bean id="importHandicappedNodeContextConfig" class="cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig"  >
+		<property name="mappingName" value="importHandicapped" />
+		<property name="module" value="people" />
+	</bean>
+	
+	<bean id="importLowincomeNodeContextConfig" class="cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig"  >
+		<property name="mappingName" value="importLowincome" />
+		<property name="module" value="people" />
+	</bean>
+	
+	<bean id="importFamilyPlanningNodeContextConfig" class="cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig"  >
+		<property name="mappingName" value="importFamilyPlanning" />
+		<property name="module" value="people" />
+	</bean>
+	
+	<bean id="addressBaseContextConfig" class="cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig"  >
+		<property name="mappingName" value="addressBase" />
+		<property name="module" value="address" />
+	</bean>
+	
+	<bean class="cn.sowell.datacenter.model.abc.service.impl.FusionContextFactoryDC">
+		<property name="configMap">
+			<map>
+				<entry key="base" value-ref="baseNodeContextConfig" />
+				<entry key="importBase" value-ref="importBaseNodeContextConfig" />
+				<entry key="importHandicapped" value-ref="importHandicappedNodeContextConfig" />
+				<entry key="importLowincome" value-ref="importLowincomeNodeContextConfig" />
+				<entry key="importFamilyPlanning" value-ref="importFamilyPlanningNodeContextConfig" />
+				<entry key="addressBase" value-ref="addressBaseContextConfig" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean class="cn.sowell.copframe.spring.propTranslator.PropertyValueTranslatorSet">
+		<property name="translatorSet">
+			<set>
+				<bean class="cn.sowell.copframe.spring.propTranslator.translator.DatePropertyValueTranlator" />
+			</set>
+		</property>
+	</bean>
+	
+	<bean class="cn.sowell.copframe.dao.utils.NormalOperateDaoImpl" />
 	
 	<aop:config>
 		<aop:pointcut id="junitPointCuts"

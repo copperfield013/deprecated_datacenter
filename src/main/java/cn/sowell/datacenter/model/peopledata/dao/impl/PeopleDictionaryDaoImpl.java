@@ -76,45 +76,6 @@ public class PeopleDictionaryDaoImpl implements PeopleDictionaryDao{
 		
 	}
 
-	@Override
-	public Map<Long, List<OptionItem>> getFieldOptionsMap(Set<Long> fieldIds) {
-		Map<Long, List<OptionItem>> map = new HashMap<Long, List<OptionItem>>();
-		if(fieldIds != null && !fieldIds.isEmpty()) {
-			String sql = 
-					"	SELECT" +
-							"		f.id field_id, o.c_title" +
-							"	FROM" +
-							"		t_dictionary_field f" +
-							"	LEFT JOIN t_dictionary_optiongroup og ON f.optgroup_id = og.id" +
-							"	LEFT JOIN t_dictionary_option o ON og.id = o.group_id" +
-							"	where f.id in (:fieldIds)" +
-							"	and o.c_disabled is null" +
-							"	and o.c_deleted is NULL" +
-							"	and og.c_deleted is null" +
-							"	and og.c_disabled is null" +
-							"	order by o.c_order asc";
-			SQLQuery query = sFactory.getCurrentSession().createSQLQuery(sql);
-			query.setParameterList("fieldIds", fieldIds);
-			query.setResultTransformer(new ColumnMapResultTransformer<byte[]>() {
-				private static final long serialVersionUID = -392302880551548725L;
-				
-				@Override
-				protected byte[] build(SimpleMapWrapper mapWrapper) {
-					OptionItem item = new OptionItem();
-					item.setTitle(mapWrapper.getString("c_title"));
-					item.setValue(mapWrapper.getString("c_title"));
-					Long fieldId = mapWrapper.getLong("field_id");
-					if(!map.containsKey(fieldId)){
-						map.put(fieldId, new ArrayList<OptionItem>());
-					}
-					map.get(fieldId).add(item);
-					return null;
-				}
-			});
-			query.list();
-		}
-		return map;
-	}
 	
 }
 

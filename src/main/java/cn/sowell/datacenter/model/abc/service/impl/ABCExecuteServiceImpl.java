@@ -1,4 +1,4 @@
-package cn.sowell.datacenter.model.basepeople.service.impl;
+package cn.sowell.datacenter.model.abc.service.impl;
 
 import java.io.FileInputStream;
 import java.text.DateFormat;
@@ -34,26 +34,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.springframework.stereotype.Service;
 
-import cn.sowell.copframe.dto.page.PageInfo;
-import cn.sowell.copframe.spring.propTranslator.PropertyParser;
-import cn.sowell.copframe.utils.CollectionUtils;
-import cn.sowell.copframe.utils.FormatUtils;
-import cn.sowell.copframe.utils.TextUtils;
-import cn.sowell.copframe.utils.excel.CellTypeUtils;
-import cn.sowell.datacenter.admin.controller.people.ExportDataPageInfo;
-import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
-import cn.sowell.datacenter.model.basepeople.EntityPagingQueryProxy;
-import cn.sowell.datacenter.model.basepeople.EntityQueryAdapter;
-import cn.sowell.datacenter.model.basepeople.dao.PropertyDictionaryDao;
-import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
-import cn.sowell.datacenter.model.basepeople.pojo.PeopleDataHistoryItem;
-import cn.sowell.datacenter.model.basepeople.pojo.PeoplePropertyDictionary;
-import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
-import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
-import cn.sowell.datacenter.model.peopledata.service.PojoService;
-import cn.sowell.datacenter.model.peopledata.service.impl.EntityTransfer;
-import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
-
 import com.abc.application.BizFusionContext;
 import com.abc.application.FusionContext;
 import com.abc.application.RemovedFusionContext;
@@ -66,6 +46,29 @@ import com.abc.panel.PanelFactory;
 import com.abc.query.criteria.Criteria;
 import com.abc.query.entity.impl.EntitySortedPagedQuery;
 import com.abc.record.HistoryTracker;
+
+import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.copframe.spring.propTranslator.PropertyParser;
+import cn.sowell.copframe.utils.CollectionUtils;
+import cn.sowell.copframe.utils.FormatUtils;
+import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.copframe.utils.excel.CellTypeUtils;
+import cn.sowell.datacenter.admin.controller.people.ExportDataPageInfo;
+import cn.sowell.datacenter.model.abc.service.ABCExecuteService;
+import cn.sowell.datacenter.model.basepeople.EntityPagingQueryProxy;
+import cn.sowell.datacenter.model.basepeople.EntityQueryAdapter;
+import cn.sowell.datacenter.model.basepeople.dao.PropertyDictionaryDao;
+import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
+import cn.sowell.datacenter.model.basepeople.pojo.PeoplePropertyDictionary;
+import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
+import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
+import cn.sowell.datacenter.model.modules.EntityPropertyParser;
+import cn.sowell.datacenter.model.modules.pojo.EntityHistoryItem;
+import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
+import cn.sowell.datacenter.model.peopledata.service.PojoService;
+import cn.sowell.datacenter.model.peopledata.service.impl.EntityTransfer;
+import cn.sowell.datacenter.model.peopledata.status.ImportStatus;
+import cn.sowell.datacenter.model.tmpl.bean.QueryEntityParameter;
 
 
 @Service
@@ -90,7 +93,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	
 	@Override
-	public EntityPagingQueryProxy getQueryProxy(List<Criteria> cs,
+	public EntityPagingQueryProxy getPeopleQueryProxy(List<Criteria> cs,
 			ExportDataPageInfo ePageInfo) {
 		BizFusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
 		Discoverer discoverer=PanelFactory.getDiscoverer(context);
@@ -114,6 +117,14 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		pageInfo.setCount(sortedPagedQuery.getAllCount());
 		List<Entity> peoples = sortedPagedQuery.visit(pageInfo.getPageNo());
 		return peoples;
+	}
+	
+	@Override
+	public List<Entity> queryModuleEntities(QueryEntityParameter param) {
+		return queryEntityList(
+				fFactory.mapDefaultModuleEntityConfig(param.getModule()), 
+				param.getCriterias(), 
+				param.getPageInfo());
 	}
 	
 	@Override
@@ -310,6 +321,15 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	}
 	
 	@Override
+	public Entity getHistoryEntity(QueryEntityParameter param, List<ErrorInfomation> errors) {
+		return getHistoryEntity(
+				fFactory.mapDefaultModuleEntityConfig(param.getModule()), 
+				param.getCode(), 
+				param.getHistoryTime(), 
+				errors);
+	}
+	
+	@Override
 	public Entity getHistoryPeople(String peopleCode, Date date, List<ErrorInfomation> errors) {
 		return getHistoryEntity(FusionContextFactoryDC.KEY_BASE, peopleCode, date, errors);
 		
@@ -475,16 +495,16 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	
 	@Override
-	public List<PeopleDataHistoryItem> queryHistory(String peopleCode,
+	public List<EntityHistoryItem> queryHistory(String module, String code,
 			Integer pageNo, Integer pageSize) {
-		BizFusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
+		BizFusionContext context = fFactory.getContext(fFactory.mapDefaultModuleEntityConfig(module));
 		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		
-		List<RecordHistory> historyList = discoverer.trackHistory(peopleCode, pageNo, pageSize);
+		List<RecordHistory> historyList = discoverer.trackHistory(code, pageNo, pageSize);
 		
-		List<PeopleDataHistoryItem> list = new ArrayList<PeopleDataHistoryItem>();
+		List<EntityHistoryItem> list = new ArrayList<EntityHistoryItem>();
 		historyList.forEach(history->{
-			PeopleDataHistoryItem item = new PeopleDataHistoryItem();
+			EntityHistoryItem item = new EntityHistoryItem();
 			item.setId(FormatUtils.toLong(history.getId()));
 			item.setTime(history.getCreationTime());
 			item.setUserName(toUserName(history.getUsergroupId()));
@@ -506,5 +526,51 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 		return result;
 	}
 	
+	@Override
+	public Entity getModuleEntity(String module, String code) {
+		BizFusionContext context = fFactory.getContext(fFactory.mapDefaultModuleEntityConfig(module));
+		Discoverer discoverer=PanelFactory.getDiscoverer(context);
+		Entity result=discoverer.discover(code);
+		return result;
+	}
+	
 
+	@Override
+	public void delete(String code) {
+		RemovedFusionContext appInfo=new RemovedFusionContext(code, null, "list-delete" );
+		if(!PanelFactory.getIntegration().remove(appInfo)){
+			throw new RuntimeException("删除失败");
+		}
+	}
+	
+	@Override
+	public String mergeEntity(String module, Map<String, Object> propMap) {
+		String configName = fFactory.mapDefaultModuleEntityConfig(module);
+		FusionContextConfig config = fFactory.getConfig(configName);
+		if(config.getConfigResolver() == null) {
+			throw new RuntimeException("config[" + configName + "]没有注入对应的ConfigResolver对象");
+		}
+		Entity entity = config.getConfigResolver().createEntity(propMap);
+		if(entity != null) {
+			BizFusionContext context = fFactory.getContext(configName);
+			context.setSource(FusionContext.SOURCE_COMMON);
+			
+			Integration integration=PanelFactory.getIntegration();
+			return integration.integrate(entity, context);
+		}else {
+			throw new RuntimeException("无法创建config[" + configName + "]的entity对象");
+		}
+	}	
+	
+	@Override
+	public EntityPropertyParser getModuleEntityParser(String module, String code) {
+		return getModuleEntityParser(module, getModuleEntity(module, code));
+	}
+	
+	@Override
+	public EntityPropertyParser getModuleEntityParser(String module, Entity entity) {
+		String configName = fFactory.mapDefaultModuleEntityConfig(module);
+		FusionContextConfig config = fFactory.getConfig(configName);
+		return config.getConfigResolver().createParser(entity);
+	}
 }

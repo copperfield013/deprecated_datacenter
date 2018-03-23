@@ -47,7 +47,7 @@ public class BasePeopleServiceImpl implements BasePeopleService{
 	@Resource
 	BasePeopleDao basePeopleDao;
 	
-	private TransportClient client = SearchTransportClient.getInstance().getTransportClient();
+	private TransportClient client ;//= SearchTransportClient.getInstance().getTransportClient();
 	
 	@Override
 	public List<BasePeople> queryList(BasePeopleCriteria criteria, PageInfo pageInfo) {

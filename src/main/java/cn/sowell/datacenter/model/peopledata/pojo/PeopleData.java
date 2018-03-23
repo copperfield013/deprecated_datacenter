@@ -6,7 +6,7 @@ import java.util.List;
 import com.abc.dto.ErrorInfomation;
 
 import cn.sowell.datacenter.model.peopledata.EntityElement;
-import cn.sowell.datacenter.model.peopledata.EntityRecord;
+import cn.sowell.datacenter.model.peopledata.EntityRelation;
 
 
 public class PeopleData implements EntityData{
@@ -89,11 +89,11 @@ public class PeopleData implements EntityData{
 	
 	/*****工作信息******/
 	@EntityElement(value="workExperience")
-	@EntityRecord(elementClass=WorkExperience.class, entityName="workExperience", domainName="工作经历")
+	@EntityRelation(elementClass=WorkExperience.class, entityName="workExperience", domainName="工作经历")
 	private List<WorkExperience> workExperiences;
 	
 	@EntityElement("家庭信息")
-	@EntityRecord(entityName="familyInfomation", domainName="家庭信息")
+	@EntityRelation(entityName="familyInfomation", domainName="家庭信息")
 	private FamilyInfo familyInfo;
 	
 	

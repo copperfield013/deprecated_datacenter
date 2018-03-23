@@ -9,17 +9,18 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import cn.sowell.copframe.dto.page.PageInfo;
-import cn.sowell.datacenter.model.address.pojo.AddressData;
-import cn.sowell.datacenter.model.address.service.TemplateAddressService;
-import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
-import cn.sowell.datacenter.model.peopledata.service.impl.EntityTransfer;
-import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
-import cn.sowell.datacenter.model.tmpl.service.ListTemplateService;
-
 import com.abc.dto.ErrorInfomation;
 import com.abc.mapping.entity.Entity;
 import com.abc.query.criteria.Criteria;
+
+import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.datacenter.model.abc.service.ABCExecuteService;
+import cn.sowell.datacenter.model.address.pojo.AddressData;
+import cn.sowell.datacenter.model.address.service.TemplateAddressService;
+import cn.sowell.datacenter.model.modules.service.ModulesService;
+import cn.sowell.datacenter.model.peopledata.service.impl.EntityTransfer;
+import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
+import cn.sowell.datacenter.model.tmpl.service.ListTemplateService;
 
 @Service
 public class TemplateAddressServiceImpl implements TemplateAddressService {
@@ -30,10 +31,13 @@ public class TemplateAddressServiceImpl implements TemplateAddressService {
 	@Resource
 	ABCExecuteService abcService;
 	
+	@Resource
+	ModulesService mService;
+	
 	@Override
 	public List<AddressData> queryAddressList(Set<NormalCriteria> criteriaMap,
 			PageInfo pageInfo) {
-		List<Criteria> cs = ltmplService.toCriterias(criteriaMap);
+		List<Criteria> cs = mService.toCriterias(criteriaMap);
 		List<Entity> list = abcService.queryAddressList(cs, pageInfo);
 		List<AddressData> res = new ArrayList<AddressData>();
 		list.forEach(e->res.add(transfer(e)));
@@ -60,15 +64,17 @@ public class TemplateAddressServiceImpl implements TemplateAddressService {
 	
 	@Override
 	public AddressData getHistoryAddress(String code, Date date) {
-		if(date == null){
-			date = new Date();
-		}
 		List<ErrorInfomation> errors = new ArrayList<ErrorInfomation>();
-		Entity people = abcService.getHistoryPeople(code, date, errors);
-		AddressData peopleData = transfer(people);
-		if(peopleData != null){
-			peopleData.setErrors(errors);
+		Entity address;
+		if(date != null) {
+			address = abcService.getHistoryAddress(code, date, errors);
+		}else {
+			address = abcService.getAddressEntity(code);
 		}
-		return peopleData;
+		AddressData addressData = transfer(address);
+		if(addressData != null){
+			addressData.setErrors(errors);
+		}
+		return addressData;
 	}
 }

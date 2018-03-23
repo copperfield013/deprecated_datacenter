@@ -18,9 +18,9 @@ public interface PeopleDictionaryService {
 	 * 获取所有枚举对象
 	 * @return
 	 */
-	List<DictionaryOption> getAllEnumList();
+	//List<DictionaryOption> getAllEnumList();
 
-	Map<Long, List<OptionItem>> getOptionsMap(Set<Long> fieldIds);
+	//Map<Long, List<OptionItem>> getOptionsMap(Set<Long> fieldIds);
 
 
 }

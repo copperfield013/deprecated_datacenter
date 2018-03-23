@@ -228,21 +228,6 @@ public class EntityTransfer {
 							Object entityValue = transferNormalEntityValue(value, composite);
 							target.putValue(propName, entityValue);
 							break;
-						/*case TYPE_RECORD:
-							EntityRecord annoRecord = composite.getFieldAnno(EntityRecord.class);
-							//如果是集合的话，那么要对集合的元素进行转换
-							if(value instanceof Collection) {
-								for (Object ele : (Collection<Object>)value) {
-									//构造集合内的一个元素对应的entity
-									//将pojo的数据绑定到entity
-									Entity rEntity = bindData(ele, new Entity(annoRecord.entityName()));
-									target.putRecordEntity(propName, annoRecord.domainName(), rEntity);
-								}
-							}else if(value != null){
-								Entity rEntity = bindData(value, new Entity(annoRecord.entityName()));
-								target.putRecordEntity(propName, annoRecord.domainName(), rEntity);
-							}
-							break;*/
 						case TYPE_RELATION:
 							EntityRelation annoRelation = composite.getFieldAnno(EntityRelation.class);
 							//如果是集合的话，那么要对集合的元素进行转换
@@ -307,6 +292,7 @@ public class EntityTransfer {
 		bindData(pojo, target);
 		entityPojoEntityMap.remove(Thread.currentThread());
 	}
+	
 	private Entity getExistEntity(Object pojo) {
 		Map<Object, Entity> peMap = entityPojoEntityMap.get(Thread.currentThread());
 		if(peMap != null) {

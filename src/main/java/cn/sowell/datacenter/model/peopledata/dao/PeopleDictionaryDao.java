@@ -39,12 +39,4 @@ public interface PeopleDictionaryDao {
 	 */
 	List<DictionaryOption> getAllEnumList();
 
-	/**
-	 * 根据字段id获得对应的所有选项
-	 * @param fieldIds
-	 * @return
-	 */
-	Map<Long, List<OptionItem>> getFieldOptionsMap(Set<Long> fieldIds);
-
-
 }

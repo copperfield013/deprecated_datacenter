@@ -1,11 +1,11 @@
-package cn.sowell.datacenter.model.basepeople.pojo;
+package cn.sowell.datacenter.model.modules.pojo;
 
 import java.util.Calendar;
 import java.util.Date;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
-public class PeopleDataHistoryItem {
+public class EntityHistoryItem {
 	private Long id;
 	private Date time;
 	private String userName;

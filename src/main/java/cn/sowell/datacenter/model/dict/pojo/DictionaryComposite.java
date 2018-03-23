@@ -21,9 +21,9 @@ public class DictionaryComposite {
 	@JSONField(name="c_id")
 	private Long id;
 	
-	@Column(name="c_full_key")
+	@Column(name="c_name")
 	@JSONField(name="name")
-	private String fullKey;
+	private String name;
 	
 	@Column(name="c_title")
 	@JSONField(name="cname")
@@ -54,11 +54,11 @@ public class DictionaryComposite {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public String getFullKey() {
-		return fullKey;
+	public String getName() {
+		return name;
 	}
-	public void setFullKey(String fullKey) {
-		this.fullKey = fullKey;
+	public void setName(String name) {
+		this.name = name;
 	}
 	public String getTitle() {
 		return title;

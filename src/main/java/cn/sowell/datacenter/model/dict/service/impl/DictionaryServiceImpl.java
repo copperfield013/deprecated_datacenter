@@ -2,6 +2,7 @@ package cn.sowell.datacenter.model.dict.service.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -11,7 +12,9 @@ import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.datacenter.model.dict.dao.DictionaryDao;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryComposite;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryField;
+import cn.sowell.datacenter.model.dict.pojo.DictionaryOption;
 import cn.sowell.datacenter.model.dict.service.DictionaryService;
+import cn.sowell.datacenter.model.peopledata.pojo.OptionItem;
 
 @Service
 public class DictionaryServiceImpl implements DictionaryService{
@@ -27,5 +30,20 @@ public class DictionaryServiceImpl implements DictionaryService{
 		composites.forEach(composite->composite.setFields(fieldMap.get(composite.getId())));
 		return composites;
 	}
+	
+	@Override
+	public List<DictionaryField> getAllFields(String module) {
+		return dictDao.getAllFields(module);
+	}
 
+	@Override
+	public List<DictionaryOption> getAllOptions() {
+		return dictDao.getAllOptions();
+	}
+	
+	@Override
+	public Map<Long, List<OptionItem>> getOptionsMap(Set<Long> fieldIds) {
+		return dictDao.getFieldOptionsMap(fieldIds);
+	}
+	
 }

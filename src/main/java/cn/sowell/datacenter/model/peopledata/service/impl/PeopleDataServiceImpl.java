@@ -20,10 +20,10 @@ import cn.sowell.copframe.spring.propTranslator.PropertyParser;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.admin.controller.people.ExportDataPageInfo;
-import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
+import cn.sowell.datacenter.model.abc.service.ABCExecuteService;
+import cn.sowell.datacenter.model.abc.service.impl.FusionContextFactoryDC;
 import cn.sowell.datacenter.model.basepeople.EntityPagingQueryProxy;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
-import cn.sowell.datacenter.model.basepeople.service.impl.FusionContextFactoryDC;
 import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
 import cn.sowell.datacenter.model.peopledata.pojo.criteria.PeopleDataCriteria;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
@@ -73,7 +73,7 @@ public class PeopleDataServiceImpl implements PeopleDataService{
 			ExportDataPageInfo ePageInfo) {
 		PageInfo pageInfo = ePageInfo.getPageInfo();
 		List<Criteria> cs = ltmplService.toCriterias(nCriterias);
-		EntityPagingQueryProxy proxy = abcService.getQueryProxy(cs, ePageInfo);
+		EntityPagingQueryProxy proxy = abcService.getPeopleQueryProxy(cs, ePageInfo);
 		Function<Integer, Set<PeopleData>> dataGetter = new Function<Integer, Set<PeopleData>>() {
 
 			@Override

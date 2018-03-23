@@ -12,12 +12,12 @@ import javax.annotation.Resource;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.format.Formatter;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.WebDataBinder;
 
 import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
-import cn.sowell.datacenter.model.basepeople.ABCExecuteService;
+import cn.sowell.datacenter.model.abc.service.ABCExecuteService;
 import cn.sowell.datacenter.model.basepeople.ExcelModelCriteria;
 import cn.sowell.datacenter.model.basepeople.dao.BasePeopleDao;
 import cn.sowell.datacenter.model.basepeople.pojo.ExcelModel;
@@ -50,11 +50,17 @@ public class PeopleButtServiceImpl implements PeopleButtService{
 	}
 
 	@Override
-	public void updatePeople(String peopleCode, Map<String, String> map) {
-		Assert.hasText(peopleCode);
-		PeopleData people = peopleService.getPeople(peopleCode);
+	public void mergePeople(String peopleCode, Map<String, String> map) {
+		PeopleData people;
+		boolean hasPeopleCode = TextUtils.hasText(peopleCode);
+		if(hasPeopleCode) {
+			people = peopleService.getPeople(peopleCode);
+			people.setPeopleCode(peopleCode);
+		}else {
+			people = new PeopleData();
+		}
 		bindProperties(people, map);
-		people.setPeopleCode(peopleCode);
+		if(!hasPeopleCode) people.setPeopleCode(null);
 		abcService.savePeople(people);
 	}
 

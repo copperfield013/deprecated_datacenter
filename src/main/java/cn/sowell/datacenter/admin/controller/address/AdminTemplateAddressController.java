@@ -25,6 +25,8 @@ import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.address.pojo.AddressData;
 import cn.sowell.datacenter.model.address.service.TemplateAddressService;
 import cn.sowell.datacenter.model.admin.pojo.ExportStatus;
+import cn.sowell.datacenter.model.dict.service.DictionaryService;
+import cn.sowell.datacenter.model.modules.service.ModulesService;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataExportService;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDataService;
 import cn.sowell.datacenter.model.peopledata.service.PeopleDictionaryService;
@@ -39,7 +41,7 @@ import cn.sowell.datacenter.model.tmpl.service.TemplateService;
 @RequestMapping(AdminConstants.URI_BASE + "/address/tmpl")
 public class AdminTemplateAddressController {
 	@Resource
-	PeopleDictionaryService dictService;
+	DictionaryService dictService;
 	
 	@Resource
 	ListTemplateService ltmplService;
@@ -62,10 +64,12 @@ public class AdminTemplateAddressController {
 	@Resource
 	TemplateService tService;
 	
+	@Resource
+	ModulesService mService;
 	
 	@RequestMapping("/list")
 	public String list(Long tmplId, PageInfo pageInfo, Model model, HttpServletRequest request, HttpSession session){
-		ListTemplateParameter param = ltmplService.exractTemplateParameter(tmplId, DataCenterConstants.TEMPLATE_MODULE_ADDRESS, request);
+		ListTemplateParameter param = mService.exractTemplateParameter(tmplId, DataCenterConstants.MODULE_KEY_ADDRESS, request);
 		if(param.getListTemplate() != null){
 			List<AddressData> srcList = addressService.queryAddressList(new HashSet<NormalCriteria>(param.getNormalCriteriaMap().values()), pageInfo);
 			List<PropertyParser> parserList = new ArrayList<PropertyParser>();
@@ -106,7 +110,7 @@ public class AdminTemplateAddressController {
          UserIdentifier user = UserUtils.getCurrentUser();
          TemplateDetailTemplate template = null;
          if(tmplId == null){
-        	 template = tService.getDefaultDetailTemplate(user, DataCenterConstants.TEMPLATE_MODULE_PEOPLE);
+        	 template = tService.getDefaultDetailTemplate(user, DataCenterConstants.MODULE_KEY_ADDRESS);
          }else{
         	 template = tService.getDetailTemplate(tmplId);
          }
@@ -121,7 +125,7 @@ public class AdminTemplateAddressController {
          model.addAttribute("date", date == null? new Date() : date);
          model.addAttribute("tmplList", tmplList);
          model.addAttribute("timestamp", timestamp);
-         return AdminConstants.JSP_ADDRESS + "/address_detail_tmpl.jsp";
+         return AdminConstants.JSP_ADDRESS + "/tmpl/address_detail_tmpl.jsp";
     }
 	
 	
