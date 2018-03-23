@@ -378,7 +378,7 @@ define(function(require, exports, module){
 		
 		var $CPF = require('$CPF');
 		$CPF.showLoading();
-		FieldInput.loadGlobalOptions('admin/peopledata/dict/enum_json').done(function(){
+		FieldInput.loadGlobalOptions('admin/field/enum_json').done(function(){
 			if($.isArray(criteriaData) && criteriaData.length > 0){
 				$CPF.showLoading();
 				+function addCriteriaItem(index){

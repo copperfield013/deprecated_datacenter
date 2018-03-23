@@ -440,6 +440,7 @@ div.detail-toggle-sublist {
     padding: 10px 0;
     padding-bottom: 30px;
     overflow: hidden;
+    z-index: 10;
 }
 
 div.detail-toggle-sublist div.detail-toggle-sublist-wrapper {
