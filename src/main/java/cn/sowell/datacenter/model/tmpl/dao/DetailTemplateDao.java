@@ -6,7 +6,7 @@ import java.util.Set;
 
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dto.page.PageInfo;
-import cn.sowell.datacenter.model.peopledata.pojo.TemplateDetailField;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailField;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
 

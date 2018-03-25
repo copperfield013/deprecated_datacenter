@@ -6,12 +6,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.MutablePropertyValues;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.ServletRequestParameterPropertyValues;
 
 import com.abc.application.FusionContext;
@@ -22,16 +23,21 @@ import com.abc.query.criteria.CriteriaFactory;
 
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.UserUtils;
+import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.DataCenterConstants;
+import cn.sowell.datacenter.model.abc.resolver.FusionContextFactoryDC;
 import cn.sowell.datacenter.model.abc.service.ABCExecuteService;
-import cn.sowell.datacenter.model.abc.service.impl.FusionContextFactoryDC;
 import cn.sowell.datacenter.model.dict.service.DictionaryService;
 import cn.sowell.datacenter.model.modules.EntityPropertyParser;
+import cn.sowell.datacenter.model.modules.bean.EntityPagingIterator;
+import cn.sowell.datacenter.model.modules.bean.EntityPagingQueryProxy;
+import cn.sowell.datacenter.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.datacenter.model.modules.pojo.EntityHistoryItem;
 import cn.sowell.datacenter.model.modules.pojo.ModuleMeta;
+import cn.sowell.datacenter.model.modules.service.ModulesImportService;
 import cn.sowell.datacenter.model.modules.service.ModulesService;
 import cn.sowell.datacenter.model.tmpl.bean.QueryEntityParameter;
 import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
@@ -40,7 +46,7 @@ import cn.sowell.datacenter.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTempalte;
 import cn.sowell.datacenter.model.tmpl.service.TemplateService;
 
-@Repository
+@Service
 public class ModulesServiceImpl implements ModulesService{
 	
 	@Resource
@@ -54,6 +60,9 @@ public class ModulesServiceImpl implements ModulesService{
 	
 	@Resource
 	DictionaryService dictService;
+	
+	@Resource
+	ModulesImportService impService;
 	
 	Map<String, ModuleMeta> moduleMap;
 	
@@ -194,5 +203,39 @@ public class ModulesServiceImpl implements ModulesService{
 	public String mergeEntity(String module, Map<String, Object> map) {
 		return abcService.mergeEntity(module, map);
 	}
+	
+	@Override
+	public EntityPagingIterator queryIterator(TemplateListTempalte ltmpl, Set<NormalCriteria> nCriterias,
+			ExportDataPageInfo ePageInfo) {
+		PageInfo pageInfo = ePageInfo.getPageInfo();
+		List<Criteria> cs = toCriterias(nCriterias);
+		String configName = fFactory.mapDefaultModuleEntityConfig(ltmpl.getModule());
+		EntityPagingQueryProxy proxy = abcService.getModuleQueryProxy(configName, cs, ePageInfo);
+		int dataCount = pageInfo.getPageSize();
+		int startPageNo = pageInfo.getPageNo();
+		int totalCount = proxy.getTotalCount();
+		int ignoreCount = 0;
+		if(totalCount < pageInfo.getPageSize()) {
+			dataCount = totalCount;
+			startPageNo = 1;
+		}
+		if("all".equals(ePageInfo.getScope())){
+			dataCount = proxy.getTotalCount();
+			startPageNo = 1;
+			if(ePageInfo.getRangeStart() != null){
+				ignoreCount = ePageInfo.getRangeStart() - 1;
+				if(ePageInfo.getRangeEnd() != null){
+					dataCount = ePageInfo.getRangeEnd() - ePageInfo.getRangeStart() + 1;
+				}else{
+					dataCount -= ePageInfo.getRangeStart() - 1;
+				}
+			}else if(ePageInfo.getRangeEnd() != null){
+				dataCount = ePageInfo.getRangeEnd();
+			}
+		}
+		return new EntityPagingIterator(totalCount, dataCount, ignoreCount, startPageNo, proxy);
+	}
+	
+	
 	
 }

@@ -5,7 +5,7 @@ import com.abc.mapping.entity.Entity;
 import com.abc.mapping.node.ABCNode;
 
 import cn.sowell.datacenter.model.abc.resolver.EntityBindContext;
-import cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig;
+import cn.sowell.datacenter.model.abc.resolver.FusionContextConfig;
 
 public class ABCNodeFusionContextConfigResolver extends AbstractFusionContextConfigResolver{
 

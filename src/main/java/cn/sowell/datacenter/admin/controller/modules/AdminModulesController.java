@@ -27,6 +27,7 @@ import cn.sowell.copframe.utils.Assert;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.model.abc.resolver.FusionContextFactoryDC;
 import cn.sowell.datacenter.model.admin.pojo.ExportStatus;
 import cn.sowell.datacenter.model.dict.service.DictionaryService;
 import cn.sowell.datacenter.model.modules.EntityPropertyParser;
@@ -35,7 +36,6 @@ import cn.sowell.datacenter.model.modules.pojo.EntityHistoryItem;
 import cn.sowell.datacenter.model.modules.pojo.ModuleMeta;
 import cn.sowell.datacenter.model.modules.service.ExportService;
 import cn.sowell.datacenter.model.modules.service.ModulesService;
-import cn.sowell.datacenter.model.peopledata.service.PeopleButtService;
 import cn.sowell.datacenter.model.tmpl.bean.QueryEntityParameter;
 import cn.sowell.datacenter.model.tmpl.param.ListTemplateParameter;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
@@ -43,7 +43,7 @@ import cn.sowell.datacenter.model.tmpl.service.ListTemplateService;
 import cn.sowell.datacenter.model.tmpl.service.TemplateService;
 
 @Controller
-@RequestMapping(AdminConstants.URI_MODULES)
+@RequestMapping(AdminConstants.URI_MODULES + "/curd")
 public class AdminModulesController {
 	
 	@Resource
@@ -58,17 +58,16 @@ public class AdminModulesController {
 	@Resource
 	ListTemplateService ltmplService;
 	
-	
-	
-	Logger logger = Logger.getLogger(AdminModulesController.class);
-
 	@Resource
 	TemplateService tService;
 
-	PeopleButtService buttService;
-
 	@Resource
 	FrameDateFormat dateFormat;
+	
+	@Resource
+	FusionContextFactoryDC fFactory;
+	
+	Logger logger = Logger.getLogger(AdminModulesController.class);
 
 	
 	/**
@@ -150,6 +149,7 @@ public class AdminModulesController {
 		model.addAttribute("dtmpl", dtmpl);
 		model.addAttribute("dtmpls", tService.getAllDetailTemplateList(module, user, null, false));
 		model.addAttribute("module", mMeta);
+		model.addAttribute("config", fFactory.getDefaultConfig(module));
 		return AdminConstants.JSP_MODULES + "/modules_update_tmpl.jsp";
 	}
 	
@@ -169,8 +169,10 @@ public class AdminModulesController {
 		model.addAttribute("module", mMeta);
 		model.addAttribute("dtmpl", dtmpl);
 		model.addAttribute("dtmpls", tService.getAllDetailTemplateList(module, user, null, false));
+		model.addAttribute("config", fFactory.getDefaultConfig(module));
 		return AdminConstants.JSP_MODULES + "/modules_update_tmpl.jsp";
 	}
+	
 	
 	@ResponseBody
     @RequestMapping("/save/{module}")
@@ -221,6 +223,10 @@ public class AdminModulesController {
 			return AjaxPageResponse.FAILD("删除失败");
 		}
 	}
+	
+	
+	
+	
 	
 
 	private TemplateDetailTemplate coalesceDetailTempalte(Long tmplId, UserIdentifier user, String module) {

@@ -12,6 +12,7 @@ import cn.sowell.datacenter.model.abc.resolver.EntityBindContext;
 import cn.sowell.datacenter.model.abc.resolver.EntityElement;
 import cn.sowell.datacenter.model.abc.resolver.EntityProxy;
 import cn.sowell.datacenter.model.abc.resolver.PropertyNamePartitions;
+import cn.sowell.datacenter.model.abc.resolver.exception.UnsupportedEntityElementException;
 import common.Logger;
 
 public class ABCNodeEntityBindContext extends AbstractEntityBindContext {
@@ -66,7 +67,11 @@ public class ABCNodeEntityBindContext extends AbstractEntityBindContext {
 	@Override
 	protected EntityElement getEntityElement(String propName) {
 		ABCNodeProxy ele = this.node.getElement(propName);
-		return ele.getEntityElement();
+		if(ele != null) {
+			return ele.getEntityElement();
+		}else {
+			throw new UnsupportedEntityElementException("没有找到属性[" + propName + "]");
+		}
 	}
 	
 	

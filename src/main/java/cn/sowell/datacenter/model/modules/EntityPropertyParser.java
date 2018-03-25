@@ -15,23 +15,25 @@ import cn.sowell.copframe.utils.Assert;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.datacenter.model.abc.resolver.FusionContextConfig;
 import cn.sowell.datacenter.model.abc.resolver.PropertyNamePartitions;
 
 public class EntityPropertyParser{
 
 	private Entity entity;
 	private Map<String, FieldParserDescription> fieldMap;
-	private String titleKey = "name";
-	private String codeKey = "code";
 	private List<ErrorInfomation> errors;
+	private FusionContextConfig config;
 	
 	
 	
-	public EntityPropertyParser(Entity entity, Set<FieldParserDescription> fieldMap) {
+	public EntityPropertyParser(FusionContextConfig config, Entity entity, Set<FieldParserDescription> fieldMap) {
 		Assert.notNull(entity);
 		Assert.notNull(fieldMap);
+		Assert.notNull(config);
 		this.entity = entity;
 		this.fieldMap = CollectionUtils.toMap(fieldMap, desc->desc.getFullKey());
+		this.config = config;
 	}
 	
 	
@@ -42,11 +44,11 @@ public class EntityPropertyParser{
 	}
 	
 	public String getId() {
-		return (String) getProperty(codeKey);
+		return (String) getProperty(config.getCodeAttributeName());
 	}
 	
 	public String getTitle() {
-		return (String) getProperty(titleKey);
+		return (String) getProperty(config.getTitleAttributeName());
 	}
 	
 	public Map<String, Object> getMap(){

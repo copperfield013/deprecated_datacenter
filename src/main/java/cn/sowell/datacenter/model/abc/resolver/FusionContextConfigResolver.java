@@ -9,6 +9,7 @@ import cn.sowell.datacenter.model.modules.EntityPropertyParser;
 public interface FusionContextConfigResolver {
 	
 	Entity createEntity(Map<String, Object> map);
+	Entity createEntityIgnoreUnsupportedElement(Map<String, Object> map);
 	EntityPropertyParser createParser(Entity entity);
 	
 	

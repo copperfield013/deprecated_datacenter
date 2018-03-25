@@ -13,8 +13,8 @@ import cn.sowell.datacenter.model.dict.dao.DictionaryDao;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryComposite;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryField;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryOption;
+import cn.sowell.datacenter.model.dict.pojo.OptionItem;
 import cn.sowell.datacenter.model.dict.service.DictionaryService;
-import cn.sowell.datacenter.model.peopledata.pojo.OptionItem;
 
 @Service
 public class DictionaryServiceImpl implements DictionaryService{

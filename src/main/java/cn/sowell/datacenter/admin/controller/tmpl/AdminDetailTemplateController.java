@@ -23,10 +23,8 @@ import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.admin.controller.people.AdminPeopleViewTemplateController;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
-import cn.sowell.datacenter.model.peopledata.pojo.TemplateDetailField;
-import cn.sowell.datacenter.model.peopledata.service.PeopleDictionaryService;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailField;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.datacenter.model.tmpl.service.TemplateService;
@@ -36,15 +34,12 @@ import cn.sowell.datacenter.model.tmpl.service.TemplateService;
 public class AdminDetailTemplateController {
 
 	@Resource
-	PeopleDictionaryService dictService;
-
-	@Resource
 	SystemAdminService adminService;
 	
 	@Resource
 	TemplateService tService;
 	
-	Logger logger = Logger.getLogger(AdminPeopleViewTemplateController.class);
+	Logger logger = Logger.getLogger(AdminDetailTemplateController.class);
 	
 	@RequestMapping("/to_create/{module}")
 	public String toCreate(@PathVariable String module, Model model){

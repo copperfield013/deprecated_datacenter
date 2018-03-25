@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -12,12 +13,15 @@ import org.springframework.beans.MutablePropertyValues;
 import com.abc.query.criteria.Criteria;
 
 import cn.sowell.datacenter.model.modules.EntityPropertyParser;
+import cn.sowell.datacenter.model.modules.bean.EntityPagingIterator;
+import cn.sowell.datacenter.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.datacenter.model.modules.pojo.EntityHistoryItem;
 import cn.sowell.datacenter.model.modules.pojo.ModuleMeta;
 import cn.sowell.datacenter.model.tmpl.bean.QueryEntityParameter;
 import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
 import cn.sowell.datacenter.model.tmpl.param.ListTemplateParameter;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListCriteria;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTempalte;
 
 public interface ModulesService {
 
@@ -78,5 +82,16 @@ public interface ModulesService {
 	 * @return 
 	 */
 	String mergeEntity(String module, Map<String, Object> map);
+
+	/**
+	 * 根据条件查找列表迭代器
+	 * @param ltmpl
+	 * @param criteria
+	 * @param ePageInfo
+	 * @return
+	 */
+	EntityPagingIterator queryIterator(TemplateListTempalte ltmpl, Set<NormalCriteria> criteria,
+			ExportDataPageInfo ePageInfo);
+	
 
 }

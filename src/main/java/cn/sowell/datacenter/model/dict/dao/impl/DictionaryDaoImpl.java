@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.SessionFactory;
+import org.hibernate.type.StandardBasicTypes;
 import org.springframework.stereotype.Repository;
 
 import cn.sowell.copframe.dao.deferedQuery.ColumnMapResultTransformer;
@@ -21,7 +22,7 @@ import cn.sowell.datacenter.model.dict.dao.DictionaryDao;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryComposite;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryField;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryOption;
-import cn.sowell.datacenter.model.peopledata.pojo.OptionItem;
+import cn.sowell.datacenter.model.dict.pojo.OptionItem;
 
 
 @Repository
@@ -60,6 +61,20 @@ public class DictionaryDaoImpl implements DictionaryDao{
 				+ " where c.c_module = :module";
 		return QueryUtils.queryList(sql, DictionaryField.class, sFactory.getCurrentSession(), dQuery->dQuery.setParam("module", module));
 		
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Map<Long, DictionaryField> getFieldMap(Set<Long> fieldIds) {
+		if(fieldIds != null && !fieldIds.isEmpty()){
+			String hql = "from DictionaryField f where f.id in (:fieldIds)";
+			Query query = sFactory.getCurrentSession().createQuery(hql);
+			query.setParameterList("fieldIds", fieldIds, StandardBasicTypes.LONG);
+			List<DictionaryField> list = query.list();
+			return CollectionUtils.toMap(list, item->item.getId());
+		}else{
+			return new HashMap<Long, DictionaryField>();
+		}
 	}
 	
 	@SuppressWarnings("unchecked")

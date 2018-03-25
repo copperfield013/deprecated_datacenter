@@ -7,7 +7,7 @@ import java.util.Set;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryComposite;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryField;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryOption;
-import cn.sowell.datacenter.model.peopledata.pojo.OptionItem;
+import cn.sowell.datacenter.model.dict.pojo.OptionItem;
 
 public interface DictionaryDao {
 
@@ -35,5 +35,7 @@ public interface DictionaryDao {
 	 * @return
 	 */
 	List<DictionaryField> getAllFields(String module);
+
+	Map<Long, DictionaryField> getFieldMap(Set<Long> fieldIds);
 	
 }

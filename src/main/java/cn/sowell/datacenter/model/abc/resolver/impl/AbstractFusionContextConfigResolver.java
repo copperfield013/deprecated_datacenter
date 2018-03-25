@@ -7,8 +7,9 @@ import com.abc.mapping.entity.Entity;
 
 import cn.sowell.copframe.utils.Assert;
 import cn.sowell.datacenter.model.abc.resolver.EntityBindContext;
+import cn.sowell.datacenter.model.abc.resolver.FusionContextConfig;
 import cn.sowell.datacenter.model.abc.resolver.FusionContextConfigResolver;
-import cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig;
+import cn.sowell.datacenter.model.abc.resolver.exception.UnsupportedEntityElementException;
 import cn.sowell.datacenter.model.modules.EntityPropertyParser;
 import cn.sowell.datacenter.model.modules.FieldParserDescription;
 
@@ -28,13 +29,18 @@ public abstract class AbstractFusionContextConfigResolver implements FusionConte
 	}
 	
 	
-	@Override
-	public Entity createEntity(Map<String, Object> map) {
+	private Entity createEntity(Map<String, Object> map, boolean ignoreUnsupportedElement) {
 		Entity entity = new Entity(config.getMappingName());
 		EntityBindContext rootContext = buildRootContext(entity);
 		if(rootContext != null) {
 			map.forEach((propName, propValue)->{
-				bindElement(rootContext, propName, propValue);
+				try {
+					bindElement(rootContext, propName, propValue);
+				} catch (UnsupportedEntityElementException e) {
+					if(!ignoreUnsupportedElement) {
+						throw e;
+					}
+				}
 			});
 			((EntitiesContainedEntityProxy)rootContext.getEntity()).commit();
 			return entity;
@@ -42,9 +48,19 @@ public abstract class AbstractFusionContextConfigResolver implements FusionConte
 		return null;
 	}
 	
+	@Override
+	public Entity createEntity(Map<String, Object> map) {
+		return createEntity(map, false);
+	}
+	
+	@Override
+	public Entity createEntityIgnoreUnsupportedElement(Map<String, Object> map) {
+		return createEntity(map, true);
+	}
+	
 	
 
-	private void bindElement(EntityBindContext context, String propName, Object propValue) {
+	private void bindElement(EntityBindContext context, String propName, Object propValue) throws UnsupportedEntityElementException {
 		String[] split = propName.split("\\.", 2);
 		String prefix = split[0];
 		if(split.length == 1) {
@@ -58,7 +74,7 @@ public abstract class AbstractFusionContextConfigResolver implements FusionConte
 	@Override
 	public EntityPropertyParser createParser(Entity entity) {
 		Assert.notNull(this.fieldSet);
-		EntityPropertyParser parser = new EntityPropertyParser(entity, this.fieldSet);
+		EntityPropertyParser parser = new EntityPropertyParser(config, entity, this.fieldSet);
 		return parser ;
 	}
 

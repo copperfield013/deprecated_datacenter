@@ -9,9 +9,9 @@ import javax.annotation.Resource;
 
 import cn.sowell.copframe.dao.utils.NormalOperateDao;
 import cn.sowell.copframe.utils.CollectionUtils;
+import cn.sowell.datacenter.model.dict.dao.DictionaryDao;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryField;
-import cn.sowell.datacenter.model.peopledata.dao.PeopleDictionaryDao;
-import cn.sowell.datacenter.model.peopledata.pojo.TemplateDetailField;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailField;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.datacenter.model.tmpl.service.TemplateService;
@@ -22,10 +22,10 @@ public class TemplateDetailUpdateStrategy implements TemplateUpdateStrategy<Temp
 	NormalOperateDao nDao;
 	
 	@Resource
-	PeopleDictionaryDao dictDao;
+	TemplateService tService;
 	
 	@Resource
-	TemplateService tService;
+	DictionaryDao dictDao;
 	
 	@Override
 	public void update(TemplateDetailTemplate template) {

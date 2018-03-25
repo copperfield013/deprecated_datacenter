@@ -1,6 +1,6 @@
 package cn.sowell.datacenter.model.admin.pojo;
 
-import cn.sowell.datacenter.admin.controller.people.ExportDataPageInfo;
+import cn.sowell.datacenter.model.modules.bean.ExportDataPageInfo;
 
 public class ExportStatus {
 

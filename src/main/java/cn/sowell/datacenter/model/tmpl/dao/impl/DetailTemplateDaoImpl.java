@@ -17,8 +17,8 @@ import cn.sowell.copframe.dao.deferedQuery.HibernateRefrectResultTransformer;
 import cn.sowell.copframe.dao.utils.QueryUtils;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.CollectionUtils;
-import cn.sowell.datacenter.model.peopledata.pojo.TemplateDetailField;
 import cn.sowell.datacenter.model.tmpl.dao.DetailTemplateDao;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailField;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
 
