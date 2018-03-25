@@ -16,16 +16,16 @@
 			<a class="export btn-toggle" title="导出" id="btn-export " href="page:#export-window.toggle">
 				<i class="glyphicon glyphicon-export"></i>
 			</a>
-			<a class="import tab" href="admin/peopledata/import" title="导入" target="peopledata_import">
+			<a class="import tab" href="admin/modules/import/go/${module.key }" title="导入" target="module_${module.key }_import">
 				<i class="glyphicon glyphicon-import"></i>
 			</a>
-			<a class="tab" href="admin/modules/add/${module.key }" title="创建${module.title }" target="module_${module }_add">
+			<a class="tab" href="admin/modules/curd/add/${module.key }" title="创建${module.title }" target="module_${module.key }_add">
 				<i class="fa fa-plus"></i>
 			</a>
 		</div>
 	</div>
 	<div class="page-body">
-		<form class="form-inline"  action="admin/modules/list/${module.key }">
+		<form class="form-inline"  action="admin/modules/curd/list/${module.key }">
 			<input type="hidden" id="tmplId" name="tmplId" value="${ltmpl.id }" />
 			<c:if test="${not empty ltmpl.criterias }">
 				<c:forEach var="criteriaItem" items="${ltmpl.criterias }">
@@ -71,7 +71,7 @@
 										</c:when>
 										<c:when test="${fn:startsWith(column.specialField, 'operate')}">
 											<c:if test="${fn:contains(column.specialField, '-d') }">
-												<a href="admin/modules/detail/${module.key }/${parser.code}" 
+												<a href="admin/modules/curd/detail/${module.key }/${parser.code}" 
 													target="module_detail_${parser.code }" 
 													title="详情-${parser.title }"
 													class="tab btn btn-success btn-xs">
@@ -81,14 +81,14 @@
 											<c:if test="${fn:contains(column.specialField, '-u') }">
 												<a target="module_update_${parser.code }" 
 													title="修改-${parser.title }" 
-													href="admin/modules/update/${module.key }/${parser.code }" 
+													href="admin/modules/curd/update/${module.key }/${parser.code }" 
 													class="tab btn btn-info btn-xs edit">
 													<i class="fa fa-edit"></i>修改
 												</a>
 											</c:if>
 											<c:if test="${fn:contains(column.specialField, '-r') }">
 												<a confirm="确认删除？"
-													href="admin/modules/delete/${module.key }/${parser.code }" 
+													href="admin/modules/curd/delete/${module.key }/${parser.code }" 
 													class="btn btn-danger btn-xs delete">
 													<i class="fa fa-trash-o"></i>删除
 												</a>
@@ -214,8 +214,8 @@
 			var $exportProgress = $('#export-progress', $page);
 			//轮询处理对象
 			var handler = Ajax.poll({
-				startupURL			: 'admin/peopledata/export/do_export',
-				progressURL			: 'admin/peopledata/export/status_export',
+				startupURL			: 'admin/modules/export/start/${module.key}',
+				progressURL			: 'admin/modules/export/status',
 				whenStartupResponse	: function(data, uuid){
 					$msg.text('开始导出');
 				},
@@ -230,7 +230,7 @@
 					if(res.uuid){
 						$msg.text('导出完成');
 						$btnDownload.removeAttr('disabled').off('click').click(function(){
-							Ajax.download('admin/peopledata/export/download/' + res.uuid);
+							Ajax.download('admin/modules/export/download/' + res.uuid);
 						}).show();
 						$btnBreak.off('click').click(function(){
 							resetExport(res.uuid);

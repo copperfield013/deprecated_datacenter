@@ -117,7 +117,9 @@
 	</div>
 </div>
 <script>
-	seajs.use(['tmpl/js/dtmpl-update.js', 'ajax'], function(ViewTmpl, Ajax){
+	console.log(1);
+	seajs.use(['tmpl/js/dtmpl-update.js'], function(ViewTmpl){
+		console.log(2);
 		var $page = $('#dtmpl-update-${tmpl.id }');
 		console.log($page);
 		var updateMode = '${tmplJson != null}' == 'true';

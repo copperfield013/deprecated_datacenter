@@ -36,13 +36,8 @@
 	</a>
 	<ul class="submenu">
 	   	<li>
-	   		<a class="tab" href="admin/peopledata/list" target="peopledata_list" title="人口列表">
-	   			<span class="menu-text">ABC人口</span>
-	   		</a>
-	   	</li>
-	   	<li>
-	   		<a class="tab" href="admin/modules/list/people" target="people_list_tmpl" title="人口列表（模板）">
-	   			<span class="menu-text">人口列表（模板）</span>
+	   		<a class="tab" href="admin/modules/curd/list/people" target="people_list_tmpl" title="人口列表">
+	   			<span class="menu-text">人口列表</span>
 	   		</a>
 	   	</li>
 	</ul>
@@ -84,7 +79,7 @@
 	</a>
 	<ul class="submenu">
 		<li>
-	   		<a class="tab" href="admin/modules/list/address" target="address_list_tmpl" title="地址列表">
+	   		<a class="tab" href="admin/modules/curd/list/address" target="address_list_tmpl" title="地址列表">
 	   			<span class="menu-text">地址列表</span>
 	   		</a>
 	   	</li>

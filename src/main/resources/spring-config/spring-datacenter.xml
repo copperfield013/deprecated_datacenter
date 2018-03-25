@@ -28,37 +28,39 @@
 	
 	<import resource="spring-security.xml"/>
 	
-	<bean id="baseNodeContextConfig" class="cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig"  >
+	<bean id="baseNodeContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
 		<property name="mappingName" value="baseinfoImport" />
 		<property name="module" value="people" />
 	</bean>
 	
-	<bean id="importBaseNodeContextConfig" class="cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig"  >
+	<bean id="importBaseNodeContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
 		<property name="mappingName" value="importBase" />
 		<property name="module" value="people" />
 	</bean>
 	
-	<bean id="importHandicappedNodeContextConfig" class="cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig"  >
+	<bean id="importHandicappedNodeContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
 		<property name="mappingName" value="importHandicapped" />
 		<property name="module" value="people" />
 	</bean>
 	
-	<bean id="importLowincomeNodeContextConfig" class="cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig"  >
+	<bean id="importLowincomeNodeContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
 		<property name="mappingName" value="importLowincome" />
 		<property name="module" value="people" />
 	</bean>
 	
-	<bean id="importFamilyPlanningNodeContextConfig" class="cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig"  >
+	<bean id="importFamilyPlanningNodeContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
 		<property name="mappingName" value="importFamilyPlanning" />
 		<property name="module" value="people" />
 	</bean>
 	
-	<bean id="addressBaseContextConfig" class="cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig"  >
+	<bean id="addressBaseContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
 		<property name="mappingName" value="addressBase" />
 		<property name="module" value="address" />
+		<property name="codeAttributeName" value="编码" />
+		<property name="titleAttributeName" value="地址简称" />
 	</bean>
 	
-	<bean class="cn.sowell.datacenter.model.abc.service.impl.FusionContextFactoryDC">
+	<bean class="cn.sowell.datacenter.model.abc.resolver.FusionContextFactoryDC">
 		<property name="configMap">
 			<map>
 				<entry key="base" value-ref="baseNodeContextConfig" />
@@ -88,6 +90,6 @@
 	</mvc:interceptors>
 	
 	<task:annotation-driven /> <!-- 定时器开关--> 
-	<bean class="cn.sowell.datacenter.model.peopledata.task.PeopleExportHandlerTask" />
+	<bean class="cn.sowell.datacenter.model.modules.bean.PeopleExportHandlerTask" />
 	
 </beans>

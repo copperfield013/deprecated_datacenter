@@ -1,16 +1,19 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
-<title>人口导入</title>
-<div id="peopledata-import">
+<title>${module.title }导入</title>
+<div id="modules-import-${module.key }">
 	<div class="page-header">
 		<div class="header-title">
-			<h1>人口导入</h1>
+			<h1>${module.title }导入</h1>
 		</div>
 	</div>
 	<div class="page-body">
 		<div class="row">
 			<div class="col-lg-12">
-				<form class="bv-form form-horizontal validate-form" action="admin/peopledata/do_import">
+				<form class="bv-form form-horizontal validate-form" 
+					start-url="admin/modules/import/do/${module.key }"
+					status-url="admin/modules/import/status"
+					break-url="admin/modules/import/break">
 					<div class="form-group">
 						<label class="col-lg-2 control-label">上传文件</label>
 						<div class="col-lg-6">
@@ -27,11 +30,9 @@
 						<label class="col-lg-2 control-label">导入条线</label>
 						<div class="col-lg-6">
 							<select name="dataType">
-								<option value="base">基本数据</option>
-								<option value="lowincome">低保数据</option>
-								<option value="handicapped">残疾人数据</option>
-								<option value="familyPlanning">计生数据</option>
-								<option value="aaa">模板</option>
+								<c:forEach var="composite" items="${composites }">
+									<option value="${composite.name }">${composite.title }</option>
+								</c:forEach>
 							</select>
 						</div>
 					</div>
@@ -72,21 +73,22 @@
 </div>
 <script>
 	seajs.use(['ajax', 'dialog'], function(Ajax, Dialog){
-		var $page = $('#peopledata-import');
+		var $page = $('#modules-import-${module.key }');
 		console.log($page);
 		var $feedback = $('#feedback-msg', $page);
 		var uuid = null;
+		var $form = $('form', $page);
 		$('#submit', $page).click(function(){
 			Dialog.confirm('确认导入？', function(yes){
 				if(yes){
-					var formData = new FormData($('form', $page)[0]);
-					Ajax.ajax('admin/peopledata/do_import', formData, function(data){
+					var formData = new FormData($form[0]);
+					Ajax.ajax($form.attr('start-url'), formData, function(data){
 						if(data.status === 'suc' && data.uuid){
 							$('#break', $page).show();
 							$('#submit', $page).attr('disabled', 'disabled');
 							var timer = setInterval(function(){
 								uuid = data.uuid;
-								Ajax.ajax('admin/peopledata/status_of_import',{uuid: data.uuid}, function(data){
+								Ajax.ajax($form.attr('status-url'),{uuid: data.uuid}, function(data){
 									if(data.status === 'suc'){
 										if(typeof data.current === 'number' && typeof data.totalCount === 'number'){
 											var progress = data.current/data.totalCount;
@@ -135,7 +137,7 @@
 		$('#break', $page).click(function(){
 			if(uuid){
 				Dialog.confirm('确认停止当前的导入任务？', function(){
-						Ajax.ajax('admin/peopledata/break_import', {uuid: uuid}, function(data){
+						Ajax.ajax($form.attr('break-url'), {uuid: uuid}, function(data){
 							if(data.status === 'suc'){
 								$('#break', $page).hide();
 							}

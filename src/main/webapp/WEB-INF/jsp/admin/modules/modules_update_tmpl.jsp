@@ -23,8 +23,8 @@
 			<a id="save" title="保存"><i class="fa fa-check-square"></i></a>
 		</div>
 		<div class="col-lg-offset-1 col-lg-10">
-			<form class="form-horizontal group-container" action="admin/modules/save/${module.key }">
-				<input type="hidden" name="code" value="${entity.code }" />
+			<form class="form-horizontal group-container" action="admin/modules/curd/save/${module.key }">
+				<input type="hidden" name="${config.codeAttributeName }" value="${entity.code }" />
 				<c:forEach var="tmplGroup" items="${dtmpl.groups }">
 					<div class="widget field-group">
 						<div class="widget-header">
@@ -82,7 +82,7 @@
 	</div>
 </div>
 <script>
-	seajs.use(['dialog', 'ajax', 'utils', 'modules/js/modules-update.js', '$CPF',
+	seajs.use(['dialog', 'ajax', 'utils', 'tmpl/js/dtmpl-update.js', '$CPF',
 	           'field/js/field-input.js'], function(Dialog, Ajax, Utils, ViewTmpl, $CPF, FieldInput){
 		var $page = $('#entity-update-tmpl-${module.key }-${entity.code }');
 		

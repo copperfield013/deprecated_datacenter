@@ -86,7 +86,7 @@
 	</div>
 </div>
 <script>
-	seajs.use(['dialog', 'ajax', 'utils', 'modules/js/modules-update.js', '$CPF'], function(Dialog, Ajax, Utils, ViewTmpl, $CPF){
+	seajs.use(['dialog', 'ajax', 'utils', 'tmpl/js/dtmpl-update.js', '$CPF'], function(Dialog, Ajax, Utils, ViewTmpl, $CPF){
 		var $page = $('#entity-detail-tmpl-${entity.code }');
 		var hasRecord = '${entity != null}';
 		if(hasRecord != 'true'){
@@ -106,7 +106,7 @@
 			var $this = $(this);
 			if(!$this.is('.disabled')){
 				$this.addClass('disabled').text('加载中');
-				Ajax.ajax('admin/modules/paging_history/${module.key}/${entity.code}', {
+				Ajax.ajax('admin/modules/curd/paging_history/${module.key}/${entity.code}', {
 					pageNo	: curPageNo + 1
 				}, function(data){
 					if(data.status === 'suc'){
@@ -124,7 +124,7 @@
 		});
 		$page.on('click', '.circ', function(){
 			var time = parseInt($(this).closest('dd').attr('data-time'));
-			$page.getLocatePage().loadContent('admin/modules/detail/${module.key}/${entity.code}?tmplId=${tmpl.id}', null, {timestamp:time});
+			$page.getLocatePage().loadContent('admin/modules/curd/detail/${module.key}/${entity.code}?tmplId=${tmpl.id}', null, {timestamp:time});
 			
 		});
 		var theTime = parseInt('${date.time}');
@@ -211,7 +211,7 @@
 			autoclose	: true,
 			startView	: 'day'
 		}).on('changeDate', function(e){
-			$page.getLocatePage().loadContent('admin/modules/detail/${module.key}/${entity.code }', undefined, {
+			$page.getLocatePage().loadContent('admin/modules/curd/detail/${module.key}/${entity.code }', undefined, {
 				datetime	: $(this).val(),
 				tmplId		: '${tmpl.id}'
 			});
@@ -222,7 +222,7 @@
 		});
 		$('#tmpl-list li[data-id]:not(.active)', $page).click(function(){
 			var tmplId = $(this).attr('data-id');
-			$page.getLocatePage().loadContent('admin/modules/detail/${module.key}/${entity.code}', undefined, {
+			$page.getLocatePage().loadContent('admin/modules/curd/detail/${module.key}/${entity.code}', undefined, {
 				timestamp	: '${timestamp}',
 				tmplId		: tmplId
 			});
