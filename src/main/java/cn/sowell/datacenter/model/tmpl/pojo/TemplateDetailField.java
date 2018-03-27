@@ -48,6 +48,11 @@ public class TemplateDetailField {
 	@JSONField(name="dv")
 	private String viewValue;
 	
+	
+	@Transient
+	@Column(name="optgroup_id")
+	private String optionGroupId;
+	
 	@Transient
 	@Column(name="c_type")
 	private String type;
@@ -117,6 +122,12 @@ public class TemplateDetailField {
 	}
 	public void setType(String type) {
 		this.type = type;
+	}
+	public String getOptionGroupId() {
+		return optionGroupId;
+	}
+	public void setOptionGroupId(String optionGroupId) {
+		this.optionGroupId = optionGroupId;
 	}
 	
 }

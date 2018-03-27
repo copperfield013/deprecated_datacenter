@@ -41,7 +41,7 @@
 											fInp-type="${tmplField.type }"
 											fInp-name="${tmplField.fieldName }"
 											fInp-value="${entity.map[tmplField.fieldName] }"
-											fInp-optkey="${tmplField.fieldId }"
+											fInp-optkey="${tmplField.optionGroupId }"
 										>
 										</span>
 									</div>
