@@ -91,7 +91,7 @@ define(function(require, exports, module){
 					fieldId		: field.id,
 					fieldKey	: field.name,
 					relation	: 'and',
-					comparator	: criteria.getComparatorName(),
+					comparator	: 't1', //criteria.getComparatorName(),
 					inputType	: criteria.getDefaultValueInput().getType(),
 					defVal		: criteria.getDefaultValueInput().getValue(),
 					placeholder	: criteria.getPlaceholder(),

@@ -86,7 +86,7 @@ public class AdminModulesController {
 		ListTemplateParameter param = mService.exractTemplateParameter(tmplId, module, request);
 		if(param.getListTemplate() != null){
 			QueryEntityParameter queryParam = new QueryEntityParameter();
-			queryParam.setCriterias(mService.toCriterias(param.getNormalCriteriaMap().values()));
+			queryParam.setCriterias(mService.toCriterias(param.getNormalCriteriaMap().values(), module));
 			queryParam.setModule(module);
 			queryParam.setPageInfo(pageInfo);
 			List<EntityPropertyParser> parserList = mService.queryEntities(queryParam);

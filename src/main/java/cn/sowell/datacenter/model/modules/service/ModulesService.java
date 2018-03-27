@@ -27,7 +27,7 @@ public interface ModulesService {
 
 	List<EntityPropertyParser> queryEntities(QueryEntityParameter param);
 	
-	List<Criteria> toCriterias(Collection<NormalCriteria> nCriterias);
+	List<Criteria> toCriterias(Collection<NormalCriteria> nCriterias, String module);
 	
 	Map<Long, NormalCriteria> getCriteriasFromRequest(
 			MutablePropertyValues pvs,
@@ -92,6 +92,7 @@ public interface ModulesService {
 	 */
 	EntityPagingIterator queryIterator(TemplateListTempalte ltmpl, Set<NormalCriteria> criteria,
 			ExportDataPageInfo ePageInfo);
+
 	
 
 }

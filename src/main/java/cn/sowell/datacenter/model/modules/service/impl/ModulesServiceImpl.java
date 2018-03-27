@@ -135,8 +135,8 @@ public class ModulesServiceImpl implements ModulesService{
 	}
 	
 	@Override
-	public List<Criteria> toCriterias(Collection<NormalCriteria> nCriterias){
-		FusionContext context = fFactory.getContext(FusionContextFactoryDC.KEY_BASE);
+	public List<Criteria> toCriterias(Collection<NormalCriteria> nCriterias, String module){
+		FusionContext context = fFactory.getContext(fFactory.mapDefaultModuleEntityConfig(module));
 		CriteriaFactory criteriaFactory = new CriteriaFactory(context);
 		ArrayList<Criteria> cs = new ArrayList<Criteria>();
 		nCriterias.forEach(nCriteria->{
@@ -214,7 +214,7 @@ public class ModulesServiceImpl implements ModulesService{
 	public EntityPagingIterator queryIterator(TemplateListTempalte ltmpl, Set<NormalCriteria> nCriterias,
 			ExportDataPageInfo ePageInfo) {
 		PageInfo pageInfo = ePageInfo.getPageInfo();
-		List<Criteria> cs = toCriterias(nCriterias);
+		List<Criteria> cs = toCriterias(nCriterias, ltmpl.getModule());
 		String configName = fFactory.mapDefaultModuleEntityConfig(ltmpl.getModule());
 		EntityPagingQueryProxy proxy = abcService.getModuleQueryProxy(configName, cs, ePageInfo);
 		int dataCount = pageInfo.getPageSize();
