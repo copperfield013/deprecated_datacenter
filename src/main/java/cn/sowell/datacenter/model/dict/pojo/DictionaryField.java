@@ -39,9 +39,6 @@ public class DictionaryField {
 	@Column(name="c_input_type")
 	private String inputType;
 	
-	@Column(name="c_abc_type")
-	private String abcType;
-	
 	@Column(name="optgroup_id")
 	private Long optionGroupId;
 	
@@ -121,11 +118,5 @@ public class DictionaryField {
 	}
 	public void setAuthority(String authority) {
 		this.authority = authority;
-	}
-	public String getAbcType() {
-		return abcType;
-	}
-	public void setAbcType(String abcType) {
-		this.abcType = abcType;
 	}
 }

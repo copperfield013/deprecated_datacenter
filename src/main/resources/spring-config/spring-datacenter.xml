@@ -53,6 +53,13 @@
 		<property name="module" value="people" />
 	</bean>
 	
+	<bean id="studentpartyConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig">
+		<property name="mappingName" value="studentpartyBase" />
+		<property name="module" value="student" />
+		<property name="codeAttributeName" value="peoplecode" />
+		<property name="titleAttributeName" value="姓名" />
+	</bean>
+	
 	<bean id="addressBaseContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
 		<property name="mappingName" value="addressBase" />
 		<property name="module" value="address" />
@@ -69,6 +76,7 @@
 				<entry key="importLowincome" value-ref="importLowincomeNodeContextConfig" />
 				<entry key="importFamilyPlanning" value-ref="importFamilyPlanningNodeContextConfig" />
 				<entry key="addressBase" value-ref="addressBaseContextConfig" />
+				<entry key="studentpartyBase" value-ref="studentpartyConfig" />
 			</map>
 		</property>
 	</bean>

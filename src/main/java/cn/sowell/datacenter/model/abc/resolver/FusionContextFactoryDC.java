@@ -14,6 +14,7 @@ public class FusionContextFactoryDC {
 	public static final String KEY_IMPORT_LOWINCOME = "importLowincome";
 	public static final String KEY_IMPORT_FAMILYPLANNING = "importFamilyPlanning";
 	public static final String KEY_ADDRESS_BASE = "addressBase";
+	public static final String KEY_STUDENT_BASE = "studentpartyBase";
 	
 	
 	private Map<String, FusionContextConfig> configMap = new HashMap<String, FusionContextConfig>();
@@ -23,6 +24,7 @@ public class FusionContextFactoryDC {
 	public FusionContextFactoryDC() {
 		defaultModuleEntityConfigMap.put(DataCenterConstants.MODULE_KEY_PEOPLE, KEY_BASE);
 		defaultModuleEntityConfigMap.put(DataCenterConstants.MODULE_KEY_ADDRESS, KEY_ADDRESS_BASE);
+		defaultModuleEntityConfigMap.put(DataCenterConstants.MODULE_KEY_STUDENT, KEY_STUDENT_BASE);
 	}
 	
 	public FusionContextConfig getConfig(String configName){

@@ -69,6 +69,16 @@
 	   			<span class="menu-text">地址列表模板</span>
 	   		</a>
 	   	</li>
+	   	<li>
+	   		<a class="tab" href="admin/tmpl/dtmpl/list/student" target="student_dtmpl_list" title="学生详情模板">
+	   			<span class="menu-text">学生详情模板</span>
+	   		</a>
+	   	</li>
+	   	<li>
+	   		<a class="tab" href="admin/tmpl/ltmpl/list/student" target="student_ltmpl_list" title="学生列表模板">
+	   			<span class="menu-text">学生列表模板</span>
+	   		</a>
+	   	</li>
 	</ul>
 </li>
 <li>
@@ -96,6 +106,20 @@
 	   	<li>
 	   		<a class="tab" href="admin/special_position/special_position_list" target="special_position_list" title="特殊地名">
 	   			<span class="menu-text">特殊地名</span>
+	   		</a>
+	   	</li>
+	</ul>
+</li>
+<li>
+	<a href="#" class="menu-dropdown">
+		<i class="menu-icon fa fa-bookmark"></i>
+		<span class="menu-text">学生模块</span>
+		<i></i>
+	</a>
+	<ul class="submenu">
+	   	<li>
+	   		<a class="tab" href="admin/modules/curd/list/student" target="student_list_tmpl" title="学生列表">
+	   			<span class="menu-text">学生列表</span>
 	   		</a>
 	   	</li>
 	</ul>

@@ -276,11 +276,10 @@ define(function(require, exports, module){
 		bind	: function($search, param){
 			var $textInput = $search.find('.search-text-input');
 			var reqDataURL = undefined;
-			if(param.module === 'people'){
-				reqDataURL = 'admin/field/json/people';
-			}else if(param.module === 'address'){
-				reqDataURL = 'admin/field/json/address';
+			if(!param.module){
+				param.module = 'people';
 			}
+			reqDataURL = 'admin/field/json/' + param.module;
 			var search = new FieldSearch($.extend({}, {
 				$container		: $search,
 				afterChoose		: undefined,

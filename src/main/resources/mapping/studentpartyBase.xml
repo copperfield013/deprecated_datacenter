@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ABC name="studentparty" abcattr="人员信息" class=""
+	xmlns="http://www.w3school.com.cn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<attribute name="peoplecode" alias="" abcattr="唯一编码" />
+	<attribute name="姓名" alias="" abcattr="姓名" />
+	<attribute name="身份证号码" alias="证件号码a" abcattr="证件号码" />
+	<attribute name="所在班级" alias="" abcattr="所在班级" />
+	<attribute name="性别" alias="" abcattr="性别" />
+	<attribute name="出生年月" alias="出生日期a" datatype="date" abcattr="出生日期" />
+	<attribute name="电话" alias="" abcattr="联系电话" />
+	<attribute name="民族" alias="" abcattr="民族" />
+	<attribute name="籍贯" alias="" abcattr="籍贯" />
+	<attribute name="编辑时间" alias="编辑时间" datatype="datetime"
+		abcattr="此人更新时间" />
+	<attribute name="寝室号" alias="" abcattr="在校居住地址" />
+	<attribute name="申请时间" alias="" datatype="date" abcattr="申请入党时间" />
+	<attribute name="确定积极分子时间" alias="" datatype="date"
+		abcattr="确定积极分子时间"  />
+	<attribute name="党校培训时间" alias="" datatype="date" abcattr="党校培训时间" />
+	<attribute name="所在支部" alias="" abcattr="所在支部" />
+	<attribute name="志愿时数" alias="" abcattr="志愿时数" />
+	
+	<label name="类别" alias="" subdomain="党员,预备党员,入党积极分子,入党申请人" />
+	
+	<multiattribute name="干部情况" alias="" abcattr="任职情况" ops="写">
+		<attribute name="任职起始时间" alias="" abcattr="任职起始时间" />
+		<attribute name="任职终止时间" alias="" abcattr="任职终止时间" />
+		<attribute name="任职名称" alias="" abcattr="任职名称" />
+		<attribute name="任职级别" alias="" abcattr="任职级别" />
+		<attribute name="任职描述" alias="" abcattr="任职描述" />
+	</multiattribute>
+
+	<multiattribute name="社会实践" alias="" abcattr="社会实践">
+		<attribute name="社会实践时间" alias="" abcattr="社会实践时间" />
+		<attribute name="社会实践名称" alias="" abcattr="社会实践名称" />
+		<attribute name="社会实践内容" alias="" abcattr="社会实践内容" />
+	</multiattribute>
+
+	<multiattribute name="获奖情况" alias="" abcattr="获奖情况">
+		<attribute name="获奖时间" alias="" abcattr="获奖时间" />
+		<attribute name="获奖级别" alias="" abcattr="获奖级别" />
+		<attribute name="获奖名称" alias="" abcattr="获奖名称" />
+	</multiattribute>
+
+	<multiattribute name="科研立项" alias="" abcattr="科研立项">
+		<attribute name="科研立项时间" alias="" abcattr="科研立项时间" />
+		<attribute name="科研立项级别" alias="" abcattr="科研立项级别" />
+		<attribute name="科研立项名称" alias="" abcattr="科研立项名称" />
+	</multiattribute>
+	
+	<multiattribute name="各期成绩排名" alias="" abcattr="各期成绩排名">
+		<attribute name="学期名称" alias=""  abcattr="学期名称" />
+		<attribute name="学分绩点" alias=""  datatype="float" abcattr="学分绩点" />
+		<attribute name="排名" alias="" datatype="int" abcattr="班级排名" />
+		<attribute name="排名人数" alias="" datatype="int" abcattr="排名人数" />
+	</multiattribute>
+	
+	<multiattribute name="workExperience" abcattr="工作经历">
+		<attribute name="companyName" alias="公司名称" abcattr="工作单位名称" />
+		<attribute name="workDepartment" alias="当前部门" abcattr="当前部门" />
+		<attribute name="unitNature" alias="单位性质" abcattr="单位性质" />
+		<attribute name="salary" alias="工资" abcattr="月收入" datatype="FLOAT" />
+		<attribute name="workDuty" alias="工作职责" abcattr="工作职责" />
+		<attribute name="workSubject" alias="工作主题" abcattr="分管工作" />
+	</multiattribute>
+
+	<relation name="培养联系人">
+		<label subdomain="入党联系人" />
+		<ABC name="培养联系人" abcattr="人口信息">
+			<attribute name="姓名" alias="" abcattr="姓名" />
+		</ABC>
+	</relation>
+	
+	<relation name="居住地址">
+		<label subdomain="居住地址" />
+		<ABC name="地址" abcattr="地址实体">
+			<attribute name="全名" abcattr="地址全名" />
+		</ABC>
+	</relation>
+	
+	<relation name="户籍地址">
+		<label subdomain="户籍地址" />
+		<ABC name="地址" abcattr="地址实体">
+			<attribute name="全名" abcattr="地址全名" />
+		</ABC>
+	</relation>
+
+</ABC>

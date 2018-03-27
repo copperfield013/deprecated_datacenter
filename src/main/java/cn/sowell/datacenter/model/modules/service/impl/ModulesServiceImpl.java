@@ -74,8 +74,14 @@ public class ModulesServiceImpl implements ModulesService{
 		ModuleMeta addressModule = new ModuleMeta();
 		addressModule.setKey(DataCenterConstants.MODULE_KEY_ADDRESS);
 		addressModule.setTitle("地址");
+		ModuleMeta studentModule = new ModuleMeta();
+		studentModule.setKey(DataCenterConstants.MODULE_KEY_STUDENT);
+		studentModule.setTitle("学生");
 		moduleMap.put(addressModule.getKey(), addressModule);
 		moduleMap.put(peopleModule.getKey(), peopleModule);
+		moduleMap.put(studentModule.getKey(), studentModule);
+		
+		
 	}
 	
 	@Override

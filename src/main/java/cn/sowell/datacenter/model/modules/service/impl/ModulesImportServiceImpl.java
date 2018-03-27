@@ -57,7 +57,8 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 				new ImportComposite("lowincome", "低保数据", DataCenterConstants.MODULE_KEY_PEOPLE, FusionContextFactoryDC.KEY_IMPORT_LOWINCOME),
 				new ImportComposite("handicapped", "残疾人数据", DataCenterConstants.MODULE_KEY_PEOPLE, FusionContextFactoryDC.KEY_IMPORT_HANDICAPPED),
 				new ImportComposite("familyPlanning", "计生数据", DataCenterConstants.MODULE_KEY_PEOPLE, FusionContextFactoryDC.KEY_IMPORT_FAMILYPLANNING),
-				new ImportComposite("addressBase", "地址基本数据", DataCenterConstants.MODULE_KEY_ADDRESS, FusionContextFactoryDC.KEY_ADDRESS_BASE)
+				new ImportComposite("addressBase", "地址基本数据", DataCenterConstants.MODULE_KEY_ADDRESS, FusionContextFactoryDC.KEY_ADDRESS_BASE),
+				new ImportComposite("studentpartyBase", "学生基本数据", DataCenterConstants.MODULE_KEY_STUDENT, FusionContextFactoryDC.KEY_STUDENT_BASE)
 			};
 			for(ImportComposite c :composites) {
 				if(!this.containsKey(c.getModuleKey())) {

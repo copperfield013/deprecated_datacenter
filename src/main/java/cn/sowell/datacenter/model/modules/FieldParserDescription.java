@@ -19,7 +19,7 @@ public class FieldParserDescription {
 	}
 	
 	public String getAbcType() {
-		return field.getAbcType();
+		return "string";
 	}
 	
 	public String getFullKey() {
