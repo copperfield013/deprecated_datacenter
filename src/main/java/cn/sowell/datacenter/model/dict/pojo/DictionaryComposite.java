@@ -21,7 +21,7 @@ public class DictionaryComposite {
 	@JSONField(name="c_id")
 	private Long id;
 	
-	@Column(name="c_full_key")
+	@Column(name="c_name")
 	@JSONField(name="name")
 	private String name;
 	

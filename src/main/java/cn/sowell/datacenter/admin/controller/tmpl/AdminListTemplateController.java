@@ -20,6 +20,7 @@ import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
+import cn.sowell.datacenter.DataCenterConstants;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListColumn;
@@ -63,7 +64,7 @@ public class AdminListTemplateController {
 	@RequestMapping("/as_default/{ltmplId}")
 	public AjaxPageResponse asDefault(@PathVariable Long ltmplId){
 		try {
-			tService.setTemplateAsDefault(UserUtils.getCurrentUser(), ltmplId);
+			tService.setTemplateAsDefault(UserUtils.getCurrentUser(), ltmplId, DataCenterConstants.TEMPLATE_TYPE_LIST);
 			return AjaxPageResponse.REFRESH_LOCAL("操作成功");
 		} catch (Exception e) {
 			logger.error("设置默认列表模板时发生错误", e);
@@ -104,7 +105,7 @@ public class AdminListTemplateController {
 	@RequestMapping("/remove/{ltmplId}")
 	public AjaxPageResponse remove(@PathVariable Long ltmplId){
 		try {
-			tService.removeTemplate(UserUtils.getCurrentUser(), ltmplId);
+			tService.removeTemplate(UserUtils.getCurrentUser(), ltmplId, DataCenterConstants.TEMPLATE_TYPE_LIST);
 			return AjaxPageResponse.REFRESH_LOCAL("删除成功");
 		} catch (Exception e) {
 			logger.error("删除模板时发生错误", e);

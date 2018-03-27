@@ -22,6 +22,7 @@ import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
+import cn.sowell.datacenter.DataCenterConstants;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailField;
@@ -87,7 +88,7 @@ public class AdminDetailTemplateController {
 	public AjaxPageResponse remove(@PathVariable Long tmplId){
 		try {
 			UserIdentifier user = UserUtils.getCurrentUser();
-			tService.removeTemplate(user, tmplId);
+			tService.removeTemplate(user, tmplId, DataCenterConstants.TEMPLATE_TYPE_DETAIL);
 			return AjaxPageResponse.REFRESH_LOCAL("删除成功");
 		} catch (Exception e) {
 			logger.error("删除失败", e);
@@ -100,7 +101,7 @@ public class AdminDetailTemplateController {
 	public AjaxPageResponse setTmplAsDefault(@PathVariable Long tmplId){
 		UserIdentifier user = UserUtils.getCurrentUser();
 		try {
-			tService.setTemplateAsDefault(user, tmplId);
+			tService.setTemplateAsDefault(user, tmplId, DataCenterConstants.TEMPLATE_TYPE_DETAIL);
 			return AjaxPageResponse.REFRESH_LOCAL("设置成功");
 		} catch (Exception e) {
 			logger.error("设置用户默认模板失败", e);

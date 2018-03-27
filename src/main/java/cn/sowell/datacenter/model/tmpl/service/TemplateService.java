@@ -59,14 +59,14 @@ public interface TemplateService {
 	 * @param user
 	 * @param tmplId
 	 */
-	void removeTemplate(UserIdentifier user, Long tmplId);
+	void removeTemplate(UserIdentifier user, Long tmplId, String tmplType);
 	
 	/**
 	 * 将某个详情模板设置为用户的默认
 	 * @param tmplId
 	 * @param user
 	 */
-	void setTemplateAsDefault(UserIdentifier user, long tmplId);
+	void setTemplateAsDefault(UserIdentifier user, long tmplId, String tmplType);
 
 	/**
 	 * 创建或者更新详情模板
@@ -93,6 +93,9 @@ public interface TemplateService {
 	 * @param tmplId
 	 * @return
 	 */
-	AbstractTemplate getTemplate(long tmplId);
+	AbstractTemplate getTemplate(long tmplId, String tmplType);
+
+	
+
 
 }

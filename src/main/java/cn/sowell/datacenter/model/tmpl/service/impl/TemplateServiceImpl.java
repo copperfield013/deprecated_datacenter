@@ -52,12 +52,13 @@ public class TemplateServiceImpl implements TemplateService{
 	TemplateUpdateStrategyFactory tmplUpdateStrategyFactory;
 	
 	@Override
-	public AbstractTemplate getTemplate(long tmplId) {
-		AbstractTemplate tmpl = getDetailTemplate(tmplId);
-		if(tmpl == null) {
-			tmpl = getListTemplate(tmplId);
+	public AbstractTemplate getTemplate(long tmplId, String tmplType) {
+		if(DataCenterConstants.TEMPLATE_TYPE_DETAIL.equals(tmplType)) {
+			return getDetailTemplate(tmplId);
+		}else if(DataCenterConstants.TEMPLATE_TYPE_LIST.equals(tmplType)){
+			return getListTemplate(tmplId);
 		}
-		return tmpl;
+		return null;
 	}
 	
 	@Override
@@ -105,25 +106,25 @@ public class TemplateServiceImpl implements TemplateService{
 		if(admin != null) {
 			TemplateAdminDefaultTemplate t = tDao.getAdminDefaultTempalte(admin.getId(), module, templateType);
 			if(t != null) {
-				return getTemplate(t.getTmplId());
+				return getTemplate(t.getTmplId(), templateType);
 			}
 		}
 		return null;
 	}
 
 	@Override
-	public void removeTemplate(UserIdentifier user, Long tmplId) {
-		AbstractTemplate template = getTemplate(tmplId);
+	public void removeTemplate(UserIdentifier user, Long tmplId, String tmplType) {
+		AbstractTemplate template = getTemplate(tmplId, tmplType);
 		if(template != null) {
 			nDao.remove(template);
 		}
 	}
 
 	@Override
-	public void setTemplateAsDefault(UserIdentifier user, long tmplId) {
+	public void setTemplateAsDefault(UserIdentifier user, long tmplId, String tmplType) {
 		SystemAdmin admin = aService.getSystemAdminByUserId((long) user.getId());
 		if(admin != null) {
-			AbstractTemplate template = getTemplate(tmplId);
+			AbstractTemplate template = getTemplate(tmplId, tmplType);
 			if(template != null) {
 				tDao.setTemplateAsDefault(
 						admin.getId(), 
