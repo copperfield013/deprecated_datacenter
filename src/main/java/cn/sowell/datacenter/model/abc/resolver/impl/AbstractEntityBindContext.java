@@ -60,6 +60,10 @@ public abstract class AbstractEntityBindContext implements EntityBindContext {
 		return null;
 	}
 	
+	@Override
+	public Object getValue(String propName, String abcAttr) {
+		return getEntity().getEntity().getTypeValue(propName, abcAttr);
+	}
 	
 	@Override
 	public void setValue(String propName, Object propValue) {

@@ -8,8 +8,8 @@ import com.abc.query.entity.impl.EntitySortedPagedQuery;
 
 import cn.sowell.copframe.utils.Assert;
 import cn.sowell.copframe.utils.CollectionUtils;
+import cn.sowell.datacenter.model.abc.resolver.EntityPropertyParser;
 import cn.sowell.datacenter.model.abc.resolver.FusionContextConfigResolver;
-import cn.sowell.datacenter.model.modules.EntityPropertyParser;
 
 public class EntityQueryAdapter implements EntityPagingQueryProxy{
 

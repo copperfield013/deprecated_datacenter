@@ -18,7 +18,8 @@ public abstract class EntitiesContainedEntityProxy implements EntityProxy{
 	public void putEntity(PropertyNamePartitions namePartitions, EntityProxy entity) {
 		Entity thisEntity = getSourceEntity();
 		if(entity instanceof MultiAttributeEntityProxy) {
-			int multiattrSize = thisEntity.getMultiAttrEntity(namePartitions.getMainPartition()).size();
+			List<SimpleEntity> multiAttrEntities = thisEntity.getMultiAttrEntity(namePartitions.getMainPartition());
+			int multiattrSize = multiAttrEntities == null? 0: multiAttrEntities.size();
 			if(multiattrSize <= namePartitions.getIndex()) {
 				for(int i = multiattrSize; i < namePartitions.getIndex(); i++) {
 					thisEntity.putMultiAttrEntity(entity.createEmptyEntity().getEntity());

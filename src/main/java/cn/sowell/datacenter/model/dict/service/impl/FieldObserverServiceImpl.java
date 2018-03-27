@@ -10,9 +10,9 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import cn.sowell.copframe.utils.CollectionUtils;
+import cn.sowell.datacenter.model.abc.resolver.FieldParserDescription;
 import cn.sowell.datacenter.model.dict.service.DictionaryService;
 import cn.sowell.datacenter.model.dict.service.FieldObserverService;
-import cn.sowell.datacenter.model.modules.FieldParserDescription;
 
 @Service
 public class FieldObserverServiceImpl implements FieldObserverService {

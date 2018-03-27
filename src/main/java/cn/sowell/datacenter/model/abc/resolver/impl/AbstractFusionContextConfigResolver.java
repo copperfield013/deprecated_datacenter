@@ -7,11 +7,12 @@ import com.abc.mapping.entity.Entity;
 
 import cn.sowell.copframe.utils.Assert;
 import cn.sowell.datacenter.model.abc.resolver.EntityBindContext;
+import cn.sowell.datacenter.model.abc.resolver.EntityPropertyParser;
+import cn.sowell.datacenter.model.abc.resolver.FieldParserDescription;
 import cn.sowell.datacenter.model.abc.resolver.FusionContextConfig;
 import cn.sowell.datacenter.model.abc.resolver.FusionContextConfigResolver;
+import cn.sowell.datacenter.model.abc.resolver.PropertyNamePartitions;
 import cn.sowell.datacenter.model.abc.resolver.exception.UnsupportedEntityElementException;
-import cn.sowell.datacenter.model.modules.EntityPropertyParser;
-import cn.sowell.datacenter.model.modules.FieldParserDescription;
 
 public abstract class AbstractFusionContextConfigResolver implements FusionContextConfigResolver{
 	protected FusionContextConfig config;
@@ -66,7 +67,7 @@ public abstract class AbstractFusionContextConfigResolver implements FusionConte
 		if(split.length == 1) {
 			context.setValue(propName, propValue);
 		}else {
-			EntityBindContext elementContext = context.getElement(prefix);
+			EntityBindContext elementContext = context.getElement(new PropertyNamePartitions(prefix));
 			bindElement(elementContext, split[1], propValue);
 		}
 	}
@@ -74,7 +75,8 @@ public abstract class AbstractFusionContextConfigResolver implements FusionConte
 	@Override
 	public EntityPropertyParser createParser(Entity entity) {
 		Assert.notNull(this.fieldSet);
-		EntityPropertyParser parser = new EntityPropertyParser(config, entity, this.fieldSet);
+		EntityBindContext rootContext = buildRootContext(entity);
+		CommonEntityPropertyParser parser = new CommonEntityPropertyParser(config, rootContext, this.fieldSet);
 		return parser ;
 	}
 

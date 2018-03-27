@@ -14,11 +14,19 @@ public interface EntityBindContext {
 	void setValue(String propName, Object propValue);
 	
 	/**
+	 * 获得直接属性值
+	 * @param propName
+	 * @param abcAttr
+	 * @return
+	 */
+	Object getValue(String propName, String abcAttr);
+	
+	/**
 	 * 获得直接子节点
 	 * @param prefix
 	 * @return
 	 */
-	EntityBindContext getElement(String propName);
+	EntityBindContext getElement(PropertyNamePartitions namePartitions);
 
 	EntityProxy getEntity();
 	

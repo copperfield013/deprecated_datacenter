@@ -1,8 +1,6 @@
 package cn.sowell.datacenter.test.abc;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -17,19 +15,12 @@ import com.abc.mapping.entity.Entity;
 import com.abc.mapping.node.ABCNode;
 import com.abc.mapping.node.AttributeNode;
 
-import cn.sowell.copframe.utils.CollectionUtils;
+import cn.sowell.datacenter.model.abc.resolver.EntityPropertyParser;
+import cn.sowell.datacenter.model.abc.resolver.FusionContextConfig;
 import cn.sowell.datacenter.model.abc.resolver.FusionContextConfigResolver;
-import cn.sowell.datacenter.model.abc.resolver.impl.ABCNodeFusionContextConfigResolver;
+import cn.sowell.datacenter.model.abc.resolver.FusionContextFactoryDC;
 import cn.sowell.datacenter.model.abc.service.ABCExecuteService;
-import cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig;
-import cn.sowell.datacenter.model.abc.service.impl.FusionContextFactoryDC;
 import cn.sowell.datacenter.model.dict.service.DictionaryService;
-import cn.sowell.datacenter.model.modules.EntityPropertyParser;
-import cn.sowell.datacenter.model.modules.FieldParserDescription;
-import cn.sowell.datacenter.model.peopledata.pojo.FamilyInfo;
-import cn.sowell.datacenter.model.peopledata.pojo.PeopleData;
-import cn.sowell.datacenter.model.peopledata.pojo.WorkExperience;
-import cn.sowell.datacenter.model.peopledata.service.impl.EntityTransfer;
 
 
 @ContextConfiguration(locations = "classpath*:spring-config/spring-junit.xml")
@@ -71,25 +62,29 @@ public class TestEntityBinder {
 	
 	public void testABCNodeResolver() {
 		FusionContextConfig config = fFactory.getConfig(FusionContextFactoryDC.KEY_BASE);
-		FusionContextConfigResolver resolver = new ABCNodeFusionContextConfigResolver(config);
 		try {
-			testResolver(resolver);
+			testResolver(config);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
 		}
 	}
 	
-	private void testResolver(FusionContextConfigResolver resolver) {
+	private void testResolver(FusionContextConfig config) {
 		Map<String, Object> map = getDataMap();
+		FusionContextConfigResolver resolver = config.getConfigResolver();
 		Entity entity = resolver.createEntity(map);
-		EntityPropertyParser parser = new EntityPropertyParser(entity, CollectionUtils.toSet(dictService.getAllFields("people"), item->new FieldParserDescription(item)));
+		EntityPropertyParser parser = resolver.createParser(entity);
 		System.out.println(parser.getProperty("name"));
 		System.out.println(parser.getProperty("code"));
+		System.out.println(parser.getProperty("lowIncomeInsureType"));
 		System.out.println(parser.getProperty("家庭关系[0].姓名"));
 		System.out.println(parser.getProperty("家庭关系[1].姓名"));
+		System.out.println(parser.getProperty("workExperience[0].companyName"));
+		System.out.println(parser.getProperty("workExperience[0].salary"));
+		System.out.println(parser.getProperty("workExperience[1].companyName"));
+		System.out.println(parser.getProperty("workExperience[1].salary"));
 	}
-	
 	@Test
 	public void testMerge() {
 		Map<String, Object> map = getDataMap();
@@ -97,6 +92,10 @@ public class TestEntityBinder {
 			String code = abcService.mergeEntity("people", map);
 			EntityPropertyParser parser = abcService.getModuleEntityParser("people", code);
 			System.out.println(parser.getProperty("家庭关系.姓名"));
+			System.out.println(parser.getProperty("workExperience[0].companyName"));
+			System.out.println(parser.getProperty("workExperience[0].salary"));
+			System.out.println(parser.getProperty("workExperience[1].companyName"));
+			System.out.println(parser.getProperty("workExperience[1].salary"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -112,46 +111,14 @@ public class TestEntityBinder {
 	private Map<String, Object> getDataMap() {
 		Map<String, Object> map = new HashMap<>();
 		map.put("name", "白熊");
+		map.put("lowIncomeInsureType", "低保人员");
 		map.put("家庭关系.姓名", "大白熊");
 		map.put("家庭关系.$$label$$", "父母");
+		map.put("workExperience[1].companyName", "杭州设维");
+		map.put("workExperience[0].salary", "10002.3");
+		map.put("workExperience[0].companyName", "杭州设维信息技术有限公司");
+		map.put("workExperience[1].salary", "500");
 		return map;
 	}
 
-	
-	EntityTransfer transfer = new EntityTransfer();
-	
-	public void test() {
-		PeopleData data = new PeopleData();
-		data.setName("张荣波");
-		
-		FamilyInfo family = new FamilyInfo();
-		family.setFamilyAddress("福建省");
-		data.setFamilyInfo(family);
-		
-		List<WorkExperience> workExperiences = new ArrayList<>();
-		WorkExperience work = new WorkExperience();
-		work.setCompanyName("杭州设维");
-		workExperiences.add(work);
-		work = new WorkExperience();
-		work.setCompanyName("未知");
-		workExperiences.add(work);
-		data.setWorkExperiences(workExperiences);
-		
-		Entity target = new Entity("baseinfoImport");
-		transfer.bind(data, target);
-		System.out.println(target.getStringValue("name"));
-		
-		/*
-		List<RecordEntity> fRecord = target.getRecords("家庭信息");
-		System.out.println(fRecord);
-		System.out.println(fRecord.size());
-		System.out.println(fRecord.get(0).getEntity().getStringValue("家庭地址"));
-		
-		
-		List<RecordEntity> wRecord = target.getRecords("workExperience");
-		wRecord.forEach(wr->{
-			System.out.println(wr.getEntity().getStringValue("companyName"));
-		});*/
-		
-	}
 }

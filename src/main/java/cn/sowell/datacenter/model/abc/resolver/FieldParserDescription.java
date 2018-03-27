@@ -1,4 +1,4 @@
-package cn.sowell.datacenter.model.modules;
+package cn.sowell.datacenter.model.abc.resolver;
 
 import cn.sowell.datacenter.model.dict.pojo.DictionaryField;
 

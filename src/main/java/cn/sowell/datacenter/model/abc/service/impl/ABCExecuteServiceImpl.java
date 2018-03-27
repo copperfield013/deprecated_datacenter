@@ -25,11 +25,11 @@ import com.abc.record.HistoryTracker;
 
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.FormatUtils;
+import cn.sowell.datacenter.model.abc.resolver.EntityPropertyParser;
 import cn.sowell.datacenter.model.abc.resolver.FusionContextConfig;
 import cn.sowell.datacenter.model.abc.resolver.FusionContextFactoryDC;
 import cn.sowell.datacenter.model.abc.service.ABCExecuteService;
 import cn.sowell.datacenter.model.basepeople.dao.PropertyDictionaryDao;
-import cn.sowell.datacenter.model.modules.EntityPropertyParser;
 import cn.sowell.datacenter.model.modules.bean.EntityPagingQueryProxy;
 import cn.sowell.datacenter.model.modules.bean.EntityQueryAdapter;
 import cn.sowell.datacenter.model.modules.bean.ExportDataPageInfo;

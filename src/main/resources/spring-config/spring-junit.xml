@@ -31,37 +31,46 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 	
-	<bean id="baseNodeContextConfig" class="cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig"  >
+	<bean id="baseNodeContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
 		<property name="mappingName" value="baseinfoImport" />
 		<property name="module" value="people" />
 	</bean>
 	
-	<bean id="importBaseNodeContextConfig" class="cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig"  >
+	<bean id="importBaseNodeContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
 		<property name="mappingName" value="importBase" />
 		<property name="module" value="people" />
 	</bean>
 	
-	<bean id="importHandicappedNodeContextConfig" class="cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig"  >
+	<bean id="importHandicappedNodeContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
 		<property name="mappingName" value="importHandicapped" />
 		<property name="module" value="people" />
 	</bean>
 	
-	<bean id="importLowincomeNodeContextConfig" class="cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig"  >
+	<bean id="importLowincomeNodeContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
 		<property name="mappingName" value="importLowincome" />
 		<property name="module" value="people" />
 	</bean>
 	
-	<bean id="importFamilyPlanningNodeContextConfig" class="cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig"  >
+	<bean id="importFamilyPlanningNodeContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
 		<property name="mappingName" value="importFamilyPlanning" />
 		<property name="module" value="people" />
 	</bean>
 	
-	<bean id="addressBaseContextConfig" class="cn.sowell.datacenter.model.abc.service.impl.FusionContextConfig"  >
-		<property name="mappingName" value="addressBase" />
-		<property name="module" value="address" />
+	<bean id="studentpartyConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig">
+		<property name="mappingName" value="studentpartyBase" />
+		<property name="module" value="student" />
+		<property name="codeAttributeName" value="peoplecode" />
+		<property name="titleAttributeName" value="姓名" />
 	</bean>
 	
-	<bean class="cn.sowell.datacenter.model.abc.service.impl.FusionContextFactoryDC">
+	<bean id="addressBaseContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
+		<property name="mappingName" value="addressBase" />
+		<property name="module" value="address" />
+		<property name="codeAttributeName" value="编码" />
+		<property name="titleAttributeName" value="地址简称" />
+	</bean>
+	
+	<bean class="cn.sowell.datacenter.model.abc.resolver.FusionContextFactoryDC">
 		<property name="configMap">
 			<map>
 				<entry key="base" value-ref="baseNodeContextConfig" />
@@ -70,6 +79,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
 				<entry key="importLowincome" value-ref="importLowincomeNodeContextConfig" />
 				<entry key="importFamilyPlanning" value-ref="importFamilyPlanningNodeContextConfig" />
 				<entry key="addressBase" value-ref="addressBaseContextConfig" />
+				<entry key="studentpartyBase" value-ref="studentpartyConfig" />
 			</map>
 		</property>
 	</bean>
