@@ -95,7 +95,7 @@
 		});
 		$('#tmpl-list li[data-id]:not(.active)', $page).click(function(){
 			var tmplId = $(this).attr('data-id');
-			var url = 'admin/modules' + (isUpdateMode? '/update/${module.key}/${entity.code}': '/add/${module.key}');
+			var url = 'admin/modules/curd' + (isUpdateMode? '/update/${module.key}/${entity.code}': '/add/${module.key}');
 			$page.getLocatePage().loadContent(url, undefined, {
 				timestamp	: '${timestamp}',
 				tmplId		: tmplId
