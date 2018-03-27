@@ -85,6 +85,8 @@ public class TestEntityBinder {
 		System.out.println(parser.getProperty("workExperience[1].companyName"));
 		System.out.println(parser.getProperty("workExperience[1].salary"));
 	}
+	
+	
 	@Test
 	public void testMerge() {
 		Map<String, Object> map = getDataMap();
@@ -92,15 +94,37 @@ public class TestEntityBinder {
 			String code = abcService.mergeEntity("people", map);
 			EntityPropertyParser parser = abcService.getModuleEntityParser("people", code);
 			System.out.println(parser.getProperty("家庭关系.姓名"));
-			System.out.println(parser.getProperty("workExperience[0].companyName"));
-			System.out.println(parser.getProperty("workExperience[0].salary"));
-			System.out.println(parser.getProperty("workExperience[1].companyName"));
-			System.out.println(parser.getProperty("workExperience[1].salary"));
+			System.out.println(parser.getProperty("workExperience.companyName"));
+			System.out.println(parser.getProperty("workExperience.workAddress"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
+	public void testMergeStudent() {
+		Map<String, Object> map = getStudentDataMap();
+		try {
+			String code = abcService.mergeEntity("student", map);
+			EntityPropertyParser parser = abcService.getModuleEntityParser("student", code);
+			System.out.println(parser.getProperty("家庭关系.姓名"));
+			System.out.println(parser.getProperty("workExperience.companyName"));
+			System.out.println(parser.getProperty("workExperience.workAddress"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private Map<String, Object> getStudentDataMap() {
+		Map<String, Object> map = new HashMap<>();
+		map.put("name", "白熊学生");
+		map.put("培养联系人.姓名", "白熊老师");
+		map.put("培养联系人.$$label$$", "入党联系人");
+		map.put("干部情况.任职名称", "杭州设维信息技术有限公司");
+		map.put("workExperience.workAddress", "东部软件园");
+		return map;
+	}
+
+
 	public void testGet() {
 		Entity entity = abcService.getModuleEntity("people", "234f3a52528c491a8c129d713bdfda99");
 		System.out.println(entity.getStringValue("name"));
@@ -114,10 +138,8 @@ public class TestEntityBinder {
 		map.put("lowIncomeInsureType", "低保人员");
 		map.put("家庭关系.姓名", "大白熊");
 		map.put("家庭关系.$$label$$", "父母");
-		map.put("workExperience[1].companyName", "杭州设维");
-		map.put("workExperience[0].salary", "10002.3");
-		map.put("workExperience[0].companyName", "杭州设维信息技术有限公司");
-		map.put("workExperience[1].salary", "500");
+		map.put("workExperience.companyName", "杭州设维信息技术有限公司");
+		map.put("workExperience.workAddress", "东部软件园");
 		return map;
 	}
 

@@ -3,6 +3,8 @@ package cn.sowell.datacenter.model.abc.resolver.impl;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import com.abc.mapping.entity.Entity;
 
 import cn.sowell.copframe.utils.Assert;
@@ -17,6 +19,9 @@ import cn.sowell.datacenter.model.abc.resolver.exception.UnsupportedEntityElemen
 public abstract class AbstractFusionContextConfigResolver implements FusionContextConfigResolver{
 	protected FusionContextConfig config;
 	private Set<FieldParserDescription> fieldSet;
+	
+	Logger logger = Logger.getLogger(AbstractFusionContextConfigResolver.class);
+	
 	public AbstractFusionContextConfigResolver(FusionContextConfig config) {
 		super();
 		Assert.notNull(config);
@@ -51,7 +56,10 @@ public abstract class AbstractFusionContextConfigResolver implements FusionConte
 	
 	@Override
 	public Entity createEntity(Map<String, Object> map) {
-		return createEntity(map, false);
+		logger.debug("==============创建Entity");
+		Entity entity = createEntity(map, false);
+		logger.debug(entity.toJson());
+		return entity;
 	}
 	
 	@Override

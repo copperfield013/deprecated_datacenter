@@ -24,8 +24,6 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
 	<context:component-scan base-package="cn.sowell.datacenter.model.*.dao.impl" />
 	<!-- serivce自动扫描 -->
 	<context:component-scan base-package="cn.sowell.datacenter.model.*.service.impl" />
-	<!-- controller自动扫描(自动注入) -->
-	<context:component-scan base-package="cn.sowell.datacenter.*.controller.*" />
 	
 	<bean id="junitOpenSessionInterceptor" class="org.springframework.orm.hibernate5.support.OpenSessionInterceptor" >
 		<property name="sessionFactory" ref="sessionFactory" />
@@ -93,13 +91,5 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
 	</bean>
 	
 	<bean class="cn.sowell.copframe.dao.utils.NormalOperateDaoImpl" />
-	
-	<aop:config>
-		<aop:pointcut id="junitPointCuts"
-			expression="(execution(* cn.sowell.datacenter.test.abc.TestPojoService.test()))
-			" />
-		<aop:advisor advice-ref="junitOpenSessionInterceptor" pointcut-ref="junitPointCuts" />
-	</aop:config>
-	
 	
 </beans>
