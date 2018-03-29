@@ -31,6 +31,8 @@
 	<bean id="baseNodeContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
 		<property name="mappingName" value="baseinfoImport" />
 		<property name="module" value="people" />
+		<property name="codeAttributeName" value="peoplecode" />
+		<property name="titleAttributeName" value="姓名" />
 	</bean>
 	
 	<bean id="importBaseNodeContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
