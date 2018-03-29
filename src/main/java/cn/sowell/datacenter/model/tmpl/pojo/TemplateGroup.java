@@ -39,7 +39,7 @@ public class TemplateGroup {
 	private String detailTemplateTitle;
 	
 	@Column(name="c_key")
-	private Long key;
+	private String key;
 	
 	@Column(name="c_authority")
 	private String authority;
@@ -112,13 +112,6 @@ public class TemplateGroup {
 		this.detailTemplateTitle = detailTemplateTitle;
 	}
 
-	public Long getKey() {
-		return key;
-	}
-
-	public void setKey(Long key) {
-		this.key = key;
-	}
 
 	public String getAuthority() {
 		return authority;
@@ -158,6 +151,14 @@ public class TemplateGroup {
 
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
 	}
 	
 }

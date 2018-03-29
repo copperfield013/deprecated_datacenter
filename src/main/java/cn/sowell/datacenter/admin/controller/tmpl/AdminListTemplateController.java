@@ -14,31 +14,31 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
+import cn.sowell.copFrame.dto.choose.ChooseTablePage;
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
+import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.DataCenterConstants;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
+import cn.sowell.datacenter.model.modules.pojo.ModuleMeta;
+import cn.sowell.datacenter.model.modules.service.ModulesService;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListColumn;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTempalte;
-import cn.sowell.datacenter.model.tmpl.service.ListTemplateService;
 import cn.sowell.datacenter.model.tmpl.service.TemplateService;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 
 @Controller
 @RequestMapping(AdminConstants.URI_TMPL + "/ltmpl")
 public class AdminListTemplateController {
-	
-	@Resource
-	ListTemplateService ltService;
 	
 	@Resource
 	SystemAdminService adminService;
@@ -47,17 +47,46 @@ public class AdminListTemplateController {
 	TemplateService tService;
 	
 	Logger logger = Logger.getLogger(AdminListTemplateController.class);
+
+	@Resource
+	FrameDateFormat dateFormat;
+
+	@Resource
+	private ModulesService mService;
 	
 	
 	@RequestMapping("/list/{module}")
 	public String list(Model model, @PathVariable String module){
 		UserIdentifier user = UserUtils.getCurrentUser();
-		List<TemplateListTempalte> ltmplList = ltService.queryLtmplList(module, user);
+		List<TemplateListTempalte> ltmplList = tService.queryLtmplList(module, user);
 		TemplateListTempalte defListTtemplate = tService.getDefaultListTemplate(user, module);
 		model.addAttribute("ltmplList", ltmplList);
 		model.addAttribute("defListTtemplate", defListTtemplate);
 		model.addAttribute("module", module);
 		return AdminConstants.JSP_TMPL_LIST + "/ltmpl_list.jsp";
+	}
+	
+	@RequestMapping("/choose/{module}")
+	public String dialogList(@PathVariable String module, Model model) {
+		UserIdentifier user = UserUtils.getCurrentUser();
+		List<TemplateListTempalte> list = tService.queryLtmplList(module, user);
+		ChooseTablePage<TemplateListTempalte> tpage = new ChooseTablePage<TemplateListTempalte>(
+				"ltmpl-choose-list", "ltmpl_");
+		tpage
+			.setPageInfo(null)
+			.setAction(AdminConstants.URI_TMPL + "/ltmpl/choose/" + module)
+			.setIsMulti(false)
+			.setTableData(list, handler->{
+				handler
+					.setDataKeyGetter(data->"ltmpl_" + data.getId())
+					.addColumn("模板名", (cell, data)->cell.setText(data.getTitle()))
+					.addColumn("创建时间", (cell, data)->cell.setText(dateFormat.formatDateTime(data.getCreateTime())))
+					;
+			})
+			;
+		
+		model.addAttribute("tpage", tpage);
+		return AdminConstants.PATH_CHOOSE_TABLE;
 	}
 	
 	@ResponseBody
@@ -74,7 +103,8 @@ public class AdminListTemplateController {
 	
 	@RequestMapping("/add/{module}")
 	public String add(@PathVariable String module, Model model){
-		model.addAttribute("module", module);
+		ModuleMeta moduleMeta = mService.getModule(module);
+		model.addAttribute("module", moduleMeta);
 		return AdminConstants.JSP_TMPL_LIST + "/ltmpl_update.jsp";
 	}
 	
@@ -84,11 +114,12 @@ public class AdminListTemplateController {
 		JSONArray columnDataJSON = toColumnData(ltmpl.getColumns());
 		JSONObject tmplDataJSON = toLtmplData(ltmpl);
 		JSONArray criteriaDataJSON = toCriteriaData(ltmpl.getCriterias());
+		ModuleMeta moduleMeta = mService.getModule(ltmpl.getModule());
+		model.addAttribute("module", moduleMeta);
 		model.addAttribute("ltmpl", ltmpl);
 		model.addAttribute("tmplDataJSON", tmplDataJSON);
 		model.addAttribute("columnDataJSON", columnDataJSON);
 		model.addAttribute("criteriaDataJSON", criteriaDataJSON);
-		model.addAttribute("module", ltmpl.getModule());
 		return AdminConstants.JSP_TMPL_LIST + "/ltmpl_update.jsp";
 	}
 	

@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <link type="text/css" rel="stylesheet" href="media/admin/modules/css/modules-detail-tmpl.css" />
-<div class="detail entity-detail-tmpl" id="entity-detail-tmpl-${entity.code }">
+<div class="detail entity-detail-tmpl" id="${moduke.key }-detail-tmpl-${entity.code }-${RES_STAMP}">
 	<div class="page-header">
 		<div class="header-title">
 			<h1>${module.title}-${entity.title }-详情</h1>
@@ -87,7 +87,7 @@
 </div>
 <script>
 	seajs.use(['dialog', 'ajax', 'utils', 'tmpl/js/dtmpl-update.js', '$CPF'], function(Dialog, Ajax, Utils, ViewTmpl, $CPF){
-		var $page = $('#entity-detail-tmpl-${entity.code }');
+		var $page = $('#${moduke.key }-detail-tmpl-${entity.code }-${RES_STAMP}');
 		var hasRecord = '${entity != null}';
 		if(hasRecord != 'true'){
 			Dialog.notice('数据不存在', 'warning');

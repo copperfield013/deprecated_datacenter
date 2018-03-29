@@ -36,8 +36,13 @@
 	</a>
 	<ul class="submenu">
 	   	<li>
-	   		<a class="tab" href="admin/modules/curd/list/people" target="people_list_tmpl" title="人口列表">
+	   		<a class="tab" href="admin/modules/curd/list/people" target="people_list_tmpl_" title="人口列表">
 	   			<span class="menu-text">人口列表</span>
+	   		</a>
+	   	</li>
+	   	<li>
+	   		<a class="tab" href="admin/modules/curd/list/people?tg=old" target="people_list_tmpl_old" title="老人信息">
+	   			<span class="menu-text">老人信息</span>
 	   		</a>
 	   	</li>
 	</ul>
@@ -57,6 +62,11 @@
 	   	<li>
 	   		<a class="tab" href="admin/tmpl/ltmpl/list/people" target="ltmpl_list" title="人口列表模板">
 	   			<span class="menu-text">人口列表模板</span>
+	   		</a>
+	   	</li>
+	   	<li>
+	   		<a class="tab" href="admin/tmpl/group/list/people" target="tmpl_group_list_people" title="人口模板组合">
+	   			<span class="menu-text">人口模板组合</span>
 	   		</a>
 	   	</li>
 	   	<li>

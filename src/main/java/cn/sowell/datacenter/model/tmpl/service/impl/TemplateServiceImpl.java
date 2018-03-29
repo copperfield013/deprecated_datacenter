@@ -1,5 +1,6 @@
 package cn.sowell.datacenter.model.tmpl.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,17 +14,20 @@ import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.NormalOperateDao;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.CollectionUtils;
+import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.DataCenterConstants;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
 import cn.sowell.datacenter.model.system.pojo.SystemAdmin;
 import cn.sowell.datacenter.model.tmpl.dao.DetailTemplateDao;
 import cn.sowell.datacenter.model.tmpl.dao.ListTemplateDao;
+import cn.sowell.datacenter.model.tmpl.dao.TempalteGroupDao;
 import cn.sowell.datacenter.model.tmpl.dao.TemplateDao;
 import cn.sowell.datacenter.model.tmpl.pojo.AbstractTemplate;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateAdminDefaultTemplate;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailField;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListColumn;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTempalte;
@@ -44,12 +48,20 @@ public class TemplateServiceImpl implements TemplateService{
 	
 	@Resource
 	TemplateDao tDao;
+	
+	@Resource
+	TempalteGroupDao gDao;
 
 	@Resource
 	SystemAdminService aService;
 	
 	@Resource
 	TemplateUpdateStrategyFactory tmplUpdateStrategyFactory;
+	
+	@Override
+	public List<TemplateListTempalte> queryLtmplList(String module, UserIdentifier user) {
+		return lDao.queryLtmplList(module, user.getId(), null);
+	}
 	
 	@Override
 	public AbstractTemplate getTemplate(long tmplId, String tmplType) {
@@ -171,5 +183,42 @@ public class TemplateServiceImpl implements TemplateService{
 		});
 		return groups;
 	}
-
+	
+	@Override
+	public List<TemplateGroup> queryTemplateGroups(String module) {
+		return gDao.queryGroups(module);
+	}
+	
+	@Override
+	public void saveGroup(TemplateGroup group, UserIdentifier user) {
+		group.setUpdateTime(new Date());
+		if(group.getId() != null) {
+			nDao.update(group);
+		}else {
+			if(group.getKey() == null) {
+				group.setKey(TextUtils.uuid());
+			}
+			group.setCreateUserId((Long) user.getId());
+			group.setCreateTime(new Date());
+			nDao.save(group);
+		}
+	}
+	
+	@Override
+	public TemplateGroup getTemplateGroup(Long groupId) {
+		return gDao.getGroup(groupId);
+	}
+	
+	@Override
+	public void remveTemplateGroup(Long groupId) {
+		TemplateGroup group = new TemplateGroup();
+		group.setId(groupId);
+		nDao.remove(group);
+	}
+	
+	@Override
+	public TemplateGroup getTemplateGroup(String module, String templateGroupKey) {
+		return gDao.getTemplateGroup(module, templateGroupKey);
+	}
+	
 }

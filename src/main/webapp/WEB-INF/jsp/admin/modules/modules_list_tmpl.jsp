@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <link type="text/css" rel="stylesheet" href="media/admin/modules/css/modules-list-tmpl.css" />
-<div id="${module.key }-list-tmpl" class="detail module-list-tmpl">
+<div id="${module.key }-list-tmpl-${RES_STAMP}" class="detail module-list-tmpl">
 	<div class="page-header">
 		<div class="header-title">
 			<h1>${module.title }列表</h1>
@@ -19,7 +19,7 @@
 			<a class="import tab" href="admin/modules/import/go/${module.key }" title="导入" target="module_${module.key }_import">
 				<i class="glyphicon glyphicon-import"></i>
 			</a>
-			<a class="tab" href="admin/modules/curd/add/${module.key }" title="创建${module.title }" target="module_${module.key }_add">
+			<a class="tab" href="admin/modules/curd/add/${module.key }?tg=${templateGroup.key }" title="创建${module.title }" target="module_${module.key }_add">
 				<i class="fa fa-plus"></i>
 			</a>
 		</div>
@@ -27,6 +27,7 @@
 	<div class="page-body">
 		<form class="form-inline"  action="admin/modules/curd/list/${module.key }">
 			<input type="hidden" id="tmplId" name="tmplId" value="${ltmpl.id }" />
+			<input type="hidden" name="tg" value="?tmplId=${templateGroup.key }"  />
 			<c:if test="${not empty ltmpl.criterias }">
 				<c:forEach var="criteriaItem" items="${ltmpl.criterias }">
 					<c:choose>
@@ -71,7 +72,7 @@
 										</c:when>
 										<c:when test="${fn:startsWith(column.specialField, 'operate')}">
 											<c:if test="${fn:contains(column.specialField, '-d') }">
-												<a href="admin/modules/curd/detail/${module.key }/${parser.code}" 
+												<a href="admin/modules/curd/detail/${module.key }/${parser.code}?tg=${templateGroup.key }" 
 													target="module_detail_${parser.code }" 
 													title="详情-${parser.title }"
 													class="tab btn btn-success btn-xs">
@@ -81,7 +82,7 @@
 											<c:if test="${fn:contains(column.specialField, '-u') }">
 												<a target="module_update_${parser.code }" 
 													title="修改-${parser.title }" 
-													href="admin/modules/curd/update/${module.key }/${parser.code }" 
+													href="admin/modules/curd/update/${module.key }/${parser.code }?tg=${templateGroup.key }" 
 													class="tab btn btn-info btn-xs edit">
 													<i class="fa fa-edit"></i>修改
 												</a>
@@ -171,7 +172,7 @@
 </div>
 <script>
 	seajs.use(['utils', 'ajax'], function(Utils, Ajax){
-		var $page = $('#${module.key }-list-tmpl');
+		var $page = $('#${module.key }-list-tmpl-${RES_STAMP}');
 		console.log($page);
 		$('#tmpl-list a[data-id]:not(.active)', $page).click(function(){
 			var $this = $(this);

@@ -8,6 +8,7 @@ import cn.sowell.datacenter.DataCenterConstants;
 import cn.sowell.datacenter.model.tmpl.pojo.AbstractTemplate;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateAdminDefaultTemplate;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTempalte;
 
 public interface TemplateService {
@@ -94,6 +95,38 @@ public interface TemplateService {
 	 * @return
 	 */
 	AbstractTemplate getTemplate(long tmplId, String tmplType);
+	
+	List<TemplateListTempalte> queryLtmplList(String module, UserIdentifier user);
+
+	/**
+	 * 获得该模块所有的模板组合
+	 * @param module
+	 * @return
+	 */
+	List<TemplateGroup> queryTemplateGroups(String module);
+
+	/**
+	 * 保存模板组
+	 * @param group
+	 * @param userIdentifier 
+	 */
+	void saveGroup(TemplateGroup group, UserIdentifier userIdentifier);
+
+	TemplateGroup getTemplateGroup(Long groupId);
+
+	/**
+	 * 移除模板组合
+	 * @param groupId
+	 */
+	void remveTemplateGroup(Long groupId);
+
+	/**
+	 * 根据模块和模板组的key获得对应的模板
+	 * @param module
+	 * @param templateGroupKey
+	 * @return
+	 */
+	TemplateGroup getTemplateGroup(String module, String templateGroupKey);
 
 	
 

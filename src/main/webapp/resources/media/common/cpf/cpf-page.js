@@ -32,7 +32,8 @@ define(function(require, exports, module){
 		if(page instanceof Page){
 			if(page.getType() === 'dialog'){
 				$('a[href],button[href]', page.getContainer()).click(function(e){
-					var href = $(this).attr('href');
+					var $this = $(this);
+					var href = $this.attr('href');
 					var je = /^javascript:(.*)$/;
 					if(je.test(href)){
 						try{
@@ -58,6 +59,26 @@ define(function(require, exports, module){
 							try{
 								$('#' + id, $page)[method]();
 							}catch(e){}
+						}else if($this.attr('choose-key')){
+							var chooseKey = $this.attr('choose-key');
+							require('dialog').openDialog(href, $this.attr('title'), $this.attr('target'), {
+								onSubmit	: function(data){
+									$('[crn-' + chooseKey + ']', $page).each(function(){
+										var $ele = $(this);
+										var propName = $ele.attr('crn-' + chooseKey);
+										if(propName){
+											if($ele.is('a,span,div,i')){
+												$ele.text(data[0][propName]);
+											}else if($ele.is('input[type="text"],input[type="hidden"],textarea,select,input[type="number"]')){
+												$ele.val(data[0][propName]);
+											}
+										}
+									});
+									
+									$('#listTemplateId', $page).val(data[0].id);
+									$('#choose-ltmpl', $page).text(data[0].title);
+								}
+							})
 						}else{
 							goPage(this, page);
 						}
@@ -99,6 +120,26 @@ define(function(require, exports, module){
 									try{
 										$('#' + id, $page)[method]();
 									}catch(e){}
+								}else if($this.attr('choose-key')){
+									var chooseKey = $this.attr('choose-key');
+									require('dialog').openDialog(href, $this.attr('title'), $this.attr('target'), {
+										onSubmit	: function(data){
+											$('[crn-' + chooseKey + ']', $page).each(function(){
+												var $ele = $(this);
+												var propName = $ele.attr('crn-' + chooseKey);
+												if(propName){
+													if($ele.is('a,span,div,i')){
+														$ele.text(data[0][propName]);
+													}else if($ele.is('input[type="text"],input[type="hidden"],textarea,select,input[type="number"]')){
+														$ele.val(data[0][propName]);
+													}
+												}
+											});
+											
+											$('#listTemplateId', $page).val(data[0].id);
+											$('#choose-ltmpl', $page).text(data[0].title);
+										}
+									})
 								}else{
 									goPage($this, page);
 								}

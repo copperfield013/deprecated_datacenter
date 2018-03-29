@@ -1,22 +1,16 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
-<c:set var="moduleTitle">
-	<c:choose>
-		<c:when test="${module == 'people' }">人口</c:when>
-		<c:when test="${module == 'address' }">地址</c:when>
-	</c:choose>
-</c:set>
 <c:set var="title">
 	<c:choose>
-		<c:when test="${tmpl != null }">修改${moduleTitle }详情模板-${tmpl.title }</c:when>
-		<c:otherwise>创建${moduleTitle }详情模板</c:otherwise>
+		<c:when test="${tmpl != null }">修改${module.title }详情模板-${tmpl.title }</c:when>
+		<c:otherwise>创建${module.title }详情模板</c:otherwise>
 	</c:choose>
 </c:set>
 
 
 <title>${title }</title>
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/dtmpl-update.css" />
-<div id="dtmpl-update-${tmpl.id }" class="dtmpl-update">
+<div id="dtmpl-update-${module.key}-${tmpl.id }" class="dtmpl-update">
 	<script type="jquery/tmpl" id="tmpl-field-group">
 		<div class="widget field-group" data-id="\${id}">
 			<div class="widget-header">
@@ -120,14 +114,14 @@
 	console.log(1);
 	seajs.use(['tmpl/js/dtmpl-update.js'], function(ViewTmpl){
 		console.log(2);
-		var $page = $('#dtmpl-update-${tmpl.id }');
+		var $page = $('#dtmpl-update-${module.key}-${tmpl.id }');
 		console.log($page);
 		var updateMode = '${tmplJson != null}' == 'true';
 		ViewTmpl.init($page, {
 			tmplId		: '${tmpl.id}',
 			tmplData	: updateMode && $.parseJSON('${tmplJson}'),
 			mode		: updateMode? 'update': 'create',
-			module		: '${module}'
+			module		: '${module.key}'
 		});
 	});
 </script>

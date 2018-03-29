@@ -16,15 +16,19 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import cn.sowell.copFrame.dto.choose.ChooseTablePage;
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
+import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.DataCenterConstants;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
+import cn.sowell.datacenter.model.modules.pojo.ModuleMeta;
+import cn.sowell.datacenter.model.modules.service.ModulesService;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailField;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
@@ -41,10 +45,17 @@ public class AdminDetailTemplateController {
 	TemplateService tService;
 	
 	Logger logger = Logger.getLogger(AdminDetailTemplateController.class);
+
+	@Resource
+	FrameDateFormat dateFormat;
+	
+	@Resource
+	ModulesService mService;
 	
 	@RequestMapping("/to_create/{module}")
 	public String toCreate(@PathVariable String module, Model model){
-		model.addAttribute("module", module);
+		ModuleMeta moduleMeta = mService.getModule(module);
+		model.addAttribute("module", moduleMeta);
 		return AdminConstants.JSP_TMPL_DETAIL + "/dtmpl_update.jsp";
 	}
 	
@@ -56,6 +67,30 @@ public class AdminDetailTemplateController {
 		model.addAttribute("tmplList", tmplList);
 		model.addAttribute("defaultTemplate", defDetailTemplate);
 		return AdminConstants.JSP_TMPL_DETAIL + "/dtmpl_list.jsp";
+	}
+	
+
+	@RequestMapping("/choose/{module}")
+	public String dialogList(@PathVariable String module, Model model) {
+		UserIdentifier user = UserUtils.getCurrentUser();
+		List<TemplateDetailTemplate> tmplList = tService.getAllDetailTemplateList(module, user, null, false);
+		ChooseTablePage<TemplateDetailTemplate> tpage = new ChooseTablePage<TemplateDetailTemplate>(
+				"ltmpl-choose-list", "ltmpl_");
+		tpage
+			.setPageInfo(null)
+			.setAction(AdminConstants.URI_TMPL + "/dtmpl/choose/" + module)
+			.setIsMulti(false)
+			.setTableData(tmplList, handler->{
+				handler
+					.setDataKeyGetter(data->"ltmpl_" + data.getId())
+					.addColumn("模板名", (cell, data)->cell.setText(data.getTitle()))
+					.addColumn("创建时间", (cell, data)->cell.setText(dateFormat.formatDateTime(data.getCreateTime())))
+					;
+			})
+			;
+		
+		model.addAttribute("tpage", tpage);
+		return AdminConstants.PATH_CHOOSE_TABLE;
 	}
 	
 	@ResponseBody
@@ -77,9 +112,10 @@ public class AdminDetailTemplateController {
 	public String update(@PathVariable Long tmplId, Model model){
 		TemplateDetailTemplate tmpl = tService.getDetailTemplate(tmplId);
 		JSONObject tmplJson = (JSONObject) JSON.toJSON(tmpl);
+		ModuleMeta moduleMeta = mService.getModule(tmpl.getModule());
+		model.addAttribute("module", moduleMeta);
 		model.addAttribute("tmpl", tmpl);
 		model.addAttribute("tmplJson", tmplJson);
-		model.addAttribute("module", tmpl.getModule());
 		return AdminConstants.JSP_TMPL_DETAIL + "/dtmpl_update.jsp";
 	}
 	

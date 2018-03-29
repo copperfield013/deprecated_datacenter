@@ -25,6 +25,7 @@ import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.Assert;
 import cn.sowell.copframe.utils.CollectionUtils;
+import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.abc.resolver.EntityPropertyParser;
@@ -39,7 +40,7 @@ import cn.sowell.datacenter.model.modules.service.ModulesService;
 import cn.sowell.datacenter.model.tmpl.bean.QueryEntityParameter;
 import cn.sowell.datacenter.model.tmpl.param.ListTemplateParameter;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
-import cn.sowell.datacenter.model.tmpl.service.ListTemplateService;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.datacenter.model.tmpl.service.TemplateService;
 
 @Controller
@@ -55,8 +56,6 @@ public class AdminModulesController {
 	@Resource
 	DictionaryService dictService;
 	
-	@Resource
-	ListTemplateService ltmplService;
 	
 	@Resource
 	TemplateService tService;
@@ -78,11 +77,19 @@ public class AdminModulesController {
 	public String list(
 			@PathVariable String module,
 			Long tmplId, 
+			@RequestParam(name="tg", required=false) String templateGroupKey,
 			PageInfo pageInfo,
 			Model model,
 			HttpServletRequest request, HttpSession session) {
 		ModuleMeta moduleMeta = mService.getModule(module);
 		Assert.notNull(moduleMeta);
+		if(TextUtils.hasText(templateGroupKey)) {
+			TemplateGroup tGroup = tService.getTemplateGroup(module, templateGroupKey);
+			if(tGroup != null) {
+				tmplId = tGroup.getListTemplateId();
+				model.addAttribute("templateGroup", tGroup);
+			}
+		}
 		ListTemplateParameter param = mService.exractTemplateParameter(tmplId, module, request);
 		if(param.getListTemplate() != null){
 			QueryEntityParameter queryParam = new QueryEntityParameter();
@@ -108,7 +115,7 @@ public class AdminModulesController {
 		model.addAttribute("vCriteriaMap", param.getNormalCriteriaMap());
 		model.addAttribute("ltmpl", param.getListTemplate());
 		model.addAttribute("pageInfo", pageInfo);
-		model.addAttribute("ltmplList", ltmplService.queryLtmplList(module, param.getUser()));
+		model.addAttribute("ltmplList", tService.queryLtmplList(module, param.getUser()));
 		model.addAttribute("module", moduleMeta);
 		return AdminConstants.JSP_MODULES + "/modules_list_tmpl.jsp";
 	}
@@ -117,6 +124,7 @@ public class AdminModulesController {
 	public String detail(@PathVariable String code, 
 			@PathVariable String module, 
 			Long tmplId,
+			@RequestParam(name="tg", required=false) String templateGroupKey,
 			String datetime, 
     		Long timestamp,
     		Model model) {
@@ -127,6 +135,13 @@ public class AdminModulesController {
         	date = new Date(timestamp);
         }
         UserIdentifier user = UserUtils.getCurrentUser();
+        if(TextUtils.hasText(templateGroupKey)) {
+			TemplateGroup tGroup = tService.getTemplateGroup(module, templateGroupKey);
+			if(tGroup != null) {
+				tmplId = tGroup.getDetailTemplateId();
+				model.addAttribute("templateGroup", tGroup);
+			}
+		}
         TemplateDetailTemplate dtmpl = coalesceDetailTempalte(tmplId, user, module);
         List<TemplateDetailTemplate> dtmpls = tService.getAllDetailTemplateList(module, user, null, false);
         EntityPropertyParser entity = mService.getEntity(module, code, date);
@@ -142,8 +157,16 @@ public class AdminModulesController {
 	}
 	
 	@RequestMapping("/add/{module}")
-	public String add(@PathVariable String module, Long tmplId, Model model) {
+	public String add(@PathVariable String module, Long tmplId, 
+			@RequestParam(name="tg", required=false) String templateGroupKey, Model model) {
 		ModuleMeta mMeta = mService.getModule(module);
+		if(TextUtils.hasText(templateGroupKey)) {
+			TemplateGroup tGroup = tService.getTemplateGroup(module, templateGroupKey);
+			if(tGroup != null) {
+				tmplId = tGroup.getDetailTemplateId();
+				model.addAttribute("templateGroup", tGroup);
+			}
+		}
 		UserIdentifier user = UserUtils.getCurrentUser();
 		TemplateDetailTemplate dtmpl = coalesceDetailTempalte(tmplId, user, module);
 		model.addAttribute("dtmpl", dtmpl);
@@ -158,10 +181,18 @@ public class AdminModulesController {
 	public String update(
 			@PathVariable String module,
 			@PathVariable String code,
+			@RequestParam(name="tg", required=false) String templateGroupKey,
 			Long tmplId,
 			Model model
 			) {
 		ModuleMeta mMeta = mService.getModule(module);
+		if(TextUtils.hasText(templateGroupKey)) {
+			TemplateGroup tGroup = tService.getTemplateGroup(module, templateGroupKey);
+			if(tGroup != null) {
+				tmplId = tGroup.getDetailTemplateId();
+				model.addAttribute("templateGroup", tGroup);
+			}
+		}
 		UserIdentifier user = UserUtils.getCurrentUser();
 		EntityPropertyParser entity = mService.getEntity(module, code, null);
 		TemplateDetailTemplate dtmpl = coalesceDetailTempalte(tmplId, user, module);

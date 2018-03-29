@@ -8,7 +8,7 @@
 	</c:choose>
 </c:set>
 <title>${title }</title>
-<div class="detail entity-detail-tmpl" id="entity-update-tmpl-${module.key }-${entity.code }">
+<div class="detail entity-detail-tmpl" id="${moduke.key }-update-tmpl-${entity.code }-${RES_STAMP}">
 	<div class="page-header">
 		<div class="header-title">
 			<h1>${title }</h1>
@@ -84,7 +84,7 @@
 <script>
 	seajs.use(['dialog', 'ajax', 'utils', 'tmpl/js/dtmpl-update.js', '$CPF',
 	           'field/js/field-input.js'], function(Dialog, Ajax, Utils, ViewTmpl, $CPF, FieldInput){
-		var $page = $('#entity-update-tmpl-${module.key }-${entity.code }');
+		var $page = $('#${moduke.key }-update-tmpl-${entity.code }-${RES_STAMP}');
 		
 		var isUpdateMode = 'true' === '${entity != null}';
 		

@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
-<title>模板组合管理（module.title）</title>
+<title>模板组合管理（${module.title }）</title>
 <div id="tmplgroup-${module.key }" class="detail">
 	<div>
 		<form action="admin/tmpl/group/list">
@@ -9,13 +9,13 @@
 	</div>
 	<div class="page-header">
 		<div class="header-title">
-			<h1>模板组合管理（module.title）</h1>
+			<h1>模板组合管理（${module.title }）</h1>
 		</div>
 		<div class="header-buttons">
 			<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
 				<i class="glyphicon glyphicon-refresh"></i>
 			</a>
-			<a class="tab"  href="admin/tmpl/group/to_create/${module }" title="创建模板" target="create_tmpl_group">
+			<a class="tab"  href="admin/tmpl/group/to_create/${module.key }" title="创建模板" target="create_tmpl_group">
 				<i class="fa fa-plus"></i>
 			</a>
 		</div>
@@ -39,10 +39,10 @@
 						<tr>
 							<td>${i.index + 1 }</td>
 							<td>${group.title }</td>
-							<td><a class="dialog" target="dialog_ltmpl_update_${group.listTempalteId }" href="admin/tmpl/ltmpl/update/${group.listTemplateId }">${group.listTemplateName }</a></td>
-							<td><a class="dialog" target="dialog_dtmpl_update_${group.detailTempalteId }" href="admin/tmpl/dtmpl/update/${group.detailTemplateId }">${group.detailTemplateName }</a></td>
+							<td><a class="dialog" target="dialog_ltmpl_update_${group.listTemplateId }" href="admin/tmpl/ltmpl/update/${group.listTemplateId }">${group.listTemplateTitle }</a></td>
+							<td><a class="dialog" target="dialog_dtmpl_update_${group.detailTemplateId }" href="admin/tmpl/dtmpl/update/${group.detailTemplateId }">${group.detailTemplateTitle }</a></td>
 							<td>${group.key }</td>
-							<td><fmt:formatDate value="${tmpl.updateTime }" pattern="yyyy-MM-dd HH:mm:ss" /> </td>
+							<td><fmt:formatDate value="${group.updateTime }" pattern="yyyy-MM-dd HH:mm:ss" /> </td>
 							<td>
 								<a target="tmpl_group_update_${group.id }" href="admin/tmpl/group/update/${group.id }" class="tab btn btn-info btn-xs edit">
 									<i class="fa fa-edit"></i>
