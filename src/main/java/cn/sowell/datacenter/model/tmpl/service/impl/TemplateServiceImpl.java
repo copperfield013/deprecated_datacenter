@@ -195,7 +195,7 @@ public class TemplateServiceImpl implements TemplateService{
 		if(group.getId() != null) {
 			nDao.update(group);
 		}else {
-			if(group.getKey() == null) {
+			if(!TextUtils.hasText(group.getKey())) {
 				group.setKey(TextUtils.uuid());
 			}
 			group.setCreateUserId((Long) user.getId());

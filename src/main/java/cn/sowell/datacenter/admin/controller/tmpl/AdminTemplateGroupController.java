@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
@@ -87,6 +86,7 @@ public class AdminTemplateGroupController {
 	}
 	
 	
+	@ResponseBody
 	@RequestMapping("/remove/{groupId}")
 	public AjaxPageResponse remove(@PathVariable Long groupId) {
 		try {

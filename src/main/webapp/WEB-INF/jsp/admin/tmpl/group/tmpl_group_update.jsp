@@ -22,7 +22,10 @@
 					<div class="form-group"> 
 						<label class="col-lg-2 control-label" for="name">名称</label>
 						<div class="col-lg-5">
-							<input type="text" class="form-control" name="title" value="${group.title }" />
+							<input type="text"
+							data-bv-notempty="true"
+							data-bv-notempty-message="模板组合名称必填"
+							class="form-control" name="title" value="${group.title }" />
 						</div>
 					</div>
 					<div class="form-group"> 
@@ -33,7 +36,8 @@
 								href="admin/tmpl/ltmpl/choose/${module.key }" 
 								title="选择列表模板"
 								choose-key="choose-ltmpl" 
-								crn-choose-ltmpl="title" >${group.listTemplateId != null? group.listTemplateTitle: '选择列表模板' }</a>
+								crn-choose-ltmpl="title" 
+								>${group.listTemplateId != null? group.listTemplateTitle: '选择列表模板' }</a>
 							<input type="hidden" crn-choose-ltmpl="id" name="listTemplateId" value="${group.listTemplateId }" />
 						</div>
 					</div>
@@ -52,7 +56,7 @@
 					<div class="form-group"> 
 						<label class="col-lg-2 control-label" for="name">模板Key</label>
 						<div class="col-lg-5">
-							<input type="text" class="form-control"  name="key" value="${group.key }" />
+							<input type="text" placeholder="不填写时自动生成32位uuid" class="form-control"  name="key" value="${group.key }" />
 						</div>
 					</div>
 					<div class="form-group">
