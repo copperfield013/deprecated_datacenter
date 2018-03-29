@@ -192,12 +192,12 @@ public class TemplateServiceImpl implements TemplateService{
 	@Override
 	public void saveGroup(TemplateGroup group, UserIdentifier user) {
 		group.setUpdateTime(new Date());
+		if(!TextUtils.hasText(group.getKey())) {
+			group.setKey(TextUtils.uuid(5, 62));
+		}
 		if(group.getId() != null) {
 			nDao.update(group);
 		}else {
-			if(!TextUtils.hasText(group.getKey())) {
-				group.setKey(TextUtils.uuid());
-			}
 			group.setCreateUserId((Long) user.getId());
 			group.setCreateTime(new Date());
 			nDao.save(group);

@@ -56,7 +56,7 @@
 					<div class="form-group"> 
 						<label class="col-lg-2 control-label" for="name">模板Key</label>
 						<div class="col-lg-5">
-							<input type="text" placeholder="不填写时自动生成32位uuid" class="form-control"  name="key" value="${group.key }" />
+							<input type="text" placeholder="不填写时自动生成5位随机码" class="form-control"  name="key" value="${group.key }" />
 						</div>
 					</div>
 					<div class="form-group">
