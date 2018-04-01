@@ -999,7 +999,7 @@ define(function(require, exports, module){
 		//绑定移除列事件
 		$page.on('click', '.col-delete', function(){
 			var fieldId = $(this).closest('.row[field-id]').attr('field-id');
-			colTable.Column(fieldId);
+			colTable.removeColumn(fieldId);
 			addColSearcher.enableField(fieldId);
 		});
 		

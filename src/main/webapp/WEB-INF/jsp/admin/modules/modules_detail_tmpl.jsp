@@ -31,7 +31,7 @@
 								<div class="form-group field-item ${tmplField.colNum == 2? 'dbcol': '' }">
 									<label class="control-label field-title">${tmplField.title }</label>
 									<div class="field-value">
-										<span class="field-view">${entity.map[tmplField.fieldName] }</span>
+										<span class="field-view">${entity.smap[tmplField.fieldName] }</span>
 									</div>
 								</div>
 							</c:forEach>

@@ -40,7 +40,7 @@
 										<span class="field-input" 
 											fInp-type="${tmplField.type }"
 											fInp-name="${tmplField.fieldName }"
-											fInp-value="${entity.map[tmplField.fieldName] }"
+											fInp-value="${entity.smap[tmplField.fieldName] }"
 											fInp-optkey="${tmplField.optionGroupId }"
 										>
 										</span>

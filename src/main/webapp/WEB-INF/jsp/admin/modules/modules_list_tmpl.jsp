@@ -96,7 +96,7 @@
 											</c:if>
 										</c:when>
 										<c:otherwise>
-											${parser.map[column.fieldKey] }
+											${parser.smap[column.fieldKey] }
 										</c:otherwise>
 									</c:choose>
 								</td>
