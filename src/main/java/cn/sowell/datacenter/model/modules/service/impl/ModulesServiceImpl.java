@@ -77,11 +77,17 @@ public class ModulesServiceImpl implements ModulesService{
 		ModuleMeta studentModule = new ModuleMeta();
 		studentModule.setKey(DataCenterConstants.MODULE_KEY_STUDENT);
 		studentModule.setTitle("学生");
+		ModuleMeta disabledpeopleModule = new ModuleMeta();
+		disabledpeopleModule.setKey(DataCenterConstants.MODULE_KEY_DISABLEDPEOPLE);
+		disabledpeopleModule.setTitle("助残");
+		ModuleMeta hspeopleModule = new ModuleMeta();
+		hspeopleModule.setKey(DataCenterConstants.MODULE_KEY_HSPEOPLE);
+		hspeopleModule.setTitle("党建");
 		moduleMap.put(addressModule.getKey(), addressModule);
 		moduleMap.put(peopleModule.getKey(), peopleModule);
 		moduleMap.put(studentModule.getKey(), studentModule);
-		
-		
+		moduleMap.put(disabledpeopleModule.getKey(), disabledpeopleModule);
+		moduleMap.put(hspeopleModule.getKey(), hspeopleModule);
 	}
 	
 	@Override

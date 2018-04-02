@@ -17,6 +17,8 @@ public interface DataCenterConstants {
 	final String MODULE_KEY_PEOPLE = "people";
 	final String MODULE_KEY_ADDRESS = "address";
 	final String MODULE_KEY_STUDENT = "student";
+	final String MODULE_KEY_DISABLEDPEOPLE = "disabledpeople";
+	final String MODULE_KEY_HSPEOPLE = "hspeople";
 	final Map<Class<?>, String> _TEMPLATE_MAP = new HashMap<>();
 	static String mapTemplateType(Class<?> templateClass) {
 		if(TemplateListTempalte.class.equals(templateClass)) {

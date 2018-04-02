@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ABC name="disabledpeople" abcattr="助残信息" class=""
+	xmlns="http://www.w3school.com.cn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<attribute name="编码" alias="" abcattr="唯一编码" />
+	<attribute name="编辑时间" alias="编辑时间" datatype="datetime"
+		abcattr="更新时间" />
+
+	<attribute name="住所类型" abcattr="住所类型" /><!-- 基本信息 -->
+	<attribute name="住院天数" abcattr="住院天数" /><!-- 基本信息 -->
+	<attribute name="住院类型" abcattr="住院类型" /><!-- 基本信息 -->
+	<attribute name="出生日期" abcattr="出生日期" /><!-- 基本信息 -->
+	<attribute name="医疗自付金额" abcattr="医疗自付金额" /><!-- 基本信息 -->
+	<attribute name="商户房租金额" abcattr="商户房租金额" /><!-- 基本信息 -->
+	<attribute name="商户经营时间" abcattr="商户经营时间" /><!-- 基本信息 -->
+	<attribute name="姓名" abcattr="姓名" /><!-- 基本信息 -->
+	<attribute name="性别" abcattr="性别" /><!-- 基本信息 -->
+	<attribute name="意外类型" abcattr="意外类型" /><!-- 基本信息 -->
+	<attribute name="护理地类型" abcattr="护理地类型" /><!-- 基本信息 -->
+	<attribute name="救助圈等级" abcattr="救助圈等级" /><!-- 基本信息 -->
+	<attribute name="死亡日期" abcattr="死亡日期" /><!-- 基本信息 -->
+	<attribute name="残疾类型" abcattr="残疾类型" /><!-- 基本信息 -->
+	<attribute name="残疾级别" abcattr="残疾级别" /><!-- 基本信息 -->
+	<attribute name="残疾证" abcattr="残疾证" /><!-- 基本信息 -->
+	<attribute name="求学类型" abcattr="求学类型" /><!-- 基本信息 -->
+	<attribute name="身份证" abcattr="身份证" /><!-- 基本信息 -->
+	<attribute name="驾驶证" abcattr="驾驶证" /><!-- 基本信息 -->
+	<attribute name="备注" abcattr="备注" /><!-- 基本信息 -->
+
+	<label name="人口标签" subdomain="户籍人口,残疾人,单亲,个体工商户,灵活就业,创业就业,有车" />
+
+	<multiattribute name="民政保障信息" abcattr="民政保障信息">
+		<attribute name="参保时间" abcattr="参保时间" />
+		<attribute name="参保事项" abcattr="参保事项" />
+		<attribute name="参保金额" abcattr="参保金额" />
+		<attribute name="频次" abcattr="频次" />
+		<attribute name="状态" abcattr="状态" />
+	</multiattribute>
+
+	<multiattribute name="发票类型" abcattr="发票类型">
+		<attribute name="发票类型" abcattr="发票类型" />
+	</multiattribute>
+
+	<multiattribute name="器材类型" abcattr="器材类型">
+		<attribute name="器材类型" abcattr="器材类型" />
+	</multiattribute>
+
+	<multiattribute name="机构证明" abcattr="机构证明">
+		<attribute name="证明类别" abcattr="证明类别" />
+	</multiattribute>
+
+	<multiattribute name="康复机构" abcattr="康复机构">
+		<attribute name="康复机构" abcattr="康复机构" />
+	</multiattribute>
+
+	<multiattribute name="手术类别" abcattr="手术类别">
+		<attribute name="手术类别" abcattr="手术类别" />
+	</multiattribute>
+	<multiattribute name="伤残详举" abcattr="伤残详举">
+		<attribute name="伤残详举" abcattr="伤残详举" />
+	</multiattribute>
+
+</ABC>

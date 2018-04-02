@@ -2,9 +2,8 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-    xmlns:tx="http://www.springframework.org/schema/tx"
-    xmlns:task="http://www.springframework.org/schema/task"  
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task"
 	xsi:schemaLocation="http://www.springframework.org/schema/mvc 
 		http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd 
 		http://www.springframework.org/schema/beans 
@@ -15,8 +14,8 @@
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
         http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd">
 
-	<import resource="spring-mvc.xml"/>
-	
+	<import resource="spring-mvc.xml" />
+
 	<context:component-scan base-package="com.abc" />
 
 	<!-- dao自动扫描 -->
@@ -25,50 +24,73 @@
 	<context:component-scan base-package="cn.sowell.datacenter.model.*.service.impl" />
 	<!-- controller自动扫描(自动注入) -->
 	<context:component-scan base-package="cn.sowell.datacenter.*.controller.*" />
-	
-	<import resource="spring-security.xml"/>
-	
-	<bean id="baseNodeContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
-		<property name="mappingName" value="baseinfoImport" />
+
+	<import resource="spring-security.xml" />
+
+	<bean id="baseNodeContextConfig"
+		class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig">
+		<property name="mappingName" value="people" />
 		<property name="module" value="people" />
 		<property name="codeAttributeName" value="peoplecode" />
 		<property name="titleAttributeName" value="姓名" />
 	</bean>
-	
-	<bean id="importBaseNodeContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
+
+	<bean id="importBaseNodeContextConfig"
+		class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig">
 		<property name="mappingName" value="importBase" />
 		<property name="module" value="people" />
 	</bean>
-	
-	<bean id="importHandicappedNodeContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
+
+	<bean id="importHandicappedNodeContextConfig"
+		class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig">
 		<property name="mappingName" value="importHandicapped" />
 		<property name="module" value="people" />
 	</bean>
-	
-	<bean id="importLowincomeNodeContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
+
+	<bean id="importLowincomeNodeContextConfig"
+		class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig">
 		<property name="mappingName" value="importLowincome" />
 		<property name="module" value="people" />
 	</bean>
-	
-	<bean id="importFamilyPlanningNodeContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
+
+	<bean id="importFamilyPlanningNodeContextConfig"
+		class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig">
 		<property name="mappingName" value="importFamilyPlanning" />
 		<property name="module" value="people" />
 	</bean>
-	
-	<bean id="studentpartyConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig">
+
+	<bean id="studentpartyConfig"
+		class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig">
 		<property name="mappingName" value="studentpartyBase" />
 		<property name="module" value="student" />
 		<property name="codeAttributeName" value="peoplecode" />
 		<property name="titleAttributeName" value="姓名" />
 	</bean>
-	
-	<bean id="addressBaseContextConfig" class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig"  >
+
+	<bean id="disabledpeopleConfig"
+		class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig">
+		<property name="mappingName" value="disabledpeople" />
+		<property name="module" value="disabledpeople" />
+		<property name="codeAttributeName" value="编码" />
+		<property name="titleAttributeName" value="姓名" />
+	</bean>
+
+	<bean id="hspeopleConfig"
+		class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig">
+		<property name="mappingName" value="hspeople" />
+		<property name="module" value="hspeople" />
+		<property name="codeAttributeName" value="编码" />
+		<property name="titleAttributeName" value="姓名" />
+	</bean>
+
+	<bean id="addressBaseContextConfig"
+		class="cn.sowell.datacenter.model.abc.resolver.FusionContextConfig">
 		<property name="mappingName" value="addressBase" />
 		<property name="module" value="address" />
 		<property name="codeAttributeName" value="编码" />
 		<property name="titleAttributeName" value="地址简称" />
 	</bean>
-	
+
 	<bean class="cn.sowell.datacenter.model.abc.resolver.FusionContextFactoryDC">
 		<property name="configMap">
 			<map>
@@ -79,27 +101,32 @@
 				<entry key="importFamilyPlanning" value-ref="importFamilyPlanningNodeContextConfig" />
 				<entry key="addressBase" value-ref="addressBaseContextConfig" />
 				<entry key="studentpartyBase" value-ref="studentpartyConfig" />
+				<entry key="disabledpeople" value-ref="disabledpeopleConfig" />
+				<entry key="hspeople" value-ref="hspeopleConfig" />
 			</map>
 		</property>
 	</bean>
-	
-	<bean class="cn.sowell.copframe.spring.propTranslator.PropertyValueTranslatorSet">
+
+	<bean
+		class="cn.sowell.copframe.spring.propTranslator.PropertyValueTranslatorSet">
 		<property name="translatorSet">
 			<set>
-				<bean class="cn.sowell.copframe.spring.propTranslator.translator.DatePropertyValueTranlator" />
+				<bean
+					class="cn.sowell.copframe.spring.propTranslator.translator.DatePropertyValueTranlator" />
 			</set>
 		</property>
 	</bean>
-	
+
 	<bean class="cn.sowell.copframe.dao.utils.NormalOperateDaoImpl" />
-	
-	
+
+
 	<mvc:interceptors>
 		<!-- 用于在请求中设置一些常用的变量 -->
-		<bean class="cn.sowell.datacenter.common.interceptor.CommonRequestAttributeSetInterceptor" />
+		<bean
+			class="cn.sowell.datacenter.common.interceptor.CommonRequestAttributeSetInterceptor" />
 	</mvc:interceptors>
-	
-	<task:annotation-driven /> <!-- 定时器开关--> 
+
+	<task:annotation-driven /> <!-- 定时器开关 -->
 	<bean class="cn.sowell.datacenter.model.modules.bean.PeopleExportHandlerTask" />
-	
+
 </beans>
