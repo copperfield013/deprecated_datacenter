@@ -102,6 +102,7 @@ define(function(require, exports, module){
 		 */
 		function transferInfoToFields(compositeData, fieldKeyData){
 			var fieldData = [];
+			console.log(compositeData);
 			for(var i in compositeData){
 				var thisComposite = compositeData[i];
 				for(var j in thisComposite.fields){
@@ -110,7 +111,7 @@ define(function(require, exports, module){
 							fieldKeyData['id_' + thisField.id] = {
 									id		: thisField.id,
 									name	: thisField.name,
-									cname	: thisField.cname,
+									cname	: thisField.title,
 									type	: thisField.type,
 									c_id	: thisComposite.id,
 									c_name	: thisComposite.name,
@@ -118,6 +119,7 @@ define(function(require, exports, module){
 							});
 				}
 			}
+			
 			return fieldData;
 		}
 		
@@ -167,21 +169,18 @@ define(function(require, exports, module){
 				return false;
 			}else{
 				//构造新字段的内容
-				getFieldData(fieldId, function(field){
-					var fieldData = {
-							id			: groupFieldData.id,
-							title		: field.cname,
-							name		: field.cname,
-							fieldId		: field.id,
-							dv			: groupFieldData.dv || 'XXXXX',
-							colNum		: groupFieldData.colNum
-					};
-					//将字段插入到字段组中
-					var $fieldContainer = getFieldContainer($group);
-					var $field = $tmplField.tmpl(fieldData);
-					$field.data('field-data', fieldData).appendTo($fieldContainer);
-					adjustFieldTitle($field.find('.field-title'));
-				});
+				var fieldData = {
+						id			: groupFieldData.id,
+						title		: groupFieldData.title,
+						fieldId		: fieldId,
+						dv			: groupFieldData.dv || 'XXXXX',
+						colNum		: groupFieldData.colNum
+				};
+				//将字段插入到字段组中
+				var $fieldContainer = getFieldContainer($group);
+				var $field = $tmplField.tmpl(fieldData);
+				$field.data('field-data', fieldData).appendTo($fieldContainer);
+				adjustFieldTitle($field.find('.field-title'));
 				fieldpickerHandler(function($fieldpicker){
 					var $toDisable = $('a.fieldpicker-field-item[data-id="' + fieldId + '"]', $fieldpicker);
 					$toDisable.addClass('disabled');
