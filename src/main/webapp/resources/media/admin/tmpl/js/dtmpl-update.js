@@ -111,7 +111,7 @@ define(function(require, exports, module){
 							fieldKeyData['id_' + thisField.id] = {
 									id		: thisField.id,
 									name	: thisField.name,
-									cname	: thisField.title,
+									cname	: thisField.title || thisField.cname,
 									type	: thisField.type,
 									c_id	: thisComposite.id,
 									c_name	: thisComposite.name,
@@ -168,22 +168,28 @@ define(function(require, exports, module){
 				Dialog.notice('该字段已存在，不能重复添加', 'error');
 				return false;
 			}else{
-				//构造新字段的内容
-				var fieldData = {
-						id			: groupFieldData.id,
-						title		: groupFieldData.title,
-						fieldId		: fieldId,
-						dv			: groupFieldData.dv || 'XXXXX',
-						colNum		: groupFieldData.colNum
-				};
-				//将字段插入到字段组中
-				var $fieldContainer = getFieldContainer($group);
-				var $field = $tmplField.tmpl(fieldData);
-				$field.data('field-data', fieldData).appendTo($fieldContainer);
-				adjustFieldTitle($field.find('.field-title'));
-				fieldpickerHandler(function($fieldpicker){
-					var $toDisable = $('a.fieldpicker-field-item[data-id="' + fieldId + '"]', $fieldpicker);
-					$toDisable.addClass('disabled');
+				var c = getFieldData;
+				if(groupFieldData && groupFieldData.title){
+					c = function(fieldId, callback){callback.apply()};
+				}
+				c(fieldId, function(fieldData){
+					//构造新字段的内容
+					var fieldData = {
+							id			: groupFieldData.id,
+							title		: groupFieldData.title || fieldData.cname,
+							fieldId		: fieldId,
+							dv			: groupFieldData.dv || 'XXXXX',
+							colNum		: groupFieldData.colNum
+					};
+					//将字段插入到字段组中
+					var $fieldContainer = getFieldContainer($group);
+					var $field = $tmplField.tmpl(fieldData);
+					$field.data('field-data', fieldData).appendTo($fieldContainer);
+					adjustFieldTitle($field.find('.field-title'));
+					fieldpickerHandler(function($fieldpicker){
+						var $toDisable = $('a.fieldpicker-field-item[data-id="' + fieldId + '"]', $fieldpicker);
+						$toDisable.addClass('disabled');
+					});
 				});
 				return true;
 			}
