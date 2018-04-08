@@ -23,6 +23,13 @@ public interface FusionContextConfigResolver {
 	 * @param entity
 	 * @return
 	 */
-	EntityPropertyParser createParser(Entity entity);
+	ModuleEntityPropertyParser createParser(Entity entity);
+	
+	/**
+	 * 
+	 * @param fieldId
+	 * @return
+	 */
+	FieldParserDescription getFieldParserDescription(Long fieldId);
 	
 }

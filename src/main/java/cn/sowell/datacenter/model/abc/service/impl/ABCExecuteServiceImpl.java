@@ -25,7 +25,7 @@ import com.abc.record.HistoryTracker;
 
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.FormatUtils;
-import cn.sowell.datacenter.model.abc.resolver.EntityPropertyParser;
+import cn.sowell.datacenter.model.abc.resolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.abc.resolver.FusionContextConfig;
 import cn.sowell.datacenter.model.abc.resolver.FusionContextFactoryDC;
 import cn.sowell.datacenter.model.abc.service.ABCExecuteService;
@@ -168,12 +168,12 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	}	
 	
 	@Override
-	public EntityPropertyParser getModuleEntityParser(String module, String code) {
+	public ModuleEntityPropertyParser getModuleEntityParser(String module, String code) {
 		return getModuleEntityParser(module, getModuleEntity(module, code));
 	}
 	
 	@Override
-	public EntityPropertyParser getModuleEntityParser(String module, Entity entity) {
+	public ModuleEntityPropertyParser getModuleEntityParser(String module, Entity entity) {
 		String configName = fFactory.mapDefaultModuleEntityConfig(module);
 		FusionContextConfig config = fFactory.getConfig(configName);
 		return config.getConfigResolver().createParser(entity);

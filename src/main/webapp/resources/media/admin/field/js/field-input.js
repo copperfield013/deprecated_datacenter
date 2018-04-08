@@ -213,6 +213,7 @@ define(function(require, exports, module){
 	
 	$.extend(FieldInput, {
 		appendTo		: function($doms, paramGetter){
+			var def = $.Deferred();
 			paramGetter = paramGetter || function($dom){
 				function attr(attrName){
 					return $dom.attr(attrName);
@@ -232,6 +233,8 @@ define(function(require, exports, module){
 				var fInp = new FieldInput(paramGetter($this));
 				$this.append(fInp.getDom());
 			});
+			def.resolve();
+			return def.promise();
 		},
 		/**
 		 * 加载全局的选项map

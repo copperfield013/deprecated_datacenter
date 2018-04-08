@@ -12,7 +12,10 @@ define(function(require, exports, module){
 			reqDataParam	: {},
 			disablePicked	: true,
 			afterPicked		: $.noop,
-			textPicked		: false
+			//选择后，是否在自动完成文本框中同步该选项
+			textPicked		: false,
+			//是否显示数组字段
+			showArrayComposite	: true
 		};
 		
 		var param = $.extend({}, defaultParam, _param);
@@ -50,7 +53,10 @@ define(function(require, exports, module){
 									type	: thisField.type,
 									c_id	: thisComposite.c_id,
 									c_name	: thisComposite.name,
-									c_cname	: thisComposite.cname
+									c_cname	: thisComposite.cname,
+									title	: thisField.cname,
+									c_title	: thisComposite.cname,
+									composite	: thisComposite
 							});
 				}
 			}
@@ -71,6 +77,21 @@ define(function(require, exports, module){
 		var __$fieldPicker = null;
 		var __fieldPickerDeferred = $.Deferred(),
 			__loadingFieldPicker = false;
+		
+		function filterTmplData(composites){
+			var result = [];
+			if($.isArray(composites)){
+				for(var i in composites){
+					var composite = composites[i];
+					if(!param.showArrayComposite && composite.isArray == 1){
+						continue;
+					}
+					result.push(composite);
+				}
+			}
+			return result;
+		}
+		
 		/**
 		 * 传入一个函数，获得字段选择器的dom，并对其进行处理
 		 */
@@ -80,8 +101,9 @@ define(function(require, exports, module){
 				if(!__loadingFieldPicker){
 					__loadingFieldPicker = true;
 					require('tmpl').load('media/admin/field/tmpl/tmpl-fieldsearch.tmpl').done(function(tmpl){
+						var _compositeData = filterTmplData(compositeData);
 						__$fieldPicker = tmpl.tmpl({
-							composites	: compositeData,
+							composites	: _compositeData,
 							pickerKey	: require('utils').uuid(5, 62)
 						});
 						$('.fieldpicker-field-item', __$fieldPicker).click(function(){
@@ -146,13 +168,15 @@ define(function(require, exports, module){
 						var $this = $(this);
 						var fieldId = suggestion.id;
 						if(param.disablePicked){
-							if(!_this.isFieldDisabled(fieldId)){
-								_this.enableField(suggestion.id, false).done(function(field){
-									thisParam.afterSelected.apply(_this, [field, $this]);
-								});
-							}else{
-								require('dialog').notice('不能选择该字段', 'error');
-							}
+							_this.isFieldDisabled(fieldId).done(function(disabled){
+								if(disabled){
+									require('dialog').notice('不能选择该字段', 'error');
+								}else{
+									_this.enableField(suggestion.id, false).done(function(field){
+										thisParam.afterSelected.apply(_this, [field, $this]);
+									});
+								}
+							});
 						}else{
 							_this.getFieldData(fieldId).done(function(field){
 								thisParam.afterSelected.apply(_this, [field, $this]);
@@ -218,12 +242,25 @@ define(function(require, exports, module){
 			fieldpickerHandler(function($fieldpicker){
 				var $toDisable = $('a.fieldpicker-field-item[data-id="' + fieldId + '"]', $fieldpicker);
 				$toDisable.toggleClass('disabled', toEnable === false);
-				if(toEnable === false){
-					disabledFieldSet.add(fieldId.toString());
-				}else{
-					disabledFieldSet['delete'](fieldId.toString());
-				}
 				_this.getFieldData(fieldId).done(function(field){
+					if(toEnable === false){
+						if(field.composite.isArray){
+							//选择的字段是一个数组字段，锁定当前选择器的标签页
+							_this.lockTabByCompositeId(field.composite.c_id);
+						}else{
+							hideArrayComposites();
+						}
+						disabledFieldSet.add(fieldId.toString());
+					}else{
+						disabledFieldSet['delete'](fieldId.toString());
+						if(disabledFieldSet.size === 0){
+							if(field.composite.isArray){
+								_this.lockTabByCompositeId(field.composite.c_id, false);
+							}else{
+								hideArrayComposites(false);
+							}
+						}
+					}
 					def.resolve(field, $fieldpicker);
 				});
 			});
@@ -233,7 +270,11 @@ define(function(require, exports, module){
 		 * 判断字段是否被禁用
 		 */
 		this.isFieldDisabled = function(fieldId){
-			return disabledFieldSet.has(fieldId.toString());
+			var def = $.Deferred();
+			isDisabledFieldWhenLocked(fieldId).done(function(isDisabledField){
+				def.resolve(disabledFieldSet.has(fieldId.toString()) || isDisabledField);
+			});
+			return def.promise();
 		}
 		/**
 		 * 选择某个字段
@@ -247,6 +288,117 @@ define(function(require, exports, module){
 				}
 			});
 		};
+		var locked = false, lockedFields = new Set();
+		/**
+		 * 判断字段是否在锁定模式下，是禁用的字段
+		 */
+		function isDisabledFieldWhenLocked(fieldId){
+			var def = $.Deferred();
+			if(locked){
+				_this.getFieldData(fieldId).done(function(field){
+					if(locked && field.composite.isArray){
+						_this.getLockedCompositeId().done(function(compositeId){
+							def.resolve(field.composite.c_id.toString() != compositeId.toString());
+						});
+					}else{
+						def.resolve(false);
+					}
+				});
+			}else{
+				def.resolve(false);
+			}
+			return def.promise();
+		}
+		function hideArrayComposites(toHide){
+			var def = $.Deferred();
+			fieldpickerHandler(function($fieldPicker){
+				$('ul.nav-tabs li>a[data-toggle="tab"]', $fieldPicker).each(function(){
+					var $li = $(this).closest('li');
+					if($li.is('.array-field')){
+						$li.toggle(toHide === false);
+					}
+				});
+				def.resolve();
+			});
+			return def.promise();
+		}
+		this.getLockedCompositeId = function(){
+			var def = $.Deferred();
+			if(locked){
+				fieldpickerHandler(function($fieldPicker){
+					def.resolve($('ul.nav-tabs li.active[data-id]', $fieldPicker).attr('data-id'));
+				});
+			}else{
+				def.resolve();
+			}
+			return def.promise();
+		}
+		this.lockTabByCompositeId = function(compositeId, toLock){
+			var def = $.Deferred();
+			fieldpickerHandler(function($fieldPicker){
+				var tabIndex = $('ul.nav-tabs li[data-id]', $fieldPicker).index($('ul.nav-tabs li[data-id="' + compositeId + '"]', $fieldPicker));
+				_this.lockTab(tabIndex, toLock);
+			});
+			return def.promise();
+		}
+		/**
+		 * 锁定选择器的标签页，
+		 * 并且限制自动完成的字段只能选择该标签页下的字段
+		 * @param tabIndex 标签页索引，如果不传入，则锁定当前打开的标签页
+		 */
+		this.lockTab = function(tabIndex, toLock){
+			var def = $.Deferred();
+			fieldpickerHandler(function($fieldPicker){
+				if(typeof tabIndex === 'boolean'){
+					toLock = tabIndex;
+					tabIndex = undefined;
+				}
+				if(tabIndex === undefined){
+					tabIndex = -1;
+					$('ul.nav-tabs li>a[data-toggle="tab"]', $fieldPicker).each(function(i, a){
+						if($(a).parent().is('.active')){
+							tabIndex = i;
+							return false;
+						}
+					});
+					
+					_this.lockTab(tabIndex, toLock).done(function(){
+						def.resolve();
+					});
+				}else{
+					_this.activeTab(tabIndex).done(function($tabTitle){
+						var toHideTab = toLock === false;
+						$('ul.nav-tabs li>a[data-toggle="tab"]', $fieldPicker).each(function(){
+							var $li = $(this).closest('li');
+							if($li.not($tabTitle)){
+								$li.toggle(toHideTab);
+							}
+						});
+						$tabTitle.show();
+						locked = !toHideTab;
+						def.resolve();
+					});
+				}
+			});
+			return def.promise();
+		}
+		
+		/**
+		 * 激活指定索引的标签页
+		 */
+		this.activeTab = function(tabIndex){
+			var def = $.Deferred();
+			fieldpickerHandler(function($fieldPicker){
+				$('.tab-pane', $fieldPicker).hide();
+				var $tabTitle = $('ul.nav-tabs li[data-id]>a', $fieldPicker).eq(tabIndex).trigger('click');
+				var $li = $tabTitle.closest('li');
+				$('.tab-pane' + $tabTitle.attr('href'), $fieldPicker).show();
+				def.resolve($li);
+			});
+			return def.promise();
+		}
+		
+		
 		var released = false;
 		this.release = function(){
 			param = undefined;

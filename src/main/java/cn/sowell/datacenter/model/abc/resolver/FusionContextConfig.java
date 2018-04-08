@@ -32,7 +32,7 @@ public class FusionContextConfig implements InitializingBean{
 	public void afterPropertiesSet() throws Exception {
 		ABCNodeFusionContextConfigResolver resolver = new ABCNodeFusionContextConfigResolver(this);
 		if(foService != null) {
-			resolver.setFieldSet(foService.getDynamicFieldDescriptionSet(this.module));
+			resolver.setFields(foService.getDynamicFieldDescriptionSet(this.module));
 		}
 		this.configResolver = resolver;
 	}

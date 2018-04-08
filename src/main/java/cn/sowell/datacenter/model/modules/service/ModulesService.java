@@ -12,7 +12,7 @@ import org.springframework.beans.MutablePropertyValues;
 
 import com.abc.query.criteria.Criteria;
 
-import cn.sowell.datacenter.model.abc.resolver.EntityPropertyParser;
+import cn.sowell.datacenter.model.abc.resolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.modules.bean.EntityPagingIterator;
 import cn.sowell.datacenter.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.datacenter.model.modules.pojo.EntityHistoryItem;
@@ -25,7 +25,7 @@ import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTempalte;
 
 public interface ModulesService {
 
-	List<EntityPropertyParser> queryEntities(QueryEntityParameter param);
+	List<ModuleEntityPropertyParser> queryEntities(QueryEntityParameter param);
 	
 	List<Criteria> toCriterias(Collection<NormalCriteria> nCriterias, String module);
 	
@@ -56,7 +56,7 @@ public interface ModulesService {
 	 * @param date
 	 * @return
 	 */
-	EntityPropertyParser getEntity(String module, String code, Date date);
+	ModuleEntityPropertyParser getEntity(String module, String code, Date date);
 
 	/**
 	 * 分页查询实体信息的历史

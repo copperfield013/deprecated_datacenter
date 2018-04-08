@@ -28,7 +28,7 @@ import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.DataCenterConstants;
-import cn.sowell.datacenter.model.abc.resolver.EntityPropertyParser;
+import cn.sowell.datacenter.model.abc.resolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.abc.resolver.FusionContextFactoryDC;
 import cn.sowell.datacenter.model.abc.service.ABCExecuteService;
 import cn.sowell.datacenter.model.dict.service.DictionaryService;
@@ -166,7 +166,7 @@ public class ModulesServiceImpl implements ModulesService{
 	}
 	
 	@Override
-	public List<EntityPropertyParser> queryEntities(QueryEntityParameter param) {
+	public List<ModuleEntityPropertyParser> queryEntities(QueryEntityParameter param) {
 		List<Entity> list = abcService.queryModuleEntities(param);
 		return CollectionUtils.toList(list, entity->abcService.getModuleEntityParser(param.getModule(), entity));
 	}
@@ -179,7 +179,7 @@ public class ModulesServiceImpl implements ModulesService{
 	
 	
 	@Override
-	public EntityPropertyParser getEntity(String module, String code, Date date) {
+	public ModuleEntityPropertyParser getEntity(String module, String code, Date date) {
 		Entity entity = null;
 		List<ErrorInfomation> errors = new ArrayList<ErrorInfomation>();
 		if(date == null) {
@@ -192,7 +192,7 @@ public class ModulesServiceImpl implements ModulesService{
 			entity = abcService.getHistoryEntity(param, errors);
 		}
 		if(entity != null) {
-			EntityPropertyParser parser = abcService.getModuleEntityParser(module, entity);
+			ModuleEntityPropertyParser parser = abcService.getModuleEntityParser(module, entity);
 			parser.setErrors(errors);
 			return parser;
 		}else {

@@ -18,8 +18,8 @@
     width: 50%;
     margin-left: 0;
     margin-right: 0;
-    line-height: 3.5em;
-    min-height: 3.5em;
+    line-height: 2.5em;
+    min-height: 2.5em;
     font-size: 1.1em;
     float: left;
     border-bottom: 1px solid #ddd;
@@ -52,13 +52,13 @@
 }
 .dtmpl-update .field-item>.field-title, .dtmpl-update .field-item>.field-value{
 	display: inline-block;
-    min-height: 3.5em;
-    line-height: 3.5em;
+    min-height: 2.5em;
+    line-height: 2.5em;
     padding-top: 0;
     margin-top: 0;
     font-size: 16px;
     vertical-align: middle;
-    word-break: break-word;
+    word-break: break-all;
 }
 .dtmpl-update span.field-view {
     line-height: 2em;
@@ -119,10 +119,6 @@
 .dtmpl-update #group-container {
 	margin-top: 20px;
 }
-.dtmpl-update .field-search {
-    width: 15em;
-    display: inline-block;
-}
 .dtmpl-update .remove-group{
 	font-size: 1.5em;
 	cursor: pointer;
@@ -174,32 +170,12 @@
 	font-size: 16px;
 	text-align: right;
 }
-.dtmpl-update .search-input-wrapper {
-    display: inline-block;
-    width: 100%;
-}
-.dtmpl-update .search-input-wrapper>span{
-	width: 100%;
-}
-.dtmpl-update .search-input-wrapper .input-xs {
-    padding-left: 26px;
-    padding-right: 26px;
-}
-
-.dtmpl-update .field-search i.field-picker-button {
-    left: initial;
-    right: 0;
-    cursor: pointer;
-    font-size: 17px;
-}
-.dtmpl-update .field-search i.field-picker-button:HOVER {
-	color: #388E8E !important;
-}
 
 .dtmpl-update span.field-title-d {
     display: inline !important;
     word-break: keep-all !important;
     opacity: 0 !important;
+    white-space: nowrap;
 }
 .dtmpl-update .header-row>* {
     height: 2.5em;
@@ -215,181 +191,12 @@
     height: 2.5em;
 }
 
-.dtmpl-update div.fieldpicker-container {
-    position: absolute;
-    right: -20px;
-    bottom: -15em;
-    top: 35px;
-    z-index: 9999;
-    display: none;
-    width: 420px;
-}
-
-.dtmpl-update .fieldpicker-container .nav-tabs.nav-justified {
-    display: flex;
-    flex-direction: row;
-}
-.dtmpl-update .fieldpicker-container .nav-tabs.nav-justified>li {
-    display: block;
-    height: 30px;
-    line-height: 30px;
-    border-right: 1px solid #dcdcdc;
-    border-bottom: 1px solid #dcdcdc;
-    width: 110px;
-}
-
-.dtmpl-update .fieldpicker-container .nav-tabs.nav-justified>li>a {
-    height: 29px;
-    word-break: keep-all;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: inline-block;
-    line-height: 30px;
-    border-top: none;
-    background-color: #fafafa;
-    margin-top: 0;
-    width: 109px;
-    padding: 0;
-}
-
-.dtmpl-update .fieldpicker-container .nav-tabs.nav-justified>li.active>a{
-	background-color: #fff;
-	height: 32px;
-}
-.dtmpl-update .fieldpicker-container .nav-tabs.nav-justified>li.dropdown>a{
-    width: 90px;
-}
-.dtmpl-update .fieldpicker-container a.dropdown-toggle {
-	text-align: center;
-}
-.dtmpl-update .fieldpicker-container a.dropdown-toggle>span {
-    word-break: keep-all;
-    max-width: 3em;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    display: inline-block;
-}
-.dtmpl-update .fieldpicker-container a.dropdown-toggle:AFTER{
-	content: "\f0dd";
-    vertical-align: top;
-    line-height: 25px;
-}
-.dtmpl-update .fieldpicker-container li.dropdown ul.dropdown-menu li>a {
-    width: 170px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-.dtmpl-update a.fieldpicker-field-item {
-    border: 1px solid #c2c2c2;
-    padding: 2px 9px;
-    margin: 0 5px;
-    word-break: keep-all;
-    color: #00C5CD;
-}
-.dtmpl-update a.fieldpicker-field-item:hover {
-    border: 1px solid #a0a0a0;
-    color: 	#009ACD;
-}
-.dtmpl-update .fieldpicker-field-container {
-    width: 100%;
-    min-height: 100%;
-    word-break: keep-all;
-    word-wrap: break-word;
-}
-.dtmpl-update .fieldpicker-container .tab-content {
-    padding: 5px 10px;
-}
-
-.dtmpl-update a.disabled.fieldpicker-field-item {
-    color: #ccc !important;
-}
-
 .dtmpl-update a#save i{
     color: #EEAD0E !important;
 }
 .dtmpl-update a#save i:HOVER{
     color: 	#FFC125 !important;
 }
-
-
-/***********自动完成样式Start*****************/
-/*****************************************/
-
-.dtmpl-update .typeahead {
-	background-color: #fff;
+.dtmpl-update .field-group-array th{
+	min-width: 50px;
 }
-
-.dtmpl-update .typeahead:focus {
-	border: 2px solid #0097cf;
-}
-
-.dtmpl-update .tt-query {
-	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-	-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-}
-
-.dtmpl-update .tt-hint {
-	color: #999
-}
-
-.dtmpl-update .tt-menu {
-	width: 100%;
-	margin: 0;
-	padding: 8px 0;
-	background-color: #fff;
-	border: 1px solid #ccc;
-	-webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
-	-moz-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
-	box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
-}
-
-.dtmpl-update .tt-suggestion {
-	padding: 3px 16px;
-	line-height: 1.3em;
-	margin: 0;
-}
-
-.dtmpl-update .tt-suggestion:hover {
-	cursor: pointer;
-	color: #fff;
-	background-color: #0097cf;
-}
-
-.dtmpl-update .tt-suggestion.tt-cursor {
-	color: #fff;
-	background-color: #0097cf;
-}
-
-.dtmpl-update .tt-suggestion p {
-	margin: 0;
-}
-
-.dtmpl-update .gist {
-	font-size: 14px;
-}
-
-.dtmpl-update #custom-templates .empty-message {
-	padding: 5px 10px;
-	text-align: center;
-}
-
-.dtmpl-update #multiple-datasets .league-name {
-	margin: 0 20px 5px 20px;
-	padding: 3px 0;
-	border-bottom: 1px solid #ccc;
-}
-
-.dtmpl-update #scrollable-dropdown-menu .tt-menu {
-	max-height: 150px;
-	overflow-y: auto;
-}
-
-.dtmpl-update #rtl-support .tt-menu {
-	text-align: right;
-}
-/*****************************************/
-/***********自动完成样式End*******************/

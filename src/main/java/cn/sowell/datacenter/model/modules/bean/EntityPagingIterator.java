@@ -3,10 +3,10 @@ package cn.sowell.datacenter.model.modules.bean;
 import java.util.Iterator;
 import java.util.Set;
 
-import cn.sowell.datacenter.model.abc.resolver.EntityPropertyParser;
+import cn.sowell.datacenter.model.abc.resolver.ModuleEntityPropertyParser;
 
 
-public class EntityPagingIterator implements Iterator<EntityPropertyParser>{
+public class EntityPagingIterator implements Iterator<ModuleEntityPropertyParser>{
 
 	//对象静态属性
 
@@ -20,7 +20,7 @@ public class EntityPagingIterator implements Iterator<EntityPropertyParser>{
 	private final int ignoreDataCount;
 	
 	//对象可变属性
-	private Iterator<EntityPropertyParser> cacheItr;
+	private Iterator<ModuleEntityPropertyParser> cacheItr;
 	private int current = 0;
 	private int pageNoInc = 0;
 	private int hasIgnored = 0;
@@ -49,9 +49,9 @@ public class EntityPagingIterator implements Iterator<EntityPropertyParser>{
 	private long lastCacheDataTime = System.currentTimeMillis();
 	private float speed = 0;
 	@Override
-	public synchronized EntityPropertyParser next() {
+	public synchronized ModuleEntityPropertyParser next() {
 		if(hasNext() && (cacheItr == null || !cacheItr.hasNext())){
-			Set<EntityPropertyParser> set = 
+			Set<ModuleEntityPropertyParser> set = 
 					queryProxy.load(startPageNo + (pageNoInc++));
 			if(set != null){
 				cacheItr = set.iterator();

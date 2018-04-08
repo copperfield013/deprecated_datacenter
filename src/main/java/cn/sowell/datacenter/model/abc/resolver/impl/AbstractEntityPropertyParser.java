@@ -1,29 +1,28 @@
 package cn.sowell.datacenter.model.abc.resolver.impl;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.abc.dto.ErrorInfomation;
-
 import cn.sowell.copframe.utils.Assert;
-import cn.sowell.datacenter.model.abc.resolver.EntityPropertyParser;
+import cn.sowell.copframe.utils.FormatUtils;
+import cn.sowell.datacenter.model.abc.resolver.CEntityPropertyParser;
 import cn.sowell.datacenter.model.abc.resolver.FieldParserDescription;
+import cn.sowell.datacenter.model.abc.resolver.GetonlyMap;
+import cn.sowell.datacenter.model.abc.resolver.format.PropertyFormat;
+import cn.sowell.datacenter.model.abc.resolver.format.PropertyFormatFactory;
 
-abstract class AbstractEntityPropertyParser implements EntityPropertyParser {
+abstract class AbstractEntityPropertyParser implements CEntityPropertyParser {
 	
 	
-	private List<ErrorInfomation> errors;
 	protected Map<String, FieldParserDescription> fieldMap;
-
 	
+	private final PropertyFormatFactory formatFactory;
 	
 	public AbstractEntityPropertyParser(Map<String, FieldParserDescription> fieldMap) {
 		super();
 		Assert.notNull(fieldMap);
 		this.fieldMap = fieldMap;
+		formatFactory = new PropertyFormatFactory();
 	}
 
 	@Override
@@ -45,148 +44,50 @@ abstract class AbstractEntityPropertyParser implements EntityPropertyParser {
 	public String getFormatedProperty(String propertyName, String propType) {
 		return getFormatedProperty(propertyName, propType, null);
 	}
-
+	
+	@Override
+	public String getFormatedProperty(String propertyName, String propType, String format) {
+		Object value = getProperty(propertyName, propType);
+		String result = null;
+		try {
+			PropertyFormat pFormat = formatFactory.getFormat(value, propType, format);
+			result = pFormat.format(value);
+		}catch(Exception e) {
+			result = FormatUtils.toString(value);
+		}
+		return result;
+	}
 
 
 	@Override
 	public String getFormatedProperty(String propertyName) {
 		return getFormatedProperty(propertyName, null);
 	}
-	@Override
-	public List<ErrorInfomation> getErrors() {
-		return errors;
-	}
 	
-	@Override
-	public void setErrors(List<ErrorInfomation> errors) {
-		this.errors = errors;
-	}
-	
-	private Map<String, Object> propertyGetMap = new Map<String, Object>(){
-		@Override
-		public int size() {
-			return 0;
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return false;
-		}
-
-		@Override
-		public boolean containsKey(Object key) {
-			return fieldMap.containsKey(key);
-		}
-
-		@Override
-		public boolean containsValue(Object value) {
-			// TODO Auto-generated method stub
-			return false;
-		}
+	private Map<String, Object> propertyGetMap = new GetonlyMap<String, Object>() {
 
 		@Override
 		public Object get(Object key) {
 			return getProperty((String) key);
 		}
-
-		@Override
-		public Object put(String key, Object value) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Object remove(Object key) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void putAll(Map<? extends String, ? extends Object> m) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void clear() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Set<String> keySet() {
-			return fieldMap.keySet();
-		}
-
-		@Override
-		public Collection<Object> values() {
-			return null;
-		}
-
-		@Override
-		public Set<Entry<String, Object>> entrySet() {
-			return new HashSet<Entry<String, Object>>();
-		}
 	};
 	
-	private Map<String, String> propertyFormatMap = new Map<String, String>(){
-
-		@Override
-		public int size() {
-			return 0;
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return false;
-		}
-
-		@Override
-		public boolean containsKey(Object key) {
-			return fieldMap.containsKey(key);
-		}
-
-		@Override
-		public boolean containsValue(Object value) {
-			// TODO Auto-generated method stub
-			return false;
-		}
+	private Map<String, String> propertyFormatMap = new GetonlyMap<String, String>() {
 
 		@Override
 		public String get(Object key) {
 			return getFormatedProperty((String) key);
 		}
-
+		
 		@Override
-		public String put(String key, String value) {
-			throw new UnsupportedOperationException();
+		public boolean containsKey(Object key) {
+			return fieldMap.containsKey(key);
 		}
-
-		@Override
-		public String remove(Object key) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void putAll(Map<? extends String, ? extends String> m) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void clear() {
-			throw new UnsupportedOperationException();
-		}
-
+		
 		@Override
 		public Set<String> keySet() {
 			return fieldMap.keySet();
 		}
-
-		@Override
-		public Collection<String> values() {
-			return null;
-		}
-
-		@Override
-		public Set<Entry<String, String>> entrySet() {
-			return new HashSet<Entry<String, String>>();
-		}
-		
 	};
+
 }

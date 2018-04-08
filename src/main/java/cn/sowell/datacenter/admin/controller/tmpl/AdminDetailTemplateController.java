@@ -161,6 +161,8 @@ public class AdminDetailTemplateController {
 						TemplateDetailFieldGroup group = new TemplateDetailFieldGroup();
 						group.setId(jGroup.getLong("id"));
 						group.setTitle(jGroup.getString("title"));
+						group.setIsArray(jGroup.getBoolean("isArray")?1:null);
+						group.setCompositeId(jGroup.getLong("compositeId"));
 						group.setOrder(i++);
 						data.getGroups().add(group);
 						JSONArray jFields = jGroup.getJSONArray("fields");

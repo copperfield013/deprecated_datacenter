@@ -27,14 +27,42 @@
 							</span>
 						</div>
 						<div class="widget-body field-container">
-							<c:forEach var="tmplField" items="${tmplGroup.fields }">
-								<div class="form-group field-item ${tmplField.colNum == 2? 'dbcol': '' }">
-									<label class="control-label field-title">${tmplField.title }</label>
-									<div class="field-value">
-										<span class="field-view">${entity.smap[tmplField.fieldName] }</span>
+							<c:choose>
+								<c:when test="${tmplGroup.isArray != 1 }">
+									<c:forEach var="tmplField" items="${tmplGroup.fields }">
+										<div class="form-group field-item ${tmplField.colNum == 2? 'dbcol': '' }">
+											<label class="control-label field-title">${tmplField.title }</label>
+											<div class="field-value">
+												<span class="field-view">${entity.smap[tmplField.fieldName] }</span>
+											</div>
+										</div>
+									</c:forEach>
+								</c:when>
+								<c:otherwise>
+									<div class="table-scrollable field-array-table">
+										<table class="table table-striped table-bordered table-hover">
+											<thead>
+												<tr class="title-row">
+													<th>#</th>
+													<c:forEach var="field" items="${tmplGroup.fields }">
+														<th>${field.title }</th>
+													</c:forEach>
+												</tr>
+											</thead>
+											<tbody>
+												<c:forEach var="entityItem" varStatus="i" items="${entity.arrayMap[tmplGroup.composite.name] }">
+													<tr class="value-row">
+														<td>${i.index + 1 }</td>
+														<c:forEach var="field" items="${tmplGroup.fields }">
+															<td>${entityItem.smap[field.fieldName] }</td>
+														</c:forEach>
+													</tr>
+												</c:forEach>
+											</tbody>
+										</table>
 									</div>
-								</div>
-							</c:forEach>
+								</c:otherwise>
+							</c:choose>
 						</div>
 					</div>
 				</c:forEach>

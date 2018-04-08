@@ -8,7 +8,7 @@ import com.abc.query.entity.impl.EntitySortedPagedQuery;
 
 import cn.sowell.copframe.utils.Assert;
 import cn.sowell.copframe.utils.CollectionUtils;
-import cn.sowell.datacenter.model.abc.resolver.EntityPropertyParser;
+import cn.sowell.datacenter.model.abc.resolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.abc.resolver.FusionContextConfigResolver;
 
 public class EntityQueryAdapter implements EntityPagingQueryProxy{
@@ -39,7 +39,7 @@ public class EntityQueryAdapter implements EntityPagingQueryProxy{
 	}
 
 	@Override
-	public Set<EntityPropertyParser> load(int pageNo) {
+	public Set<ModuleEntityPropertyParser> load(int pageNo) {
 		List<Entity> entities = sortedPagedQuery.visit(pageNo);
 		return CollectionUtils.toSet(entities, entity->resolver.createParser(entity));
 	}

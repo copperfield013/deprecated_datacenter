@@ -4,6 +4,10 @@
 	font-size: 14px;
 }
 
+div.fieldpicker-container ul.nav li.array-field>a{
+	background-color: #9F79EE !important;
+}
+
 /***********自动完成样式Start*****************/
 /*****************************************/
 

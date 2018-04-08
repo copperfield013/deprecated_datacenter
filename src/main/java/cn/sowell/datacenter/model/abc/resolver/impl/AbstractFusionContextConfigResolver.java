@@ -8,17 +8,18 @@ import org.apache.log4j.Logger;
 import com.abc.mapping.entity.Entity;
 
 import cn.sowell.copframe.utils.Assert;
+import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.datacenter.model.abc.resolver.EntityBindContext;
-import cn.sowell.datacenter.model.abc.resolver.EntityPropertyParser;
 import cn.sowell.datacenter.model.abc.resolver.FieldParserDescription;
 import cn.sowell.datacenter.model.abc.resolver.FusionContextConfig;
 import cn.sowell.datacenter.model.abc.resolver.FusionContextConfigResolver;
+import cn.sowell.datacenter.model.abc.resolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.abc.resolver.PropertyNamePartitions;
 import cn.sowell.datacenter.model.abc.resolver.exception.UnsupportedEntityElementException;
 
 public abstract class AbstractFusionContextConfigResolver implements FusionContextConfigResolver{
 	protected FusionContextConfig config;
-	private Set<FieldParserDescription> fieldSet;
+	private Set<FieldParserDescription> fields;
 	
 	Logger logger = Logger.getLogger(AbstractFusionContextConfigResolver.class);
 	
@@ -30,8 +31,17 @@ public abstract class AbstractFusionContextConfigResolver implements FusionConte
 	
 	protected abstract EntityBindContext buildRootContext(Entity entity);
 	
-	public synchronized void setFieldSet(Set<FieldParserDescription> fieldSet) {
-		this.fieldSet = fieldSet;
+	public synchronized void setFields(Set<FieldParserDescription> dynamicFieldDescriptionSet) {
+		this.fields = dynamicFieldDescriptionSet;
+		
+	}
+	
+	@Override
+	public FieldParserDescription getFieldParserDescription(Long fieldId) {
+		if(this.fields != null) {
+			return fields.stream().filter(field->fieldId.equals(field.getFieldId())).findFirst().orElse(null);
+		}
+		return null;
 	}
 	
 	
@@ -81,11 +91,15 @@ public abstract class AbstractFusionContextConfigResolver implements FusionConte
 	}
 	
 	@Override
-	public EntityPropertyParser createParser(Entity entity) {
-		Assert.notNull(this.fieldSet);
+	public ModuleEntityPropertyParser createParser(Entity entity) {
+		Assert.notNull(this.fields);
 		EntityBindContext rootContext = buildRootContext(entity);
-		CommonEntityPropertyParser parser = new CommonEntityPropertyParser(config, rootContext, this.fieldSet);
+		CommonModuleEntityPropertyParser parser = new CommonModuleEntityPropertyParser(config, rootContext, getFullKeyFieldMap());
 		return parser ;
+	}
+
+	private Map<String, FieldParserDescription> getFullKeyFieldMap() {
+		return CollectionUtils.toMap(this.fields, field->field.getFullKey());
 	}
 
 }

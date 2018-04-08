@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 
 import cn.sowell.copframe.common.property.PropertyPlaceholder;
 import cn.sowell.copframe.utils.FormatUtils;
-import cn.sowell.datacenter.model.abc.resolver.EntityPropertyParser;
+import cn.sowell.datacenter.model.abc.resolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.admin.pojo.ExportStatus;
 import cn.sowell.datacenter.model.modules.bean.EntityPagingIterator;
 import cn.sowell.datacenter.model.modules.bean.ExportDataPageInfo;
@@ -132,7 +132,7 @@ public class ExportServiceImpl implements ExportService {
 					status.setTotalData(itr.getDataCount());
 					while(itr.hasNext()){
 						checkBreaked(status);
-						EntityPropertyParser parser = itr.next();
+						ModuleEntityPropertyParser parser = itr.next();
 						XSSFRow row = sheet.createRow(i);
 						float dataProgress = ((float)i)/itr.getDataCount();
 						status.setCurrent(20 + (int)(dataProgress * 50));

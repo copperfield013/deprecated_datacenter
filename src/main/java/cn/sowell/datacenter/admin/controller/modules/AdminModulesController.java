@@ -1,6 +1,7 @@
 package cn.sowell.datacenter.admin.controller.modules;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,8 +29,10 @@ import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.model.abc.resolver.EntityPropertyParser;
+import cn.sowell.datacenter.model.abc.resolver.FieldParserDescription;
 import cn.sowell.datacenter.model.abc.resolver.FusionContextFactoryDC;
+import cn.sowell.datacenter.model.abc.resolver.GetonlyMap;
+import cn.sowell.datacenter.model.abc.resolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.admin.pojo.ExportStatus;
 import cn.sowell.datacenter.model.dict.service.DictionaryService;
 import cn.sowell.datacenter.model.modules.ModuleConstants;
@@ -96,7 +99,7 @@ public class AdminModulesController {
 			queryParam.setCriterias(mService.toCriterias(param.getNormalCriteriaMap().values(), module));
 			queryParam.setModule(module);
 			queryParam.setPageInfo(pageInfo);
-			List<EntityPropertyParser> parserList = mService.queryEntities(queryParam);
+			List<ModuleEntityPropertyParser> parserList = mService.queryEntities(queryParam);
 			model.addAttribute("parserList", parserList);
 			
 			if(moduleMeta.hasFunction(ModuleConstants.FUNCTION_EXPORT)) {
@@ -144,7 +147,7 @@ public class AdminModulesController {
 		}
         TemplateDetailTemplate dtmpl = coalesceDetailTempalte(tmplId, user, module);
         List<TemplateDetailTemplate> dtmpls = tService.getAllDetailTemplateList(module, user, null, false);
-        EntityPropertyParser entity = mService.getEntity(module, code, date);
+        ModuleEntityPropertyParser entity = mService.getEntity(module, code, date);
         model.addAttribute("date", date);
         model.addAttribute("entity", entity);
         model.addAttribute("datetime", datetime);
@@ -193,14 +196,26 @@ public class AdminModulesController {
 				model.addAttribute("templateGroup", tGroup);
 			}
 		}
+		Map<Long, FieldParserDescription> fieldDescMap = new GetonlyMap<Long, FieldParserDescription>() {
+
+        	Map<Long, FieldParserDescription> cache = new HashMap<>();
+			@Override
+			public FieldParserDescription get(Object fieldId) {
+				if(!cache.containsKey(fieldId)) {
+					cache.put((Long) fieldId, fFactory.getDefaultConfig(module).getConfigResolver().getFieldParserDescription((Long) fieldId));
+				}
+				return cache.get(fieldId);
+			}
+		};
 		UserIdentifier user = UserUtils.getCurrentUser();
-		EntityPropertyParser entity = mService.getEntity(module, code, null);
+		ModuleEntityPropertyParser entity = mService.getEntity(module, code, null);
 		TemplateDetailTemplate dtmpl = coalesceDetailTempalte(tmplId, user, module);
 		model.addAttribute("entity", entity);
 		model.addAttribute("module", mMeta);
 		model.addAttribute("dtmpl", dtmpl);
 		model.addAttribute("dtmpls", tService.getAllDetailTemplateList(module, user, null, false));
 		model.addAttribute("config", fFactory.getDefaultConfig(module));
+		model.addAttribute("fieldDescMap", fieldDescMap);
 		return AdminConstants.JSP_MODULES + "/modules_update_tmpl.jsp";
 	}
 	

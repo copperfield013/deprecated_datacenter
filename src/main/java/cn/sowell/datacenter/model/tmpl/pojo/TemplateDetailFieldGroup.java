@@ -9,8 +9,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import cn.sowell.datacenter.model.dict.pojo.DictionaryComposite;
 
 @Entity
 @Table(name="t_tmpl_detail_fieldgroup")
@@ -25,6 +29,16 @@ public class TemplateDetailFieldGroup {
 	@Column(name="c_title")
 	private String title;
 	
+	@Column(name="c_is_array")
+	private Integer isArray;
+	
+	@Column(name="composite_id")
+	private Long compositeId;
+	
+	@ManyToOne
+	@JoinColumn(name = "composite_id",insertable = false, updatable = false)
+	private DictionaryComposite composite;
+	
 	@Column(name="c_order")
 	private Integer order;
 	
@@ -33,6 +47,7 @@ public class TemplateDetailFieldGroup {
 	
 	@Column(name="update_time")
 	private Date updateTime;
+	
 	
 	@Transient
 	private List<TemplateDetailField> fields = new ArrayList<TemplateDetailField>();
@@ -77,5 +92,23 @@ public class TemplateDetailFieldGroup {
 	}
 	public void setFields(List<TemplateDetailField> fields) {
 		this.fields = fields;
+	}
+	public Integer getIsArray() {
+		return isArray;
+	}
+	public void setIsArray(Integer isArray) {
+		this.isArray = isArray;
+	}
+	public Long getCompositeId() {
+		return compositeId;
+	}
+	public void setCompositeId(Long compositeId) {
+		this.compositeId = compositeId;
+	}
+	public DictionaryComposite getComposite() {
+		return composite;
+	}
+	public void setComposite(DictionaryComposite composite) {
+		this.composite = composite;
 	}
 }

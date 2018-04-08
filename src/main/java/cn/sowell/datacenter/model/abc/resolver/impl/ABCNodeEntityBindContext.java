@@ -1,6 +1,7 @@
 package cn.sowell.datacenter.model.abc.resolver.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.util.Assert;
 
@@ -10,12 +11,16 @@ import com.abc.mapping.node.ABCNode;
 import cn.sowell.datacenter.model.abc.resolver.EntityBindContext;
 import cn.sowell.datacenter.model.abc.resolver.EntityElement;
 import cn.sowell.datacenter.model.abc.resolver.EntityProxy;
+import cn.sowell.datacenter.model.abc.resolver.FieldParserDescription;
 import cn.sowell.datacenter.model.abc.resolver.PropertyNamePartitions;
 import cn.sowell.datacenter.model.abc.resolver.exception.UnsupportedEntityElementException;
 import common.Logger;
 
 public class ABCNodeEntityBindContext extends AbstractEntityBindContext {
 	private ABCNodeProxy node;
+	
+	protected Map<String, FieldParserDescription> fieldMap;
+	
 	
 	Logger logger = Logger.getLogger(ABCNodeEntityBindContext.class);
 	

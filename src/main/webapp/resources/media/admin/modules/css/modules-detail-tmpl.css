@@ -326,3 +326,34 @@ div#tmpl-list span.tmpl-date {
     line-height: 3em;
     height: 3em;
 }
+
+.field-array-table .field-input select,.field-array-table .field-input input {
+    font-size: 1em;
+    height: 2em;
+    line-height: 2em;
+    padding: 0;
+    text-align: center;
+}
+.field-array-table span.array-item-remove,.field-array-table span.array-item-add{
+	display: inline-block;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 16px;
+    border-radius: 1em;
+    color: #fff;
+    cursor: pointer;
+    font-weight: normal;
+}
+.field-array-table span.array-item-add{
+	background-color: #9ACD32;
+}
+.field-array-table span.array-item-add:hover{
+	background-color: #ADFF2F;
+}
+.field-array-table span.array-item-remove {
+    background: #FF4040;
+}
+.field-array-table span.array-item-remove:hover{
+    background: #FFA07A;
+}

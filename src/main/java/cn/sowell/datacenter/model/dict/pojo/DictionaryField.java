@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.alibaba.fastjson.annotation.JSONField;
@@ -22,6 +24,11 @@ public class DictionaryField {
 	@Column(name="composite_id")
 	@JSONField(name="c_id")
 	private Long compositeId;
+	
+	@ManyToOne
+	@JoinColumn(name="composite_id", insertable=false, updatable=false)
+	@JSONField(serialize=false, deserialize=false)
+	private DictionaryComposite composite;
 	
 	@Column(name="c_full_key")
 	@JSONField(name="name")
@@ -127,5 +134,11 @@ public class DictionaryField {
 	}
 	public void setAbcType(String abcType) {
 		this.abcType = abcType;
+	}
+	public DictionaryComposite getComposite() {
+		return composite;
+	}
+	public void setComposite(DictionaryComposite composite) {
+		this.composite = composite;
 	}
 }

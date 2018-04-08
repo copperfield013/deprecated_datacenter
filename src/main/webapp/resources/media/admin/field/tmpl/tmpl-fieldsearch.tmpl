@@ -1,10 +1,12 @@
 <div class="fieldpicker-container">
 	<ul class="nav nav-tabs nav-justified">
-		<li class="active"><a data-toggle="tab" href="#ctab_${pickerKey }_0">${composites[0].cname }</a></li>
+		{{if composites.length > 0}}
+			<li data-id="${composites[0].c_id}" class="active ${composites[0].isArray == 1 ?'array-field':''}"><a data-toggle="tab" href="#ctab_${pickerKey }_0">${composites[0].cname }</a></li>
+		{{/if}}
 		{{if composites.length > 1}}
-			<li><a data-toggle="tab" href="#ctab_${pickerKey }_1">${composites[1].cname }</a></li>
+			<li data-id="${composites[1].c_id}" class="${composites[1].isArray == 1?'array-field':''}"><a data-toggle="tab" href="#ctab_${pickerKey }_1">${composites[1].cname }</a></li>
 			{{if composites.length > 2}}
-				<li><a data-toggle="tab" href="#ctab_${pickerKey }_2">${composites[2].cname }</a></li>
+				<li data-id="${composites[2].c_id}" class="${composites[2].isArray == 1?'array-field':''}"><a data-toggle="tab" href="#ctab_${pickerKey }_2">${composites[2].cname }</a></li>
 			{{/if}}
 		{{/if}}
 		{{if composites.length > 3}}
@@ -15,7 +17,7 @@
 				<ul class="dropdown-menu dropdown-blue">
 					{{each(i, composite) composites}}
 						{{if i > 3}}
-							<li><a data-toggle="tab" href="#ctab_${pickerKey }_${i }">${composite.cname }</a></li>
+							<li data-id="${composites[i].c_id}" class="${composite.isArray == 1?'array-field':''}"><a data-toggle="tab" href="#ctab_${pickerKey }_${i }">${composite.cname }</a></li>
 						{{/if}}
 					{{/each}}
 				</ul>

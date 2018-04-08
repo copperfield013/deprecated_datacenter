@@ -16,7 +16,6 @@ import org.springframework.stereotype.Repository;
 
 import cn.sowell.copframe.dao.deferedQuery.ColumnMapResultTransformer;
 import cn.sowell.copframe.dao.deferedQuery.SimpleMapWrapper;
-import cn.sowell.copframe.dao.utils.QueryUtils;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.datacenter.model.dict.dao.DictionaryDao;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryComposite;
@@ -54,13 +53,11 @@ public class DictionaryDaoImpl implements DictionaryDao{
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<DictionaryField> getAllFields(String module) {
-		String sql = "select f.* from t_dictionary_field f "
-				+ " left join t_dictionary_composite c on f.composite_id = c.id"
-				+ " where c.c_module = :module";
-		return QueryUtils.queryList(sql, DictionaryField.class, sFactory.getCurrentSession(), dQuery->dQuery.setParam("module", module));
-		
+		String hql = "from DictionaryField f where f.composite.module = :module";
+		return sFactory.getCurrentSession().createQuery(hql).setString("module", module).list();
 	}
 	
 	@SuppressWarnings("unchecked")

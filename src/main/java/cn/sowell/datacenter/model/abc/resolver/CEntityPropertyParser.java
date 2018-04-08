@@ -1,18 +1,8 @@
 package cn.sowell.datacenter.model.abc.resolver;
 
-import java.util.List;
 import java.util.Map;
 
-import com.abc.dto.ErrorInfomation;
-
-public interface EntityPropertyParser {
-
-	String getCode();
-
-	String getId();
-
-	String getTitle();
-
+public interface CEntityPropertyParser {
 	/**
 	 * 
 	 * @return
@@ -24,7 +14,7 @@ public interface EntityPropertyParser {
 	 * @return
 	 */
 	Map<String, Object> getPmap();
-
+	
 	/**
 	 * 使用内置的策略获得对应的字段值
 	 * @param propertyName 字段名（可为复合）
@@ -63,11 +53,4 @@ public interface EntityPropertyParser {
 	 * @return
 	 */
 	String getFormatedProperty(String propertyName);
-	
-	
-	List<ErrorInfomation> getErrors();
-
-	void setErrors(List<ErrorInfomation> errors);
-	
-
 }

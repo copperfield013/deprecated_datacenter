@@ -33,6 +33,10 @@ public class DictionaryComposite {
 	@JSONField(serialize=false)
 	private String module;
 	
+	@Column(name="c_is_array")
+	@JSONField(name="isArray")
+	private Integer isArray;
+	
 	@Column(name="create_time")
 	@JSONField(serialize=false)
 	private Date createTime;
@@ -95,6 +99,12 @@ public class DictionaryComposite {
 	}
 	public void setModule(String module) {
 		this.module = module;
+	}
+	public Integer getIsArray() {
+		return isArray;
+	}
+	public void setIsArray(Integer isArray) {
+		this.isArray = isArray;
 	}
 	
 }

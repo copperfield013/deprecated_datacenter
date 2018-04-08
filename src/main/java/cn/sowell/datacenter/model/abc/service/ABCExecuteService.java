@@ -7,7 +7,7 @@ import com.abc.dto.ErrorInfomation;
 import com.abc.mapping.entity.Entity;
 import com.abc.query.criteria.Criteria;
 
-import cn.sowell.datacenter.model.abc.resolver.EntityPropertyParser;
+import cn.sowell.datacenter.model.abc.resolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.modules.bean.EntityPagingQueryProxy;
 import cn.sowell.datacenter.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.datacenter.model.modules.pojo.EntityHistoryItem;
@@ -69,9 +69,9 @@ public interface ABCExecuteService {
 	 * @param code
 	 * @return
 	 */
-	EntityPropertyParser getModuleEntityParser(String module, String code);
+	ModuleEntityPropertyParser getModuleEntityParser(String module, String code);
 
-	EntityPropertyParser getModuleEntityParser(String module, Entity entity);
+	ModuleEntityPropertyParser getModuleEntityParser(String module, Entity entity);
 
 	EntityPagingQueryProxy getModuleQueryProxy(String module, List<Criteria> cs, ExportDataPageInfo ePageInfo);
 

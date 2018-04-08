@@ -32,6 +32,28 @@
 			</div>
 		</div>
 	</script>
+	<script type="jquery/tmpl" id="tmpl-field-array-table">
+		<div class="table-scrollable field-array-table">
+			<table class="table table-striped table-bordered table-hover">
+				<thead>
+					<tr class="title-row">
+						<th>#</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="value-row">
+						<td>1</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</script>
+	<script type="jquery/tmpl" id="tmpl-field-array-title">
+		<th data-id="\${id}" field-id="\${fieldId}">\${title }</th>
+	</script>
+	<script type="jquery/tmpl" id="tmpl-field-array-value">
+		<td>\${dv }</td>
+	</script>
 	<script type="jquery/tmpl" id="tmpl-field">
 		<div class="form-group field-item movable \${colNum == 2? 'dbcol': ''}" field-id="\${fieldId}" data-id="\${id}">
 			<label class="control-label field-title">\${title}</label>
@@ -42,44 +64,6 @@
 				<a class="remove-field" title="删除字段"><i class="fa fa-trash-o"></i></a>
 				<a class="toggle-expand-field" title="拓展字段显示长度"><i class="fa fa-expand"></i></a>
 				<a class="recover-field" title="恢复默认名称"><i class="iconfont icon-recover"></i></a>
-			</div>
-		</div>
-	</script>
-	<script type="jquery/tmpl" id="tmpl-fieldpicker">
-		<div class="fieldpicker-container">
-			<ul class="nav nav-tabs nav-justified">
-				<li class="active"><a data-toggle="tab" href="#ctab_0">\${composites[0].cname }</a></li>
-				{{if composites.length > 1}}
-					<li><a data-toggle="tab" href="#ctab_1">\${composites[1].cname }</a></li>
-				{{/if}}
-				{{if composites.length > 2}}
-					<li><a data-toggle="tab" href="#ctab_2">\${composites[2].cname }</a></li>
-				{{/if}}
-				{{if composites.length > 3}}
-					<li class="dropdown">
-						<a data-toggle="dropdown" class="fa dropdown-toggle" href="#">
-							<span>更多</span>
-						</a>
-						<ul class="dropdown-menu dropdown-blue">
-							{{each(i, composite) composites}}
-								{{if i > 3}}
-									<li><a data-toggle="tab" href="#ctab_\${i }">\${composite.cname }</a></li>
-								{{/if}}
-							{{/each}}
-						</ul>
-					</li>
-				{{/if}}
-			</ul>
-			<div class="tab-content">
-				{{each(i, composite) composites}}
-					<div id="ctab_\${i }" class="tab-pane {{if i==0}}active{{/if}}">
-						<div class="fieldpicker-field-container">
-							{{each(i, field) composite.fields}}
-								<a href="#" data-id="\${field.id}" class="fieldpicker-field-item">\${field.cname }</a>
-							{{/each}}
-						</div>
-					</div>
-				{{/each}}
 			</div>
 		</div>
 	</script>

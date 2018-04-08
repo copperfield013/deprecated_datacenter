@@ -14,6 +14,9 @@
 			<h1>${title }</h1>
 		</div>
 		<div class="template-container title-operate">
+			<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
+				<i class="glyphicon glyphicon-refresh"></i>
+			</a>
 			<a href="#" title="查看模板" class="toggle-template"><i class="iconfont icon-template"></i></a>
 		</div>
 	</div>
@@ -33,20 +36,65 @@
 							</span>
 						</div>
 						<div class="widget-body field-container">
-							<c:forEach var="tmplField" items="${tmplGroup.fields }">
-								<div class="form-group field-item ${tmplField.colNum == 2? 'dbcol': '' }">
-									<label class="control-label field-title">${tmplField.title }</label>
-									<div class="field-value">
-										<span class="field-input" 
-											fInp-type="${tmplField.type }"
-											fInp-name="${tmplField.fieldName }"
-											fInp-value="${entity.smap[tmplField.fieldName] }"
-											fInp-optkey="${tmplField.optionGroupId }"
-										>
-										</span>
+							<c:choose>
+								<c:when test="${tmplGroup.isArray != 1 }">
+									<c:forEach var="tmplField" items="${tmplGroup.fields }">
+										<div class="form-group field-item ${tmplField.colNum == 2? 'dbcol': '' }">
+											<label class="control-label field-title">${tmplField.title }</label>
+											<div class="field-value">
+												<span class="field-input" 
+													fInp-type="${tmplField.type }"
+													fInp-name="${tmplField.fieldName }"
+													fInp-value="${entity.smap[tmplField.fieldName] }"
+													fInp-optkey="${tmplField.optionGroupId }"
+												>
+												</span>
+											</div>
+										</div>
+									</c:forEach>
+								</c:when>
+								<c:otherwise>
+									<div class="table-scrollable field-array-table">
+										<table class="table table-striped table-bordered table-hover">
+											<thead>
+												<tr class="title-row">
+													<th>#</th>
+													<c:forEach var="field" items="${tmplGroup.fields }">
+														<th 
+															class="th-field-title"
+															fname-format="${fieldDescMap[field.fieldId].arrayFieldNameFormat }"
+															fInp-type="${field.type }"
+															fInp-optkey="${field.optionGroupId }"
+															>${field.title }</th>
+													</c:forEach>
+													<th width="10px"><span class="array-item-add" title="添加一行">+</span></th>
+												</tr>
+											</thead>
+											<tbody>
+												<c:forEach var="entityItem" varStatus="i" items="${entity.arrayMap[tmplGroup.composite.name] }">
+													<tr class="value-row">
+														<td>${i.index + 1 }</td>
+														<c:forEach var="tmplField" items="${tmplGroup.fields }">
+															<td>
+																<span class="field-value">
+																	<span class="field-input" 
+																		fInp-type="${tmplField.type }"
+																		fInp-name="${fieldDescMap[tmplField.fieldId].arrayFieldNameMap[i.index] }"
+																		fInp-value="${entityItem.smap[tmplField.fieldName] }"
+																		fInp-optkey="${tmplField.optionGroupId }"
+																	>
+																	</span>
+																</span>
+															</td>
+														</c:forEach>
+														<td><span class="array-item-remove" title="移除当前行">×</span></td>
+													</tr>
+												</c:forEach>
+											</tbody>
+										</table>
 									</div>
-								</div>
-							</c:forEach>
+								</c:otherwise>
+							</c:choose>
 						</div>
 					</div>
 				</c:forEach>
@@ -84,6 +132,7 @@
 <script>
 	seajs.use(['dialog', 'ajax', 'utils', 'tmpl/js/dtmpl-update.js', '$CPF',
 	           'field/js/field-input.js'], function(Dialog, Ajax, Utils, ViewTmpl, $CPF, FieldInput){
+		"use strict";
 		var $page = $('#${moduke.key }-update-tmpl-${entity.code }-${RES_STAMP}');
 		
 		var isUpdateMode = 'true' === '${entity != null}';
@@ -114,7 +163,53 @@
 		$('#save i', $page).click(function(){
 			$('form', $page).submit();
 		});
+		$page.on('click', '.array-item-remove', function(){
+			var $row = $(this).closest('tr');
+			Dialog.confirm('确认删除该行？', function(yes){
+				if(yes){
+					var $table = $row.closest('table');
+					$row.remove();
+					refreshTable($table);
+				}
+			});
+		});
+		$('.array-item-add', $page).click(function(){
+			var $table = $(this).closest('table');
+			var $tbody = $table.children('tbody');
+			var $titleRow = $table.find('.title-row');
+			var $dataRow = $('<tr>').append('<td></td>')
+			$titleRow.children('th.th-field-title').each(function(){
+				var $title = $(this);
+				var $td = $('<td>');
+				var $fieldInput = $('<span class="field-input"></span></span>');
+				$fieldInput
+					.attr('fInp-type', $title.attr('fInp-type'))
+					.attr('fInp-optkey', $title.attr('fInp-optkey'))
+					.appendTo($('<span class="field-value"></span>').appendTo($td));
+				$dataRow.append($td);
+			});
+			$dataRow.append('<td><span class="array-item-remove" title="移除当前行">×</span></td>');
+			$dataRow.appendTo($tbody);
+			FieldInput.appendTo($dataRow.find('.field-input')).done(function(){
+				refreshTable($table);
+			})
+		});
 		
+		function refreshTable($table){
+			var $titles = $('thead tr.title-row th', $table); 
+			$('tbody tr', $table).each(function(i){
+				var $tr = $(this);
+				var $tds = $tr.children('td');
+				$tds.eq(0).text(i + 1);
+				for(var j = 1; j < $tds.length - 1; j ++){
+					var nameFormat = $titles.eq(j).attr('fname-format');
+					var inputName = nameFormat.replace('ARRAY_INDEX_REPLACEMENT', i);
+					$tds.eq(j).find(':text,select,textarea,input[type="hidden"]').each(function(){
+						$(this).attr('name', inputName);
+					});
+				}
+			});
+		}
 		setTimeout(function(){
 			$('.field-title', $page).each(function(){ViewTmpl.adjustFieldTitle($(this))});
 		}, 100);
