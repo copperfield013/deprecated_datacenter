@@ -16,7 +16,7 @@
 				</a>
 				<ul class="dropdown-menu dropdown-blue">
 					{{each(i, composite) composites}}
-						{{if i > 3}}
+						{{if i > 2}}
 							<li data-id="${composites[i].c_id}" class="${composite.isArray == 1?'array-field':''}"><a data-toggle="tab" href="#ctab_${pickerKey }_${i }">${composite.cname }</a></li>
 						{{/if}}
 					{{/each}}
