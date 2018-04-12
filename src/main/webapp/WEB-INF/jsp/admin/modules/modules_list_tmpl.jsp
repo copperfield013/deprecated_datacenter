@@ -27,7 +27,7 @@
 	<div class="page-body">
 		<form class="form-inline"  action="admin/modules/curd/list/${module.key }">
 			<input type="hidden" id="tmplId" name="tmplId" value="${ltmpl.id }" />
-			<input type="hidden" name="tg" value="?tmplId=${templateGroup.key }"  />
+			<input type="hidden" name="tg" value="${templateGroup.key }"  />
 			<c:if test="${not empty ltmpl.criterias }">
 				<c:forEach var="criteriaItem" items="${ltmpl.criterias }">
 					<c:choose>

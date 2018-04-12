@@ -95,7 +95,14 @@ define(function(require, exports, module){
 				}
 			}
 		}
-		
+		this.getValue = function(){
+			var val = [];
+			for(var i in param.checkboxs){
+				var checkbox = param.checkboxs[i];
+				val.push(checkbox.getValue());
+			}
+			return val;
+		}
 		this.init();
 		
 	}
@@ -200,7 +207,8 @@ define(function(require, exports, module){
 		CheckboxGroup	: CcheckboxGroup,
 		bind			: function($inputs, defaultValue, whenChanged){
 			if(typeof $inputs === 'string'){
-				$inputs = $('[name="' + $inputs + '"]');
+				$.error('不能传入string参数');
+				//$inputs = $('[name="' + $inputs + '"]');
 			}
 			if($inputs instanceof $){
 				var checkboxs = [];
@@ -213,7 +221,9 @@ define(function(require, exports, module){
 							$label = $(this).prev('*[for="' + thisInputId + '"]');
 						}
 						if($label == null || ($label instanceof $ && $label.length == 0)){
-							$label = $('<span>').addClass($CPF.getParam('ccheckboxClass')).text($this.attr('data-text')).insertBefore($this);
+							$label = $('<span>')
+								.addClass($CPF.getParam('ccheckboxClass'))
+								.text($this.attr('data-text')).insertBefore($this);
 						}
 						var ccheckbox = new Ccheckbox({
 							$label	: $label,

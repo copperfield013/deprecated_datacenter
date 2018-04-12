@@ -1,16 +1,37 @@
 define(function(require, exports, module){
-	function Console(_param){
-		var defaultParam = {
-				
-		};
+	"use strict";
+	function Logger(key){
+		
 	}
-	module.exports = Console;
-	$.extend(Console, {
+	
+	Logger.prototype = {
+		debug	: function(){
+			doInConsole('log', arguments);
+			return this;
+		},
+		info	: function(){
+			doInConsole('log', arguments);
+			return this;
+		},
 		log		: function(){
 			doInConsole('log', arguments);
+			return this;
 		},
 		error	: function(){
 			doInConsole('error', arguments);
+			return this;
+		}
+	}
+	
+	module.exports = Logger;
+	var keyMap = {};
+	$.extend(Logger, new Logger('GLOBAL'), {
+		getLogger: function(key){
+			var logger = keyMap[key];
+			if(!logger){
+				keyMap[key] = logger = new Console(key);
+			}
+			return logger;
 		}
 	});
 	

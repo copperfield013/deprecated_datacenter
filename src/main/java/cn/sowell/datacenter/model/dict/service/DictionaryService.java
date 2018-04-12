@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import cn.sowell.datacenter.model.abc.resolver.FieldParserDescription;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryComposite;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryField;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryOption;
@@ -18,4 +19,8 @@ public interface DictionaryService {
 	List<DictionaryOption> getAllOptions();
 
 	public Map<Long, List<OptionItem>> getOptionsMap(Set<Long> fieldIds);
+	
+	
+	Set<FieldParserDescription> getDynamicFieldDescriptionSet(String module);
+	void updateDynamicFiedDescriptionSet(String module);
 }

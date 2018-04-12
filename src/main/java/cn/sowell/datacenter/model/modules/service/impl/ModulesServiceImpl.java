@@ -101,14 +101,18 @@ public class ModulesServiceImpl implements ModulesService{
 		}else{
 			ltmpl = tService.getListTemplate(tmplId);
 		}
-		Map<Long, NormalCriteria> vCriteriaMap = getCriteriasFromRequest(
-				new ServletRequestParameterPropertyValues(request, "criteria", "_"), 
-				CollectionUtils.toMap(ltmpl.getCriterias(), c->c.getId())); 
-		ListTemplateParameter param = new ListTemplateParameter();
-		param.setListTemplate(ltmpl);
-		param.setNormalCriteriaMap(vCriteriaMap);
-		param.setUser(user);
-		return param;
+		if(ltmpl == null) {
+			return null;
+		}else {
+			Map<Long, NormalCriteria> vCriteriaMap = getCriteriasFromRequest(
+					new ServletRequestParameterPropertyValues(request, "criteria", "_"), 
+					CollectionUtils.toMap(ltmpl.getCriterias(), c->c.getId())); 
+			ListTemplateParameter param = new ListTemplateParameter();
+			param.setListTemplate(ltmpl);
+			param.setNormalCriteriaMap(vCriteriaMap);
+			param.setUser(user);
+			return param;
+		}
 	}
 	
 	@Override

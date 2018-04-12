@@ -1,8 +1,10 @@
 package cn.sowell.datacenter.model.abc.resolver.impl;
 
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
@@ -75,7 +77,7 @@ public abstract class AbstractEntityBindContext implements EntityBindContext {
 					entity.putValue(propName, val);
 				}else if(eElement instanceof EntityLabelElement) {
 					String val = FormatUtils.toString(propValue);
-					if(((EntityLabelElement) eElement).getSubdomain().contains(val)) {
+					if(((EntityLabelElement) eElement).getSubdomain().containsAll(splitToSet(val))) {
 						entity.putValue(propName, propValue);
 					}
 				}
@@ -83,6 +85,17 @@ public abstract class AbstractEntityBindContext implements EntityBindContext {
 		}
 		
 	}
+
+	private Set<String> splitToSet(String val) {
+		Set<String> result = new LinkedHashSet<>();
+		if(val != null) {
+			for(String snippet : val.split(",")) {
+				result.add(snippet);
+			}
+		}
+		return result;
+	}
+
 
 	private boolean filterEntityElement(EntityElement eElement, Object propValue) {
 		if("唯一编码".equals(eElement.getAbcattr()) && propValue instanceof String && !TextUtils.hasText((String) propValue)) {

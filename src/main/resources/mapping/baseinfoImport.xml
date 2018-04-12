@@ -253,6 +253,8 @@
 	<attribute name="艾滋收治情况" abcattr="艾滋收治情况" /><!--艾滋病信息 -->
 	<attribute name="艾滋收治机构名称" abcattr="艾滋收治机构名称" /><!--艾滋病信息 -->
 
+	<label name="人口标签" subdomain="户籍人口,残疾人,单亲,个体工商户,灵活就业,创业就业,有车,困难救助人员" />
+
 	<multiattribute name="证件信息" abcattr="证件信息">
 		<attribute name="证件类型" abcattr="证件类型" />
 		<attribute name="证件号码" abcattr="证件号码" />

@@ -5,7 +5,7 @@ import javax.annotation.Resource;
 import org.springframework.beans.factory.InitializingBean;
 
 import cn.sowell.datacenter.model.abc.resolver.impl.ABCNodeFusionContextConfigResolver;
-import cn.sowell.datacenter.model.dict.service.FieldObserverService;
+import cn.sowell.datacenter.model.dict.service.DictionaryService;
 
 public class FusionContextConfig implements InitializingBean{
 	private String mappingName;
@@ -14,7 +14,7 @@ public class FusionContextConfig implements InitializingBean{
 	private String titleAttributeName = "name";
 	private FusionContextConfigResolver configResolver;
 	@Resource
-	FieldObserverService foService;
+	DictionaryService dictService;
 	
 	public String getMappingName() {
 		return mappingName;
@@ -31,8 +31,8 @@ public class FusionContextConfig implements InitializingBean{
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		ABCNodeFusionContextConfigResolver resolver = new ABCNodeFusionContextConfigResolver(this);
-		if(foService != null) {
-			resolver.setFields(foService.getDynamicFieldDescriptionSet(this.module));
+		if(dictService != null) {
+			resolver.setFields(dictService.getDynamicFieldDescriptionSet(this.module));
 		}
 		this.configResolver = resolver;
 	}
@@ -41,9 +41,6 @@ public class FusionContextConfig implements InitializingBean{
 	}
 	public void setModule(String module) {
 		this.module = module;
-	}
-	public void setFoService(FieldObserverService foService) {
-		this.foService = foService;
 	}
 	public String getCodeAttributeName() {
 		return codeAttributeName;
@@ -56,6 +53,9 @@ public class FusionContextConfig implements InitializingBean{
 	}
 	public void setTitleAttributeName(String titleAttributeName) {
 		this.titleAttributeName = titleAttributeName;
+	}
+	public void setDictService(DictionaryService dictService) {
+		this.dictService = dictService;
 	}
 	
 }

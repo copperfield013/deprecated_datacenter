@@ -29,12 +29,12 @@ public interface DictionaryDao {
 
 	Map<Long, List<OptionItem>> getFieldOptionsMap(Set<Long> fieldIds);
 
-	/**
+/*	*//**
 	 * 获得该模块的所有字段
 	 * @param module
 	 * @return
-	 */
-	List<DictionaryField> getAllFields(String module);
+	 *//*
+	List<DictionaryField> getAllFields(String module);*/
 
 	Map<Long, DictionaryField> getFieldMap(Set<Long> fieldIds);
 	

@@ -100,6 +100,7 @@
 					'timer'		: 'COMMON/cpf/cpf-timer.js?v=${cpfVersion}',
 					'console'	: 'COMMON/cpf/cpf-console.js?v=${cpfVersion}',
 					'control'	: 'COMMON/cpf/cpf-control.js?v=${cpfVersion}',
+					'checkbox'	: 'COMMON/cpf/cpf-checkbox.js?v=${cpfVersion}',
 					'innerpage'	: 'COMMON/cpf/cpf-innerpage.js?v=$${cpfVersion}',
 					'bloodhound': '${basePath}media/admin/plugins/typeahead/dist/typeahead.bundle.js?v=$${cpfVersion}',
 					'tmpl'		: 'COMMON/cpf/cpf-tmpl.js?v=${cpfVersion}'

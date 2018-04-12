@@ -64,10 +64,10 @@ public class ABCNodeProxy {
 				result = handlerWithNode((MultiAttributeNode)node, arg);
 			}else if(node instanceof RelationNode) {
 				result = handlerWithNode((RelationNode)node, arg);
-			}else if(node instanceof AttributeNode) {
-				result = handlerWithNode((AttributeNode)node, arg);
 			}else if(node instanceof LabelNode) {
 				result = handlerWithNode((LabelNode)node, arg);
+			}else if(node instanceof AttributeNode) {
+				result = handlerWithNode((AttributeNode)node, arg);
 			}else {
 				result = handlerWithOther(node, arg);
 			}

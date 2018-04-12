@@ -133,6 +133,30 @@ define(function(require, exports, module){
 			return $text;
 		};
 		
+		this.__buildCheckbox = function(){
+			var Checkbox = require('checkbox');
+			var $c = $('<span>');
+			if($.isArray(param.options)){
+				for(var i in param.options){
+					var option = param.options[i];
+					var $checkbox = $('<input type="checkbox" '
+							+ 'name="' + param.name + '" '
+							+ 'value="' + option.value + '" '
+							+ 'data-text="' + option.view + '" />');
+					$c.append($checkbox);
+				}
+				var group = Checkbox.bind($c.children(), param.value);
+			}
+			$c.val = function(val){
+				if(val === undefined){
+					return group.getValue().join();
+				}else{
+					group.setValue(val);
+				}
+			}
+			return $c;
+		}
+		
 		this.__buildDom = function(){
 			checkBuildParam();
 			var $dom = null;
@@ -148,6 +172,9 @@ define(function(require, exports, module){
 					break;
 				case 'date':
 					$dom = this.__buildDatepicker();
+					break;
+				case 'checkbox':
+					$dom = this.__buildCheckbox();
 					break;
 				default:
 			}
@@ -236,6 +263,8 @@ define(function(require, exports, module){
 			def.resolve();
 			return def.promise();
 		},
+		globalOptionsCacheTimeLineMap	: {},
+		globalOptionsCacheMap			: {},
 		/**
 		 * 加载全局的选项map
 		 * loadGlobalOptions(url, reqParam)：从后台加载所有选项数据
@@ -243,12 +272,21 @@ define(function(require, exports, module){
 		loadGlobalOptions	: function(url, reqParam){
 			var deferred = $.Deferred();
 			var originOptions = FieldInput.GLOBAL_OPTIONS;
+			var TIMELINE = 30000;
 			if(typeof url === 'string'){
-				require('ajax').ajax(url, reqParam, function(data){
-					FieldInput.loadGlobalOptions(data).done(function(){
-						deferred.resolve([data, originOptions]);
+				var timeline = this.globalOptionsCacheTimeLineMap[url];
+				var now = (new Date()).getTime();
+				if(!timeline || now - timeline > TIMELINE){
+					require('ajax').ajax(url, reqParam, function(data){
+						FieldInput.loadGlobalOptions(data).done(function(){
+							FieldInput.globalOptionsCacheMap[url] = data;
+							FieldInput.globalOptionsCacheTimeLineMap[url] = now;
+							deferred.resolve([data, originOptions]);
+						});
 					});
-				});
+				}else{
+					deferred.resolve([FieldInput.globalOptionsCacheMap[url], originOptions]);
+				}
 			}else if(typeof url === 'object'){
 				FieldInput.GLOBAL_OPTIONS = url;
 				FieldInput.globalOptionsLoaded = true;

@@ -172,7 +172,10 @@ define(function(require, exports, module){
 		}else if(formData instanceof FormData){
 			fData = formData;
 		}
-		
+		require('console')
+			.debug('发送请求到' + url)
+			.debug(fData)
+			;
 		return $.ajax({
 		    url: 		url,
 		    type: 		param.method,
@@ -241,6 +244,10 @@ define(function(require, exports, module){
 	 * @param done {Function} 请求成功后的回调函数，有一个参数，是已经对象化的json对象
 	 */
 	function postJson(url, obj, done){
+		var json = JSON.stringify(obj);
+		require('console')
+			.debug('发送json请求到' + url)
+			.debug(json);
 		$.ajax({
 			//提交的地址
 			url		: url,
@@ -249,7 +256,7 @@ define(function(require, exports, module){
 			headers	: {
 				'content-type'	: 'application/json;charset=utf-8'
 			},
-			data	: JSON.stringify(obj)
+			data	: json
 		}).done(function(data, textStatus, jqXHR){
 			commonHandleSucAjax(data, textStatus, jqXHR);
 			var json = data;

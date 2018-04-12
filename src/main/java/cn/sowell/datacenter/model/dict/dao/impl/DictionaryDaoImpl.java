@@ -53,12 +53,12 @@ public class DictionaryDaoImpl implements DictionaryDao{
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
+	/*@SuppressWarnings("unchecked")
 	@Override
 	public List<DictionaryField> getAllFields(String module) {
 		String hql = "from DictionaryField f where f.composite.module = :module";
 		return sFactory.getCurrentSession().createQuery(hql).setString("module", module).list();
-	}
+	}*/
 	
 	@SuppressWarnings("unchecked")
 	@Override
