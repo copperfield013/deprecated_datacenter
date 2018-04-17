@@ -5,7 +5,7 @@
 	<head>
 		<base href="${basePath }" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<title>登录易+数据融合工具</title>
+		<title>登录经管智慧党建</title>
 		<meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
 		<script type="text/javascript">
 			if(window.ADMIN_LOADED === true){
@@ -63,7 +63,7 @@
 			}
 			
 			div.Z-loginbox > div.loginbox-logo >img {
-			    width:25em;
+			    width:5em;
 			    height:5em;
 			}
 			div.warn-warp {
@@ -125,7 +125,8 @@
     			<div class="Z-loginbox">
     	    		
         			<div class="loginbox-logo">
-            			<img src="media/admin/main/image/datacenter-login.png"/>
+            			 <img src="media/admin/main/image/hsjglogo.png"/> 
+            			<h1>经管智慧党建</h1>
         			</div>
         			<div class="warn-warp">
 	        			<c:if test="${error != null }">

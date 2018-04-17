@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>易+数据融合工具</title>
+		<title>经管智慧党建</title>
 		<link rel="icon" href="favicon.ico" type="image/x-icon" />
 		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
 		<jsp:include page="/WEB-INF/jsp/admin/common/admin-include.jsp"></jsp:include>
@@ -24,7 +24,7 @@
 	        <div class="navbar-inner">
 	             <div class="navbar-header pull-left">
 	                 <a href="admin/logout" class="datacenter-logo">	                   
-	                                                                        易+数据融合中心
+	                                                                        经管智慧党建
 	                 </a>
 	             </div>
 	             <div class="sidebar-collapse" id="sidebar-collapse">
@@ -57,7 +57,7 @@
 									<ul class="nav nav-tabs" id="main-tab-title-container">
 										<li class="active main-tab-title">
 										    <a data-toggle="tab" href="#cpf-home-tab">
-												主页
+												欢迎页面
 										    </a>
 										</li>
 									</ul>
