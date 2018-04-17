@@ -51,7 +51,7 @@ public class DictionaryServiceImpl implements DictionaryService, InitializingBea
 			Map<Long, DictionaryComposite> compositeMap = CollectionUtils.toMap(composites, DictionaryComposite::getId);
 			Map<Long, List<DictionaryField>> compositeFieldMap = dictDao.getAllFields(compositeMap.keySet());
 			compositeFieldMap.forEach((cId, fields)->fields.forEach(field->field.setComposite(compositeMap.get(cId))));
-			composites.forEach(composite->composite.setFields(FormatUtils.coalesce(compositeFieldMap.get(composite.getId()), new ArrayList<>())));
+			composites.forEach(composite->composite.setFields(FormatUtils.coalesce(compositeFieldMap.get(composite.getId()), new ArrayList<DictionaryField>())));
 			return composites;
 		});
 	}
