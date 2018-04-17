@@ -198,7 +198,7 @@
 		<i></i>
 	</a>
 	<ul class="submenu">
-	   	<li>
+	   	<li> 
 	   		<a class="tab" href="admin/modules/curd/list/disabledpeople" target="disabledpeople_list_tmpl" title="残助列表">
 	   			<span class="menu-text">残助列表</span>
 	   		</a>
