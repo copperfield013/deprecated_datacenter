@@ -5,13 +5,9 @@
 	<head>
 		<base href="${basePath }" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<<<<<<< .mine
+
 		<title>登录易+数据融合工具</title> 
-||||||| .r30
-		<title>登录易+数据融合工具</title>
-=======
-		<title>登录经管智慧党建</title>
->>>>>>> .r274
+
 		<meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
 		<script type="text/javascript">
 			if(window.ADMIN_LOADED === true){
