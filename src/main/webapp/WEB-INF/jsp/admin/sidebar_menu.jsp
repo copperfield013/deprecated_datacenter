@@ -1,12 +1,10 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
-<!--  
 <li>
 	<a href="#" class="menu-dropdown">
 	    <i class="menu-icon fa fa-bookmark"></i>
 	    <span class="menu-text">Demo</span>
 	</a>
 	<ul class="submenu">
-
 	   	<li>
 	   		<a class="tab" href="admin/demo/list" target="demo_list" title="列表">
 	   			<span class="menu-text">列表</span>
@@ -49,21 +47,6 @@
 	   	</li>
 	</ul>
 </li>
- -->
- <li>
-	<a href="#" class="menu-dropdown">
-		<i class="menu-icon fa fa-bookmark"></i>
-		<span class="menu-text">党员模块</span>
-		<i></i>
-	</a>
-	<ul class="submenu">
-	   	<li>
-	   		<a class="tab" href="admin/modules/curd/list/hspeople" target="hspeople_list_tmpl" title="党员列表">
-	   			<span class="menu-text">党员列表</span>
-	   		</a>
-	   	</li>
-	</ul>
-</li>
 <li>
 	<a href="#" class="menu-dropdown">
 		<i class="menu-icon fa fa-bookmark"></i>
@@ -71,7 +54,6 @@
 		<i></i>
 	</a>
 	<ul class="submenu">
-	<!-- 
 	   	<li>
 	   		<a class="tab" href="admin/tmpl/dtmpl/list/people" target="people_dtmpl_list" title="人口详情模板">
 	   			<span class="menu-text">人口详情模板</span>
@@ -92,7 +74,7 @@
 	   			<span class="menu-text">地址详情模板</span>
 	   		</a>
 	   	</li>
-	   	 <!-- 
+	   	<!-- 
 	   	<li>
 	   		<a class="tab" href="admin/tmpl/ltmpl/list/address" target="address_ltmpl_list" title="地址列表模板">
 	   			<span class="menu-text">学生列表模板</span>
@@ -113,8 +95,7 @@
 	   			<span class="menu-text">学生模板组合</span>
 	   		</a>
 	   	</li>
-	   	 
-	   	 
+	   	 -->
 	   		<li>
 	   		<a class="tab" href="admin/tmpl/dtmpl/list/disabledpeople" target="disabledpeople_dtmpl_list" title="残助详情模板">
 	   			<span class="menu-text">残助详情模板</span>
@@ -125,7 +106,6 @@
 	   			<span class="menu-text">残助列表模板</span>
 	   		</a>
 	   	</li>
-	   	-->
 	   	<li>
 	   		<a class="tab" href="admin/tmpl/dtmpl/list/hspeople" target="hspeople_dtmpl_list" title="党员详情模板">
 	   			<span class="menu-text">党员详情模板</span>
@@ -138,7 +118,6 @@
 	   	</li>
 	</ul>
 </li>
-<!-- 
 <li>
 	<a href="#" class="menu-dropdown">
 		<i class="menu-icon fa fa-bookmark"></i>
@@ -168,7 +147,7 @@
 	   	</li>
 	</ul>
 </li>
-  <!-- 
+<!--  
 <li>
 	<a href="#" class="menu-dropdown">
 		<i class="menu-icon fa fa-bookmark"></i>
@@ -189,8 +168,21 @@
 	</ul>
 </li>
 -->
+<li>
+	<a href="#" class="menu-dropdown">
+		<i class="menu-icon fa fa-bookmark"></i>
+		<span class="menu-text">党员模块</span>
+		<i></i>
+	</a>
+	<ul class="submenu">
+	   	<li>
+	   		<a class="tab" href="admin/modules/curd/list/hspeople" target="hspeople_list_tmpl" title="党员列表">
+	   			<span class="menu-text">党员列表</span>
+	   		</a>
+	   	</li>
+	</ul>
+</li>
 
-<!-- 
 <li>
 	<a href="#" class="menu-dropdown">
 		<i class="menu-icon fa fa-bookmark"></i>
@@ -198,11 +190,10 @@
 		<i></i>
 	</a>
 	<ul class="submenu">
-	   	<li> 
+	   	<li>
 	   		<a class="tab" href="admin/modules/curd/list/disabledpeople" target="disabledpeople_list_tmpl" title="残助列表">
 	   			<span class="menu-text">残助列表</span>
 	   		</a>
 	   	</li>
 	</ul>
 </li>
- -->
