@@ -24,7 +24,7 @@
 
 	<label name="人口标签" subdomain="户籍人口,残疾人,单亲,个体工商户,灵活就业,创业就业,有车,困难救助人员" />
 
-	<multiattribute name="民政保障信息" abcattr="民政保障信息">
+	<multiattribute name="民政保障信息" abcattr="民政保障信息" ops="并">
 		<attribute name="参保时间" abcattr="参保时间" />
 		<attribute name="参保事项" abcattr="参保事项" />
 		<attribute name="参保金额" abcattr="参保金额" />
@@ -34,61 +34,62 @@
 		<attribute name="其他说明" abcattr="其他说明" />
 		<attribute name="参保依据" abcattr="参保依据" /> 
 	</multiattribute>
-	<multiattribute name="发票信息" abcattr="发票信息">
+	<multiattribute name="发票信息" abcattr="发票信息" ops="写" >
 		<attribute name="发票类型" abcattr="发票类型" />
 		<attribute name="发票金额" abcattr="发票金额" />
 		<attribute name="有效期" abcattr="有效期" />
 	</multiattribute>
-	<multiattribute name="器材信息" abcattr="器材信息">
+	<multiattribute name="器材信息" abcattr="器材信息" ops="写" >
 		<attribute name="器材类型" abcattr="器材类型" />
 	</multiattribute>
 
-	<multiattribute name="机构证明信息" abcattr="机构证明信息">
+	<multiattribute name="机构证明信息" abcattr="机构证明信息" ops="写">
 		<attribute name="证明类别" abcattr="证明类别" />
 	</multiattribute>
 
-	<multiattribute name="手术信息" abcattr="手术信息">
+	<multiattribute name="手术信息" abcattr="手术信息" ops="写">
 		<attribute name="手术时间" abcattr="手术时间" />
 		<attribute name="手术类别" abcattr="手术类别" />
 		<attribute name="手术医院" abcattr="手术医院" />
 	</multiattribute>
 
-	<multiattribute name="伤残明细" abcattr="伤残明细">
+	<multiattribute name="伤残明细" abcattr="伤残明细" ops="写">
 		<attribute name="伤残详举" abcattr="伤残详举" />
 	</multiattribute>
 
-	<multiattribute name="残疾信息" abcattr="残疾信息">
+	<multiattribute name="残疾信息" abcattr="残疾信息" ops="写">
 		<attribute name="残疾类型" abcattr="残疾类型" />
 		<attribute name="残疾级别" abcattr="残疾级别" />
 	</multiattribute>
 
-	<multiattribute name="住院记录" abcattr="住院记录">
+	<multiattribute name="住院记录" abcattr="住院记录" ops="写">
 		<attribute name="住院时间" abcattr="住院时间" />
 		<attribute name="出院时间" abcattr="出院时间" />
 		<attribute name="住院天数" abcattr="住院天数" />
 		<attribute name="住院类型" abcattr="住院类型" />
 		<attribute name="医院名称" abcattr="医院名称" />
+		<attribute name="重大疾病" abcattr="重大疾病" />
 	</multiattribute>
 
-	<multiattribute name="康复记录" abcattr="康复记录">
+	<multiattribute name="康复记录" abcattr="康复记录" ops="写">
 		<attribute name="开始时间" abcattr="开始时间" />
 		<attribute name="结束时间" abcattr="结束时间" />
 		<attribute name="康复天数" abcattr="康复天数" />
 		<attribute name="机构名称" abcattr="机构名称" />
 	</multiattribute>
 
-	<multiattribute name="工商记录" abcattr="工商记录">
+	<multiattribute name="工商记录" abcattr="工商记录" ops="写">
 		<attribute name="开始时间" abcattr="开始时间" />
 		<attribute name="结束时间" abcattr="结束时间" />
 		<attribute name="营业执照号" abcattr="营业执照号" />
 	</multiattribute>
 
-	<multiattribute name="完税信息" abcattr="完税信息">
+	<multiattribute name="完税信息" abcattr="完税信息" ops="写">
 		<attribute name="完税时间" abcattr="完税时间" />
 		<attribute name="完税凭证" abcattr="完税凭证" />
 	</multiattribute>
 
-	<multiattribute name="学业证书" abcattr="学业证书">
+	<multiattribute name="学业证书" abcattr="学业证书" ops="写">
 		<attribute name="发放时间" abcattr="发放时间" />
 		<attribute name="证书类型" abcattr="证书类型" />
 	</multiattribute>
