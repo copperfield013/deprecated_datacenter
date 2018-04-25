@@ -11,8 +11,8 @@
 	<properties>
 		<version.kie>6.5.0.Final</version.kie>
 		<version.cpfweb>0.2.7</version.cpfweb>
-		<version.abcitem>3.0.7</version.abcitem>
-		<version.abcbizz>2.0.17</version.abcbizz>
+		<version.abcitem>3.1.2</version.abcitem>
+		<version.abcbizz>2.0.37</version.abcbizz>
 	</properties>
 	
 	<dependencies>
@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>cn.sowell.copframe</groupId>
 			<artifactId>cpf-spring</artifactId>
-			<version>0.3.7</version>
+			<version>0.3.8</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.sowell.copframe</groupId>
@@ -47,6 +47,21 @@
 			<artifactId>bizz</artifactId>
 			<version>${version.abcbizz}</version>
 		</dependency> -->
+		<dependency>
+			<groupId>cn.sowell.datacenter</groupId>
+			<artifactId>entityResolver</artifactId>
+			<version>0.5</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.abc</groupId>
+					<artifactId>item</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>cn.sowell.copframe</groupId>
+					<artifactId>cpf-spring</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		<dependency>
 			<groupId>cn.sowell.copframe</groupId>
 			<artifactId>cpf-jedica</artifactId>
