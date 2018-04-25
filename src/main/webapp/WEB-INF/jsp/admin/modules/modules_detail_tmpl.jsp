@@ -134,7 +134,7 @@
 			var $this = $(this);
 			if(!$this.is('.disabled')){
 				$this.addClass('disabled').text('加载中');
-				Ajax.ajax('admin/modules/curd/paging_history/${module.key}/${entity.code}', {
+				Ajax.ajax('admin/modules/curd/paging_history/${module.name}/${entity.code}', {
 					pageNo	: curPageNo + 1
 				}, function(data){
 					if(data.status === 'suc'){
@@ -152,7 +152,7 @@
 		});
 		$page.on('click', '.circ', function(){
 			var time = parseInt($(this).closest('dd').attr('data-time'));
-			$page.getLocatePage().loadContent('admin/modules/curd/detail/${module.key}/${entity.code}?tmplId=${tmpl.id}', null, {timestamp:time});
+			$page.getLocatePage().loadContent('admin/modules/curd/detail/${module.name}/${entity.code}?tmplId=${tmpl.id}', null, {timestamp:time});
 			
 		});
 		var theTime = parseInt('${date.time}');
@@ -239,7 +239,7 @@
 			autoclose	: true,
 			startView	: 'day'
 		}).on('changeDate', function(e){
-			$page.getLocatePage().loadContent('admin/modules/curd/detail/${module.key}/${entity.code }', undefined, {
+			$page.getLocatePage().loadContent('admin/modules/curd/detail/${module.name}/${entity.code }', undefined, {
 				datetime	: $(this).val(),
 				tmplId		: '${tmpl.id}'
 			});
@@ -250,7 +250,7 @@
 		});
 		$('#tmpl-list li[data-id]:not(.active)', $page).click(function(){
 			var tmplId = $(this).attr('data-id');
-			$page.getLocatePage().loadContent('admin/modules/curd/detail/${module.key}/${entity.code}', undefined, {
+			$page.getLocatePage().loadContent('admin/modules/curd/detail/${module.name}/${entity.code}', undefined, {
 				timestamp	: '${timestamp}',
 				tmplId		: tmplId
 			});

@@ -12,9 +12,11 @@ import javax.persistence.Transient;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
+import cn.sowell.datacenter.entityResolver.Field;
+
 @Entity
 @Table(name="t_dictionary_field")
-public class DictionaryField {
+public class DictionaryField implements Field{
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@JSONField(name="id")

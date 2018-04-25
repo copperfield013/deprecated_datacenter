@@ -13,9 +13,11 @@ import javax.persistence.Transient;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
+import cn.sowell.datacenter.entityResolver.Composite;
+
 @Entity
 @Table(name="t_dictionary_composite")
-public class DictionaryComposite {
+public class DictionaryComposite implements Composite{
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@JSONField(name="c_id")

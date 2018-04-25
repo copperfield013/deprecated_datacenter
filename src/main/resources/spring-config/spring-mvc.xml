@@ -24,6 +24,8 @@ http://www.springframework.org/schema/context/spring-context-4.3.xsd">
       		<list>
         		<!-- PageInfo参数的解析器 -->
         		<bean class="cn.sowell.copframe.dto.page.PageInfoArgumentResolver" />
+        		<!-- 构造参数map的解析器 -->
+        		<bean class="cn.sowell.datacenter.common.RequestParameterMapCompositeResolver" />
       		</list>
     	</property>
     	<!-- Controller的消息转换器 -->

@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <link type="text/css" rel="stylesheet" href="media/admin/modules/css/modules-list-tmpl.css" />
-<div id="${module.key }-list-tmpl-${RES_STAMP}" class="detail module-list-tmpl">
+<div id="${module.name }-list-tmpl-${RES_STAMP}" class="detail module-list-tmpl">
 	<div class="page-header">
 		<div class="header-title">
 			<h1>${module.title }列表</h1>
@@ -16,16 +16,16 @@
 			<a class="export btn-toggle" title="导出" id="btn-export " href="page:#export-window.toggle">
 				<i class="glyphicon glyphicon-export"></i>
 			</a>
-			<a class="import tab" href="admin/modules/import/go/${module.key }" title="导入" target="module_${module.key }_import">
+			<a class="import tab" href="admin/modules/import/go/${module.name }" title="导入" target="module_${module.name }_import">
 				<i class="glyphicon glyphicon-import"></i>
 			</a>
-			<a class="tab" href="admin/modules/curd/add/${module.key }?tg=${templateGroup.key }" title="创建${module.title }" target="module_${module.key }_add">
+			<a class="tab" href="admin/modules/curd/add/${module.name }?tg=${templateGroup.key }" title="创建${module.title }" target="module_${module.name }_add">
 				<i class="fa fa-plus"></i>
 			</a>
 		</div>
 	</div>
 	<div class="page-body">
-		<form class="form-inline"  action="admin/modules/curd/list/${module.key }">
+		<form class="form-inline"  action="admin/modules/curd/list/${module.name }">
 			<input type="hidden" id="tmplId" name="tmplId" value="${ltmpl.id }" />
 			<input type="hidden" name="tg" value="${templateGroup.key }"  />
 			<c:if test="${not empty ltmpl.criterias }">
@@ -72,7 +72,7 @@
 										</c:when>
 										<c:when test="${fn:startsWith(column.specialField, 'operate')}">
 											<c:if test="${fn:contains(column.specialField, '-d') }">
-												<a href="admin/modules/curd/detail/${module.key }/${parser.code}?tg=${templateGroup.key }" 
+												<a href="admin/modules/curd/detail/${module.name }/${parser.code}?tg=${templateGroup.key }" 
 													target="module_detail_${parser.code }" 
 													title="详情-${parser.title }"
 													class="tab btn btn-success btn-xs">
@@ -82,14 +82,14 @@
 											<c:if test="${fn:contains(column.specialField, '-u') }">
 												<a target="module_update_${parser.code }" 
 													title="修改-${parser.title }" 
-													href="admin/modules/curd/update/${module.key }/${parser.code }?tg=${templateGroup.key }" 
+													href="admin/modules/curd/update/${module.name }/${parser.code }?tg=${templateGroup.key }" 
 													class="tab btn btn-info btn-xs edit">
 													<i class="fa fa-edit"></i>修改
 												</a>
 											</c:if>
 											<c:if test="${fn:contains(column.specialField, '-r') }">
 												<a confirm="确认删除？"
-													href="admin/modules/curd/delete/${module.key }/${parser.code }" 
+													href="admin/modules/curd/delete/${module.name }/${parser.code }" 
 													class="btn btn-danger btn-xs delete">
 													<i class="fa fa-trash-o"></i>删除
 												</a>
@@ -172,7 +172,7 @@
 </div>
 <script>
 	seajs.use(['utils', 'ajax'], function(Utils, Ajax){
-		var $page = $('#${module.key }-list-tmpl-${RES_STAMP}');
+		var $page = $('#${module.name }-list-tmpl-${RES_STAMP}');
 		console.log($page);
 		$('#tmpl-list a[data-id]:not(.active)', $page).click(function(){
 			var $this = $(this);
@@ -215,7 +215,7 @@
 			var $exportProgress = $('#export-progress', $page);
 			//轮询处理对象
 			var handler = Ajax.poll({
-				startupURL			: 'admin/modules/export/start/${module.key}',
+				startupURL			: 'admin/modules/export/start/${module.name}',
 				progressURL			: 'admin/modules/export/status',
 				whenStartupResponse	: function(data, uuid){
 					$msg.text('开始导出');

@@ -8,7 +8,7 @@
 </c:set>
 <title>${title }</title>
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/ltmpl-update.css" />
-<div class="ltmpl-update detail" id="ltmpl-update-${module.key }-${ltmpl.id }">
+<div class="ltmpl-update detail" id="ltmpl-update-${module.name }-${ltmpl.id }">
 	<script type="jquery/tmpl" id="col-row-tmpl">
 		<div class="row" column-id="\${columnId}" field-id="\${id}" field-key="\${(c_name?(c_name + '.'):'') + name}">
 			<span class="col-name">\${cname}</span>
@@ -285,11 +285,11 @@
 </div>
 <script>
 	seajs.use(['tmpl/js/ltmpl-update.js', 'utils'], function(LtmplUpdate, Utils){
-		var $page = $('#ltmpl-update-${module.key }-${ltmpl.id }');
+		var $page = $('#ltmpl-update-${module.name }-${ltmpl.id }');
 		var tmplData = Utils.parseJSON('${tmplDataJSON}'),
 			criteriaData = Utils.parseJSON('${criteriaDataJSON}'),
 			columnData = Utils.parseJSON('${columnDataJSON}')
 			;
-		LtmplUpdate.init($page, tmplData, criteriaData, columnData, '${module.key}');
+		LtmplUpdate.init($page, tmplData, criteriaData, columnData, '${module.name}');
 	});
 </script>

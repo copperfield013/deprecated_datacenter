@@ -10,7 +10,7 @@
 
 <title>${title }</title>
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/dtmpl-update.css" />
-<div id="dtmpl-update-${module.key}-${tmpl.id }" class="dtmpl-update">
+<div id="dtmpl-update-${module.name}-${tmpl.id }" class="dtmpl-update">
 	<script type="jquery/tmpl" id="tmpl-field-group">
 		<div class="widget field-group" data-id="\${id}">
 			<div class="widget-header">
@@ -98,14 +98,14 @@
 	console.log(1);
 	seajs.use(['tmpl/js/dtmpl-update.js'], function(ViewTmpl){
 		console.log(2);
-		var $page = $('#dtmpl-update-${module.key}-${tmpl.id }');
+		var $page = $('#dtmpl-update-${module.name}-${tmpl.id }');
 		console.log($page);
 		var updateMode = '${tmplJson != null}' == 'true';
 		ViewTmpl.init($page, {
 			tmplId		: '${tmpl.id}',
 			tmplData	: updateMode && $.parseJSON('${tmplJson}'),
 			mode		: updateMode? 'update': 'create',
-			module		: '${module.key}'
+			module		: '${module.name}'
 		});
 	});
 </script>

@@ -18,7 +18,7 @@
 			<div class="col-lg-12">
 				<form class="bv-form form-horizontal validate-form" action="admin/tmpl/group/save">
 					<input type="hidden" name="id" value="${group.id }" />
-					<input type="hidden" name="module" value="${module.key }" />
+					<input type="hidden" name="module" value="${module.name }" />
 					<div class="form-group"> 
 						<label class="col-lg-2 control-label" for="name">名称</label>
 						<div class="col-lg-5">
@@ -33,7 +33,7 @@
 						<div class="col-lg-5">
 							<a 
 								class="form-control"
-								href="admin/tmpl/ltmpl/choose/${module.key }" 
+								href="admin/tmpl/ltmpl/choose/${module.name }" 
 								title="选择列表模板"
 								choose-key="choose-ltmpl" 
 								crn-choose-ltmpl="title" 
@@ -46,7 +46,7 @@
 						<div class="col-lg-5">
 							<a 
 								class="form-control"
-								href="admin/tmpl/dtmpl/choose/${module.key }" 
+								href="admin/tmpl/dtmpl/choose/${module.name }" 
 								title="选择列表模板"
 								choose-key="choose-dtmpl" 
 								crn-choose-dtmpl="title" >${group.detailTemplateId != null? group.detailTemplateTitle: '选择详情模板' }</a>

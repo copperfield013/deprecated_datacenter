@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <title>${module.title }导入</title>
-<div id="modules-import-${module.key }">
+<div id="modules-import-${module.name }">
 	<div class="page-header">
 		<div class="header-title">
 			<h1>${module.title }导入</h1>
@@ -11,7 +11,7 @@
 		<div class="row">
 			<div class="col-lg-12">
 				<form class="bv-form form-horizontal validate-form" 
-					start-url="admin/modules/import/do/${module.key }"
+					start-url="admin/modules/import/do/${module.name }"
 					status-url="admin/modules/import/status"
 					break-url="admin/modules/import/break">
 					<div class="form-group">
@@ -73,7 +73,7 @@
 </div>
 <script>
 	seajs.use(['ajax', 'dialog'], function(Ajax, Dialog){
-		var $page = $('#modules-import-${module.key }');
+		var $page = $('#modules-import-${module.name }');
 		console.log($page);
 		var $feedback = $('#feedback-msg', $page);
 		var uuid = null;

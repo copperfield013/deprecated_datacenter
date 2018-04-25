@@ -573,6 +573,15 @@ define(function(require, exports){
 				json = $.parseJSON(_json);
 			}catch(e){}
 			return json;
+		},
+		swap				: function(array, x, y){
+			if(!$.isArray(array)){
+				$.error('第一个参数必须是数组');
+			}
+			if(x < 0 || y < 0 || x >= array.length || y >= array.length){
+				$.error('索引必须小于数组长度' + array.length);
+			}
+			array.splice(x, 1, array.splice(y, 1, array[x])[0]);
 		}
 	});
 	

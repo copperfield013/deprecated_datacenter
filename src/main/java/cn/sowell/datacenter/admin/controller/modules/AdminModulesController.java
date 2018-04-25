@@ -2,7 +2,6 @@ package cn.sowell.datacenter.admin.controller.modules;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -28,15 +27,16 @@ import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.model.abc.resolver.FieldDescCacheMap;
-import cn.sowell.datacenter.model.abc.resolver.FusionContextConfig;
-import cn.sowell.datacenter.model.abc.resolver.FusionContextFactoryDC;
-import cn.sowell.datacenter.model.abc.resolver.ModuleEntityPropertyParser;
+import cn.sowell.datacenter.common.RequestParameterMapComposite;
+import cn.sowell.datacenter.entityResolver.FieldDescCacheMap;
+import cn.sowell.datacenter.entityResolver.FusionContextConfig;
+import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
+import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
+import cn.sowell.datacenter.entityResolver.config.ModuleMeta;
 import cn.sowell.datacenter.model.admin.pojo.ExportStatus;
 import cn.sowell.datacenter.model.dict.service.DictionaryService;
 import cn.sowell.datacenter.model.modules.ModuleConstants;
 import cn.sowell.datacenter.model.modules.pojo.EntityHistoryItem;
-import cn.sowell.datacenter.model.modules.pojo.ModuleMeta;
 import cn.sowell.datacenter.model.modules.service.ExportService;
 import cn.sowell.datacenter.model.modules.service.ModulesService;
 import cn.sowell.datacenter.model.tmpl.bean.QueryEntityParameter;
@@ -66,7 +66,7 @@ public class AdminModulesController {
 	FrameDateFormat dateFormat;
 	
 	@Resource
-	FusionContextFactoryDC fFactory;
+	FusionContextConfigFactory fFactory;
 	
 	Logger logger = Logger.getLogger(AdminModulesController.class);
 
@@ -93,6 +93,14 @@ public class AdminModulesController {
 			}
 		}
 		ListTemplateParameter param = mService.exractTemplateParameter(tmplId, module, request);
+		if(param == null || param.getListTemplate() == null) {
+			if(tmplId == null) {
+				logger.error("没有指定模块[" + module + "]的默认列表模板");
+			}else {
+				logger.error("根据模板id[" + module + "]无法获得对应的列表模板");
+			}
+			return null;
+		}
 		if(param != null && param.getListTemplate() != null){
 			QueryEntityParameter queryParam = new QueryEntityParameter();
 			queryParam.setCriterias(mService.toCriterias(param.getNormalCriteriaMap().values(), module));
@@ -213,9 +221,9 @@ public class AdminModulesController {
 	
 	@ResponseBody
     @RequestMapping("/save/{module}")
-    public AjaxPageResponse save(@PathVariable String module, String code, @RequestParam Map<String, Object> map){
+    public AjaxPageResponse save(@PathVariable String module, String code, RequestParameterMapComposite composite){
     	 try {
-    		 mService.mergeEntity(module, map);
+    		 mService.mergeEntity(module, composite.getMap());
              return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("保存成功", module + "_list_tmpl");
          } catch (Exception e) {
              logger.error("保存时发生错误", e);

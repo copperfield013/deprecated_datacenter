@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <title>模板组合管理（${module.title }）</title>
-<div id="tmplgroup-${module.key }" class="detail">
+<div id="tmplgroup-${module.name }" class="detail">
 	<div>
 		<form action="admin/tmpl/group/list">
 			
@@ -15,7 +15,7 @@
 			<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
 				<i class="glyphicon glyphicon-refresh"></i>
 			</a>
-			<a class="tab"  href="admin/tmpl/group/to_create/${module.key }" title="创建模板" target="create_tmpl_group">
+			<a class="tab"  href="admin/tmpl/group/to_create/${module.name }" title="创建模板" target="create_tmpl_group">
 				<i class="fa fa-plus"></i>
 			</a>
 		</div>

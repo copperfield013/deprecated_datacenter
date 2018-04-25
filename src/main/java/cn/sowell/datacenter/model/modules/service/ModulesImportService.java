@@ -4,8 +4,8 @@ import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Sheet;
 
+import cn.sowell.datacenter.entityResolver.config.ImportComposite;
 import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
-import cn.sowell.datacenter.model.modules.bean.ImportComposite;
 import cn.sowell.datacenter.model.modules.pojo.ImportStatus;
 
 public interface ModulesImportService {

@@ -26,7 +26,7 @@
 			<a id="save" title="保存"><i class="fa fa-check-square"></i></a>
 		</div>
 		<div class="col-lg-offset-1 col-lg-10">
-			<form class="form-horizontal group-container" action="admin/modules/curd/save/${module.key }">
+			<form class="form-horizontal group-container" action="admin/modules/curd/save/${module.name }">
 				<input type="hidden" name="${config.codeAttributeName }" value="${entity.code }" />
 				<c:forEach var="tmplGroup" items="${dtmpl.groups }">
 					<div class="widget field-group">
@@ -73,7 +73,9 @@
 											<tbody>
 												<c:forEach var="entityItem" varStatus="i" items="${entity.arrayMap[tmplGroup.composite.name] }">
 													<tr class="value-row">
-														<td>${i.index + 1 }</td>
+														<td>${i.index + 1 }
+															<input type="hidden" name="${entityItem.codeName }" value="${entityItem.code }" />
+														</td>
 														<c:forEach var="tmplField" items="${tmplGroup.fields }">
 															<td>
 																<span class="field-value">
@@ -144,7 +146,7 @@
 		});
 		$('#tmpl-list li[data-id]:not(.active)', $page).click(function(){
 			var tmplId = $(this).attr('data-id');
-			var url = 'admin/modules/curd' + (isUpdateMode? '/update/${module.key}/${entity.code}': '/add/${module.key}');
+			var url = 'admin/modules/curd' + (isUpdateMode? '/update/${module.name}/${entity.code}': '/add/${module.name}');
 			$page.getLocatePage().loadContent(url, undefined, {
 				timestamp	: '${timestamp}',
 				tmplId		: tmplId

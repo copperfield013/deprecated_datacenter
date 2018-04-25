@@ -5,7 +5,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -29,12 +28,11 @@ import com.abc.panel.PanelFactory;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.excel.CellTypeUtils;
-import cn.sowell.datacenter.DataCenterConstants;
-import cn.sowell.datacenter.model.abc.resolver.FusionContextConfig;
-import cn.sowell.datacenter.model.abc.resolver.FusionContextConfigResolver;
-import cn.sowell.datacenter.model.abc.resolver.FusionContextFactoryDC;
+import cn.sowell.datacenter.entityResolver.FusionContextConfig;
+import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
+import cn.sowell.datacenter.entityResolver.FusionContextConfigResolver;
+import cn.sowell.datacenter.entityResolver.config.ImportComposite;
 import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
-import cn.sowell.datacenter.model.modules.bean.ImportComposite;
 import cn.sowell.datacenter.model.modules.pojo.ImportStatus;
 import cn.sowell.datacenter.model.modules.service.ModulesImportService;
 
@@ -42,14 +40,14 @@ import cn.sowell.datacenter.model.modules.service.ModulesImportService;
 public class ModulesImportServiceImpl implements ModulesImportService {
 
 	@Resource
-	FusionContextFactoryDC fFactory;
+	FusionContextConfigFactory fFactory;
 
 	Logger logger = Logger.getLogger(ModulesImportServiceImpl.class);
 	
 	private DateFormat defaultDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
 	private NumberFormat numberFormat = new DecimalFormat("0.000");
 	
-	@SuppressWarnings("serial")
+	/*@SuppressWarnings("serial")
 	Map<String, Map<String, ImportComposite>> importConfigKeyMap = new HashMap<String, Map<String, ImportComposite>>(){
 		{
 			ImportComposite[] composites = new ImportComposite[] {
@@ -69,20 +67,16 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 				this.get(c.getModuleKey()).put(c.getName(), c);
 			}
 		}
-	};
+	};*/
 	
+	
+	private String getConfigKey(String module, String compositeName) {
+		return getImportCompositeMap(module).get(compositeName).getConfigId();
+	}
 	
 	@Override
 	public Map<String, ImportComposite> getImportCompositeMap(String module) {
-		return importConfigKeyMap.get(module);
-	}
-	
-	public String getConfigKey(String module, String compositeName) {
-		try {
-			return getImportCompositeMap(module).get(compositeName).getConfigKey();
-		} catch (NullPointerException e) {
-			return null;
-		}
+		return fFactory.getModuleImportMap(module);
 	}
 	
 	@Override
@@ -104,7 +98,7 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 		int rownum = 2;
 		importStatus.appendMessage("开始导入");
 		Integration integration = PanelFactory.getIntegration();
-		BizFusionContext context = fFactory.getContext(config.getMappingName());
+		BizFusionContext context = config.createContext();
 		context.setSource(FusionContext.SOURCE_COMMON);
 		while(true){
 			if(importStatus.breaked()){

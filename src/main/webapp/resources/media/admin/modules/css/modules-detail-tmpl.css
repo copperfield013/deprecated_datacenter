@@ -136,7 +136,7 @@ div#timeline-area .show-more-history{
 
 .entity-detail-tmpl .field-value {
     width: 70%;
-    max-height: 20em;
+    max-height: 12em;
     overflow-x: hidden;
     overflow-y: auto;
 }

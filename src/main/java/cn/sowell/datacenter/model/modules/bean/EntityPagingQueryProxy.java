@@ -2,7 +2,7 @@ package cn.sowell.datacenter.model.modules.bean;
 
 import java.util.Set;
 
-import cn.sowell.datacenter.model.abc.resolver.ModuleEntityPropertyParser;
+import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 
 public interface EntityPagingQueryProxy {
 	int getTotalCount();

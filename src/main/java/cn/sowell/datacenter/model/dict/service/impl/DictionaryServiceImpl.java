@@ -9,14 +9,14 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
 import cn.sowell.copFrame.utils.TimelinenessWrapper;
 import cn.sowell.copFrame.utils.TimelinessMap;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.FormatUtils;
-import cn.sowell.datacenter.model.abc.resolver.FieldParserDescription;
+import cn.sowell.datacenter.entityResolver.FieldParserDescription;
+import cn.sowell.datacenter.entityResolver.FieldService;
 import cn.sowell.datacenter.model.dict.dao.DictionaryDao;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryComposite;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryField;
@@ -24,8 +24,8 @@ import cn.sowell.datacenter.model.dict.pojo.DictionaryOption;
 import cn.sowell.datacenter.model.dict.pojo.OptionItem;
 import cn.sowell.datacenter.model.dict.service.DictionaryService;
 
-@Service
-public class DictionaryServiceImpl implements DictionaryService, InitializingBean{
+@Service("dictionaryServiceImpl")
+public class DictionaryServiceImpl implements DictionaryService, FieldService{
 
 	private static final long GLOBAL_TIMEOUT = 20000l;
 
@@ -36,12 +36,6 @@ public class DictionaryServiceImpl implements DictionaryService, InitializingBea
 	private final TimelinessMap<String, List<DictionaryField>> moduleFieldsMap = new TimelinessMap<>(GLOBAL_TIMEOUT);
 	private final TimelinenessWrapper<List<DictionaryOption>> optionsCache = new TimelinenessWrapper<>(GLOBAL_TIMEOUT);
 	private final Map<String, Set<FieldParserDescription>> fieldDescsMap = new HashMap<>();
-	
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
 	
 	
 	@Override
@@ -65,6 +59,8 @@ public class DictionaryServiceImpl implements DictionaryService, InitializingBea
 			return result;
 		});
 	}
+	
+	
 
 	@Override
 	public List<DictionaryOption> getAllOptions() {
@@ -78,7 +74,7 @@ public class DictionaryServiceImpl implements DictionaryService, InitializingBea
 	
 	
 	@Override
-	public Set<FieldParserDescription> getDynamicFieldDescriptionSet(String module) {
+	public Set<FieldParserDescription> getFieldDescriptions(String module) {
 		if(!fieldDescsMap.containsKey(module)) {
 			Set<FieldParserDescription> fieldDescs = getLastFieldDescs(module);
 			fieldDescsMap.put(module, fieldDescs);
@@ -92,7 +88,6 @@ public class DictionaryServiceImpl implements DictionaryService, InitializingBea
 		return Collections.synchronizedSet(fieldDescs);
 	}
 	
-	@Override
 	public void updateDynamicFiedDescriptionSet(String module) {
 		if(fieldDescsMap.containsKey(module)) {
 			Set<FieldParserDescription> lastFieldDescs = getLastFieldDescs(module);
@@ -100,11 +95,10 @@ public class DictionaryServiceImpl implements DictionaryService, InitializingBea
 			fieldDescs.clear();
 			fieldDescs.addAll(lastFieldDescs);
 		}else {
-			getDynamicFieldDescriptionSet(module);
+			getFieldDescriptions(module);
 		}
 		
 	}
-
 	
 	
 }

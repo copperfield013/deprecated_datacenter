@@ -138,20 +138,25 @@ define(function(require, exports, module){
 			var $c = $('<span>');
 			if($.isArray(param.options)){
 				for(var i in param.options){
+					var uuid = require('utils').uuid(10, 62);
 					var option = param.options[i];
+					var $label = $('<span for="' + uuid + '">').text(option.view);
 					var $checkbox = $('<input type="checkbox" '
+							+ 'id="' + uuid + '" '
 							+ 'name="' + param.name + '" '
 							+ 'value="' + option.value + '" '
 							+ 'data-text="' + option.view + '" />');
 					$c.append($checkbox);
+					$c.append($label);
 				}
-				var group = Checkbox.bind($c.children(), param.value);
+				var group = Checkbox.bind($c.children(':checkbox'), param.value);
 			}
 			$c.val = function(val){
 				if(val === undefined){
 					return group.getValue().join();
 				}else{
 					group.setValue(val);
+					group.autoSort();
 				}
 			}
 			return $c;

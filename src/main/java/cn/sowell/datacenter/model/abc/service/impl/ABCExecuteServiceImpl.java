@@ -25,9 +25,9 @@ import com.abc.record.HistoryTracker;
 
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.FormatUtils;
-import cn.sowell.datacenter.model.abc.resolver.ModuleEntityPropertyParser;
-import cn.sowell.datacenter.model.abc.resolver.FusionContextConfig;
-import cn.sowell.datacenter.model.abc.resolver.FusionContextFactoryDC;
+import cn.sowell.datacenter.entityResolver.FusionContextConfig;
+import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
+import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.abc.service.ABCExecuteService;
 import cn.sowell.datacenter.model.basepeople.dao.PropertyDictionaryDao;
 import cn.sowell.datacenter.model.modules.bean.EntityPagingQueryProxy;
@@ -43,7 +43,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	Logger logger = Logger.getLogger(ABCExecuteService.class);
 	
 	@Resource
-	FusionContextFactoryDC fFactory;
+	FusionContextConfigFactory fFactory;
 	
 	@Resource
 	PropertyDictionaryDao dictionartDao;
@@ -52,7 +52,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	@Override
 	public EntityPagingQueryProxy getModuleQueryProxy(String entityConfig, List<Criteria> cs, ExportDataPageInfo ePageInfo) {
 		FusionContextConfig config = fFactory.getConfig(entityConfig);
-		BizFusionContext context = fFactory.getContext(entityConfig);
+		BizFusionContext context = config.createContext();
 		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(cs, "编辑时间");
 		
@@ -66,7 +66,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	
 	private List<Entity> queryEntityList(String entityConfig, List<Criteria> criterias, PageInfo pageInfo){
-		BizFusionContext context = fFactory.getContext(entityConfig);
+		BizFusionContext context = fFactory.getConfig(entityConfig).createContext();
 		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		
 		EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(criterias, "编辑时间");
@@ -79,7 +79,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	@Override
 	public List<Entity> queryModuleEntities(QueryEntityParameter param) {
 		return queryEntityList(
-				fFactory.mapDefaultModuleEntityConfig(param.getModule()), 
+				fFactory.getDefaultConfigId(param.getModule()), 
 				param.getCriterias(), 
 				param.getPageInfo());
 	}
@@ -87,7 +87,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	private Entity getHistoryEntity(String configKey, String code,
 			Date date, List<ErrorInfomation> errors) {
-		BizFusionContext context = fFactory.getContext(configKey);
+		BizFusionContext context = fFactory.getConfig(configKey).createContext();
 		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		
 		HistoryTracker tracker = discoverer.track(code, date);
@@ -101,7 +101,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	@Override
 	public Entity getHistoryEntity(QueryEntityParameter param, List<ErrorInfomation> errors) {
 		return getHistoryEntity(
-				fFactory.mapDefaultModuleEntityConfig(param.getModule()), 
+				fFactory.getDefaultConfigId(param.getModule()), 
 				param.getCode(), 
 				param.getHistoryTime(), 
 				errors);
@@ -110,7 +110,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	@Override
 	public List<EntityHistoryItem> queryHistory(String module, String code,
 			Integer pageNo, Integer pageSize) {
-		BizFusionContext context = fFactory.getContext(fFactory.mapDefaultModuleEntityConfig(module));
+		BizFusionContext context = fFactory.getDefaultConfig(module).createContext();
 		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		
 		List<RecordHistory> historyList = discoverer.trackHistory(code, pageNo, pageSize);
@@ -133,7 +133,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public Entity getModuleEntity(String module, String code) {
-		BizFusionContext context = fFactory.getContext(fFactory.mapDefaultModuleEntityConfig(module));
+		BizFusionContext context = fFactory.getDefaultConfig(module).createContext();
 		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		Entity result=discoverer.discover(code);
 		return result;
@@ -150,14 +150,14 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public String mergeEntity(String module, Map<String, Object> propMap) {
-		String configName = fFactory.mapDefaultModuleEntityConfig(module);
+		String configName = fFactory.getDefaultConfigId(module);
 		FusionContextConfig config = fFactory.getConfig(configName);
 		if(config.getConfigResolver() == null) {
 			throw new RuntimeException("config[" + configName + "]没有注入对应的ConfigResolver对象");
 		}
 		Entity entity = config.getConfigResolver().createEntity(propMap);
 		if(entity != null) {
-			BizFusionContext context = fFactory.getContext(configName);
+			BizFusionContext context = fFactory.getConfig(configName).createContext();
 			context.setSource(FusionContext.SOURCE_COMMON);
 			
 			Integration integration=PanelFactory.getIntegration();
@@ -174,9 +174,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public ModuleEntityPropertyParser getModuleEntityParser(String module, Entity entity) {
-		String configName = fFactory.mapDefaultModuleEntityConfig(module);
-		FusionContextConfig config = fFactory.getConfig(configName);
-		return config.getConfigResolver().createParser(entity);
+		return fFactory.getModuleDefaultResolver(module).createParser(entity);
 	}
 
 

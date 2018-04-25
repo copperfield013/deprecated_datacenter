@@ -27,16 +27,15 @@ import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
-import cn.sowell.datacenter.DataCenterConstants;
-import cn.sowell.datacenter.model.abc.resolver.ModuleEntityPropertyParser;
-import cn.sowell.datacenter.model.abc.resolver.FusionContextFactoryDC;
+import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
+import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
+import cn.sowell.datacenter.entityResolver.config.ModuleMeta;
 import cn.sowell.datacenter.model.abc.service.ABCExecuteService;
 import cn.sowell.datacenter.model.dict.service.DictionaryService;
 import cn.sowell.datacenter.model.modules.bean.EntityPagingIterator;
 import cn.sowell.datacenter.model.modules.bean.EntityPagingQueryProxy;
 import cn.sowell.datacenter.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.datacenter.model.modules.pojo.EntityHistoryItem;
-import cn.sowell.datacenter.model.modules.pojo.ModuleMeta;
 import cn.sowell.datacenter.model.modules.service.ModulesImportService;
 import cn.sowell.datacenter.model.modules.service.ModulesService;
 import cn.sowell.datacenter.model.tmpl.bean.QueryEntityParameter;
@@ -53,7 +52,7 @@ public class ModulesServiceImpl implements ModulesService{
 	ABCExecuteService abcService;
 	
 	@Resource
-	FusionContextFactoryDC fFactory;
+	FusionContextConfigFactory fFactory;
 	
 	@Resource
 	TemplateService tService;
@@ -64,9 +63,9 @@ public class ModulesServiceImpl implements ModulesService{
 	@Resource
 	ModulesImportService impService;
 	
-	Map<String, ModuleMeta> moduleMap;
+	//Map<String, ModuleMeta> moduleMap;
 	
-	public ModulesServiceImpl() {
+	/*public ModulesServiceImpl() {
 		moduleMap = new HashMap<String, ModuleMeta>();
 		ModuleMeta peopleModule = new ModuleMeta();
 		peopleModule.setKey(DataCenterConstants.MODULE_KEY_PEOPLE);
@@ -88,7 +87,7 @@ public class ModulesServiceImpl implements ModulesService{
 		moduleMap.put(studentModule.getKey(), studentModule);
 		moduleMap.put(disabledpeopleModule.getKey(), disabledpeopleModule);
 		moduleMap.put(hspeopleModule.getKey(), hspeopleModule);
-	}
+	}*/
 	
 	@Override
 	public ListTemplateParameter exractTemplateParameter(Long tmplId,
@@ -146,7 +145,7 @@ public class ModulesServiceImpl implements ModulesService{
 	
 	@Override
 	public List<Criteria> toCriterias(Collection<NormalCriteria> nCriterias, String module){
-		FusionContext context = fFactory.getContext(fFactory.mapDefaultModuleEntityConfig(module));
+		FusionContext context = fFactory.getDefaultConfig(module).createContext();
 		CriteriaFactory criteriaFactory = new CriteriaFactory(context);
 		ArrayList<Criteria> cs = new ArrayList<Criteria>();
 		nCriterias.forEach(nCriteria->{
@@ -178,7 +177,7 @@ public class ModulesServiceImpl implements ModulesService{
 	
 	@Override
 	public ModuleMeta getModule(String moduleKey) {
-		return moduleMap.get(moduleKey);
+		return fFactory.getModuleMeta(moduleKey);
 	}
 	
 	
@@ -225,7 +224,7 @@ public class ModulesServiceImpl implements ModulesService{
 			ExportDataPageInfo ePageInfo) {
 		PageInfo pageInfo = ePageInfo.getPageInfo();
 		List<Criteria> cs = toCriterias(nCriterias, ltmpl.getModule());
-		String configName = fFactory.mapDefaultModuleEntityConfig(ltmpl.getModule());
+		String configName = fFactory.getDefaultConfigId(ltmpl.getModule());
 		EntityPagingQueryProxy proxy = abcService.getModuleQueryProxy(configName, cs, ePageInfo);
 		int dataCount = pageInfo.getPageSize();
 		int startPageNo = pageInfo.getPageNo();
