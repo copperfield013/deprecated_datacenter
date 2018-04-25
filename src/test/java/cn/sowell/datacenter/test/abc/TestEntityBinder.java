@@ -15,10 +15,10 @@ import com.abc.mapping.entity.Entity;
 import com.abc.mapping.node.ABCNode;
 import com.abc.mapping.node.AttributeNode;
 
-import cn.sowell.datacenter.model.abc.resolver.ModuleEntityPropertyParser;
-import cn.sowell.datacenter.model.abc.resolver.FusionContextConfig;
-import cn.sowell.datacenter.model.abc.resolver.FusionContextConfigResolver;
-import cn.sowell.datacenter.model.abc.resolver.FusionContextFactoryDC;
+import cn.sowell.datacenter.entityResolver.FusionContextConfig;
+import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
+import cn.sowell.datacenter.entityResolver.FusionContextConfigResolver;
+import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.abc.service.ABCExecuteService;
 import cn.sowell.datacenter.model.dict.service.DictionaryService;
 
@@ -27,7 +27,7 @@ import cn.sowell.datacenter.model.dict.service.DictionaryService;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class TestEntityBinder {
 	@Resource
-	FusionContextFactoryDC fFactory;
+	FusionContextConfigFactory fFactory;
 	
 	@Resource
 	DictionaryService dictService;
@@ -36,7 +36,7 @@ public class TestEntityBinder {
 	ABCExecuteService abcService;
 	
 	public void testNode() {
-		FusionContextConfig config = fFactory.getConfig(FusionContextFactoryDC.KEY_BASE);
+		FusionContextConfig config = fFactory.getDefaultConfig("people");
 		ABCNode rootNode = MappingContainer.getABCNode(config.getMappingName());
 		AttributeNode node = rootNode.getAttribute("birthday");
 		System.out.println("getTitle--" + node.getTitle());
@@ -61,7 +61,7 @@ public class TestEntityBinder {
 	
 	
 	public void testABCNodeResolver() {
-		FusionContextConfig config = fFactory.getConfig(FusionContextFactoryDC.KEY_BASE);
+		FusionContextConfig config = fFactory.getDefaultConfig("people");
 		try {
 			testResolver(config);
 		} catch (Exception e) {
@@ -119,18 +119,29 @@ public class TestEntityBinder {
 	@Test
 	public void 证件() {
 		Map<String, Object> propMap = new HashMap<>();
-		propMap.put("peoplecode", "6338f82d4d8e47a5832079e02987628b");
-		propMap.put("证件信息[0].证件类型", "身份证");
+		//propMap.put("peoplecode", "6338f82d4d8e47a5832079e02987628b");
+		/*propMap.put("证件信息[0].证件类型", "身份证");
 		propMap.put("证件信息[0].证件号码", "123456789");
 		propMap.put("证件信息[1].证件类型", "市民卡");
-		propMap.put("证件信息[1].证件号码", "1111");
-		abcService.mergeEntity("people", propMap);
+		propMap.put("证件信息[1].证件号码", "1111");*/
+		propMap.put("人口标签", "户籍人口");
+		String peopleCode = abcService.mergeEntity("people", propMap);
+		
+		Entity entity = abcService.getModuleEntity("people", peopleCode);
+		System.out.println(entity);
 		
 	}
 	
 	@Test
 	public void 字段查询() {
 		dictService.getAllFields("people");
+	}
+	
+	@Test
+	public void 唯一编码() {
+		ModuleEntityPropertyParser parser = abcService.getModuleEntityParser("people", "6338f82d4d8e47a5832079e02987628b");
+		System.out.println(parser.getProperty("证件信息[1].证件类型"));
+		System.out.println(parser.getProperty("证件信息[1].唯一编码"));
 	}
 	
 	private Map<String, Object> getStudentDataMap() {
