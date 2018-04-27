@@ -16,7 +16,12 @@ import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.DataCenterConstants;
+import cn.sowell.datacenter.entityResolver.FieldConfigure;
+import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
+import cn.sowell.datacenter.entityResolver.FusionContextConfigResolver;
+import cn.sowell.datacenter.entityResolver.RelationFieldConfigure;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
+import cn.sowell.datacenter.model.dict.pojo.DictionaryComposite;
 import cn.sowell.datacenter.model.system.pojo.SystemAdmin;
 import cn.sowell.datacenter.model.tmpl.dao.DetailTemplateDao;
 import cn.sowell.datacenter.model.tmpl.dao.ListTemplateDao;
@@ -58,6 +63,9 @@ public class TemplateServiceImpl implements TemplateService{
 	@Resource
 	TemplateUpdateStrategyFactory tmplUpdateStrategyFactory;
 	
+	@Resource
+	FusionContextConfigFactory fFactory;
+	
 	@Override
 	public List<TemplateListTempalte> queryLtmplList(String module, UserIdentifier user) {
 		return lDao.queryLtmplList(module, user.getId(), null);
@@ -77,7 +85,7 @@ public class TemplateServiceImpl implements TemplateService{
 	public TemplateDetailTemplate getDetailTemplate(long tmplId) {
 		TemplateDetailTemplate data = nDao.get(TemplateDetailTemplate.class, tmplId);
 		if(data != null){
-			List<TemplateDetailFieldGroup> groups = getTemplateGroups(data.getId());
+			List<TemplateDetailFieldGroup> groups = getTemplateGroups(fFactory.getModuleDefaultResolver(data.getModule()), data.getId());
 			if(groups != null){
 				data.setGroups(groups);
 			}
@@ -165,20 +173,34 @@ public class TemplateServiceImpl implements TemplateService{
 			boolean loadDetail) {
 		List<TemplateDetailTemplate> list = dDao.getTemplateList(module, user, pageInfo);
 		if(loadDetail){
+			FusionContextConfigResolver resolver = fFactory.getModuleDefaultResolver(module);
 			list.forEach(data->{
-				data.setGroups(getTemplateGroups(data.getId()));
+				data.setGroups(getTemplateGroups(resolver, data.getId()));
 			});
 		}
 		return list;
 	}
 	
-	private List<TemplateDetailFieldGroup> getTemplateGroups(Long tmplId) {
+	
+	
+	
+	private List<TemplateDetailFieldGroup> getTemplateGroups(FusionContextConfigResolver resolver, Long tmplId) {
 		List<TemplateDetailFieldGroup> groups = dDao.getTemplateGroups(tmplId);
 		Map<Long, List<TemplateDetailField>> fieldMap = dDao.getTemplateFieldsMap(CollectionUtils.toSet(groups, group->group.getId()));
 		groups.forEach(group->{
 			List<TemplateDetailField> fields = fieldMap.get(group.getId());
 			if(fields != null){
 				group.setFields(fields);
+			}
+			if(Integer.valueOf(1).equals(group.getIsArray())) {
+				DictionaryComposite composite = group.getComposite();
+				if(composite != null && TextUtils.hasText(composite.getName()) && composite.getRelationSubdomain() == null) {
+					FieldConfigure conf = resolver.getFieldConfigure(composite.getName());
+					if(conf instanceof RelationFieldConfigure) {
+						composite.setRelationSubdomain(((RelationFieldConfigure) conf).getLabelDomain());
+					}
+				}
+				
 			}
 		});
 		return groups;

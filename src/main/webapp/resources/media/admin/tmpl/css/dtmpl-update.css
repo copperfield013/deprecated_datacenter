@@ -200,3 +200,6 @@
 .dtmpl-update .field-group-array th{
 	min-width: 50px;
 }
+.dtmpl-update select.tmpl-relation-labels{
+	width: 90%;
+}

@@ -15,8 +15,14 @@ import cn.sowell.copFrame.utils.TimelinenessWrapper;
 import cn.sowell.copFrame.utils.TimelinessMap;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.FormatUtils;
+import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.datacenter.entityResolver.FieldConfigure;
 import cn.sowell.datacenter.entityResolver.FieldParserDescription;
 import cn.sowell.datacenter.entityResolver.FieldService;
+import cn.sowell.datacenter.entityResolver.FusionContextConfig;
+import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
+import cn.sowell.datacenter.entityResolver.FusionContextConfigResolver;
+import cn.sowell.datacenter.entityResolver.RelationFieldConfigure;
 import cn.sowell.datacenter.model.dict.dao.DictionaryDao;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryComposite;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryField;
@@ -38,10 +44,12 @@ public class DictionaryServiceImpl implements DictionaryService, FieldService{
 	private final Map<String, Set<FieldParserDescription>> fieldDescsMap = new HashMap<>();
 	
 	
+	
 	@Override
 	public List<DictionaryComposite> getAllComposites(String module) {
 		return moduleCompositesMap.get(module, m->{
 			List<DictionaryComposite> composites = dictDao.getAllComposites(m);
+			handerWithConfig(module, composites);
 			Map<Long, DictionaryComposite> compositeMap = CollectionUtils.toMap(composites, DictionaryComposite::getId);
 			Map<Long, List<DictionaryField>> compositeFieldMap = dictDao.getAllFields(compositeMap.keySet());
 			compositeFieldMap.forEach((cId, fields)->fields.forEach(field->field.setComposite(compositeMap.get(cId))));
@@ -50,6 +58,30 @@ public class DictionaryServiceImpl implements DictionaryService, FieldService{
 		});
 	}
 	
+	@Resource
+	FusionContextConfigFactory fFactory;
+	
+	
+	private void handerWithConfig(String module, List<DictionaryComposite> composites) {
+		String configId = fFactory.getDefaultConfigId(module);
+		FusionContextConfig config = fFactory.getConfigDependented(configId);
+		if(config.getConfigResolver() == null) {
+			config.loadResolver(null);
+		}
+		FusionContextConfigResolver resolver = config.getConfigResolver();
+		composites.forEach(composite->{
+			if(TextUtils.hasText(composite.getName())) {
+				FieldConfigure cpsConfig = resolver.getFieldConfigure(composite.getName());
+				if(cpsConfig instanceof RelationFieldConfigure) {
+					composite.setRelationSubdomain(((RelationFieldConfigure) cpsConfig).getLabelDomain());
+				}else {
+					composite.setRelationSubdomain(null);
+				}
+			}
+		});
+		
+	}
+
 	@Override
 	public List<DictionaryField> getAllFields(String module) {
 		return moduleFieldsMap.get(module, m->{

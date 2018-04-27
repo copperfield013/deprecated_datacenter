@@ -35,6 +35,8 @@ define(function(require, exports, module){
 			//当没有传入options，但是传入optionKey时，
 			//会自动去FieldInput.GLOBAL_OPTIONS中根据该key去获取options
 			optionsKey	: null,
+			//当没有传入options和optionsKey，并且optionsSet不为空时，会将其转换成options
+			optionsSet	: '',
 			//已经生成的表单元素，如果传入了该值，那么就不会根据其他参数再生成表单元素
 			$dom		: null,
 			//检测表单的函数，如果错误，返回错误信息(string)，否则检测成功
@@ -44,7 +46,47 @@ define(function(require, exports, module){
 		var param = $.extend({}, defaultParam, _param);
 		
 		if(!param.options){
-			param.options = FieldInput.GLOBAL_OPTIONS[param.optionsKey];
+			if(param.optionsKey != undefined){
+				param.options = FieldInput.GLOBAL_OPTIONS[param.optionsKey];
+			}else{
+				if(param.optionsSet){
+					param.options = resolveOptionsSet(param.optionsSet);
+				}
+			}
+		}
+		function resolveOptionsSet(arg){
+			if(typeof arg === 'string'){
+				arg = arg.trim();
+				try{
+					var arr = $.parseJSON(arg);
+					if($.isArray(arr)){
+						return arr;
+					}else{
+						$.error();
+					}
+				}catch(e){
+					var matcher = arg.match(/^\[(([^\,]+\,?)*)\]$/);
+					if(matcher != null){
+						var mainSnippet = matcher[1];
+						var reg = /([^\,]+)\,?/g;
+						var snippet;
+						var arr = [];
+						do{
+							snippet = reg.exec(mainSnippet);
+							if(snippet){
+								arr.push(snippet[1].trim());
+							}
+						}while(snippet);
+						for(var i in arr){
+							arr[i] = {
+								view	: arr[i],
+								value	: arr[i]
+							}
+						}
+						return arr;
+					}
+				}
+			}
 		}
 		/**
 		 * 检查构造表单元素的参数是否正常
@@ -257,7 +299,8 @@ define(function(require, exports, module){
 					value		: attr('fInp-value'),
 					styleClass	: attr('fInp-class'),
 					optionsKey	: attr('fInp-optkey'),
-					readonly	: attr('fInp-readonly')
+					readonly	: attr('fInp-readonly'),
+					optionsSet	: attr('fInp-optset')
 				};
 			};
 			$doms.each(function(){

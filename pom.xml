@@ -13,6 +13,7 @@
 		<version.cpfweb>0.2.7</version.cpfweb>
 		<version.abcitem>3.1.2</version.abcitem>
 		<version.abcbizz>2.0.37</version.abcbizz>
+		<version.entityResolver>0.6</version.entityResolver>
 	</properties>
 	
 	<dependencies>
@@ -50,7 +51,7 @@
 		<dependency>
 			<groupId>cn.sowell.datacenter</groupId>
 			<artifactId>entityResolver</artifactId>
-			<version>0.5</version>
+			<version>${version.entityResolver}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.abc</groupId>

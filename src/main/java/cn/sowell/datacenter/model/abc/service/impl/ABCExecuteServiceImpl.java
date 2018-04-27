@@ -11,13 +11,11 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.abc.application.BizFusionContext;
-import com.abc.application.FusionContext;
 import com.abc.application.RemovedFusionContext;
 import com.abc.dto.ErrorInfomation;
 import com.abc.extface.dto.RecordHistory;
 import com.abc.mapping.entity.Entity;
 import com.abc.panel.Discoverer;
-import com.abc.panel.Integration;
 import com.abc.panel.PanelFactory;
 import com.abc.query.criteria.Criteria;
 import com.abc.query.entity.impl.EntitySortedPagedQuery;
@@ -150,6 +148,10 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public String mergeEntity(String module, Map<String, Object> propMap) {
+		return fFactory.getModuleDefaultResolver(module).saveEntity(propMap, null);
+		
+		
+		/*
 		String configName = fFactory.getDefaultConfigId(module);
 		FusionContextConfig config = fFactory.getConfig(configName);
 		if(config.getConfigResolver() == null) {
@@ -164,7 +166,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 			return integration.integrate(entity, context);
 		}else {
 			throw new RuntimeException("无法创建config[" + configName + "]的entity对象");
-		}
+		}*/
 	}	
 	
 	@Override

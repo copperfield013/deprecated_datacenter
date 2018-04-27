@@ -59,6 +59,14 @@
 											<thead>
 												<tr class="title-row">
 													<th>#</th>
+													<c:if test="${tmplGroup.relationSubdomain != null }">
+														<th
+															class="th-field-title"
+															fname-format="${tmplGroup.composite.name }[ARRAY_INDEX_REPLACEMENT].$$label$$"
+															fInp-type="select"
+															fInp-optset="${tmplGroup.relationSubdomain }"
+															>关系</th>
+													</c:if>
 													<c:forEach var="field" items="${tmplGroup.fields }">
 														<th 
 															class="th-field-title"
@@ -73,9 +81,24 @@
 											<tbody>
 												<c:forEach var="entityItem" varStatus="i" items="${entity.arrayMap[tmplGroup.composite.name] }">
 													<tr class="value-row">
-														<td>${i.index + 1 }
+														<td>
+															<span>${i.index + 1 }</span>
 															<input type="hidden" name="${entityItem.codeName }" value="${entityItem.code }" />
 														</td>
+														<c:if test="${tmplGroup.relationSubdomain != null }">
+															<c:set var="relationName" value="${tmplGroup.composite.name }[${i.index }].$$label$$" />
+															<td>
+																<span class="field-value">
+																	<span class="field-input" 
+																		fInp-type="select"
+																		fInp-name="${relationName }"
+																		fInp-value="${entityItem.smap[relationName] }"
+																		fInp-optset="${tmplGroup.relationSubdomain }"
+																	>
+																	</span>
+																</span>
+															</td>
+														</c:if>
 														<c:forEach var="tmplField" items="${tmplGroup.fields }">
 															<td>
 																<span class="field-value">
@@ -179,7 +202,7 @@
 			var $table = $(this).closest('table');
 			var $tbody = $table.children('tbody');
 			var $titleRow = $table.find('.title-row');
-			var $dataRow = $('<tr>').append('<td></td>')
+			var $dataRow = $('<tr>').append('<td><span></span></td>')
 			$titleRow.children('th.th-field-title').each(function(){
 				var $title = $(this);
 				var $td = $('<td>');
@@ -188,6 +211,9 @@
 					.attr('fInp-type', $title.attr('fInp-type'))
 					.attr('fInp-optkey', $title.attr('fInp-optkey'))
 					.appendTo($('<span class="field-value"></span>').appendTo($td));
+				if($title.attr('fInp-optset')){
+					$fieldInput.attr('fInp-optset', $title.attr('fInp-optset'));
+				}
 				$dataRow.append($td);
 			});
 			$dataRow.append('<td><span class="array-item-remove" title="移除当前行">×</span></td>');
@@ -202,7 +228,7 @@
 			$('tbody tr', $table).each(function(i){
 				var $tr = $(this);
 				var $tds = $tr.children('td');
-				$tds.eq(0).text(i + 1);
+				$tds.eq(0).children('span').text(i + 1);
 				for(var j = 1; j < $tds.length - 1; j ++){
 					var nameFormat = $titles.eq(j).attr('fname-format');
 					var inputName = nameFormat.replace('ARRAY_INDEX_REPLACEMENT', i);

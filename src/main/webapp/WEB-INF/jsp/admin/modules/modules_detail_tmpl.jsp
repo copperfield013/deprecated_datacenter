@@ -44,6 +44,9 @@
 											<thead>
 												<tr class="title-row">
 													<th>#</th>
+													<c:if test="${tmplGroup.relationSubdomain != null }">
+														<th>关系</th>
+													</c:if>
 													<c:forEach var="field" items="${tmplGroup.fields }">
 														<th>${field.title }</th>
 													</c:forEach>
@@ -53,6 +56,10 @@
 												<c:forEach var="entityItem" varStatus="i" items="${entity.arrayMap[tmplGroup.composite.name] }">
 													<tr class="value-row">
 														<td>${i.index + 1 }</td>
+														<c:if test="${tmplGroup.relationSubdomain != null }">
+															<c:set var="relationName" value="${tmplGroup.composite.name }.$$label$$" />
+															<td>${entityItem.smap[relationName] }</td>
+														</c:if>
 														<c:forEach var="field" items="${tmplGroup.fields }">
 															<td>${entityItem.smap[field.fieldName] }</td>
 														</c:forEach>

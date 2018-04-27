@@ -2,6 +2,7 @@ package cn.sowell.datacenter.model.dict.pojo;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -53,6 +54,9 @@ public class DictionaryComposite implements Composite{
 	
 	@Transient
 	private List<DictionaryField> fields;
+
+	@Transient
+	private Set<String> relationSubdomain;
 	
 	public Long getId() {
 		return id;
@@ -107,6 +111,12 @@ public class DictionaryComposite implements Composite{
 	}
 	public void setIsArray(Integer isArray) {
 		this.isArray = isArray;
+	}
+	public void setRelationSubdomain(Set<String> relationSubdomain) {
+		this.relationSubdomain = relationSubdomain;
+	}
+	public Set<String> getRelationSubdomain() {
+		return relationSubdomain;
 	}
 	
 }

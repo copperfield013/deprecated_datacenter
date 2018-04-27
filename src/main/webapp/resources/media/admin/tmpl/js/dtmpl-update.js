@@ -94,7 +94,10 @@ define(function(require, exports, module){
 						title		: field.title,
 						fieldId		: field.id,
 						colNum		: 1
-					}, $group, field.composite.isArray == 1);
+					}, $group, {
+						isArrayField	: field.composite.isArray == 1,
+						relations		: field.composite.relationSubdomain
+					});
 				}
 			});
 			/*disabledFieldIdSet.forEach(function(disabledFieldId){
@@ -106,7 +109,7 @@ define(function(require, exports, module){
 		 * 添加一个字段到指定的字段组中
 		 * @param groupFieldData 字段数据，必须包含fieldId属性
 		 */
-		function appendFieldToGroup(groupFieldData, $group, isArrayField){
+		function appendFieldToGroup(groupFieldData, $group, option){
 			//判断字段在页面中是否存在
 			//var $existsField = $page.find('.field-item[field-id="' + groupFieldData.fieldId + '"]');
 			/*if($existsField.length > 0){
@@ -123,11 +126,20 @@ define(function(require, exports, module){
 			};
 			//将字段插入到字段组中
 			var $fieldContainer = getFieldContainer($group);
-			if(isArrayField){
+			if(option.isArrayField){
 				var $arrayTable = $('.field-array-table', $fieldContainer);
 				if($arrayTable.length == 0){
 					$arrayTable = $('#tmpl-field-array-table', $page).tmpl();
 					$arrayTable.appendTo($fieldContainer);
+					if($.isArray(option.relations)){
+						var $titleCell = $('<th>关系</th>')
+						var $relationSelect = $('<select class="tmpl-relation-labels">');
+						for(var i in option.relations){
+							$relationSelect.append('<option value="' + option.relations[i] + '">' + option.relations[i] + '</option>');
+						}
+						$arrayTable.find('.title-row').append($titleCell);
+						$arrayTable.find('.value-row').append($('<td>').append($relationSelect));
+					}
 				}
 				var $titleCell = $('#tmpl-field-array-title', $page).tmpl(fieldData);
 				$titleCell.data('field-data', fieldData);
@@ -402,7 +414,10 @@ define(function(require, exports, module){
 				initGroupFieldSearchAutocomplete($group);
 				for(var j in group.fields){
 					var field = group.fields[j];
-					appendFieldToGroup(field, $group, group.isArray == 1);
+					appendFieldToGroup(field, $group, {
+						isArrayField	: group.isArray == 1,
+						relations		: group.relationSubdomain
+					});
 				}
 			}
 		}

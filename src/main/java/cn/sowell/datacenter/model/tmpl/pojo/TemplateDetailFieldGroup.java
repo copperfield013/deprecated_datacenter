@@ -3,6 +3,7 @@ package cn.sowell.datacenter.model.tmpl.pojo;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +14,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import com.alibaba.fastjson.annotation.JSONField;
 
 import cn.sowell.datacenter.model.dict.pojo.DictionaryComposite;
 
@@ -51,6 +54,15 @@ public class TemplateDetailFieldGroup {
 	
 	@Transient
 	private List<TemplateDetailField> fields = new ArrayList<TemplateDetailField>();
+	
+	@JSONField(name="relationSubdomain")
+	public Set<String> getRelationSubdomain() {
+		if(composite != null) {
+			return composite.getRelationSubdomain();
+		}
+		return null;
+	}
+	
 	public Long getId() {
 		return id;
 	}
