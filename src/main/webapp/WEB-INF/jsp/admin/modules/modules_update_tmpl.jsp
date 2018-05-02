@@ -8,7 +8,7 @@
 	</c:choose>
 </c:set>
 <title>${title }</title>
-<div class="detail entity-detail-tmpl" id="${moduke.key }-update-tmpl-${entity.code }-${RES_STAMP}">
+<div class="detail entity-detail-tmpl" id="${module.name }-update-tmpl-${entity.code }-${RES_STAMP}">
 	<div class="page-header">
 		<div class="header-title">
 			<h1>${title }</h1>
@@ -47,6 +47,7 @@
 													fInp-name="${tmplField.fieldName }"
 													fInp-value="${entity.smap[tmplField.fieldName] }"
 													fInp-optkey="${tmplField.optionGroupId }"
+													fInp-fieldkey="${module.name }@${tmplField.fieldName }"
 												>
 												</span>
 											</div>
@@ -73,6 +74,7 @@
 															fname-format="${fieldDescMap[field.fieldId].arrayFieldNameFormat }"
 															fInp-type="${field.type }"
 															fInp-optkey="${field.optionGroupId }"
+															fInp-fieldkey="${module.name }@${tmplField.fieldName }"
 															>${field.title }</th>
 													</c:forEach>
 													<th width="10px"><span class="array-item-add" title="添加一行">+</span></th>
@@ -107,6 +109,7 @@
 																		fInp-name="${fieldDescMap[tmplField.fieldId].arrayFieldNameMap[i.index] }"
 																		fInp-value="${entityItem.smap[tmplField.fieldName] }"
 																		fInp-optkey="${tmplField.optionGroupId }"
+																		fInp-fieldkey="${module.name }@${tmplField.fieldName }"
 																	>
 																	</span>
 																</span>
@@ -158,7 +161,7 @@
 	seajs.use(['dialog', 'ajax', 'utils', 'tmpl/js/dtmpl-update.js', '$CPF',
 	           'field/js/field-input.js'], function(Dialog, Ajax, Utils, ViewTmpl, $CPF, FieldInput){
 		"use strict";
-		var $page = $('#${moduke.key }-update-tmpl-${entity.code }-${RES_STAMP}');
+		var $page = $('#${module.name }-update-tmpl-${entity.code }-${RES_STAMP}');
 		
 		var isUpdateMode = 'true' === '${entity != null}';
 		
@@ -210,6 +213,7 @@
 				$fieldInput
 					.attr('fInp-type', $title.attr('fInp-type'))
 					.attr('fInp-optkey', $title.attr('fInp-optkey'))
+					.attr('fInp-fieldkey', $title.attr('fInp-fieldkey'))
 					.appendTo($('<span class="field-value"></span>').appendTo($td));
 				if($title.attr('fInp-optset')){
 					$fieldInput.attr('fInp-optset', $title.attr('fInp-optset'));

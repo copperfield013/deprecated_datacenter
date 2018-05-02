@@ -19,6 +19,7 @@ define(function(require, exports, module){
 			//daterange		: 日期范围选择
 			//datetimerange	: 日期时间范围选择
 			//autocomplete	: 自动完成框
+			//label			: 多选标签
 			type		: 0,
 			//表单的name（提交的字段名）
 			name		: null,
@@ -37,6 +38,8 @@ define(function(require, exports, module){
 			optionsKey	: null,
 			//当没有传入options和optionsKey，并且optionsSet不为空时，会将其转换成options
 			optionsSet	: '',
+			//用于标记字段，只在类型是label时有效
+			fieldKey	: null,
 			//已经生成的表单元素，如果传入了该值，那么就不会根据其他参数再生成表单元素
 			$dom		: null,
 			//检测表单的函数，如果错误，返回错误信息(string)，否则检测成功
@@ -192,17 +195,49 @@ define(function(require, exports, module){
 					$c.append($label);
 				}
 				var group = Checkbox.bind($c.children(':checkbox'), param.value);
-			}
-			$c.val = function(val){
-				if(val === undefined){
-					return group.getValue().join();
-				}else{
-					group.setValue(val);
-					group.autoSort();
+				$c.val = function(val){
+					if(val === undefined){
+						return group.getValue().join();
+					}else{
+						group.setValue(val);
+						group.autoSort();
+					}
 				}
 			}
 			return $c;
 		}
+		
+		this.__buildLabel = function(){
+			var Checkbox = require('checkbox');
+			var $c = $('<span>');
+			if(param.fieldKey){
+				var labels = FieldInput.GLOBAL_LABELS[param.fieldKey];
+				if(labels){
+					for(var i in labels){
+						var label = labels[i];
+						var uuid = require('utils').uuid(10, 62);
+						var $label = $('<span for="' + uuid + '">').text(label);
+						var $checkbox = $('<input type="checkbox" '
+								+ 'id="' + uuid + '" '
+								+ 'name="' + param.name + '" '
+								+ 'value="' + label + '" '
+								+ 'data-text="' + label + '" />');
+						$c.append($checkbox);
+						$c.append($label);
+					}
+				}
+				var group = Checkbox.bind($c.children(':checkbox'), param.value);
+				$c.val = function(val){
+					if(val === undefined){
+						return group.getValue().join();
+					}else{
+						group.setValue(val);
+						group.autoSort();
+					}
+				}
+			}
+			return $c;
+		};
 		
 		this.__buildDom = function(){
 			checkBuildParam();
@@ -223,6 +258,8 @@ define(function(require, exports, module){
 				case 'checkbox':
 					$dom = this.__buildCheckbox();
 					break;
+				case 'label':
+					$dom = this.__buildLabel();
 				default:
 			}
 			return $dom;
@@ -300,7 +337,8 @@ define(function(require, exports, module){
 					styleClass	: attr('fInp-class'),
 					optionsKey	: attr('fInp-optkey'),
 					readonly	: attr('fInp-readonly'),
-					optionsSet	: attr('fInp-optset')
+					optionsSet	: attr('fInp-optset'),
+					fieldKey	: attr('fInp-fieldkey')
 				};
 			};
 			$doms.each(function(){
@@ -337,6 +375,7 @@ define(function(require, exports, module){
 				}
 			}else if(typeof url === 'object'){
 				FieldInput.GLOBAL_OPTIONS = url;
+				FieldInput.GLOBAL_LABELS = url.LABELS_MAP;
 				FieldInput.globalOptionsLoaded = true;
 				deferred.resolve([url, originOptions]);
 			}
@@ -345,6 +384,7 @@ define(function(require, exports, module){
 		globalOptionsLoaded		: false,
 		//全局选项，
 		GLOBAL_OPTIONS			: {},
+		GLOBAL_LABELS			: {},
 		GLOBAL_COMPARATOR_MAP	: null,
 		getGlobalComparators	: function(inputType, callback){
 			function _callback(){

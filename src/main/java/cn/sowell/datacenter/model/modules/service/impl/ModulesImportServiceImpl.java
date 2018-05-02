@@ -135,6 +135,14 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 		return rownum - 3;
 	}
 	
+	private String trim(String str) {
+		if(str != null) {
+			str = str.replaceAll("^\\u00a0+", "").replaceAll("\\u00a0+$", "");
+			return str.trim();
+		}else {
+			return null;
+		}
+	}
 	
 	private String getStringWithBlank(Cell cell){
 		//如果有覆盖至
@@ -143,20 +151,20 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 		}
 		CellType cellType = cell.getCellTypeEnum();
 		if(cellType == CellType.STRING){
-			return cell.getStringCellValue();
+			return trim(cell.getStringCellValue());
 		}else if(cellType == CellType.NUMERIC){
 			if(CellTypeUtils.isCellDateFormatted(cell)){
-				return defaultDateFormat.format(HSSFDateUtil.getJavaDate(cell.getNumericCellValue()));
+				return trim(defaultDateFormat.format(HSSFDateUtil.getJavaDate(cell.getNumericCellValue())));
 			}
-			return FormatUtils.toString(FormatUtils.toLong(cell.getNumericCellValue()));
+			return trim(FormatUtils.toString(FormatUtils.toLong(cell.getNumericCellValue())));
 		}else if(cellType == CellType.FORMULA){
 			FormulaEvaluator evaluator = cell.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator();
 			CellValue cellValue = evaluator.evaluate(cell);
 			CellType cellValueType = cellValue.getCellTypeEnum();
 			if(cellValueType == CellType.STRING){
-				return cellValue.getStringValue();
+				return trim(cellValue.getStringValue());
 			}else if(cellValueType == CellType.NUMERIC){
-				return FormatUtils.toString(FormatUtils.toLong(cellValue.getNumberValue()));
+				return trim(FormatUtils.toString(FormatUtils.toLong(cellValue.getNumberValue())));
 			}
 			return null;
 		}

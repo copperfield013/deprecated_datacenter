@@ -21,6 +21,9 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSONArray;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.basepeople.BasePeopleCriteria;
 import cn.sowell.datacenter.model.basepeople.BasePeopleDictionaryCriteria;
@@ -32,10 +35,6 @@ import cn.sowell.datacenter.model.basepeople.pojo.CityEntiy;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleDictionaryEntity;
 import cn.sowell.datacenter.model.basepeople.pojo.TBasePeopleItemEntity;
 import cn.sowell.datacenter.model.basepeople.service.BasePeopleService;
-import cn.sowell.datacenter.model.esbasic.SearchTransportClient;
-
-import com.alibaba.fastjson.JSONArray;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 

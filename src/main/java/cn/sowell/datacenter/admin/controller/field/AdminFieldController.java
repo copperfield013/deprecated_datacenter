@@ -1,6 +1,8 @@
 package cn.sowell.datacenter.admin.controller.field;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -17,6 +19,7 @@ import com.alibaba.fastjson.JSONObject;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonArrayResponse;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
+import cn.sowell.datacenter.entityResolver.Label;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryComposite;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryOption;
 import cn.sowell.datacenter.model.dict.service.DictionaryService;
@@ -61,6 +64,18 @@ public class AdminFieldController {
 				array.add(jItem);
 			});
 		}
+		JSONObject labelsMap = new JSONObject();
+		Map<String, Set<Label>> source = dService.getAllLabelsMap();
+		if(source != null) {
+			source.forEach((module, labels)->{
+				if(labels != null) {
+					labels.forEach(label->{
+						labelsMap.put(module + "@" + label.getFieldName(), label.getSubdomain());
+					});
+				}
+			});
+		}
+		jRes.put("LABELS_MAP", labelsMap);
 		return jRes;
 	}
 

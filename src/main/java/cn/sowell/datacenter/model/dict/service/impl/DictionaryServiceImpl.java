@@ -22,6 +22,7 @@ import cn.sowell.datacenter.entityResolver.FieldService;
 import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigResolver;
+import cn.sowell.datacenter.entityResolver.Label;
 import cn.sowell.datacenter.entityResolver.RelationFieldConfigure;
 import cn.sowell.datacenter.model.dict.dao.DictionaryDao;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryComposite;
@@ -130,6 +131,16 @@ public class DictionaryServiceImpl implements DictionaryService, FieldService{
 			getFieldDescriptions(module);
 		}
 		
+	}
+	
+	@Override
+	public Map<String, Set<Label>> getAllLabelsMap() {
+		Map<String, Set<Label>> labelsMap = new HashMap<>();
+		Set<FusionContextConfig> configs = fFactory.getAllDefaultConfig();
+		configs.forEach(config->{
+			labelsMap.put(config.getModule(), config.getAllLabels());
+		});
+		return labelsMap;
 	}
 	
 	

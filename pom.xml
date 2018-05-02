@@ -13,7 +13,7 @@
 		<version.cpfweb>0.2.7</version.cpfweb>
 		<version.abcitem>3.2.8</version.abcitem>
 		<version.abcbizz>2.0.39</version.abcbizz>
-		<version.entityResolver>0.8</version.entityResolver>
+		<version.entityResolver>0.9</version.entityResolver>
 	</properties>
 	
 	<dependencies>
