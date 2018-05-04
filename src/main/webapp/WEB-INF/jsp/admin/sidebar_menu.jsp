@@ -74,6 +74,7 @@
 	   			<span class="menu-text">地址详情模板</span>
 	   		</a>
 	   	</li>
+	   	
 	   	<!-- 
 	   	<li>
 	   		<a class="tab" href="admin/tmpl/ltmpl/list/address" target="address_ltmpl_list" title="地址列表模板">
@@ -104,6 +105,16 @@
 	   	<li>
 	   		<a class="tab" href="admin/tmpl/ltmpl/list/disabledpeople" target="disabledpeople_ltmpl_list" title="残助列表模板">
 	   			<span class="menu-text">残助列表模板</span>
+	   		</a>
+	   	</li>
+	   		<li>
+	   		<a class="tab" href="admin/tmpl/dtmpl/list/disablederror" target="disablederror_dtmpl_list" title="残助错误详情模板">
+	   			<span class="menu-text">残助错误详情模板</span>
+	   		</a>
+	   	</li>
+	   	<li>
+	   		<a class="tab" href="admin/tmpl/ltmpl/list/disablederror" target="disablederror_ltmpl_list" title="残助错误列表模板">
+	   			<span class="menu-text">残助错误列表模板</span>
 	   		</a>
 	   	</li>
 	   	<li>
@@ -193,6 +204,13 @@
 	   	<li>
 	   		<a class="tab" href="admin/modules/curd/list/disabledpeople" target="disabledpeople_list_tmpl" title="残助列表">
 	   			<span class="menu-text">残助列表</span>
+	   		</a>
+	   	</li>
+	</ul>
+	<ul class="submenu">
+	   	<li>
+	   		<a class="tab" href="admin/modules/curd/list/disablederror" target="disablederror_list_tmpl" title="错误信息">
+	   			<span class="menu-text">错误信息</span>
 	   		</a>
 	   	</li>
 	</ul>
