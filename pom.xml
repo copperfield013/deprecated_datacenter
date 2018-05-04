@@ -11,8 +11,8 @@
 	<properties>
 		<version.kie>6.5.0.Final</version.kie>
 		<version.cpfweb>0.2.7</version.cpfweb>
-		<version.abcitem>3.2.8</version.abcitem>
-		<version.abcbizz>2.0.39</version.abcbizz>
+		<version.abcitem>3.2.15</version.abcitem>
+		<version.abcbizz>2.1.7</version.abcbizz>
 		<version.entityResolver>0.9</version.entityResolver>
 	</properties>
 	
@@ -43,11 +43,11 @@
 			<artifactId>item</artifactId>
 			<version>${version.abcitem}</version>
 		</dependency>
-		<!-- <dependency>
+		 <dependency>
 			<groupId>com.abc</groupId>
 			<artifactId>bizz</artifactId>
 			<version>${version.abcbizz}</version>
-		</dependency> -->
+		</dependency>
 		<dependency>
 			<groupId>cn.sowell.datacenter</groupId>
 			<artifactId>entityResolver</artifactId>
@@ -144,6 +144,11 @@
 		<dependency>
 			<groupId>org.drools</groupId>
 			<artifactId>drools-compiler</artifactId>
+			<version>${version.kie}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.drools</groupId>
+			<artifactId>drools-decisiontables</artifactId>
 			<version>${version.kie}</version>
 		</dependency>
 		<dependency>
