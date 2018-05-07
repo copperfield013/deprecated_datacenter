@@ -83,6 +83,8 @@ public interface ModulesService {
 	 */
 	String mergeEntity(String module, Map<String, Object> map);
 
+	String fuseEntity(String module, Map<String, Object> map);
+	
 	/**
 	 * 根据条件查找列表迭代器
 	 * @param ltmpl
@@ -92,6 +94,8 @@ public interface ModulesService {
 	 */
 	EntityPagingIterator queryIterator(TemplateListTempalte ltmpl, Set<NormalCriteria> criteria,
 			ExportDataPageInfo ePageInfo);
+
+	
 
 	
 

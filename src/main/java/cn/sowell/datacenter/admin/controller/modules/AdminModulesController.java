@@ -219,17 +219,28 @@ public class AdminModulesController {
 	}
 	
 	
+	final static String KEY_FUSE_MODE = "%fuseMode%";
+	
 	@ResponseBody
-    @RequestMapping("/save/{module}")
-    public AjaxPageResponse save(@PathVariable String module, String code, RequestParameterMapComposite composite){
+    @RequestMapping({"/save/{module}"})
+    public AjaxPageResponse save(
+    		@PathVariable String module,
+    		@RequestParam(KEY_FUSE_MODE) Boolean fuseMode,
+    		RequestParameterMapComposite composite){
     	 try {
-    		 mService.mergeEntity(module, composite.getMap());
+    		 composite.getMap().remove(KEY_FUSE_MODE);
+    		 if(Boolean.TRUE.equals(fuseMode)) {
+    			 mService.fuseEntity(module, composite.getMap());
+    		 }else {
+    			 mService.mergeEntity(module, composite.getMap());
+    		 }
              return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("保存成功", module + "_list_tmpl");
          } catch (Exception e) {
              logger.error("保存时发生错误", e);
              return AjaxPageResponse.FAILD("保存失败");
          }
     }
+	
 	
 	
 	@ResponseBody

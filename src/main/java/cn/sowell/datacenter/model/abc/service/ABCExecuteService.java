@@ -63,6 +63,8 @@ public interface ABCExecuteService {
 	 */
 	String mergeEntity(String module, Map<String, Object> propMap);
 	
+	String fuseEntity(String module, Map<String, Object> map);
+	
 	/**
 	 * 根据模块和code获得对应的的实体的转化对象
 	 * @param module
@@ -74,6 +76,9 @@ public interface ABCExecuteService {
 	ModuleEntityPropertyParser getModuleEntityParser(String module, Entity entity);
 
 	EntityPagingQueryProxy getModuleQueryProxy(String module, List<Criteria> cs, ExportDataPageInfo ePageInfo);
+
+
+	
 
 
 }

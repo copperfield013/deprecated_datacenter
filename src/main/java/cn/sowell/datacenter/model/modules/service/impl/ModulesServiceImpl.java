@@ -220,6 +220,11 @@ public class ModulesServiceImpl implements ModulesService{
 	}
 	
 	@Override
+	public String fuseEntity(String module, Map<String, Object> map) {
+		return abcService.fuseEntity(module, map);
+	}
+	
+	@Override
 	public EntityPagingIterator queryIterator(TemplateListTempalte ltmpl, Set<NormalCriteria> nCriterias,
 			ExportDataPageInfo ePageInfo) {
 		PageInfo pageInfo = ePageInfo.getPageInfo();

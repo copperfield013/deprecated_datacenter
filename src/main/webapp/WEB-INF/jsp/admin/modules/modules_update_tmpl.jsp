@@ -31,7 +31,7 @@
 		</div>
 		<div class="col-lg-offset-1 col-lg-10">
 			<form class="form-horizontal group-container" action="admin/modules/curd/save/${module.name }">
-				<input type="hidden" id="code-field" name="${config.codeAttributeName }" value="${entity.code }" />
+				<input type="hidden" name="${config.codeAttributeName }" value="${entity.code }" />
 				<c:forEach var="tmplGroup" items="${dtmpl.groups }">
 					<div class="widget field-group">
 						<div class="widget-header">
@@ -204,15 +204,12 @@
 				}
 			});
 		});
+		$('form', $page).on('cpf-submit', function(e, formData){
+			formData.append('%fuseMode%', fuseMode);
+		});
 		$('#fuse-switch', $page).change(function(){
 			fuseMode = $(this).prop('checked');
 			$('#save', $page).toggleClass('fuse-mode', fuseMode);
-			var $codeField = $('#code-field', $page); 
-			if(fuseMode){
-				$codeField.val('');
-			}else{
-				$codeField.val('${entity.code}');
-			}
 		});
 		
 		$page.on('click', '.array-item-remove', function(){

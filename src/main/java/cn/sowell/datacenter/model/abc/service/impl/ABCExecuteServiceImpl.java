@@ -23,9 +23,11 @@ import com.abc.record.HistoryTracker;
 
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.FormatUtils;
+import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
+import cn.sowell.datacenter.entityResolver.impl.ABCNodeProxy;
 import cn.sowell.datacenter.model.abc.service.ABCExecuteService;
 import cn.sowell.datacenter.model.basepeople.dao.PropertyDictionaryDao;
 import cn.sowell.datacenter.model.modules.bean.EntityPagingQueryProxy;
@@ -149,25 +151,19 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	@Override
 	public String mergeEntity(String module, Map<String, Object> propMap) {
 		return fFactory.getModuleDefaultResolver(module).saveEntity(propMap, null);
-		
-		
-		/*
-		String configName = fFactory.getDefaultConfigId(module);
-		FusionContextConfig config = fFactory.getConfig(configName);
-		if(config.getConfigResolver() == null) {
-			throw new RuntimeException("config[" + configName + "]没有注入对应的ConfigResolver对象");
-		}
-		Entity entity = config.getConfigResolver().createEntity(propMap);
-		if(entity != null) {
-			BizFusionContext context = fFactory.getConfig(configName).createContext();
-			context.setSource(FusionContext.SOURCE_COMMON);
-			
-			Integration integration=PanelFactory.getIntegration();
-			return integration.integrate(entity, context);
-		}else {
-			throw new RuntimeException("无法创建config[" + configName + "]的entity对象");
-		}*/
 	}	
+	
+	@Override
+	public String fuseEntity(String module, Map<String, Object> map) {
+		FusionContextConfig config = fFactory.getDefaultConfig(module);
+		String code = (String) map.remove(config.getCodeAttributeName());
+		map.remove(ABCNodeProxy.CODE_PROPERTY_NAME);
+		if(TextUtils.hasText(code)) {
+			delete(code);
+		}
+		return mergeEntity(module, map);
+	}
+	
 	
 	@Override
 	public ModuleEntityPropertyParser getModuleEntityParser(String module, String code) {
