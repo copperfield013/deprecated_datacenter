@@ -357,3 +357,9 @@ div#tmpl-list span.tmpl-date {
 .field-array-table span.array-item-remove:hover{
     background: #FFA07A;
 }
+#save.fuse-mode>i{
+	color: #9932CC;
+}
+.template-container.title-operate>* {
+    margin-right: 8px;
+}

@@ -14,8 +14,12 @@
 			<h1>${title }</h1>
 		</div>
 		<div class="template-container title-operate">
+			<label style="display: inline-flex" title="是否开启融合模式">
+				<input id="fuse-switch" class="checkbox-slider toggle" type="checkbox">
+				<span class="text"></span>
+			</label> 
 			<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
-				<i class="glyphicon glyphicon-refresh"></i>
+				<i style="font-size: 20px" class="glyphicon glyphicon-refresh"></i>
 			</a>
 			<a href="#" title="查看模板" class="toggle-template"><i class="iconfont icon-template"></i></a>
 		</div>
@@ -27,7 +31,7 @@
 		</div>
 		<div class="col-lg-offset-1 col-lg-10">
 			<form class="form-horizontal group-container" action="admin/modules/curd/save/${module.name }">
-				<input type="hidden" name="${config.codeAttributeName }" value="${entity.code }" />
+				<input type="hidden" id="code-field" name="${config.codeAttributeName }" value="${entity.code }" />
 				<c:forEach var="tmplGroup" items="${dtmpl.groups }">
 					<div class="widget field-group">
 						<div class="widget-header">
@@ -188,9 +192,29 @@
 			$CPF.closeLoading();
 		});
 		
+		var fuseMode = false;
 		$('#save i', $page).click(function(){
-			$('form', $page).submit();
+			var msg = '是否保存？';
+			if(fuseMode){
+				msg = '是否保存（当前为融合模式）？'
+			}
+			Dialog.confirm(msg, function(yes){
+				if(yes){
+					$('form', $page).submit();
+				}
+			});
 		});
+		$('#fuse-switch', $page).change(function(){
+			fuseMode = $(this).prop('checked');
+			$('#save', $page).toggleClass('fuse-mode', fuseMode);
+			var $codeField = $('#code-field', $page); 
+			if(fuseMode){
+				$codeField.val('');
+			}else{
+				$codeField.val('${entity.code}');
+			}
+		});
+		
 		$page.on('click', '.array-item-remove', function(){
 			var $row = $(this).closest('tr');
 			Dialog.confirm('确认删除该行？', function(yes){
