@@ -11,8 +11,8 @@
 	<properties>
 		<version.kie>6.5.0.Final</version.kie>
 		<version.cpfweb>0.2.7</version.cpfweb>
-		<version.abcitem>3.2.15</version.abcitem>
-		<version.abcbizz>2.1.7</version.abcbizz>
+		<version.abcitem>3.3.4</version.abcitem>
+		<version.abcbizz>2.1.9</version.abcbizz>
 		<version.entityResolver>0.9</version.entityResolver>
 		<cxf.version>3.2.2</cxf.version>
 	</properties>
