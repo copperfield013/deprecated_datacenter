@@ -29,11 +29,12 @@
 					<div class="form-group">
 						<label class="col-lg-2 control-label">导入条线</label>
 						<div class="col-lg-6">
-							<select name="dataType">
+							<select id="composite" name="dataType">
 								<c:forEach var="composite" items="${composites }">
 									<option value="${composite.name }">${composite.title }</option>
 								</c:forEach>
 							</select>
+							<a href="javascript:;" id="link-import-tmpl">模板</a>
 						</div>
 					</div>
 					<div class="form-group">
@@ -144,6 +145,13 @@
 						});
 				});
 			}
+		});
+		$('#link-import-tmpl', $page).click(function(){
+			var composite = $('#composite', $page).val();
+			Dialog.openDialog('admin/modules/import/tmpl/${module.name}/' + composite, '字段', undefined, {
+				width	: 1000,
+				height	: 500
+			});
 		});
 	});
 </script>

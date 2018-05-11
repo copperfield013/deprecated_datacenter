@@ -4,6 +4,7 @@
 	<attribute name="peoplecode" alias="" abcattr="唯一编码" />
 	<attribute name="编辑时间" alias="编辑时间" datatype="datetime"
 		abcattr="更新时间" />
+	<attribute name="身份证号" abcattr="身份证" />
 	<attribute name="住所类型" abcattr="住所类型" /><!--基本信息 -->
 	<attribute name="健康状况" abcattr="健康状况" /><!--基本信息 -->
 	<attribute name="出生地" abcattr="出生地" /><!--基本信息 -->

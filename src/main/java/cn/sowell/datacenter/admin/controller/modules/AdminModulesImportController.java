@@ -1,6 +1,9 @@
 package cn.sowell.datacenter.admin.controller.modules;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -10,27 +13,47 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
+import cn.sowell.copframe.common.UserIdentifier;
+import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
+import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
+import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.entityResolver.ImportCompositeField;
 import cn.sowell.datacenter.entityResolver.config.ModuleMeta;
 import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
 import cn.sowell.datacenter.model.modules.pojo.ImportStatus;
+import cn.sowell.datacenter.model.modules.pojo.ImportTemplateCriteria;
+import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplate;
+import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplateField;
 import cn.sowell.datacenter.model.modules.service.ModulesImportService;
 import cn.sowell.datacenter.model.modules.service.ModulesService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_MODULES + "/import")
 public class AdminModulesImportController {
+	private static final String SESSION_KEY_FIELD_NAMES = "field_names_";
+
 	@Resource
 	ModulesImportService impService;
 	
@@ -144,4 +167,122 @@ public class AdminModulesImportController {
         }
         return jRes;
     }
+	
+	@RequestMapping("/tmpl/{module}/{composite}")
+	public String tmpl(
+			@PathVariable String module,
+			@PathVariable String composite,
+			Model model
+			) {
+		UserIdentifier user = UserUtils.getCurrentUser();
+		ModuleMeta mMeta = mService.getModule(module);
+		Set<ImportCompositeField> fields = impService.getImportCompositeFields(module, composite);
+		ImportTemplateCriteria criteria = new ImportTemplateCriteria();
+		criteria.setModule(module);
+		criteria.setUserId((Long) user.getId());
+		criteria.setComposite(composite);
+		List<ModuleImportTemplate> tmpls = impService.getImportTemplates(criteria);
+		model.addAttribute("tmpls", tmpls);
+		model.addAttribute("fields", fields);
+		model.addAttribute("module", mMeta);
+		model.addAttribute("compositeName", composite);
+		
+		return AdminConstants.JSP_MODULES + "/modules_import_download.jsp";
+	}
+	
+	@RequestMapping("/tmpl/show/{tmplId}")
+	public String showTemplate(@PathVariable Long tmplId, Model model) {
+		ModuleImportTemplate tmpl = impService.getImportTempalte(tmplId);
+		model.addAttribute("tmpl", tmpl);
+		model.addAttribute("tmplFieldsJson", JSON.toJSON(tmpl.getFields()));
+		return tmpl(tmpl.getModule(), tmpl.getComposite(), model);
+	}
+	
+	@ResponseBody
+	@RequestMapping("/submit_field_names")
+	public ResponseJSON submitFieldNames(@RequestBody JsonRequest jReq, HttpSession session) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		JSONObject reqJson = jReq.getJsonObject();
+		ModuleImportTemplate tmpl = toImportTemplate(reqJson);
+		if(tmpl != null) {
+			String uuid = TextUtils.uuid();
+			session.setAttribute(SESSION_KEY_FIELD_NAMES + uuid, tmpl);
+			jRes.put("uuid", uuid);
+		}
+		return jRes;
+	}
+	
+	@RequestMapping("/download_tmpl/{uuid}")
+	public ResponseEntity<byte[]> download(@PathVariable String uuid, HttpSession session){
+		ModuleImportTemplate tmpl = (ModuleImportTemplate) session.getAttribute(SESSION_KEY_FIELD_NAMES + uuid);
+		if(tmpl != null) {
+			try {
+				byte[] tmplInputStream = impService.createImportTempalteBytes(tmpl);
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentDispositionFormData("attachment", new String(
+						(tmpl.getTitle() + ".xlsx").getBytes("UTF-8"),
+						"iso-8859-1"));
+				headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+				return new ResponseEntity<byte[]>(tmplInputStream, headers, HttpStatus.CREATED);
+			} catch (Exception e) {
+				logger.error("下载导出文件时发生错误", e);
+			}
+		}
+		return null;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/save_tmpl")
+	public ResponseJSON saveTmpl(@RequestBody JsonRequest jReq) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		JSONObject reqJson = jReq.getJsonObject();
+		try {
+			ModuleImportTemplate tmpl = toImportTemplate(reqJson);
+			Long tmplId = impService.saveTemplate(tmpl);
+			jRes.put("tmplId", tmplId);
+			jRes.put("tmplTitle", tmpl.getTitle());
+			jRes.setStatus("suc");
+		} catch (Exception e) {
+			logger.error("保存导入模板时发生错误", e);
+			jRes.setStatus("error");
+		}
+		return jRes;
+	}
+
+	private ModuleImportTemplate toImportTemplate(JSONObject reqJson) {
+		String composite = reqJson.getString("composite"),
+				module = reqJson.getString("module");
+		Assert.hasText(composite);
+		Assert.hasText(module);
+		
+		JSONArray fieldArray = reqJson.getJSONArray("fields");
+		if(fieldArray != null && !fieldArray.isEmpty()) {
+			UserIdentifier user = UserUtils.getCurrentUser();
+			ArrayList<ModuleImportTemplateField> fields = new ArrayList<ModuleImportTemplateField>();
+			CollectionUtils.appendTo(fieldArray, fields, item->{
+				JSONObject fieldItem = (JSONObject) item; 
+				ModuleImportTemplateField field = new ModuleImportTemplateField();
+				field.setFieldName(fieldItem.getString("fieldName"));
+				field.setTitle(fieldItem.getString("title"));
+				return field;
+			});
+			
+			String title = reqJson.getString("title");
+			if(!TextUtils.hasText(title)) {
+				title = "导入模板";
+			}
+			ModuleImportTemplate importTmpl = new ModuleImportTemplate();
+			importTmpl.setTitle(title);
+			importTmpl.setFields(fields);
+			importTmpl.setComposite(composite);
+			importTmpl.setModule(module);
+			importTmpl.setCreateUserId((Long) user.getId());
+			return importTmpl;
+		}
+		return null;
+	}
+	
+	
+	
+	
 }

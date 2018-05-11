@@ -225,7 +225,7 @@ public class AdminModulesController {
     @RequestMapping({"/save/{module}"})
     public AjaxPageResponse save(
     		@PathVariable String module,
-    		@RequestParam(KEY_FUSE_MODE) Boolean fuseMode,
+    		@RequestParam(value=KEY_FUSE_MODE, required=false) Boolean fuseMode,
     		RequestParameterMapComposite composite){
     	 try {
     		 composite.getMap().remove(KEY_FUSE_MODE);

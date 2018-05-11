@@ -13,7 +13,7 @@
 		<version.cpfweb>0.2.7</version.cpfweb>
 		<version.abcitem>3.3.4</version.abcitem>
 		<version.abcbizz>2.1.9</version.abcbizz>
-		<version.entityResolver>0.9</version.entityResolver>
+		<version.entityResolver>0.10</version.entityResolver>
 		<cxf.version>3.2.2</cxf.version>
 	</properties>
 	
@@ -44,7 +44,7 @@
 			<artifactId>item</artifactId>
 			<version>${version.abcitem}</version>
 		</dependency>
-		 <dependency>
+		<dependency>
 			<groupId>com.abc</groupId>
 			<artifactId>bizz</artifactId>
 			<version>${version.abcbizz}</version>

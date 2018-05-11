@@ -86,6 +86,7 @@ div.tab-content>.tab-pane>h1{
 	width: 100%;
 	text-align: center;
     vertical-align: middle;
+    z-index: 99999;
 }
 .modal-backdrop {
     background-color: #333;

@@ -570,3 +570,40 @@ input.search-input:hover {
 .address-participle-item {
 	font-size: 0;
 }
+
+.module-import-tmpl-dialog .fields-l,
+.module-import-tmpl-dialog .fields-r{
+	max-height: 300px;
+	overflow-y: auto;
+}
+
+.module-import-tmpl-dialog .fields-l h4,
+.module-import-tmpl-dialog .fields-r h4{
+	text-align: center;
+}
+
+.module-import-tmpl-dialog .fields-l{
+	border-right: 1px solid #eee;
+    min-height: 150px;
+}
+
+
+.module-import-tmpl-dialog  .fields-r ul li{
+	cursor: pointer;
+	moz-user-select: -moz-none; 
+	-moz-user-select: none; 
+	-o-user-select:none; 
+	-khtml-user-select:none; 
+	-webkit-user-select:none; 
+	-ms-user-select:none; 
+	user-select:none;
+}
+.module-import-tmpl-dialog  .fields-r ul li:hover{
+	background-color: #FFEC8B;
+}
+.module-import-tmpl-dialog .fields-r ul li.multiple-field {
+    background-color: #FFEFDB;
+}
+.module-import-tmpl-dialog .fields-r ul li.multiple-field:hover {
+    background-color: #CDAF95;
+}

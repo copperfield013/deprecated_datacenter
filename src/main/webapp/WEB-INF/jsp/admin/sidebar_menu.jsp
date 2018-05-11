@@ -36,7 +36,7 @@
 	</a>
 	<ul class="submenu">
 	   	<li>
-	   		<a class="tab" href="admin/modules/curd/list/people" target="people_list_tmpl_" title="人口列表">
+	   		<a class="tab" href="admin/modules/curd/list/people" target="people_list_tmpl" title="人口列表">
 	   			<span class="menu-text">人口列表</span>
 	   		</a>
 	   	</li>

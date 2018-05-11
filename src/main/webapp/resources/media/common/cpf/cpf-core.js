@@ -95,7 +95,7 @@ define(function(require, exports, module){
 		 */
 		showLoading			: function(){
 			if($loading){
-				$loading.modal('show');
+				$loading.appendTo(document.body).modal('show');
 			}else{
 				$loading = $('<div id="loading-container"><img id="loading-gif" src="' + this.param.loadingImg + '" /></div>');
 				$loading
@@ -139,7 +139,19 @@ define(function(require, exports, module){
 	/**
 	 * CPF在加载页面之后第1个执行该页面的所有script
 	 */
-	/*$CPF.putPageInitSequeue(1, loadPageScript);*/
+	$CPF.putPageInitSequeue(1, function($page){
+		if($page instanceof $){
+			$page.off('cpf-check-all-checkbox');
+			$page.off('click');
+			var page = $($page).getLocatePage();
+			if(page instanceof require('page')){
+				if(page.getType() === 'dialog'){
+					$(page.getContainer()).off('cpf-check-all-checkbox');
+					$(page.getContainer()).off('click');
+				}
+			}
+		}
+	});
 	
 	//对外暴露接口
 	module.exports = $CPF;

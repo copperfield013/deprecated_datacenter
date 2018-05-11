@@ -1,22 +1,39 @@
 package cn.sowell.datacenter.model.modules.service.impl;
 
+import java.awt.Color;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.CellValue;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
 import com.abc.application.BizFusionContext;
@@ -25,15 +42,21 @@ import com.abc.mapping.entity.Entity;
 import com.abc.panel.Integration;
 import com.abc.panel.PanelFactory;
 
+import cn.sowell.copframe.dao.utils.NormalOperateDao;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.excel.CellTypeUtils;
 import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigResolver;
+import cn.sowell.datacenter.entityResolver.ImportCompositeField;
 import cn.sowell.datacenter.entityResolver.config.ImportComposite;
 import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
+import cn.sowell.datacenter.model.modules.dao.ModulesImportDao;
 import cn.sowell.datacenter.model.modules.pojo.ImportStatus;
+import cn.sowell.datacenter.model.modules.pojo.ImportTemplateCriteria;
+import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplate;
+import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplateField;
 import cn.sowell.datacenter.model.modules.service.ModulesImportService;
 
 @Service
@@ -42,6 +65,12 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 	@Resource
 	FusionContextConfigFactory fFactory;
 
+	@Resource
+	NormalOperateDao nDao;
+	
+	@Resource
+	ModulesImportDao impDao;
+	
 	Logger logger = Logger.getLogger(ModulesImportServiceImpl.class);
 	
 	private DateFormat defaultDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
@@ -182,5 +211,133 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 		Entity entity = fusionContextConfigResolver.createEntityIgnoreUnsupportedElement(map);
 		return entity;
 	}
+	
+	@Override
+	public byte[] createImportTempalteBytes(ModuleImportTemplate tmpl) throws Exception {
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		try {
+			XSSFSheet sheet = workbook.createSheet("导入数据");
+			sheet.createRow(0);
+			XSSFRow headerRow = sheet.createRow(1);
+			XSSFRow firstDataRow = sheet.createRow(2);
+			
+			CellStyle titleStyle = getTitleStyle(workbook);
+			CellStyle dataStyle = getDataStyle(workbook);
+			
+			sheet.setDefaultColumnStyle(0, dataStyle);
+			XSSFCell numberTitleCell = headerRow.createCell(0);
+			numberTitleCell.setCellValue("序号");
+			numberTitleCell.setCellStyle(titleStyle);
+			XSSFCell valueCell = firstDataRow.createCell(0);
+			valueCell.setCellValue(1);
+			valueCell.setCellStyle(dataStyle);
+			
+			List<ModuleImportTemplateField> fields = tmpl.getFields();
+			if(fields != null) {
+				int columnIndex = 1;
+				for (ModuleImportTemplateField field : fields) {
+					sheet.setDefaultColumnStyle(columnIndex, dataStyle);
+					XSSFCell titleCell = headerRow.createCell(columnIndex);
+					titleCell.setCellValue(field.getFieldName());
+					titleCell.setCellStyle(titleStyle);
+					XSSFCell dataCell = firstDataRow.createCell(columnIndex);
+					dataCell.setCellType(CellType.STRING);
+					dataCell.setCellStyle(dataStyle);
+					sheet.autoSizeColumn(columnIndex);
+					columnIndex++;
+				}
+				
+			}
+			
+			try {
+				ByteArrayOutputStream os = new ByteArrayOutputStream();
+				workbook.write(os);
+				return os.toByteArray();
+			} catch (IOException e) {
+				throw e;
+			}
+		} catch (Exception e) {
+			throw e;
+		}finally{
+			try {
+				workbook.close();
+			} catch (IOException e) {
+			}
+		}
+	}
 
+	
+
+	private CellStyle getTitleStyle(XSSFWorkbook workbook) {
+		XSSFCellStyle style = workbook.createCellStyle();
+		style.setFillForegroundColor(new XSSFColor( new Color(146, 208, 80)));
+		style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+		style.setBorderBottom(BorderStyle.THIN);
+		style.setBorderLeft(BorderStyle.THIN);
+		style.setBorderRight(BorderStyle.THIN);
+		style.setBorderTop(BorderStyle.THIN);
+		style.setAlignment(HorizontalAlignment.CENTER);
+		XSSFFont font = workbook.createFont();
+		font.setBold(true);
+		font.setFontName("宋体");
+		style.setFont(font);
+		return style;
+	}
+	
+	private CellStyle getDataStyle(XSSFWorkbook workbook) {
+		XSSFCellStyle style = workbook.createCellStyle();
+		style.setBorderBottom(BorderStyle.THIN);
+		style.setBorderLeft(BorderStyle.THIN);
+		style.setBorderRight(BorderStyle.THIN);
+		style.setBorderTop(BorderStyle.THIN);
+		style.setAlignment(HorizontalAlignment.CENTER);
+		XSSFFont font = workbook.createFont();
+		font.setFontName("宋体");
+		style.setFont(font);
+		return style;
+	}
+	
+	@Override
+	public Long saveTemplate(ModuleImportTemplate tmpl) {
+		Date now = new Date();
+		if(tmpl.getId() == null) {
+			tmpl.setCreateTime(now);
+		}
+		tmpl.setUpdateTime(now);
+		Long tmplId = nDao.save(tmpl);
+		if(tmpl.getFields() != null) {
+			for (int i = 0; i < tmpl.getFields().size(); i++) {
+				ModuleImportTemplateField field = tmpl.getFields().get(i);
+				field.setOrder(i);
+				field.setTemplateId(tmplId);
+				field.setUpdateTime(now);
+				nDao.save(field);
+			}
+		}
+		return tmplId;
+	}
+	
+	@Override
+	public Set<ImportCompositeField> getImportCompositeFields(String module, String compositeName) {
+		Map<String, ImportComposite> impMap = fFactory.getModuleImportMap(module);
+		ImportComposite composite = impMap.get(compositeName);
+		FusionContextConfig config = fFactory.getConfig(composite.getConfigId());
+		return config.getAllImportFields();
+	}
+	
+	@Override
+	public List<ModuleImportTemplate> getImportTemplates(ImportTemplateCriteria criteria) {
+		return impDao.getImportTemplates(criteria);
+	}
+	
+	@Override
+	public ModuleImportTemplate getImportTempalte(Long tmplId) {
+		ModuleImportTemplate tmpl = nDao.get(ModuleImportTemplate.class, tmplId);
+		List<ModuleImportTemplateField> fields = impDao.getTemplateFields(tmpl.getId());
+		tmpl.setFields(fields);
+		return tmpl;
+	}
+	
+	
+	
 }

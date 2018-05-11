@@ -337,7 +337,10 @@ define(function(require, exports, module){
 			var def = $.Deferred();
 			fieldpickerHandler(function($fieldPicker){
 				var tabIndex = $('ul.nav-tabs li[data-id]', $fieldPicker).index($('ul.nav-tabs li[data-id="' + compositeId + '"]', $fieldPicker));
-				_this.lockTab(tabIndex, toLock);
+				_this.lockTab(tabIndex, toLock).done(function(){
+					def.resolve();
+				});
+				
 			});
 			return def.promise();
 		}
@@ -389,10 +392,10 @@ define(function(require, exports, module){
 		this.activeTab = function(tabIndex){
 			var def = $.Deferred();
 			fieldpickerHandler(function($fieldPicker){
-				$('.tab-pane', $fieldPicker).hide();
+				$('.tab-pane', $fieldPicker).removeClass('active');
 				var $tabTitle = $('ul.nav-tabs li[data-id]>a', $fieldPicker).eq(tabIndex).trigger('click');
 				var $li = $tabTitle.closest('li');
-				$('.tab-pane' + $tabTitle.attr('href'), $fieldPicker).show();
+				$('.tab-pane' + $tabTitle.attr('href'), $fieldPicker).addClass('active');
 				def.resolve($li);
 			});
 			return def.promise();

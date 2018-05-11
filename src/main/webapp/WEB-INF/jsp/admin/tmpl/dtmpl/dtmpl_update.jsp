@@ -37,22 +37,32 @@
 			<table class="table table-striped table-bordered table-hover">
 				<thead>
 					<tr class="title-row">
-						<th>#</th>
+						<th class="number-col">#</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr class="value-row">
-						<td>1</td>
+						<td class="number-col">1</td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
 	</script>
 	<script type="jquery/tmpl" id="tmpl-field-array-title">
-		<th data-id="\${id}" field-id="\${fieldId}">\${title }</th>
+		<th data-id="\${id}" field-id="\${fieldId}">
+			<span>\${title }</span>
+			<div class="operate-buttons">     
+				<a class="remove-array-field" title="删除字段">
+					<i class="fa fa-trash-o"></i>
+				</a>
+				<a class="recover-array-field" title="恢复默认名称">
+					<i class="iconfont icon-recover"></i>
+				</a>
+			</div>
+		</th>
 	</script>
 	<script type="jquery/tmpl" id="tmpl-field-array-value">
-		<td>\${dv }</td>
+		<td field-id="\${fieldId}">\${dv }</td>
 	</script>
 	<script type="jquery/tmpl" id="tmpl-field">
 		<div class="form-group field-item movable \${colNum == 2? 'dbcol': ''}" field-id="\${fieldId}" data-id="\${id}">

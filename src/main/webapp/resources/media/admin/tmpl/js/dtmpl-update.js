@@ -100,9 +100,6 @@ define(function(require, exports, module){
 					});
 				}
 			});
-			/*disabledFieldIdSet.forEach(function(disabledFieldId){
-				fieldSearch.enableField(disabledFieldId, false);
-			});*/
 			$group.data('fieldSearch', fieldSearch);
 		}
 		/**
@@ -127,6 +124,7 @@ define(function(require, exports, module){
 			//将字段插入到字段组中
 			var $fieldContainer = getFieldContainer($group);
 			if(option.isArrayField){
+				//添加数组字段
 				var $arrayTable = $('.field-array-table', $fieldContainer);
 				if($arrayTable.length == 0){
 					$arrayTable = $('#tmpl-field-array-table', $page).tmpl();
@@ -140,6 +138,34 @@ define(function(require, exports, module){
 						$arrayTable.find('.title-row').append($titleCell);
 						$arrayTable.find('.value-row').append($('<td>').append($relationSelect));
 					}
+					$arrayTable.find('.title-row').sortable({
+						helper		: 'original',
+						cursor		: 'move',
+						axis		: 'x',
+						opacity		: 0.5,
+						tolerance 	: 'pointer',
+						stop		: function(e, ui){
+							var Utils = require('utils');
+							$(this).children().each(function(index){
+								var $title = $(this);
+								var fieldId = $title.attr('field-id');
+								$arrayTable.find('tbody').children('tr').each(function(){
+									var $row = $(this);
+									var $cell = null;
+									if(fieldId){
+										$cell = $row.find('td[field-id="' + fieldId + '"]');
+									}else if($title.is('.number-col')){
+										$cell = $row.find('td.number-col');
+									}
+									if($cell != null){
+										Utils.prependTo($cell, $row, index);
+									}
+								});
+							});
+							console.log(this);
+							console.log(ui);
+						}
+					});
 				}
 				var $titleCell = $('#tmpl-field-array-title', $page).tmpl(fieldData);
 				$titleCell.data('field-data', fieldData);
@@ -148,7 +174,6 @@ define(function(require, exports, module){
 			}else{
 				var $field = $tmplField.tmpl(fieldData);
 				$field.data('field-data', fieldData).appendTo($fieldContainer);
-				//enableFieldSelectable(groupFieldData.fieldId, false);
 				adjustFieldTitle($field.find('.field-title'));
 			}
 			var fieldSearch = $group.data('fieldSearch');
@@ -236,7 +261,7 @@ define(function(require, exports, module){
 						group.fields.push({
 							id		: $th.attr('data-id'),
 							fieldId	: $th.attr('field-id'),
-							title	: $th.text(),
+							title	: $th.children('span').text(),
 							viewVal	: 'XXX'
 						});
 					});
@@ -273,18 +298,6 @@ define(function(require, exports, module){
 		}
 		
 		var disabledFieldIdSet = new Set();
-		function enableFieldSelectable(fieldId, toEnable){
-			/*var $groups = getAllGroups();
-			$groups.each(function(){
-				var fieldSearch = $(this).data('fieldSearch');
-				fieldSearch.enableField(fieldId, toEnable);
-				if(toEnable == false){
-					disabledFieldIdSet.add(fieldId.toString());
-				}else{
-					disabledFieldIdSet['delete'](fieldId.toString());
-				}
-			});*/
-		}
 		
 		//初始化字段组容器的拖拽事件
 		$groupContainer.sortable({
@@ -347,12 +360,19 @@ define(function(require, exports, module){
 		//删除字段
 		bindPageEvent('click', '.remove-field i', function(e){
 			var $field = getLocateField(e.target),
-			$group = getLocateGroup(e.target),
-			fieldTitle = $field.find('.field-title').text(),
-			groupName = $group.find('.group-title').text();
+				$group = getLocateGroup(e.target),
+				fieldTitle = $field.find('.field-title').text(),
+				groupName = $group.find('.group-title').text();
 			require('dialog').confirm('确认在字段组[' + groupName + ']中删除字段[' + fieldTitle + ']？', function(yes){
 				if(yes){
-					enableFieldSelectable($field.attr('field-id'));
+					if($field.siblings('div[field-id]').length == 0){
+						//如果是最后一个字段，那么就重置该字段组
+						$field.closest('.field-group').removeAttr('data-id');
+					}
+					var fieldSearch = $group.data('fieldSearch');
+					if(fieldSearch){
+						fieldSearch.enableField($field.attr('field-id'));
+					}
 					$field.remove();
 				}
 			});
@@ -375,6 +395,50 @@ define(function(require, exports, module){
 			});
 		});
 		
+		//删除数组字段
+		bindPageEvent('click', '.remove-array-field i', function(e){
+			var $title = $(this).closest('th'),
+				title = $title.children('span').text(),
+				fieldId = $title.attr('field-id'),
+				$group = getLocateGroup(e.target),
+				groupName = $group.find('.group-title').text();
+			if(fieldId){
+				require('dialog').confirm('确认在字段组[' + groupName + ']中删除字段[' + title + ']？', function(yes){
+					if(yes){
+						var isOnly = false;
+						if($title.siblings('th[field-id]').length == 0){
+							//如果是最后一个字段，那么就把整个列表移除
+							$title.closest('.field-group').removeAttr('data-id');
+							$title.closest('.field-array-table').remove();
+						}else{
+							$title.closest('table').find('td[field-id="' + fieldId + '"]').remove();
+							$title.remove();
+						}
+						var fieldSearch = $group.data('fieldSearch');
+						if(fieldSearch){
+							fieldSearch.enableField(fieldId);
+						}
+					}
+				});
+			}
+		});
+		
+		bindPageEvent('click', '.recover-array-field i', function(e){
+			var $title = $(this).closest('th'),
+				title = $title.children('span').text(),
+				fieldData = $title.data('field-data'),
+				fieldTitle = title;
+			
+			if(fieldData && fieldData.title){
+				fieldTitle = fieldData.title;
+			}
+			require('dialog').confirm('确认恢复字段[' + title + ']为原始名称[' + fieldTitle + ']？', function(yes){
+				if(yes){
+					$title.text(fieldTitle);
+				}
+			});
+		});
+		
 		//删除字段组
 		bindPageEvent('click', '.remove-group i', function(e){
 			var $group = getLocateGroup(e.target);
@@ -388,10 +452,6 @@ define(function(require, exports, module){
 					if(fieldSearch){
 						fieldSearch.release();
 					}
-					//events.afterRemoveGroup([$group, $group.attr('data-id'), groupTitle]);
-					$('.field-item[field-id]', $group).each(function(){
-						enableFieldSelectable($(this).attr('field-id'));
-					});
 				}
 			});
 		});
@@ -400,6 +460,7 @@ define(function(require, exports, module){
 		//双击编辑字段标题
 		bindDblClickEdit('label.field-title', 'field-title');
 		bindDblClickEdit('span.field-view', 'field-view');
+		bindDblClickEdit('.field-array-table tr.title-row th>span', 'field-title');
 		
 		//初始化默认数据
 		if(tmplData && tmplData.groups){
