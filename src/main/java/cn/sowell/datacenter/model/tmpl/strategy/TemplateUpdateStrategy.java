@@ -6,6 +6,6 @@ public interface TemplateUpdateStrategy<T extends AbstractTemplate> {
 
 	void update(T template);
 
-	void create(T template);
+	Long create(T template);
 	
 }

@@ -100,6 +100,8 @@ define(function(require, exports, module){
 				$loading = $('<div id="loading-container"><img id="loading-gif" src="' + this.param.loadingImg + '" /></div>');
 				$loading
 					.css('lineHeight', document.body.clientHeight + 'px')
+					.css('zIndex', '99998')
+					.data('backdropZIndex', '99999')
 					.appendTo(document.body).modal({
 					keyboard	: false
 				});

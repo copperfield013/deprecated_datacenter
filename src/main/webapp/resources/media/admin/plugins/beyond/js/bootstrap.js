@@ -1124,6 +1124,13 @@ if (typeof jQuery === 'undefined') {
 
       this.$backdrop.addClass('in')
 
+      if(typeof this.options.backdropClass === 'string'){
+    	  this.$backdrop.addClass(this.options.backdropClass);
+      }
+      if(typeof this.options.backdropZIndex === 'string' || typeof this.options.backdropZIndex === 'number'){
+    	  this.$backdrop.css('zIndex', this.options.backdropZIndex);
+      }
+      
       if (!callback) return
 
       doAnimate ?

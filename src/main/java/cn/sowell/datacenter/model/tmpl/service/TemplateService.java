@@ -73,7 +73,7 @@ public interface TemplateService {
 	 * 创建或者更新详情模板
 	 * @param data
 	 */
-	public <T extends AbstractTemplate> void mergeTemplate(T template);
+	public <T extends AbstractTemplate> Long mergeTemplate(T template);
 
 	/**
 	 * 

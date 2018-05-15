@@ -113,7 +113,7 @@ public class TemplateDetailUpdateStrategy implements TemplateUpdateStrategy<Temp
 	}
 
 	@Override
-	public void create(TemplateDetailTemplate template) {
+	public Long create(TemplateDetailTemplate template) {
 		Set<Long> fieldIds = new HashSet<Long>();
 		template.getGroups().forEach(group->group.getFields().forEach(field->fieldIds.add(field.getFieldId())));
 		Map<Long, DictionaryField> fieldMap = dictDao.getFieldMap(fieldIds);
@@ -136,7 +136,7 @@ public class TemplateDetailUpdateStrategy implements TemplateUpdateStrategy<Temp
 				}
 			}
 		}
-		
+		return tmplId;
 	}
 
 

@@ -35,7 +35,7 @@ public class ModulesImportDaoImpl implements ModulesImportDao{
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<ModuleImportTemplateField> getTemplateFields(Long tmplId) {
-		String hql = "from ModuleImportTemplateField f where f.templateId = :tmplId";
+		String hql = "from ModuleImportTemplateField f where f.templateId = :tmplId order by f.order asc";
 		Query query = sFactory.getCurrentSession().createQuery(hql);
 		query.setLong("tmplId", tmplId);
 		return query.list();

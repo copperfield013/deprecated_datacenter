@@ -8,9 +8,11 @@ import javax.annotation.Resource;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Repository;
 
+import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplate;
 import cn.sowell.datacenter.model.tmpl.pojo.AbstractTemplate;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTempalte;
+import cn.sowell.datacenter.model.tmpl.strategy.ModuleImportTemplateStrategy;
 import cn.sowell.datacenter.model.tmpl.strategy.TemplateDetailUpdateStrategy;
 import cn.sowell.datacenter.model.tmpl.strategy.TemplateListUpdateStrategy;
 import cn.sowell.datacenter.model.tmpl.strategy.TemplateUpdateStrategy;
@@ -26,6 +28,7 @@ public class TemplateUpdateStrategyFactory {
 	public TemplateUpdateStrategyFactory() {
 		add(TemplateDetailTemplate.class, TemplateDetailUpdateStrategy.class, true);
 		add(TemplateListTempalte.class, TemplateListUpdateStrategy.class, true);
+		add(ModuleImportTemplate.class, ModuleImportTemplateStrategy.class, true);
 	}
 	
 	private void add(Class<?> templateClass, Class<?> strategyClass, boolean isSingleton) {

@@ -7,8 +7,8 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,6 +58,7 @@ import cn.sowell.datacenter.model.modules.pojo.ImportTemplateCriteria;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplate;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplateField;
 import cn.sowell.datacenter.model.modules.service.ModulesImportService;
+import cn.sowell.datacenter.model.tmpl.service.TemplateService;
 
 @Service
 public class ModulesImportServiceImpl implements ModulesImportService {
@@ -71,32 +72,14 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 	@Resource
 	ModulesImportDao impDao;
 	
+	@Resource
+	TemplateService tService;
+	
 	Logger logger = Logger.getLogger(ModulesImportServiceImpl.class);
 	
 	private DateFormat defaultDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
 	private NumberFormat numberFormat = new DecimalFormat("0.000");
 	
-	/*@SuppressWarnings("serial")
-	Map<String, Map<String, ImportComposite>> importConfigKeyMap = new HashMap<String, Map<String, ImportComposite>>(){
-		{
-			ImportComposite[] composites = new ImportComposite[] {
-				new ImportComposite("base", "基本数据", DataCenterConstants.MODULE_KEY_PEOPLE, FusionContextFactoryDC.KEY_IMPORT_BASE),
-				new ImportComposite("lowincome", "低保数据", DataCenterConstants.MODULE_KEY_PEOPLE, FusionContextFactoryDC.KEY_IMPORT_LOWINCOME),
-				new ImportComposite("handicapped", "残疾人数据", DataCenterConstants.MODULE_KEY_PEOPLE, FusionContextFactoryDC.KEY_IMPORT_HANDICAPPED),
-				new ImportComposite("familyPlanning", "计生数据", DataCenterConstants.MODULE_KEY_PEOPLE, FusionContextFactoryDC.KEY_IMPORT_FAMILYPLANNING),
-				new ImportComposite("addressBase", "地址基本数据", DataCenterConstants.MODULE_KEY_ADDRESS, FusionContextFactoryDC.KEY_ADDRESS_BASE),
-				new ImportComposite("studentpartyBase", "学生基本数据", DataCenterConstants.MODULE_KEY_STUDENT, FusionContextFactoryDC.KEY_STUDENT_BASE),
-				new ImportComposite("disabledpeople", "残助数据", DataCenterConstants.MODULE_KEY_DISABLEDPEOPLE, FusionContextFactoryDC.KEY_DISABLEDPEOPLE_BASE),
-				new ImportComposite("hspeople", "党员管理", DataCenterConstants.MODULE_KEY_HSPEOPLE, FusionContextFactoryDC.KEY_HSPEOPLE_BASE)
-			};
-			for(ImportComposite c :composites) {
-				if(!this.containsKey(c.getModuleKey())) {
-					this.put(c.getModuleKey(), new LinkedHashMap<>());
-				}
-				this.get(c.getModuleKey()).put(c.getName(), c);
-			}
-		}
-	};*/
 	
 	
 	private String getConfigKey(String module, String compositeName) {
@@ -232,7 +215,7 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 			valueCell.setCellValue(1);
 			valueCell.setCellStyle(dataStyle);
 			
-			List<ModuleImportTemplateField> fields = tmpl.getFields();
+			Set<ModuleImportTemplateField> fields = tmpl.getFields();
 			if(fields != null) {
 				int columnIndex = 1;
 				for (ModuleImportTemplateField field : fields) {
@@ -299,24 +282,12 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 	
 	@Override
 	public Long saveTemplate(ModuleImportTemplate tmpl) {
-		Date now = new Date();
-		if(tmpl.getId() == null) {
-			tmpl.setCreateTime(now);
-		}
-		tmpl.setUpdateTime(now);
-		Long tmplId = nDao.save(tmpl);
-		if(tmpl.getFields() != null) {
-			for (int i = 0; i < tmpl.getFields().size(); i++) {
-				ModuleImportTemplateField field = tmpl.getFields().get(i);
-				field.setOrder(i);
-				field.setTemplateId(tmplId);
-				field.setUpdateTime(now);
-				nDao.save(field);
-			}
-		}
-		return tmplId;
+		return tService.mergeTemplate(tmpl);
 	}
 	
+	
+
+
 	@Override
 	public Set<ImportCompositeField> getImportCompositeFields(String module, String compositeName) {
 		Map<String, ImportComposite> impMap = fFactory.getModuleImportMap(module);
@@ -333,7 +304,7 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 	@Override
 	public ModuleImportTemplate getImportTempalte(Long tmplId) {
 		ModuleImportTemplate tmpl = nDao.get(ModuleImportTemplate.class, tmplId);
-		List<ModuleImportTemplateField> fields = impDao.getTemplateFields(tmpl.getId());
+		Set<ModuleImportTemplateField> fields = new LinkedHashSet<>(impDao.getTemplateFields(tmpl.getId()));
 		tmpl.setFields(fields);
 		return tmpl;
 	}

@@ -78,7 +78,7 @@ public class TemplateListUpdateStrategy implements TemplateUpdateStrategy<Templa
 	}
 
 	@Override
-	public void create(TemplateListTempalte template) {
+	public Long create(TemplateListTempalte template) {
 		if(template.getId() == null){
 			Date now = new Date();
 			//创建
@@ -99,7 +99,9 @@ public class TemplateListUpdateStrategy implements TemplateUpdateStrategy<Templa
 				criteria.setUpdateTime(now);
 				nDao.save(criteria);
 			}
+			return tmplId;
 		}
+		return null;
 	}
 
 }

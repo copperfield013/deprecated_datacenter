@@ -1,7 +1,7 @@
 package cn.sowell.datacenter.admin.controller.modules;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -41,6 +41,7 @@ import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.entityResolver.ImportCompositeField;
 import cn.sowell.datacenter.entityResolver.config.ModuleMeta;
+import cn.sowell.datacenter.entityResolver.impl.RelationEntityProxy;
 import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
 import cn.sowell.datacenter.model.modules.pojo.ImportStatus;
 import cn.sowell.datacenter.model.modules.pojo.ImportTemplateCriteria;
@@ -186,6 +187,7 @@ public class AdminModulesImportController {
 		model.addAttribute("fields", fields);
 		model.addAttribute("module", mMeta);
 		model.addAttribute("compositeName", composite);
+		model.addAttribute("relationLabelKey", RelationEntityProxy.LABEL_KEY);
 		
 		return AdminConstants.JSP_MODULES + "/modules_import_download.jsp";
 	}
@@ -258,15 +260,21 @@ public class AdminModulesImportController {
 		JSONArray fieldArray = reqJson.getJSONArray("fields");
 		if(fieldArray != null && !fieldArray.isEmpty()) {
 			UserIdentifier user = UserUtils.getCurrentUser();
-			ArrayList<ModuleImportTemplateField> fields = new ArrayList<ModuleImportTemplateField>();
+			Set<ModuleImportTemplateField> fields = new LinkedHashSet<ModuleImportTemplateField>();
 			CollectionUtils.appendTo(fieldArray, fields, item->{
 				JSONObject fieldItem = (JSONObject) item; 
 				ModuleImportTemplateField field = new ModuleImportTemplateField();
+				field.setId(fieldItem.getLong("id"));
 				field.setFieldName(fieldItem.getString("fieldName"));
 				field.setTitle(fieldItem.getString("title"));
+				field.setFieldPattern(fieldItem.getString("fieldPattern"));
+				field.setFieldIndex(fieldItem.getInteger("fieldIndex"));
 				return field;
 			});
-			
+			int order = 1;
+			for (ModuleImportTemplateField field : fields) {
+				field.setOrder(order++);
+			}
 			String title = reqJson.getString("title");
 			if(!TextUtils.hasText(title)) {
 				title = "导入模板";
@@ -277,6 +285,10 @@ public class AdminModulesImportController {
 			importTmpl.setComposite(composite);
 			importTmpl.setModule(module);
 			importTmpl.setCreateUserId((Long) user.getId());
+			Long tmplId = reqJson.getLong("tmplId");
+			if(tmplId != null) {
+				importTmpl.setId(tmplId);
+			}
 			return importTmpl;
 		}
 		return null;

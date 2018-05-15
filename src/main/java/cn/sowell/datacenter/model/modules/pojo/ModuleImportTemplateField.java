@@ -25,6 +25,12 @@ public class ModuleImportTemplateField {
 	@Column(name="c_field_name")
 	private String fieldName;
 	
+	@Column(name="c_field_pattern")
+	private String fieldPattern;
+	
+	@Column(name="c_field_index")
+	private Integer fieldIndex;
+	
 	@Column(name="c_order")
 	private Integer order;
 	
@@ -70,5 +76,17 @@ public class ModuleImportTemplateField {
 	}
 	public void setTemplateId(Long templateId) {
 		this.templateId = templateId;
+	}
+	public String getFieldPattern() {
+		return fieldPattern;
+	}
+	public void setFieldPattern(String fieldPattern) {
+		this.fieldPattern = fieldPattern;
+	}
+	public Integer getFieldIndex() {
+		return fieldIndex;
+	}
+	public void setFieldIndex(Integer fieldIndex) {
+		this.fieldIndex = fieldIndex;
 	}
 }

@@ -157,12 +157,13 @@ public class TemplateServiceImpl implements TemplateService{
 
 	@Override
 	@Transactional
-	public <T extends AbstractTemplate> void mergeTemplate(T template) {
+	public <T extends AbstractTemplate> Long mergeTemplate(T template) {
 		TemplateUpdateStrategy<T> strategy = tmplUpdateStrategyFactory.getStrategy(template);
 		if(template.getId() != null) {
 			strategy.update(template);
+			return template.getId();
 		}else {
-			strategy.create(template);
+			return strategy.create(template);
 		}
 	}
 	

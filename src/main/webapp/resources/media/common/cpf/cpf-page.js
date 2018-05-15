@@ -40,7 +40,10 @@ define(function(require, exports, module){
 						try{
 							eval(je.exec(href)[1]);
 						}catch(e){}
-					}else if(href && href !== '#'){
+					}else if(href){
+						if(href.match('^#.*$')){
+							return;
+						}
 						var reg = /^page:(\w+)$/;
 						var regJquery = /^page:#([\w\-_]+)\.([\w_]+)$/;
 						if(reg.test(href)){
@@ -96,7 +99,10 @@ define(function(require, exports, module){
 							try{
 								eval(je.exec(href)[1]);
 							}catch(e){}
-						}else if(href && href !== '#'){
+						}else if(href){
+							if(href.match('^#.*$')){
+								return;
+							}
 							var confirmStr = $this.attr('confirm');
 							if(confirmStr){
 								require('dialog').confirm(confirmStr, function(yes){
