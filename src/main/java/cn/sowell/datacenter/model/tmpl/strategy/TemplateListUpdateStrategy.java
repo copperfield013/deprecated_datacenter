@@ -61,6 +61,7 @@ public class TemplateListUpdateStrategy implements TemplateUpdateStrategy<Templa
 					originCriteria.setQueryShow(criteria.getQueryShow());
 					originCriteria.setComparator(criteria.getComparator());
 					originCriteria.setInputType(criteria.getInputType());
+					originCriteria.setRelationLabel(criteria.getRelationLabel());
 					originCriteria.setOrder(criteria.getOrder());
 					originCriteria.setViewOption(criteria.getViewOption());
 					originCriteria.setDefaultValue(criteria.getDefaultValue());

@@ -135,7 +135,8 @@ define(function(require, exports, module){
 			//当前页面
 			page		: undefined,
 			//
-			interval	: 0
+			interval	: 0,
+			cache		: false
 		};
 		if(typeof formData === 'function'){
 			if($.isPlainObject(whenSuc)){
@@ -172,15 +173,16 @@ define(function(require, exports, module){
 		}else if(formData instanceof FormData){
 			fData = formData;
 		}
+		var method = param.method.toLowerCase();
 		require('console')
 			.debug('发送请求到' + url)
 			.debug(fData)
 			;
 		return $.ajax({
 		    url: 		url,
-		    type: 		param.method,
-		    cache: 		false,
-		    data: 		fData,
+		    type: 		method,
+		    cache: 		param.cache,
+		    data: 		method == 'post'? fData: null,
 		    processData: false,
 		    contentType: false,
 		    beforeSend	: function(){
@@ -278,6 +280,7 @@ define(function(require, exports, module){
 		var deferred = $.Deferred();
 		ajax(url, reqParam, $.extend({}, {
 			method	: 'get',
+			cache	: true,
 			whenSuc	: function(data){
 				try{
 					data = $.parseJSON(data);

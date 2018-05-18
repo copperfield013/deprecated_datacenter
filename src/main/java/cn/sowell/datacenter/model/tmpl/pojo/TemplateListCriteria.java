@@ -48,6 +48,9 @@ public class TemplateListCriteria {
 	@Column(name="c_input_type")
 	private String inputType;
 	
+	@Column(name="c_relation_label")
+	private String relationLabel;
+	
 	@Column(name="c_order")
 	private Integer order;
 	
@@ -163,6 +166,14 @@ public class TemplateListCriteria {
 	}
 	public void setQueryShow(Integer queryShow) {
 		this.queryShow = queryShow;
+	}
+
+	public String getRelationLabel() {
+		return relationLabel;
+	}
+
+	public void setRelationLabel(String relationLabel) {
+		this.relationLabel = relationLabel;
 	}
 	
 	

@@ -283,9 +283,17 @@ define(function(require, exports, module){
 		 */
 		this.getValue = function(){
 			switch(param.type){
+				case 'label':
+					var labels = [];
+					this.getDom().find(':checkbox:checked').each(function(){
+						labels.push($(this).val());
+					});
+					return labels;
+					break;
 				case 'select':
 				default:
 					return this.getDom().val();
+					
 			}
 		};
 		

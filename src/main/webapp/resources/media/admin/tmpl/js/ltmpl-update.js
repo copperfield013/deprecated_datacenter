@@ -85,18 +85,20 @@ define(function(require, exports, module){
 					require('dialog').notice('条件必须选择一个字段', 'error');
 					$.error();
 				}
+				var relationLabelInput = criteria.getRelationLabelInput();
 				var itemData = {
-					id			: criteria.getId(),
-					title		: criteria.getTitle(),
-					fieldId		: field.id,
-					fieldKey	: field.name,
-					relation	: 'and',
-					comparator	: 't1', //criteria.getComparatorName(),
-					inputType	: criteria.getDefaultValueInput().getType(),
-					defVal		: criteria.getDefaultValueInput().getValue(),
-					placeholder	: criteria.getPlaceholder(),
-					partitions	: [],
-					queryShow	: criteria.isQueryShow()
+					id				: criteria.getId(),
+					title			: criteria.getTitle(),
+					fieldId			: field.id,
+					fieldKey		: field.name,
+					relation		: 'and',
+					comparator		: criteria.getComparatorName(),
+					inputType		: criteria.getDefaultValueInput().getType(),
+					defVal			: criteria.getDefaultValueInput().getValue(),
+					placeholder		: criteria.getPlaceholder(),
+					partitions		: [],
+					queryShow		: criteria.isQueryShow(),
+					relationLabel 	: relationLabelInput && relationLabelInput.getValue()
 				};
 				var partitions = criteria.getPartitions();
 				for(var i in partitions){
@@ -139,6 +141,7 @@ define(function(require, exports, module){
 			single			: true,
 			textPicked		: true,
 			module			: module,
+			hideCompositeFields	: true,
 			afterChoose		: function(field){
 				if(cField){
 					criteriaSearcher.enableField(cField.id);
@@ -176,6 +179,42 @@ define(function(require, exports, module){
 			$detailArea.show();
 		}
 		
+		var fieldInputTypeMap = {
+				text	: '文本框',
+				select	: '单选下拉框',
+				date	: '日期选择'
+		};
+		
+		var selectableType	= {
+				text	: ['text'],
+				select	: ['text', 'select'],
+				date	: ['date']
+		}
+		
+		function filterFieldInputSelectable($select, field){
+			$select.empty();
+			var set = new Set();
+			set.add('text');
+			var types = require('utils').merge(set, field && selectableType[field.type]);
+			if(types){
+				types.forEach(function(type){
+					$select.append($('<option value="' + type + '">' + fieldInputTypeMap[type] + '</option>'))
+				});
+				
+			}
+		}
+		
+		function toggleRelationLabelInput($relationLabelRow, labelInput){
+			if(labelInput){
+				$('#relation-label-value-wrap', $relationLabelRow)
+					.children().detach()
+					.end().append(labelInput.getDom());
+				$relationLabelRow.show();
+			}else{
+				$relationLabelRow.hide();
+			}
+		}
+		
 		function showCriteria(criteria){
 			var field = criteria.getField();
 			if(field){
@@ -189,11 +228,17 @@ define(function(require, exports, module){
 			var queryShow = criteria.isQueryShow();
 			$('#toggle-show-criteria', $page).prop('checked', queryShow).trigger('change');
 			if(queryShow){
+				var $defVal = $('#criteria-default-value-container', $page).children();
+				$defVal.detach();
 				criteria.detailHandler(function($$){
-					$$('#field-input-type').val(criteria.getDefaultValueInput().getType());
-					$$('#criteria-comparator').val(criteria.getComparatorName());
-					$$('#criteria-default-value-container').empty().append(criteria.getDefaultValueInput().getInput());
+					var defValInput = criteria.getDefaultValueInput();
+					filterFieldInputSelectable($$('#field-input-type'), field);
+					$$('#field-input-type').val(defValInput.getType());
+					criteria.setDefaultInputType(criteria.getDefaultValueInput());
+					$$('#criteria-detail-comparator').val(criteria.getComparatorName());
+					$$('#criteria-default-value-container').append(defValInput.getInput());
 					$$('#criteria-detail-placeholder').val(criteria.getPlaceholder());
+					toggleRelationLabelInput($$('#relation-label-row'), criteria.getRelationLabelInput())
 				});
 			}
 			
@@ -203,6 +248,7 @@ define(function(require, exports, module){
 			for(var i in partitions){
 				apppendPartitionDom(partitions[i]);
 			}
+			cField = field;
 		}
 		function apppendPartitionDom(partition){
 			if(partition){
@@ -230,7 +276,8 @@ define(function(require, exports, module){
 				checkIsCurrent	: function(){
 					return currentCriteria == this;
 				},
-				$detailArea		: $('.criteria-detail-area', $page)
+				$detailArea		: $('.criteria-detail-area', $page),
+				module			: module
 			});
 			$criteria.find('.criteria-property-name span').dblclick(function(){
 				require('utils').toEditContent(this).bind('confirmed', function(title){
@@ -243,6 +290,11 @@ define(function(require, exports, module){
 				},
 				afterSetField		: function(field){
 					$criteria.find('.criteria-property-name span').text(field.cname);
+					criteria.detailHandler(function($$){
+						filterFieldInputSelectable($$('#field-input-type'), field);
+						criteria.setDefaultInputType($$('#field-input-type').val());
+						toggleRelationLabelInput($$('#relation-label-row'), criteria.getRelationLabelInput());
+					});
 				},
 				afterSetPlaceholder	: function(placeholder){
 					$('#criteria-detail-placeholder', $page).val(placeholder);
@@ -284,16 +336,31 @@ define(function(require, exports, module){
 					if(fieldInput){
 						fieldInput.getComparatorMap(function(comparators){
 							if(comparators){
+								var comparatorName = criteria.getComparatorName();
+								var inComparators = false;
 								var $comparator = $('#criteria-detail-comparator', $page).empty();
 								for(var i in comparators){
 									var comparator = comparators[i];
 									if(comparator['class'] !== 'negative'){
 										$comparator.append('<option value="' + comparator.key + '">' + comparator.title + '</option>');
 									}
+									if(comparatorName === comparator.key){
+										inComparators = true;
+									}
+								}
+								if(comparatorName && inComparators){
+									criteria.setComparatorName(comparatorName);
+								}else{
+									criteria.setComparatorName($comparator.val());
 								}
 							}
 						});
 						$('#criteria-default-value-container', $page).empty().append(valueInput.getInput());
+						if(valueInput.getType() === 'text'){
+							$('#criteria-placeholder-row', $page).show();
+						}else{
+							$('#criteria-placeholder-row', $page).hide();
+						}
 					}
 				}
 			});
@@ -368,11 +435,20 @@ define(function(require, exports, module){
 			handleSelectedItem(function(){
 				try{
 					if(inputType === 'select'){
-						this.setDefaultInputType(this.getField());
+						this.setDefaultInputType({
+							type		: inputType,
+							optGroupId	: this.getField().optGroupId
+						});
 					}else{
 						this.setDefaultInputType(inputType);
 					}
 				}catch(e){}
+			});
+		});
+		$('#criteria-detail-comparator', $page).change(function(){
+			var comparatorName = $(this).val();
+			handleSelectedItem(function(){
+				this.setComparatorName(comparatorName);
 			});
 		});
 		
@@ -409,7 +485,7 @@ define(function(require, exports, module){
 			queryShow	: true,
 			title		: '',
 			field		: null,
-			
+			module		: null
 		};
 		
 		var param = $.extend({}, defaultParam, _param);
@@ -417,6 +493,8 @@ define(function(require, exports, module){
 		var callbackMap = require('utils').CallbacksMap(this);
 		
 		var defaultValueInput = new ValueInput();
+		
+		var relationLabelFieldInput = null;
 		
 		this.initFromData = function(data){
 			if(data && data.fieldData){
@@ -427,7 +505,8 @@ define(function(require, exports, module){
 				//this.setRelation(data.relation);
 				this.setComparatorName(data.comparator);
 				this.setPlaceholder(data.placeholder);
-				defaultValueInput = new ValueInput(data.inputType);
+				this.setRelationLabelValue(data.relationLabel);
+				defaultValueInput = new ValueInput(data.fieldData);
 				defaultValueInput.setValue(data.defaultValue);
 			}else{
 				$.error();
@@ -460,7 +539,7 @@ define(function(require, exports, module){
 			if(typeof field === 'object'){
 				param.field = field;
 				param.title = field.cname;
-				this.setDefaultInputType(field);
+				//this.setDefaultInputType(field);
 				callbackMap.fire('afterSetField', [field]);
 			}else{
 				$.error('setField方法只能从传入field数据对象');
@@ -519,7 +598,11 @@ define(function(require, exports, module){
 		 * @param inputType 可以是string，也可以是字段数组对象field
 		 */
 		this.setDefaultInputType = function(inputType){
-			defaultValueInput = new ValueInput(inputType);
+			if(inputType instanceof ValueInput){
+				defaultValueInput = inputType;
+			}else{
+				defaultValueInput = new ValueInput(inputType);
+			}
 			callbackMap.fire('afterSetDefaultInputType', [defaultValueInput]);
 		}
 		
@@ -554,6 +637,30 @@ define(function(require, exports, module){
 		this.setPlaceholder = function(placeholder){
 			param.placeholder = placeholder;
 			callbackMap.fire('afterSetPlaceholder', [placeholder]);
+		}
+		
+		
+		this.getRelationLabelInput = function(){
+			var field = this.getField();
+			if(field && field.composite && field.composite.relationSubdomain){
+				if(!relationLabelFieldInput){
+					relationLabelFieldInput = new FieldInput({
+						type	: 'label',
+						fieldKey: param.module + '@' + field.composite.name,
+						value	: param.data && param.data.relationLabel
+					});
+				}
+			}else{
+				relationLabelFieldInput = null;
+			}
+			return relationLabelFieldInput;
+		};
+		
+		this.setRelationLabelValue = function(relationLabel){
+			var relationLabelInput = this.getRelationLabelInput();
+			if(relationLabelInput != null){
+				relationLabelInput.setValue(relationLabel);
+			}
 		}
 		
 		/**
@@ -739,7 +846,7 @@ define(function(require, exports, module){
 			console.log(field);
 			var fParam = {
 				type		: field.type,
-				optionsKey	: field.id
+				optionsKey	: field.optGroupId
 			};
 			
 			fieldInput = new FieldInput(fParam);
@@ -779,7 +886,10 @@ define(function(require, exports, module){
 			viewTransfer = _viewTransfer;
 		}
 		this.getValue = function(){
-			return viewTransfer(fieldInput? fieldInput.getValue(): '', fieldInput);
+			return fieldInput? fieldInput.getValue(): '';
+		}
+		this.getView = function(){
+			return viewTransfer(this.getValue(), fieldInput);
 		}
 		this.bindChange = function(callback){
 			

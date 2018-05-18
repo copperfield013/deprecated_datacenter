@@ -44,7 +44,11 @@ public class DictionaryServiceImpl implements DictionaryService, FieldService{
 	private final TimelinenessWrapper<List<DictionaryOption>> optionsCache = new TimelinenessWrapper<>(GLOBAL_TIMEOUT);
 	private final Map<String, Set<FieldParserDescription>> fieldDescsMap = new HashMap<>();
 	
-	
+	@Override
+	public DictionaryComposite getCurrencyCacheCompositeByFieldId(String module, Long fieldId) {
+		DictionaryField field = getAllFields(module).stream().filter(f->fieldId.equals(f.getId())).findFirst().orElse(null);
+		return field != null? field.getComposite(): null;
+	}
 	
 	@Override
 	public List<DictionaryComposite> getAllComposites(String module) {
@@ -58,6 +62,7 @@ public class DictionaryServiceImpl implements DictionaryService, FieldService{
 			return composites;
 		});
 	}
+	
 	
 	@Resource
 	FusionContextConfigFactory fFactory;

@@ -15,6 +15,7 @@ import org.hibernate.type.StandardBasicTypes;
 import org.springframework.stereotype.Repository;
 
 import cn.sowell.copframe.dao.deferedQuery.ColumnMapResultTransformer;
+import cn.sowell.copframe.dao.deferedQuery.DeferedParamQuery;
 import cn.sowell.copframe.dao.deferedQuery.SimpleMapWrapper;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.datacenter.model.dict.dao.DictionaryDao;
@@ -34,8 +35,9 @@ public class DictionaryDaoImpl implements DictionaryDao{
 	@Override
 	public List<DictionaryComposite> getAllComposites(String module) {
 		String hql = "from DictionaryComposite c where c.module = :module";
-		Query query = sFactory.getCurrentSession().createQuery(hql);
-		query.setString("module", module);
+		DeferedParamQuery dQuery = new DeferedParamQuery(hql);
+		dQuery.setParam("module", module);
+		Query query = dQuery.createQuery(sFactory.getCurrentSession(), false, null);
 		return query.list();
 	}
 

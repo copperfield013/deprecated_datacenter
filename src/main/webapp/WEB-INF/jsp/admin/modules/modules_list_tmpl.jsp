@@ -41,10 +41,17 @@
 							<div class="form-group">
 								<label class="control-label">${criteriaItem.title }</label>
 								<select class="form-control" name="criteria_${criteriaItem.id }" data-value="${vCriteriaMap[criteriaItem.id].value}">
+									<option value="">--请选择--</option>
 									<c:forEach var="option" items="${criteriaOptionsMap[criteriaItem.fieldId]}">
 										<option value="${option.value }">${option.title}</option>
 									</c:forEach>								
 								</select>
+							</div>
+						</c:when>
+						<c:when test="${criteriaItem.inputType == 'date' }">
+							<div class="form-group">
+								<label class="control-label">${criteriaItem.title }</label>
+								<input class="form-control datepicker" type="text" name="criteria_${criteriaItem.id }" value="${vCriteriaMap[criteriaItem.id].value}"  />
 							</div>
 						</c:when>
 					</c:choose>

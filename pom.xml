@@ -11,9 +11,9 @@
 	<properties>
 		<version.kie>6.5.0.Final</version.kie>
 		<version.cpfweb>0.2.7</version.cpfweb>
-		<version.abcitem>3.3.4</version.abcitem>
-		<version.abcbizz>2.1.9</version.abcbizz>
-		<version.entityResolver>0.10</version.entityResolver>
+		<version.abcitem>3.3.24.alphal</version.abcitem>
+		<version.abcbizz>2.1.15</version.abcbizz>
+		<version.entityResolver>0.11</version.entityResolver>
 		<cxf.version>3.2.2</cxf.version>
 	</properties>
 	
@@ -44,11 +44,11 @@
 			<artifactId>item</artifactId>
 			<version>${version.abcitem}</version>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.abc</groupId>
 			<artifactId>bizz</artifactId>
 			<version>${version.abcbizz}</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>cn.sowell.datacenter</groupId>
 			<artifactId>entityResolver</artifactId>

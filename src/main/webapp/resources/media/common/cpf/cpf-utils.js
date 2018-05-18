@@ -329,13 +329,21 @@ define(function(require, exports){
 			return currentSeq;
 		},
 		datepicker		: function($dom,scrollEle){
-			return $($dom).datepicker({
-				format		: 'yyyy-mm-dd',
-				weekStart	: 1,
-				daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],  
-                monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月',  
-                        '七月', '八月', '九月', '十月', '十一月', '十二月' ]
-			},scrollEle);
+			$dom = $($dom);
+			if($dom.is(':text')){
+				$dom.keydown(function(e){
+					if(e.keyCode == 8){
+						$dom.val('');
+					}
+				});
+				return $dom.datepicker({
+					format		: 'yyyy-mm-dd',
+					weekStart	: 1,
+					daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],  
+					monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月',  
+						'七月', '八月', '九月', '十月', '十一月', '十二月' ]
+				},scrollEle);
+			}
 		},
 		/**
 		 * 获取焦点
@@ -582,8 +590,49 @@ define(function(require, exports){
 				$.error('索引必须小于数组长度' + array.length);
 			}
 			array.splice(x, 1, array.splice(y, 1, array[x])[0]);
+		},
+		merge			: function(){
+			if(arguments.length > 0){
+				var supportSet = typeof Set === 'function';
+				var first = arguments[0];
+				if($.isArray(first) || (supportSet && first instanceof Set)){
+					var second = arguments[1];
+					if($.isArray(second) || (supportSet && first instanceof Set)){
+						addAToB(second, first);
+					}
+					if(arguments.length > 2){
+						return exports.merge.apply(exports, $.merge([], first, arguments.slice(2)));
+					}else{
+						return first;
+					}
+				}
+			}
 		}
 	});
+	
+	function addAToB(a, b){
+		if($.isArray(b)){
+			if($.isArray(a)){
+				for(var i in a){
+					b.push(a[i]);
+				}
+			}else if(a instanceof Set){
+				a.forEach(function(e){
+					b.push(e);
+				});
+			}
+		}else if(b instanceof Set){
+			if($.isArray(a)){
+				for(var i in a){
+					b.add(a[i]);
+				}
+			}else if(a instanceof Set){
+				a.forEach(function(e){
+					b.add(e);
+				});
+			}
+		}
+	}
 	
 	/**
 	 * 封装jquery的回调列表，使其支持多个事件

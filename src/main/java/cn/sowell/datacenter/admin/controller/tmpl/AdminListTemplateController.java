@@ -25,6 +25,7 @@ import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
+import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.DataCenterConstants;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
@@ -241,6 +242,10 @@ public class AdminListTemplateController {
 					criteria.setTitle(item.getString("title"));
 					criteria.setFieldId(item.getLong("fieldId"));
 					criteria.setFieldKey(item.getString("fieldKey"));
+					JSONArray relationLabels = item.getJSONArray("relationLabel");
+					if(relationLabels != null) {
+						criteria.setRelationLabel(TextUtils.join(relationLabels.toArray(new String[relationLabels.size()])));
+					}
 					criteria.setCreateUserId(tmpl.getCreateUserId());
 					criteria.setOrder(order);
 					Boolean queryShow = item.getBoolean("queryShow");

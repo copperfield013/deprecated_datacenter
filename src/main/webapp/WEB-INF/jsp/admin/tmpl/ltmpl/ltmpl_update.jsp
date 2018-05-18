@@ -127,6 +127,11 @@
 													</div>
 												</div>
 												<div class="col-lg-12 criteria-detail-show-config-container">
+													<div id="relation-label-row">
+														<label>关系名</label>
+														<div id="relation-label-value-wrap">
+														</div>
+													</div>
 													<div>
 														<label>显示控件</label>
 														<div>
@@ -152,7 +157,7 @@
 														<div id="criteria-default-value-container">
 														</div>
 													</div>
-													<div>
+													<div id="criteria-placeholder-row">
 														<label>占位文本</label>
 														<div>
 															<input id="criteria-detail-placeholder" type="text">

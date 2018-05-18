@@ -15,12 +15,16 @@ define(function(require, exports, module){
 			//选择后，是否在自动完成文本框中同步该选项
 			textPicked		: false,
 			//是否显示数组字段
-			showArrayComposite	: true
+			showArrayComposite	: true,
+			//是否显示复合字段
+			hideCompositeFields	: false
 		};
 		
 		var param = $.extend({}, defaultParam, _param);
 		var _afterPicked = param.afterPicked;
 		var _this = this;
+
+		var disabledFieldSet = new Set();
 		
 		param.afterPicked = function(){
 			param.afterChoose.apply(_this, arguments);
@@ -31,7 +35,10 @@ define(function(require, exports, module){
 		function afterLoadFieldData(callback){
 			if(loadFieldDataDeferred == null){
 				loadFieldDataDeferred = $.Deferred();
-				require('ajax').ajax(param.reqDataURL, param.reqDataParam, function(__compositeData){
+				var reqParam = $.extend({}, {
+					withCompositeFields	: !param.hideCompositeFields
+				}, param.reqDataParam);
+				require('ajax').ajax(param.reqDataURL, reqParam, function(__compositeData){
 					var __fieldKeyData = {};
 					var __fieldData = transferInfoToFields(__compositeData, __fieldKeyData);
 					loadFieldDataDeferred.resolve(__fieldData, __compositeData, __fieldKeyData);
@@ -47,15 +54,16 @@ define(function(require, exports, module){
 					var thisField = thisComposite.fields[j];
 					fieldData.push(
 							fieldKeyData['id_' + thisField.id] = {
-									id		: thisField.id,
-									name	: thisField.name,
-									cname	: thisField.cname,
-									type	: thisField.type,
-									c_id	: thisComposite.c_id,
-									c_name	: thisComposite.name,
-									c_cname	: thisComposite.cname,
-									title	: thisField.cname,
-									c_title	: thisComposite.cname,
+									id			: thisField.id,
+									name		: thisField.name,
+									cname		: thisField.cname,
+									type		: thisField.type,
+									c_id		: thisComposite.c_id,
+									c_name		: thisComposite.name,
+									c_cname		: thisComposite.cname,
+									title		: thisField.cname,
+									c_title		: thisComposite.cname,
+									optGroupId	: thisField.optionGroupId,
 									composite	: thisComposite
 							});
 				}
@@ -100,7 +108,7 @@ define(function(require, exports, module){
 				
 				if(!__loadingFieldPicker){
 					__loadingFieldPicker = true;
-					require('tmpl').load('media/admin/field/tmpl/tmpl-fieldsearch.tmpl').done(function(tmpl){
+					loadGlobalTmpl().done(function(tmpl){
 						var _compositeData = filterTmplData(compositeData);
 						__$fieldPicker = tmpl.tmpl({
 							composites	: _compositeData,
@@ -203,6 +211,10 @@ define(function(require, exports, module){
 					}else{
 						$container.append($fieldPicker.show());
 					}
+					if($fieldPicker.is(':visible')){
+						var toActiveIndex = $fieldPicker.find('.fieldpicker-field-item.disabled').closest('.tab-pane').index();
+						_this.activeTab(toActiveIndex);
+					}
 				}
 				deferred.resolve($fieldPicker);
 			});
@@ -232,7 +244,6 @@ define(function(require, exports, module){
 		};
 		
 		
-		var disabledFieldSet = new Set();
 		/**
 		 * 启用字段（参数toEnable为false时为禁用，其他情况均为启用）
 		 * 该方法是异步操作，返回一个Deferred对象
@@ -244,20 +255,24 @@ define(function(require, exports, module){
 				$toDisable.toggleClass('disabled', toEnable === false);
 				_this.getFieldData(fieldId).done(function(field){
 					if(toEnable === false){
-						if(field.composite.isArray){
-							//选择的字段是一个数组字段，锁定当前选择器的标签页
-							_this.lockTabByCompositeId(field.composite.c_id);
-						}else{
-							hideArrayComposites();
+						if(!param.single){
+							if(field.composite.isArray){
+								//选择的字段是一个数组字段，锁定当前选择器的标签页
+								_this.lockTabByCompositeId(field.composite.c_id);
+							}else{
+								hideArrayComposites();
+							}
 						}
 						disabledFieldSet.add(fieldId.toString());
 					}else{
 						disabledFieldSet['delete'](fieldId.toString());
 						if(disabledFieldSet.size === 0){
-							if(field.composite.isArray){
-								_this.lockTabByCompositeId(field.composite.c_id, false);
-							}else{
-								hideArrayComposites(false);
+							if(!param.single){
+								if(field.composite.isArray){
+									_this.lockTabByCompositeId(field.composite.c_id, false);
+								}else{
+									hideArrayComposites(false);
+								}
 							}
 						}
 					}
@@ -423,6 +438,18 @@ define(function(require, exports, module){
 			+ '<i class="glyphicon glyphicon-search blue"></i>'
 			+ '<i title="选择字段" class="glyphicon glyphicon-th blue field-picker-button"></i>'
 			+ '</div>');
+	
+	var globalFieldSearchTemplateDeferred = null;
+	function loadGlobalTmpl(){
+		if(globalFieldSearchTemplateDeferred == null){
+			globalFieldSearchTemplateDeferred = $.Deferred();
+			require('tmpl').load('media/admin/field/tmpl/tmpl-fieldsearch.tmpl').done(function(tmpl){
+				globalFieldSearchTemplateDeferred.resolve(tmpl);
+			});
+		}
+		return globalFieldSearchTemplateDeferred.promise();
+	}
+	
 	$.extend(FieldSearch, {
 		build	: function(param){
 			var $search = $model.clone();

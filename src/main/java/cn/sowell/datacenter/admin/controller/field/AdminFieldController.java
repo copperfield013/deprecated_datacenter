@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
@@ -35,7 +36,9 @@ public class AdminFieldController {
     
     @ResponseBody
 	@RequestMapping("/json/{module}")
-	public ResponseJSON fieldJson(@PathVariable String module){
+	public ResponseJSON fieldJson(
+				@PathVariable String module, 
+				@RequestParam(name="withCompositeFields", required=false) Boolean withCompositeFields){
 		List<DictionaryComposite> infoList = dService.getAllComposites(module);
 		JsonArrayResponse jRes = new JsonArrayResponse();
 		for (DictionaryComposite info : infoList) {

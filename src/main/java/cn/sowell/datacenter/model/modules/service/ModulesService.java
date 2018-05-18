@@ -12,7 +12,6 @@ import org.springframework.beans.MutablePropertyValues;
 
 import com.abc.query.criteria.Criteria;
 
-import cn.sowell.datacenter.entityResolver.ImportCompositeField;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.config.ModuleMeta;
 import cn.sowell.datacenter.model.modules.bean.EntityPagingIterator;

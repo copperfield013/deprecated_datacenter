@@ -49,22 +49,22 @@ define(function(require, exports, module){
 				confirm = $this.attr('confirm'),
 				Dialog = require('dialog'),
 				_submit = function(){
-				//构造提交事件
-				var submitEvent = $.Event('cpf-submit');
-				var canceled = false;
-				submitEvent.doCancel = function(){canceled = true};
-				var result = $this.trigger(submitEvent, [formData, $this, page]);
-				try{
-					if(!canceled){
-						page.loadContent(url, undefined, formData);
-						$this.trigger('cpf-submitting', [formData, $this, page]);
+					//构造提交事件
+					var submitEvent = $.Event('cpf-submit');
+					var canceled = false;
+					submitEvent.doCancel = function(){canceled = true};
+					var result = $this.trigger(submitEvent, [formData, $this, page]);
+					try{
+						if(!canceled){
+							page.loadContent(url, undefined, formData);
+							$this.trigger('cpf-submitting', [formData, $this, page]);
+						}
+					}catch(e){
+						console.error(e);
+					}finally{
+						return false;
 					}
-				}catch(e){
-					console.error(e);
-				}finally{
-					return false;
-				}
-			};
+				};
 			if(confirm && Dialog){
 				Dialog.confirm(confirm, function(yes){
 					if(yes){
@@ -107,7 +107,7 @@ define(function(require, exports, module){
 			}
 		});
 		$('form :text.datepicker', $page).each(function(){
-			$(this).datepicker();
+			require('utils').datepicker(this);
 		});
 		/**
 		 * 初始化页面的所有勾选框

@@ -13,10 +13,10 @@ public interface DictionaryDao {
 
 	/**
 	 * 根据模块获得所有可用字段组
-	 * @param module
+	 * @param m
 	 * @return
 	 */
-	List<DictionaryComposite> getAllComposites(String module);
+	List<DictionaryComposite> getAllComposites(String m);
 
 	/**
 	 * 根据字段组获得其对应的所有可用字段
