@@ -94,13 +94,13 @@ public class DictionaryDaoImpl implements DictionaryDao{
 							"		f.id field_id, o.c_title" +
 							"	FROM" +
 							"		t_dictionary_field f" +
-							"	LEFT JOIN t_dictionary_optiongroup og ON f.optgroup_id = og.id" +
-							"	LEFT JOIN t_dictionary_option o ON og.id = o.group_id" +
+							"	LEFT JOIN v_dictionary_optiongroup og ON f.optgroup_id = og.id" +
+							"	LEFT JOIN v_dictionary_option o ON og.id = o.group_id" +
 							"	where f.id in (:fieldIds)" +
-							"	and o.c_disabled is null" +
-							"	and o.c_deleted is NULL" +
-							"	and og.c_deleted is null" +
-							"	and og.c_disabled is null" +
+//							"	and o.c_disabled is null" +
+//							"	and o.c_deleted is NULL" +
+//							"	and og.c_deleted is null" +
+//							"	and og.c_disabled is null" +
 							"	order by o.c_order asc";
 			SQLQuery query = sFactory.getCurrentSession().createSQLQuery(sql);
 			query.setParameterList("fieldIds", fieldIds);
