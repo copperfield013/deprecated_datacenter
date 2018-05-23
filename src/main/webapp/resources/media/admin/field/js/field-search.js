@@ -213,7 +213,9 @@ define(function(require, exports, module){
 					}
 					if($fieldPicker.is(':visible')){
 						var toActiveIndex = $fieldPicker.find('.fieldpicker-field-item.disabled').closest('.tab-pane').index();
-						_this.activeTab(toActiveIndex);
+						if(toActiveIndex >= 0){
+							_this.activeTab(toActiveIndex);
+						}
 					}
 				}
 				deferred.resolve($fieldPicker);
@@ -475,7 +477,7 @@ define(function(require, exports, module){
 			$button.click(function(){
 				search.togglePicker($search);
 			});
-			$($search.getLocatePage().getContent()).on('click', function(e){
+			$($search.getLocatePage().getContent().children()).on('mouseup', function(e){
 				if($(e.target).closest($search).length === 0){
 					search.togglePicker(false);
 				}

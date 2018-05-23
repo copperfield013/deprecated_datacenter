@@ -105,6 +105,7 @@
     this.linkFormat = DPGlobal.parseFormat(options.linkFormat || this.element.data('link-format') || DPGlobal.getDefaultFormat(this.formatType, 'link'), this.formatType);
     this.minuteStep = options.minuteStep || this.element.data('minute-step') || 5;
     this.pickerPosition = options.pickerPosition || this.element.data('picker-position') || 'bottom-right';
+    this.optionPickerPosition = options.pickerPosition;
     this.showMeridian = options.showMeridian || this.element.data('show-meridian') || false;
     this.initialDate = options.initialDate || new Date();
     this.zIndex = options.zIndex || this.element.data('z-index') || undefined;
@@ -632,17 +633,31 @@
         left = bodyWidth - 220;
       }
 
-      if (this.pickerPosition === 'top-left' || this.pickerPosition === 'top-right') {
-        top = offset.top - this.picker.outerHeight();
-      } else {
-        top = offset.top + this.height;
+      if(this.optionPickerPosition){
+    	  if (this.pickerPosition === 'top-left' || this.pickerPosition === 'top-right') {
+    		  top = offset.top - this.picker.outerHeight();
+    	  } else {
+    		  top = offset.top + this.height;
+    	  }
+      }else{
+    	  //没有传入pickerPosition的情况下，自动根据元素位置来显示选择器的位置
+    	  //当元素的位置+元素的高+选择器的高>屏幕高度，那么选择器显示在元素右上方
+    	  //否则选择器显示在元素右下方
+    	  this.picker.removeClass('datetimepicker-dropdown-' + this.pickerPosition);
+    	  var bodyHeight = document.body.clientHeight || window.innerHeight;
+    	  if(offset.top + this.height + this.picker.outerHeight() > bodyHeight){
+    		  this.pickerPosition = 'top-right';
+    		  top = offset.top - this.picker.outerHeight();
+    	  }else{
+    		  this.pickerPosition = 'bottom-right';
+    		  top = offset.top + this.height;
+    	  }
       }
-     /* if(this.container !== body){
-    	  top = top + document.body.scrollTop;
-      }*/
-      console.log(this.container);
-      top = top - containerOffset.top;
-      left = left - containerOffset.left;
+      /* if(this.container !== body){
+		  top = top + document.body.scrollTop;
+	  }*/
+	  top = top - containerOffset.top;
+	  left = left - containerOffset.left;
 
       this.picker.css({
         top:    top,

@@ -43,6 +43,7 @@ import cn.sowell.datacenter.model.tmpl.bean.QueryEntityParameter;
 import cn.sowell.datacenter.model.tmpl.param.ListTemplateParameter;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateGroup;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.datacenter.model.tmpl.service.TemplateService;
 
 @Controller
@@ -120,6 +121,16 @@ public class AdminModulesController {
 			}
 			if(param.getListTemplate().getCriterias() != null){
 				model.addAttribute("criteriaOptionsMap", dictService.getOptionsMap(CollectionUtils.toSet(param.getListTemplate().getCriterias(), criteria->criteria.getFieldId())));
+				model.addAttribute("labelsMap", dictService.getModuleLabelMap(module));
+			}
+			if(param.getListTemplate().getCriterias() != null) {
+				StringBuffer hidenCriteriaDesc = new StringBuffer();
+				for (TemplateListCriteria criteria : param.getListTemplate().getCriterias()) {
+					if(criteria.getQueryShow() == null && TextUtils.hasText(criteria.getDefaultValue())) {
+						hidenCriteriaDesc.append(criteria.getTitle() + ":" + criteria.getDefaultValue() + "&#10;");
+					}
+				}
+				model.addAttribute("hidenCriteriaDesc", hidenCriteriaDesc);
 			}
 		}
 		model.addAttribute("vCriteriaMap", param.getNormalCriteriaMap());

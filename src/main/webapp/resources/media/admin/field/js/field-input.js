@@ -2,7 +2,7 @@
  * 人口编辑的编辑功能中，用于匹配生成适用于对应字段的表单
  */
 define(function(require, exports, module){
-	
+	"use strict";
 	
 	function FieldInput(_param){
 		var defaultParam = {
@@ -43,7 +43,8 @@ define(function(require, exports, module){
 			//已经生成的表单元素，如果传入了该值，那么就不会根据其他参数再生成表单元素
 			$dom		: null,
 			//检测表单的函数，如果错误，返回错误信息(string)，否则检测成功
-			validator	: $.noop
+			validator	: $.noop,
+			$page		: null
 		};
 		
 		var param = $.extend({}, defaultParam, _param);
@@ -174,70 +175,102 @@ define(function(require, exports, module){
 				$text.val(value);
 			}
 			$text.attr('readonly', 'readonly');
-			Utils.datepicker($text);
+			var scrollEle = null;
+			if(param.$page){
+				var page = param.$page.getLocatePage();
+				if(page instanceof require('page')){
+					scrollEle = page.getContent();
+				}
+			}
+			Utils.datepicker($text, scrollEle);
 			return $text;
 		};
 		
 		this.__buildCheckbox = function(){
-			var Checkbox = require('checkbox');
-			var $c = $('<span>');
-			if($.isArray(param.options)){
-				for(var i in param.options){
-					var uuid = require('utils').uuid(10, 62);
-					var option = param.options[i];
-					var $label = $('<span for="' + uuid + '">').text(option.view);
-					var $checkbox = $('<input type="checkbox" '
-							+ 'id="' + uuid + '" '
-							+ 'name="' + param.name + '" '
-							+ 'value="' + option.value + '" '
-							+ 'data-text="' + option.view + '" />');
-					$c.append($checkbox);
-					$c.append($label);
-				}
-				var group = Checkbox.bind($c.children(':checkbox'), param.value);
-				$c.val = function(val){
-					if(val === undefined){
-						return group.getValue().join();
-					}else{
-						group.setValue(val);
-						group.autoSort();
-					}
-				}
-			}
-			return $c;
+			return this.__buildMultiselect('options');
 		}
 		
 		this.__buildLabel = function(){
-			var Checkbox = require('checkbox');
-			var $c = $('<span>');
-			if(param.fieldKey){
-				var labels = FieldInput.GLOBAL_LABELS[param.fieldKey];
-				if(labels){
-					for(var i in labels){
-						var label = labels[i];
-						var uuid = require('utils').uuid(10, 62);
-						var $label = $('<span for="' + uuid + '">').text(label);
-						var $checkbox = $('<input type="checkbox" '
-								+ 'id="' + uuid + '" '
-								+ 'name="' + param.name + '" '
-								+ 'value="' + label + '" '
-								+ 'data-text="' + label + '" />');
-						$c.append($checkbox);
-						$c.append($label);
-					}
-				}
-				var group = Checkbox.bind($c.children(':checkbox'), param.value);
-				$c.val = function(val){
-					if(val === undefined){
-						return group.getValue().join();
-					}else{
-						group.setValue(val);
-						group.autoSort();
-					}
+			return this.__buildMultiselect('labels');
+		};
+		
+		this.__buildMultiselect = function(source){
+			var options = null;
+			if(!source){
+				if($.isArray(param.options)){
+					source = 'options';
+				}else if(param.fieldKey){
+					source = 'labels';
 				}
 			}
-			return $c;
+			
+			if(source === 'options'){
+				options = param.options;
+			}else if(source === 'labels'){
+				options = FieldInput.GLOBAL_LABELS[param.fieldKey];
+			}
+			
+			if(options){
+				var $div = $('<div style="width:85%;">');
+				var $select = $('<select multiple="multiple" >').appendTo($div);
+				var S2 = require('select2');
+				if($.fn.select2){
+					$select.select2({
+						theme	: "bootstrap",
+						width	: null,
+						data	: options
+						
+					});
+				}
+				$div.val = function(value){
+					if(value === undefined){
+						var v = $select.val();
+						if(typeof v === 'string'){
+							return v;
+						}else if($.isArray(v)){
+							return v.join();
+						}
+					}else if(typeof value === 'string'){
+						return $div.val(value.split(','));
+					}else if($.isArray(value)){
+						$select.val(value).trigger('change');
+						return $div;
+					}
+				}
+				return $div;
+			}
 		};
+		
+		this.__buildDateRange = function(){
+			var $start = $('<input type="text" />'),
+				$end = $('<input type="text" />'),
+				$div = $('<span class="field-input-date-range">');
+			$div.append($start);
+			$div.append('~');
+			$div.append($end);
+			require('utils').datepicker($start).on('changeDate', function(){
+				var start = $(this).val() || '0-0-0';
+				$end.datetimepicker('setStartDate', start);
+			});
+			require('utils').datepicker($end).on('changeDate', function(){
+				var end = $(this).val() || '9999-12-31';
+				$start.datetimepicker('setEndDate', end);
+			});
+			$div.val = function(value){
+				if(!value){
+					var start = $start.val(),
+						end = $end.val();
+					return start + '~' + end;
+				}else{
+					if(typeof value === 'string'){
+						var split = value.split('~');
+						$start.val(split[0]).trigger('changeDate');
+						$end.val(split[1]).trigger('changeDate');
+					}
+				}
+			};
+			return $div;
+		}
 		
 		this.__buildDom = function(){
 			checkBuildParam();
@@ -260,6 +293,13 @@ define(function(require, exports, module){
 					break;
 				case 'label':
 					$dom = this.__buildLabel();
+					break
+				case 'multiselect':
+					$dom = this.__buildMultiselect();
+					break;
+				case 'daterange':
+					$dom = this.__buildDateRange();
+					break
 				default:
 			}
 			return $dom;
@@ -284,12 +324,12 @@ define(function(require, exports, module){
 		this.getValue = function(){
 			switch(param.type){
 				case 'label':
-					var labels = [];
+					/*var labels = [];
 					this.getDom().find(':checkbox:checked').each(function(){
 						labels.push($(this).val());
 					});
 					return labels;
-					break;
+					break;*/
 				case 'select':
 				default:
 					return this.getDom().val();

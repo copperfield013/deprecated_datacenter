@@ -1,6 +1,7 @@
 package cn.sowell.datacenter.admin.controller.modules;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +37,7 @@ import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
+import cn.sowell.copframe.spring.file.FileUtils;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
@@ -61,6 +63,9 @@ public class AdminModulesImportController {
 	@Resource
 	ModulesService mService;
 	
+	@Resource
+	FileUtils fileUtils;
+	
 	Logger logger = Logger.getLogger(AdminModulesImportController.class);
 	
 	
@@ -73,9 +78,49 @@ public class AdminModulesImportController {
 	}
 	
 	@ResponseBody
+	@RequestMapping("/resolve_file")
+	public ResponseJSON resolveFile(MultipartFile file) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		String fileName = file.getOriginalFilename();
+		String suffix = null;
+    	Workbook wk = null;
+    	try {
+    		if(fileName.endsWith(".xls")){
+    			wk = new HSSFWorkbook(file.getInputStream());
+    			suffix = ".xls";
+    		}if(fileName.endsWith("xlsx")){
+    			wk = new XSSFWorkbook(file.getInputStream());
+    			suffix = ".xlsx";
+    		}else{
+    			jRes.put("msg", "文件格式错误，只支持xls和xlsx格式的文件。");
+    		}
+    	} catch (IOException e1) {
+    		jRes.put("msg", "读取文件时发生错误");
+    	}
+    	if(wk != null){
+    		int sheetCount = wk.getNumberOfSheets();
+    		LinkedHashSet<String> names = new LinkedHashSet<>();
+    		for (int i = 0; i < sheetCount; i++) {
+				names.add(wk.getSheetName(i));
+			}
+    		jRes.put("names", names);
+    		String uuid = TextUtils.uuid();
+			try {
+				fileUtils.saveFile(uuid + suffix, file.getInputStream());
+				jRes.put("fileName", uuid + suffix);
+				jRes.setStatus("suc");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+		return jRes;
+	}
+	
+	@ResponseBody
     @RequestMapping("/do/{module}")
 	public ResponseJSON doImport(
-			MultipartFile file, 
+			@RequestParam String fileName,
 			@PathVariable String module,
 			@RequestParam String sheetName, 
 			@RequestParam String dataType, 
@@ -86,13 +131,13 @@ public class AdminModulesImportController {
         if(mData != null) {
         	String uuid = TextUtils.uuid();
         	jRes.put("uuid", uuid);
-        	String fileName = file.getOriginalFilename();
         	Workbook wk = null;
         	try {
+        		InputStream inputStream = fileUtils.getInputStream(fileName);
         		if(fileName.endsWith(".xls")){
-        			wk = new HSSFWorkbook(file.getInputStream());
+					wk = new HSSFWorkbook(inputStream);
         		}if(fileName.endsWith("xlsx")){
-        			wk = new XSSFWorkbook(file.getInputStream());
+        			wk = new XSSFWorkbook(inputStream);
         		}else{
         			jRes.put("msg", "文件格式错误，只支持xls和xlsx格式的文件。");
         		}

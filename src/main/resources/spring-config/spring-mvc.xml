@@ -95,7 +95,7 @@ http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 	    <property name="maxUploadSize" value="10240000"></property>  
 	</bean>  
 	
-	<bean class="cn.sowell.copframe.common.file.FileUploadUtils">
+	<bean class="cn.sowell.copframe.spring.file.FileUtils">
 		<constructor-arg value="${upload_path}" />
 		<constructor-arg value="${upload_uri}" />
 	</bean>

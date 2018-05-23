@@ -1,6 +1,20 @@
 define(function(require, exports, module){
 	var FieldSearch = require('field/js/field-search.js');
 	var FieldInput = require('field/js/field-input.js');
+	var fieldInputTypeMap = {
+			text		: '文本框',
+			select		: '单选下拉框',
+			date		: '日期选择',
+			label		: '标签选择',
+			daterange	: '日期范围'
+	};
+	
+	var selectableType	= {
+			text	: ['text'],
+			select	: ['text', 'select'],
+			date	: ['date', 'daterange'],
+			label	: ['label']
+	}
 	exports.init = function($page, tmplData, criteriaData, columnData, module){
 		console.log($page);
 		initTmpl($page, tmplData);
@@ -160,6 +174,10 @@ define(function(require, exports, module){
 			$criteriaPartitionTmpl = $('#criteria-partition-tmpl', $page);
 		
 		var currentCriteria = null;
+		
+		
+		
+		
 		/**
 		 * 显示条件详情
 		 */
@@ -179,17 +197,6 @@ define(function(require, exports, module){
 			$detailArea.show();
 		}
 		
-		var fieldInputTypeMap = {
-				text	: '文本框',
-				select	: '单选下拉框',
-				date	: '日期选择'
-		};
-		
-		var selectableType	= {
-				text	: ['text'],
-				select	: ['text', 'select'],
-				date	: ['date']
-		}
 		
 		function filterFieldInputSelectable($select, field){
 			$select.empty();
@@ -227,7 +234,7 @@ define(function(require, exports, module){
 			}
 			var queryShow = criteria.isQueryShow();
 			$('#toggle-show-criteria', $page).prop('checked', queryShow).trigger('change');
-			if(queryShow){
+			//if(queryShow){
 				var $defVal = $('#criteria-default-value-container', $page).children();
 				$defVal.detach();
 				criteria.detailHandler(function($$){
@@ -240,14 +247,14 @@ define(function(require, exports, module){
 					$$('#criteria-detail-placeholder').val(criteria.getPlaceholder());
 					toggleRelationLabelInput($$('#relation-label-row'), criteria.getRelationLabelInput())
 				});
-			}
+			//}
 			
-			var $partitionsContainer = $('.criteria-detail-partitions-container', $page)
+			/*var $partitionsContainer = $('.criteria-detail-partitions-container', $page)
 					.find('.criteria-detail-partition').remove().end(); 
 			var partitions = criteria.getPartitions();
 			for(var i in partitions){
 				apppendPartitionDom(partitions[i]);
-			}
+			}*/
 			cField = field;
 		}
 		function apppendPartitionDom(partition){
@@ -278,7 +285,7 @@ define(function(require, exports, module){
 				},
 				$detailArea		: $('.criteria-detail-area', $page),
 				module			: module
-			});
+			}, $page);
 			$criteria.find('.criteria-property-name span').dblclick(function(){
 				require('utils').toEditContent(this).bind('confirmed', function(title){
 					criteria.setTitle(title);
@@ -300,7 +307,7 @@ define(function(require, exports, module){
 					$('#criteria-detail-placeholder', $page).val(placeholder);
 				},
 				afterToggleQueryShow: function(toShow){
-					
+					$criteria.toggleClass('criteria-hidden', !toShow);
 				},
 				afterSetComparatorName:	function(comparatorName){
 					criteria.detailHandler(function($$){
@@ -356,11 +363,7 @@ define(function(require, exports, module){
 							}
 						});
 						$('#criteria-default-value-container', $page).empty().append(valueInput.getInput());
-						if(valueInput.getType() === 'text'){
-							$('#criteria-placeholder-row', $page).show();
-						}else{
-							$('#criteria-placeholder-row', $page).hide();
-						}
+						$('#criteria-placeholder-row', $page).toggle(criteria.isQueryShow() && valueInput.getType() === 'text');
 					}
 				}
 			});
@@ -374,10 +377,10 @@ define(function(require, exports, module){
 		}
 		
 		//点击条件节点时的回调
-		$page.on('click', '.criteria-item:not(.criteria-selected)', function(){
+		$criteriaContainer.on('click', '.criteria-item:not(.criteria-selected)', function(){
 			showCriteriaDetail($(this));
 		});
-		$page.on('click', '.btn-remove-criteria', function(){
+		$criteriaContainer.on('click', '.btn-remove-criteria', function(){
 			var $criteriaItem = $(this).closest('.criteria-item');
 			require('dialog').confirm('确定删除该条件？', function(yes){
 				if(yes){
@@ -405,13 +408,21 @@ define(function(require, exports, module){
 		//切换条件显示状态
 		$('#toggle-show-criteria', $page).change(function(){
 			var toShow = $(this).prop('checked');
-			$('.criteria-detail-partitions-container', $page).toggle(!toShow);
-			$('.criteria-detail-show-config-container', $page).toggle(toShow);
+			var $defaultValueLabel = $('#default-value-label', $page);
+			var $placeholderRow = $('#criteria-placeholder-row', $page);
+			$placeholderRow.toggle(toShow);
+			if(toShow){
+				$defaultValueLabel.text('默认值');
+			}else{
+				$defaultValueLabel.text('值');
+			}
+			//$('.criteria-detail-partitions-container', $page).toggle(!toShow);
+			//$('.criteria-detail-show-config-container', $page).toggle(toShow);
 			handleSelectedItem(function($item){
 				this.toggleQueryShow(toShow);
 			});
 		}).trigger('change');
-		$('.criteria-partition-add', $page).click(function(){k
+		$('.criteria-partition-add', $page).click(function(){
 			handleSelectedItem(function(){
 				this.addPartition();
 			});
@@ -434,11 +445,9 @@ define(function(require, exports, module){
 			var inputType = $(this).val();
 			handleSelectedItem(function(){
 				try{
-					if(inputType === 'select'){
-						this.setDefaultInputType({
-							type		: inputType,
-							optGroupId	: this.getField().optGroupId
-						});
+					if(inputType === 'select' 
+						|| inputType === 'label'){
+						this.setDefaultInputType($.extend({type	: inputType}, this.getField()));
 					}else{
 						this.setDefaultInputType(inputType);
 					}
@@ -474,12 +483,20 @@ define(function(require, exports, module){
 				$CPF.closeLoading();
 			}
 		});
+		$criteriaContainer.sortable({
+			helper 		: "clone",
+			cursor 		: "move",// 移动时候鼠标样式
+			opacity		: 0.5, // 拖拽过程中透明度
+			tolerance 	: 'pointer',
+			update		: function(){
+			}
+		});
 	}
 	
 	/**
 	 * 条件类
 	 */
-	function Criteria(_param){
+	function Criteria(_param, $page){
 		var defaultParam = {
 			field		: null,
 			queryShow	: true,
@@ -506,7 +523,7 @@ define(function(require, exports, module){
 				this.setComparatorName(data.comparator);
 				this.setPlaceholder(data.placeholder);
 				this.setRelationLabelValue(data.relationLabel);
-				defaultValueInput = new ValueInput(data.fieldData);
+				defaultValueInput = new ValueInput($.extend({}, data.fieldData, {type:data.inputType}), $page);
 				defaultValueInput.setValue(data.defaultValue);
 			}else{
 				$.error();
@@ -601,7 +618,7 @@ define(function(require, exports, module){
 			if(inputType instanceof ValueInput){
 				defaultValueInput = inputType;
 			}else{
-				defaultValueInput = new ValueInput(inputType);
+				defaultValueInput = new ValueInput(inputType, $page);
 			}
 			callbackMap.fire('afterSetDefaultInputType', [defaultValueInput]);
 		}
@@ -645,7 +662,7 @@ define(function(require, exports, module){
 			if(field && field.composite && field.composite.relationSubdomain){
 				if(!relationLabelFieldInput){
 					relationLabelFieldInput = new FieldInput({
-						type	: 'label',
+						type	: 'multiselect',
 						fieldKey: param.module + '@' + field.composite.name,
 						value	: param.data && param.data.relationLabel
 					});
@@ -834,22 +851,23 @@ define(function(require, exports, module){
 		return new Selection(options, clazz);
 	}
 	
-	function ValueInput(field){
+	function ValueInput(field, $page){
 		var fieldInput = null;
 		var defaultValue = null,
 			placeholder = null;
 		if(typeof field === 'string'){
 			fieldInput = new FieldInput({
-				type	: field
+				type	: field,
+				$page	: $page
 			});
 		}else if(typeof field === 'object'){
-			console.log(field);
 			var fParam = {
-				type		: field.type,
-				optionsKey	: field.optGroupId
+				optionsKey	: field.optGroupId,
+				fieldKey	: field.composite.module + '@' + field.name,
+				$page		: $page
 			};
 			
-			fieldInput = new FieldInput(fParam);
+			fieldInput = new FieldInput($.extend({}, field, fParam));
 		}else{
 			fieldInput = new FieldInput({
 				type	: 'text'

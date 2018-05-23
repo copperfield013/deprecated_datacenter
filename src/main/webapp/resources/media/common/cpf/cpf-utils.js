@@ -331,18 +331,26 @@ define(function(require, exports){
 		datepicker		: function($dom,scrollEle){
 			$dom = $($dom);
 			if($dom.is(':text')){
-				$dom.keydown(function(e){
+				/*$dom.keydown(function(e){
 					if(e.keyCode == 8){
-						$dom.val('');
+						$dom.val('').trigger('changeDate');
 					}
+				});*/
+				return $dom.datetimepicker({
+					format		: 'yyyy-mm-dd',
+					language	: 'zh-CN',
+					weekStart	: 1,
+					autoclose	: true,
+					minView		: 'month',
+					bootcssVer	: 3
 				});
-				return $dom.datepicker({
+				/*return $dom.datepicker({
 					format		: 'yyyy-mm-dd',
 					weekStart	: 1,
 					daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],  
 					monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月',  
 						'七月', '八月', '九月', '十月', '十一月', '十二月' ]
-				},scrollEle);
+				},scrollEle);*/
 			}
 		},
 		/**
@@ -371,7 +379,7 @@ define(function(require, exports){
 				}
 			};
 			var param = $.extend({}, defaultParam, _param);
-			return $dom.daterangepicker(param);
+			return $($dom).daterangepicker(param);
 		},
 		triggerInField	: function(fieldName, eventName, args, target){
 			if(typeof fieldName === 'string' && typeof eventName === 'string'){

@@ -25,7 +25,6 @@ import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
-import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.DataCenterConstants;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
@@ -242,22 +241,18 @@ public class AdminListTemplateController {
 					criteria.setTitle(item.getString("title"));
 					criteria.setFieldId(item.getLong("fieldId"));
 					criteria.setFieldKey(item.getString("fieldKey"));
-					JSONArray relationLabels = item.getJSONArray("relationLabel");
-					if(relationLabels != null) {
-						criteria.setRelationLabel(TextUtils.join(relationLabels.toArray(new String[relationLabels.size()])));
-					}
+					criteria.setRelationLabel(item.getString("relationLabel"));
 					criteria.setCreateUserId(tmpl.getCreateUserId());
-					criteria.setOrder(order);
+					criteria.setOrder(order++);
+					//条件需要显示
+					criteria.setComparator(item.getString("comparator"));
+					criteria.setInputType(item.getString("inputType"));
+					criteria.setDefaultValue(item.getString("defVal"));
+					criteria.setTitle(item.getString("title"));
 					Boolean queryShow = item.getBoolean("queryShow");
 					if(queryShow != null && queryShow){
 						criteria.setQueryShow(1);
-						//条件需要显示
-						criteria.setComparator(item.getString("comparator"));
-						criteria.setInputType(item.getString("inputType"));
-						criteria.setDefaultValue(item.getString("defVal"));
 						criteria.setPlaceholder(item.getString("placeholder"));
-						criteria.setTitle(item.getString("title"));
-						
 					}else{
 						//隐藏条件
 						/*

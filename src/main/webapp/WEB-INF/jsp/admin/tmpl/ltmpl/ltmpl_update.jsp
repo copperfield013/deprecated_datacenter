@@ -8,7 +8,7 @@
 </c:set>
 <title>${title }</title>
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/ltmpl-update.css" />
-<div class="ltmpl-update detail" id="ltmpl-update-${module.name }-${ltmpl.id }">
+<div class="ltmpl-update detail" id="ltmpl-update-${RES_STAMP }">
 	<script type="jquery/tmpl" id="col-row-tmpl">
 		<div class="row" column-id="\${columnId}" field-id="\${id}" field-key="\${(c_name?(c_name + '.'):'') + name}">
 			<span class="col-name">\${cname}</span>
@@ -98,7 +98,7 @@
 											<div class="row criteria-show-toggle-row hide-when-no-field">
 												<div class="col-lg-12">
 													<label>
-														<input disabled="disabled" id="toggle-show-criteria" class="checkbox-slider slider-icon colored-blue" checked="checked" type="checkbox">
+														<input id="toggle-show-criteria" class="checkbox-slider slider-icon colored-blue" checked="checked" type="checkbox">
 														<span class="text">显示(勾选时将条件显示在列表上方，供用户查询)</span>
 													</label>
 												</div>
@@ -133,7 +133,7 @@
 														</div>
 													</div>
 													<div>
-														<label>显示控件</label>
+														<label>控件</label>
 														<div>
 															<select id="field-input-type">
 																<option value="text">文本框</option>
@@ -153,7 +153,7 @@
 														</div>
 													</div>
 													<div>
-														<label>默认值</label>
+														<label id="default-value-label">默认值</label>
 														<div id="criteria-default-value-container">
 														</div>
 													</div>
@@ -290,7 +290,7 @@
 </div>
 <script>
 	seajs.use(['tmpl/js/ltmpl-update.js', 'utils'], function(LtmplUpdate, Utils){
-		var $page = $('#ltmpl-update-${module.name }-${ltmpl.id }');
+		var $page = $('#ltmpl-update-${RES_STAMP }');
 		var tmplData = Utils.parseJSON('${tmplDataJSON}'),
 			criteriaData = Utils.parseJSON('${criteriaDataJSON}'),
 			columnData = Utils.parseJSON('${columnDataJSON}')

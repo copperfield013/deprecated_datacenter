@@ -148,5 +148,11 @@ public class DictionaryServiceImpl implements DictionaryService, FieldService{
 		return labelsMap;
 	}
 	
+	@Override
+	public Map<String, Label> getModuleLabelMap(String module) {
+		FusionContextConfig config = fFactory.getDefaultConfig(module);
+		return CollectionUtils.toMap(config.getAllLabels(), label->label.getFieldName());
+	}
+	
 	
 }

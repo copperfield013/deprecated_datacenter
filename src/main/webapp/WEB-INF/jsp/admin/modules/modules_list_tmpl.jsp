@@ -30,33 +30,44 @@
 			<input type="hidden" name="tg" value="${templateGroup.key }"  />
 			<c:if test="${not empty ltmpl.criterias }">
 				<c:forEach var="criteriaItem" items="${ltmpl.criterias }">
-					<c:choose>
-						<c:when test="${criteriaItem.inputType == 'text' }">
-							<div class="form-group">
-								<label class="control-label">${criteriaItem.title }</label>
-								<input class="form-control" type="text" name="criteria_${criteriaItem.id }" value="${vCriteriaMap[criteriaItem.id].value}" placeholder="${criteriaItem.placeholder }" />
-							</div>
-						</c:when>
-						<c:when test="${criteriaItem.inputType == 'select' }">
-							<div class="form-group">
-								<label class="control-label">${criteriaItem.title }</label>
-								<select class="form-control" name="criteria_${criteriaItem.id }" data-value="${vCriteriaMap[criteriaItem.id].value}">
-									<option value="">--请选择--</option>
-									<c:forEach var="option" items="${criteriaOptionsMap[criteriaItem.fieldId]}">
-										<option value="${option.value }">${option.title}</option>
-									</c:forEach>								
-								</select>
-							</div>
-						</c:when>
-						<c:when test="${criteriaItem.inputType == 'date' }">
-							<div class="form-group">
-								<label class="control-label">${criteriaItem.title }</label>
-								<input class="form-control datepicker" type="text" name="criteria_${criteriaItem.id }" value="${vCriteriaMap[criteriaItem.id].value}"  />
-							</div>
-						</c:when>
-					</c:choose>
+					<c:if test="${criteriaItem.queryShow != null }">
+						<div class="form-group">
+							<label class="control-label">${criteriaItem.title }</label>
+							<c:choose>
+								<c:when test="${criteriaItem.inputType == 'text' }">
+									<input class="form-control" type="text" name="criteria_${criteriaItem.id }" value="${vCriteriaMap[criteriaItem.id].value}" placeholder="${criteriaItem.placeholder }" />
+								</c:when>
+								<c:when test="${criteriaItem.inputType == 'select' }">
+									<select class="form-control" name="criteria_${criteriaItem.id }" data-value="${vCriteriaMap[criteriaItem.id].value}">
+										<option value="">--请选择--</option>
+										<c:forEach var="option" items="${criteriaOptionsMap[criteriaItem.fieldId]}">
+											<option value="${option.value }">${option.title}</option>
+										</c:forEach>								
+									</select>
+								</c:when>
+								<c:when test="${criteriaItem.inputType == 'date' }">
+									<input class="form-control datepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${vCriteriaMap[criteriaItem.id].value}"  />
+								</c:when>
+								<c:when test="${criteriaItem.inputType == 'label' }">
+									<select style="min-width: 70px" class="cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${vCriteriaMap[criteriaItem.id].value}">
+										<c:forEach var="label" items="${labelsMap[criteriaItem.fieldKey].subdomain}">
+											<option value="${label }">${label}</option>
+										</c:forEach>								
+									</select>
+								</c:when>
+								<c:when test="${criteriaItem.inputType == 'daterange' }">
+									<span class="cpf-daterangepicker format-submit-value" 
+										data-name="criteria_${criteriaItem.id }" 
+										data-value="${vCriteriaMap[criteriaItem.id].value}"></span>
+								</c:when>
+								<c:otherwise>
+									<input type="text" disabled="disabled" placeholder="没有配置对应的控件${criteriaItem.inputType }" />
+								</c:otherwise>
+							</c:choose>
+						</div>
+					</c:if>
 				</c:forEach>
-				<button type="submit" class="btn btn-default">查询</button>
+				<button type="submit" class="btn btn-default" title="${hidenCriteriaDesc }">查询</button>
 			</c:if>
 		</form>
 		<div class="row list-area">

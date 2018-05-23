@@ -28,5 +28,7 @@ public interface DictionaryService {
 
 	DictionaryComposite getCurrencyCacheCompositeByFieldId(String module, Long fieldId);
 
+	Map<String, Label> getModuleLabelMap(String module);
+
 	
 }

@@ -33,7 +33,6 @@ public class DictionaryComposite implements Composite{
 	private String title;
 	
 	@Column(name="c_module")
-	@JSONField(serialize=false)
 	private String module;
 	
 	@Column(name="c_is_array")

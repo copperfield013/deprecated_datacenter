@@ -252,6 +252,10 @@
     position: relative;
     overflow: hidden;
 }
+.ltmpl-update .criteria-item.criteria-hidden {
+    background-color: #efefef;
+    border-color: #bbb;
+}
 .ltmpl-update .criteria-item.criteria-selected {
     border: 2px solid #5db2ff;
 }
@@ -374,7 +378,9 @@
     display: inline-block;
 }
 
-.ltmpl-update .criteria-detail-show-config-container,
+.ltmpl-update .criteria-detail-show-config-container{
+	padding-left: 50px;
+}
 .ltmpl-update .criteria-detail-partitions-container{
 	display: none;
 	padding-left: 50px;

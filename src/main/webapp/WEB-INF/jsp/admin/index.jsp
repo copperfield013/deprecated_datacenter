@@ -18,6 +18,10 @@
 	    <script src="media/admin/plugins/bootstrapt-treeview/dist/bootstrap-treeview.min.js"></script>
 	    <script src="media/admin/plugins/beyond/js/validation/bootstrapValidator.js"></script>
 	    <script src="media/admin/plugins/beyond/js/tagsinput/bootstrap-tagsinput.js"></script>
+	    <link href="media/admin/plugins/select2/css/select2.min.css" rel="stylesheet" />
+	    <link href="media/admin/plugins/select2/css/select2-bootstrap.css" rel="stylesheet" />
+	    <!-- <script src="media/admin/plugins/select2/js/select2.full.js"></script>
+	    <script src="media/admin/plugins/select2/js/i18n/zh-CN.js"></script> -->
 	</head>
 	<body>
 		<div class="navbar">
@@ -57,7 +61,7 @@
 									<ul class="nav nav-tabs" id="main-tab-title-container">
 										<li class="active main-tab-title">
 										    <a data-toggle="tab" href="#cpf-home-tab">
-												主页 
+												主页
 										    </a>
 										</li>
 									</ul>
@@ -103,7 +107,8 @@
 					'checkbox'	: 'COMMON/cpf/cpf-checkbox.js?v=${cpfVersion}',
 					'innerpage'	: 'COMMON/cpf/cpf-innerpage.js?v=$${cpfVersion}',
 					'bloodhound': '${basePath}media/admin/plugins/typeahead/dist/typeahead.bundle.js?v=$${cpfVersion}',
-					'tmpl'		: 'COMMON/cpf/cpf-tmpl.js?v=${cpfVersion}'
+					'tmpl'		: 'COMMON/cpf/cpf-tmpl.js?v=${cpfVersion}',
+					'select2'	: '${basePath}media/admin/plugins/select2/js/select2.full.js'
 				}
 	    		});
 	    		

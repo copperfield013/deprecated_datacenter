@@ -113,6 +113,19 @@
 	"datetime"	: {
 		"ref_comparators"	: "#comparators.*"
 	},
+	"daterange"	: {
+		"comparators"		: [
+			{
+				"title"	: "在",
+				"key"	: "dr1"
+			},
+			{
+				"title"	: "不在",
+				"key"	: "dr1n",
+				"class"	: "negative"
+			}
+		]
+	},
 	"timerange"	: {
 		"comparators"		: [
 			{
@@ -138,6 +151,19 @@
 			{
 				"title"	: "不为",
 				"key"	: "a1n",
+				"class"	: "negative"
+			}
+		]
+	},
+	"label"			: {
+		"comparators"		: [
+			{
+				"title"	: "包含",
+				"key"	: "l1"
+			},
+			{
+				"title"	: "不包含",
+				"key"	: "l1n",
 				"class"	: "negative"
 			}
 		]

@@ -17,13 +17,14 @@
 					<div class="form-group">
 						<label class="col-lg-2 control-label">上传文件</label>
 						<div class="col-lg-6">
-							<input type="file" name="file" class="form-control" />
+							<input id="file" type="file" name="file" class="form-control" accept=".xls,.xlsx" />
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="col-lg-2 control-label">表格名</label>
 						<div class="col-lg-6">
-							<input type="text" name="sheetName" class="form-control" />
+							<select id="sheetName" name="sheetName" class="form-control"></select>
+							<!-- <input id="sheetNames" type="text" name="sheetName" class="form-control" /> -->
 						</div>
 					</div>
 					<div class="form-group">
@@ -73,16 +74,44 @@
 	</div>
 </div>
 <script>
-	seajs.use(['ajax', 'dialog'], function(Ajax, Dialog){
+	seajs.use(['ajax', 'dialog', '$CPF'], function(Ajax, Dialog, $CPF){
 		var $page = $('#modules-import-${module.name }');
 		console.log($page);
 		var $feedback = $('#feedback-msg', $page);
 		var uuid = null;
 		var $form = $('form', $page);
+		var fileUUID = null;
+		$('#file').change(function(){
+			var formData = new FormData();
+			if(this.files && this.files.length > 0){
+				formData.append('file', this.files[0]);
+				$CPF.showLoading();
+				Ajax.ajax('admin/modules/import/resolve_file', formData, function(data){
+					if(data.status === 'suc'){
+						var $sheetName = $('#sheetName', $page).empty();
+						for(var i in data.names){
+							$sheetName.append('<option value="' + data.names[i] + '">' + data.names[i] + '</option>');	
+						}
+						fileUUID = data.fileName;
+					}else{
+						Dialog.notice('文件错误', 'error');
+					}
+				}, {
+					afterLoad	: function(){
+						$CPF.closeLoading();
+					}
+				});
+			}
+		});
+		
+		
 		$('#submit', $page).click(function(){
 			Dialog.confirm('确认导入？', function(yes){
 				if(yes){
 					var formData = new FormData($form[0]);
+					formData['delete']('file');
+					formData.append('fileName', fileUUID)
+					$CPF.showLoading();
 					Ajax.ajax($form.attr('start-url'), formData, function(data){
 						if(data.status === 'suc' && data.uuid){
 							$('#break', $page).show();
@@ -113,8 +142,8 @@
 												var msg = data.message + ',' 
 															+ '剩余' + remain + '条';
 												if(data.lastInterval && data.lastInterval > 0){
-													msg += '，当前速率' + parseFloat(1000/data.lastInterval).toFixed(2) + '条/秒，'
-													+ '预计剩余时间' + parseFloat(remain * data.lastInterval / 1000).toFixed(0) + '秒'
+													msg += '，当前速率' + parseFloat(1000 / data.lastInterval).toFixed(2) + '条/秒，'
+													+ '预计剩余时间' + parseFloat(remain * data.lastInterval / 1000).toFixed(0) + '秒';
 												}
 												$feedback.text(msg);
 											}
@@ -130,6 +159,10 @@
 							if(data.status === 'error' && data.msg){
 								Dialog.notice(data.msg, 'error');
 							}
+						}
+					}, {
+						afterLoad	: function(){
+							$CPF.closeLoading();
 						}
 					});
 				}

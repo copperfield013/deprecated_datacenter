@@ -108,7 +108,6 @@
 				}
             });
             $(this.scrollEle).on('scroll', function(){
-            	console.log('scroll');
                 var offset = triggerEle.offset();
                 //判断生成的picker 是在触发元素的上方还是下方
                 if(PICKER.hasClass('bottom')){

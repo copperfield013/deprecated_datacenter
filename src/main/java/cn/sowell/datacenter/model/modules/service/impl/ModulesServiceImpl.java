@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +30,7 @@ import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.config.ModuleMeta;
@@ -66,31 +68,8 @@ public class ModulesServiceImpl implements ModulesService{
 	@Resource
 	ModulesImportService impService;
 	
-	//Map<String, ModuleMeta> moduleMap;
-	
-	/*public ModulesServiceImpl() {
-		moduleMap = new HashMap<String, ModuleMeta>();
-		ModuleMeta peopleModule = new ModuleMeta();
-		peopleModule.setKey(DataCenterConstants.MODULE_KEY_PEOPLE);
-		peopleModule.setTitle("人口");
-		ModuleMeta addressModule = new ModuleMeta();
-		addressModule.setKey(DataCenterConstants.MODULE_KEY_ADDRESS);
-		addressModule.setTitle("地址");
-		ModuleMeta studentModule = new ModuleMeta();
-		studentModule.setKey(DataCenterConstants.MODULE_KEY_STUDENT);
-		studentModule.setTitle("学生");
-		ModuleMeta disabledpeopleModule = new ModuleMeta();
-		disabledpeopleModule.setKey(DataCenterConstants.MODULE_KEY_DISABLEDPEOPLE);
-		disabledpeopleModule.setTitle("助残");
-		ModuleMeta hspeopleModule = new ModuleMeta();
-		hspeopleModule.setKey(DataCenterConstants.MODULE_KEY_HSPEOPLE);
-		hspeopleModule.setTitle("党建");
-		moduleMap.put(addressModule.getKey(), addressModule);
-		moduleMap.put(peopleModule.getKey(), peopleModule);
-		moduleMap.put(studentModule.getKey(), studentModule);
-		moduleMap.put(disabledpeopleModule.getKey(), disabledpeopleModule);
-		moduleMap.put(hspeopleModule.getKey(), hspeopleModule);
-	}*/
+	@Resource
+	FrameDateFormat dateFormat;
 	
 	@Override
 	public ListTemplateParameter exractTemplateParameter(Long tmplId,
@@ -251,6 +230,39 @@ public class ModulesServiceImpl implements ModulesService{
 									null
 									)
 							));
+				}else if("l1".equals(comparator)) {
+					Set<String> valueSet = new HashSet<>();
+					
+					if(nCriteria.getValue() != null) {
+						for(String val : nCriteria.getValue().split(",")) {
+							valueSet.add(val);
+						}
+					}
+					cs.add(createCriteria(nCriteria, 
+							()->criteriaFactory.createIncludeQueryCriteria(nCriteria.getAttributeName(), valueSet), 
+							(compositeName, suffix)->criteriaFactory.createIncludeQueryCriteria(
+									compositeName, 
+									criteria.getRelationLabel(),
+									suffix, 
+									valueSet
+									)
+							));
+				}else if("dr1".equals(comparator)) {
+					Date[] range = dateFormat.splitDateRange(nCriteria.getValue());
+					String[] rangeStr = new String[2];
+					rangeStr[0] = dateFormat.formatDate(range[0]);
+					rangeStr[1] = dateFormat.formatDate(range[1]);
+					cs.add(createCriteria(nCriteria, 
+							()->criteriaFactory.createOpenBetweenQueryCriteria(nCriteria.getAttributeName(), rangeStr[0], rangeStr[1]), 
+							(compositeName, suffix)->criteriaFactory.createOpenBetweenQueryCriteria(
+									compositeName, 
+									criteria.getRelationLabel(),
+									suffix, 
+									rangeStr[0], rangeStr[1]
+									)
+							));
+				
+					
 				}
 			}
 		});
