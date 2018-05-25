@@ -212,6 +212,7 @@ define(function(require, exports, module){
 			
 			if(options){
 				var $div = $('<div>');
+				$div.append('<span class="cpf-select-sign cpf-select-sign-and"></span>')
 				var $select = $('<select multiple="multiple" >').appendTo($div);
 				this.__setNormalAttrs($select);
 				if(param.styleClass){

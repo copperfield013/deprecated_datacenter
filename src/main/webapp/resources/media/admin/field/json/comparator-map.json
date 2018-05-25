@@ -158,8 +158,12 @@
 	"label"			: {
 		"comparators"		: [
 			{
-				"title"	: "包含",
+				"title"	: "包含其一",
 				"key"	: "l1"
+			},
+			{
+				"title"	: "包含全部",
+				"key"	: "l2"
 			},
 			{
 				"title"	: "不包含",

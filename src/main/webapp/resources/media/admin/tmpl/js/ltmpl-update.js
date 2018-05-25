@@ -1359,13 +1359,13 @@ define(function(require, exports, module){
 		 */
 		function move($ele, index, slibingSelector){
 			var $parent = $ele.parent();
-			var originIndex = $parent.index($ele);
+			var $siblings = $parent.children(slibingSelector);
+			var originIndex = $siblings.index($ele);
 			if(originIndex !== index){
-				var $siblings = $parent.children(slibingSelector);
 				if($siblings.length <= index){
 					$parent.append($ele);
 				}else{
-					$siblings.eq(index).before($ele);
+					$parent.children(slibingSelector).eq(index).before($ele);
 				}
 			}
 		}
@@ -1377,7 +1377,7 @@ define(function(require, exports, module){
 			if(index >= 0){
 				move(param.$domination, index, '*');
 				cellsHandler(function($cell){
-					move($cell, index, 'tr', 'td,th');
+					move($cell, index, 'td,th');
 				});
 			}
 		}

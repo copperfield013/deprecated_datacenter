@@ -105,6 +105,7 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 	}
 	
 	private void execute(Sheet sheet, Row headerRow, FusionContextConfig config, ImportStatus importStatus) throws ImportBreakException {
+		logger.debug("导入表格【" + sheet.getSheetName() + "】");
 		importStatus.appendMessage("正在计算总行数");
 		importStatus.setTotal(colculateRowCount(sheet));
 		int rownum = 2;
@@ -112,6 +113,7 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 		Integration integration = PanelFactory.getIntegration();
 		BizFusionContext context = config.createContext();
 		context.setSource(FusionContext.SOURCE_COMMON);
+		int failed = 0;
 		while(true){
 			if(importStatus.breaked()){
 				throw new ImportBreakException();
@@ -128,11 +130,12 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 				logger.debug("修改记录" + code);
 				importStatus.endItemTimer().appendMessage("第" + importStatus.getCurrent() + "条数据导入完成，用时" + numberFormat.format(importStatus.lastInterval()));
 			} catch (Exception e) {
+				failed++;
 				logger.error("导入第" + rownum + "行时发生异常", e);
 				importStatus.endItemTimer().appendMessage("第" + importStatus.getCurrent() + "条数据导入异常，用时" + numberFormat.format(importStatus.lastInterval()));
 			}
 		}
-		importStatus.appendMessage("导入完成");
+		importStatus.appendMessage("导入完成,共导入" + (importStatus.getTotal() - failed) + "/" + importStatus.getTotal() + "条");
 		importStatus.setEnded();
 		
 		

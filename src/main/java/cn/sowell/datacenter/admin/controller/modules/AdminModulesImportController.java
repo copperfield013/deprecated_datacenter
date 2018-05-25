@@ -1,7 +1,6 @@
 package cn.sowell.datacenter.admin.controller.modules;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -120,9 +119,8 @@ public class AdminModulesImportController {
 	@ResponseBody
     @RequestMapping("/do/{module}")
 	public ResponseJSON doImport(
-			@RequestParam String fileName,
+			MultipartFile file,
 			@PathVariable String module,
-			@RequestParam String sheetName, 
 			@RequestParam String dataType, 
 			HttpSession session) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
@@ -133,11 +131,11 @@ public class AdminModulesImportController {
         	jRes.put("uuid", uuid);
         	Workbook wk = null;
         	try {
-        		InputStream inputStream = fileUtils.getInputStream(fileName);
-        		if(fileName.endsWith(".xls")){
-					wk = new HSSFWorkbook(inputStream);
+        		String fileName = file.getOriginalFilename();
+				if(fileName.endsWith(".xls")){
+					wk = new HSSFWorkbook(file.getInputStream());
         		}if(fileName.endsWith("xlsx")){
-        			wk = new XSSFWorkbook(inputStream);
+        			wk = new XSSFWorkbook(file.getInputStream());
         		}else{
         			jRes.put("msg", "文件格式错误，只支持xls和xlsx格式的文件。");
         		}
@@ -145,7 +143,7 @@ public class AdminModulesImportController {
         		jRes.put("msg", "读取文件时发生错误");
         	}
         	if(wk != null){
-        		Sheet sheet = wk.getSheet(sheetName);
+        		Sheet sheet = wk.getSheetAt(0);
         		if(sheet != null){
         			final Workbook workbook = wk;
         			ImportStatus importStatus = new ImportStatus();
@@ -169,7 +167,7 @@ public class AdminModulesImportController {
         			jRes.setStatus("suc");
         			jRes.put("msg", "开始导入");
         		}else{
-        			jRes.put("msg", "Excel文件内不存在名称为" + sheetName + "的表格");
+        			jRes.put("msg", "Excel文件内不存在表格");
         		}
         	}
         }else {

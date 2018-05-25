@@ -632,3 +632,37 @@ span.ccheckbox.checked:after {
     min-width: 150px;
   }
 }
+
+.cpf-select2-container{
+	position: relative !important;
+	min-width: 14em;
+}
+span.cpf-select2-sign {
+    position: absolute;
+    top: -1em;
+    right: -1em;
+    font-size: 12px;
+    border-radius: 1.8em;
+    display: inline-block;
+    width: 1.8em;
+    height: 1.8em;
+    line-height: 1.5em;
+    color: #fff;
+    padding: 0;
+    margin: 0;
+    border: 2px solid #fff;
+    text-align: center;
+    vertical-align: middle;
+}
+span.cpf-select2-sign.cpf-select2-sign-and{
+	background-color: #EEB422;
+}
+span.cpf-select2-sign.cpf-select2-sign-or{
+	background-color: #7CFC00;
+}
+span.cpf-select2-sign.cpf-select2-sign-and:after {
+    content: "全";
+}
+span.cpf-select2-sign.cpf-select2-sign-or:after {
+    content: "１";
+}

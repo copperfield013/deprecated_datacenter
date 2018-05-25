@@ -49,11 +49,22 @@
 									<input class="form-control datepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${vCriteriaMap[criteriaItem.id].value}"  />
 								</c:when>
 								<c:when test="${criteriaItem.inputType == 'label' }">
-									<select style="min-width: 14em;" class="cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${vCriteriaMap[criteriaItem.id].value}">
-										<c:forEach var="label" items="${labelsMap[criteriaItem.fieldKey].subdomain}">
-											<option value="${label }">${label}</option>
-										</c:forEach>								
-									</select>
+									<span class="cpf-select2-container">
+										<select class="cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${vCriteriaMap[criteriaItem.id].value}">
+											<c:forEach var="label" items="${labelsMap[criteriaItem.fieldKey].subdomain}">
+												<option value="${label }">${label}</option>
+											</c:forEach>								
+										</select>
+										<c:choose>
+											<c:when test="${criteriaItem.comparator == 'l1' }">
+												<c:set var="labelSelectClass" value="cpf-select2-sign-or"></c:set>
+											</c:when>
+											<c:when test="${criteriaItem.comparator == 'l2' }">
+												<c:set var="labelSelectClass" value="cpf-select2-sign-and"></c:set>
+											</c:when>
+										</c:choose>
+										<span class="cpf-select2-sign ${labelSelectClass }"></span>
+									</span>
 								</c:when>
 								<c:when test="${criteriaItem.inputType == 'daterange' }">
 									<span class="cpf-daterangepicker format-submit-value" 

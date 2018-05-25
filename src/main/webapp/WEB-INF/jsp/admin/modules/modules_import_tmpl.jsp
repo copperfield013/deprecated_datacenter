@@ -20,13 +20,12 @@
 							<input id="file" type="file" name="file" class="form-control" accept=".xls,.xlsx" />
 						</div>
 					</div>
-					<div class="form-group">
+					<!-- <div class="form-group">
 						<label class="col-lg-2 control-label">表格名</label>
 						<div class="col-lg-6">
 							<select id="sheetName" name="sheetName" class="form-control"></select>
-							<!-- <input id="sheetNames" type="text" name="sheetName" class="form-control" /> -->
 						</div>
-					</div>
+					</div> -->
 					<div class="form-group">
 						<label class="col-lg-2 control-label">导入条线</label>
 						<div class="col-lg-6">
@@ -81,7 +80,7 @@
 		var uuid = null;
 		var $form = $('form', $page);
 		var fileUUID = null;
-		$('#file').change(function(){
+		/* $('#file').change(function(){
 			var formData = new FormData();
 			if(this.files && this.files.length > 0){
 				formData.append('file', this.files[0]);
@@ -102,15 +101,13 @@
 					}
 				});
 			}
-		});
+		}); */
 		
 		
 		$('#submit', $page).click(function(){
 			Dialog.confirm('确认导入？', function(yes){
 				if(yes){
 					var formData = new FormData($form[0]);
-					formData['delete']('file');
-					formData.append('fileName', fileUUID)
 					$CPF.showLoading();
 					Ajax.ajax($form.attr('start-url'), formData, function(data){
 						if(data.status === 'suc' && data.uuid){
@@ -135,7 +132,7 @@
 												Dialog.notice('导入完成', 'success');
 												$('#progress span', $page).text('导入完成');
 												clearInterval(timer);
-												$feedback.text('');
+												$feedback.text(data.message);
 												$('#submit', $page).removeAttr('disabled').text('重新导入');
 												uuid = null;
 											}else{

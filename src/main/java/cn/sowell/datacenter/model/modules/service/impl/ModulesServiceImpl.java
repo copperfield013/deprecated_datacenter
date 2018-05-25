@@ -247,6 +247,27 @@ public class ModulesServiceImpl implements ModulesService{
 									valueSet
 									)
 							));
+				}else if("l2".equals(comparator)) {
+					Set<String> valueSet = new HashSet<String>();
+					
+					if(nCriteria.getValue() != null) {
+						for(String val : nCriteria.getValue().split(",")) {
+							valueSet.add(val);
+						}
+					}
+					valueSet.forEach(label->{
+						Set<String> s = new HashSet<String>();
+						s.add(label);
+						cs.add(createCriteria(nCriteria, 
+								()->criteriaFactory.createIncludeQueryCriteria(nCriteria.getAttributeName(), s), 
+								(compositeName, suffix)->criteriaFactory.createIncludeQueryCriteria(
+										compositeName, 
+										criteria.getRelationLabel(),
+										suffix, 
+										s
+										)
+								));
+					});
 				}else if("dr1".equals(comparator)) {
 					Date[] range = dateFormat.splitDateRange(nCriteria.getValue());
 					String[] rangeStr = new String[2];
@@ -346,12 +367,12 @@ public class ModulesServiceImpl implements ModulesService{
 			startPageNo = 1;
 			if(ePageInfo.getRangeStart() != null){
 				ignoreCount = ePageInfo.getRangeStart() - 1;
-				if(ePageInfo.getRangeEnd() != null){
+				if(ePageInfo.getRangeEnd() != null && ePageInfo.getRangeEnd() < dataCount){
 					dataCount = ePageInfo.getRangeEnd() - ePageInfo.getRangeStart() + 1;
 				}else{
 					dataCount -= ePageInfo.getRangeStart() - 1;
 				}
-			}else if(ePageInfo.getRangeEnd() != null){
+			}else if(ePageInfo.getRangeEnd() != null && ePageInfo.getRangeEnd() < dataCount){
 				dataCount = ePageInfo.getRangeEnd();
 			}
 		}
