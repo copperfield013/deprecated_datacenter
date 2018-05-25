@@ -144,7 +144,7 @@ public class ExportServiceImpl implements ExportService {
 								if("number".equals(column.getSpecialField())){
 									cell.setCellValue(i);
 								}else{
-									cell.setCellValue(FormatUtils.toString(parser.getProperty(column.getFieldKey())));
+									cell.setCellValue(FormatUtils.toString(parser.getFormatedProperty(column.getFieldKey())));
 								}
 							}
 						}

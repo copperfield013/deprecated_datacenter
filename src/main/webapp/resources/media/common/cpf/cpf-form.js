@@ -17,6 +17,39 @@ define(function(require, exports, module){
 		
 	});
 	
+	function formatFormData($form, formData){
+		+function(){
+			var $select2 = $form.find('select.cpf-select2.format-submit-value');
+			$select2.each(function(){
+				try{
+					var $thisSelect = $(this),
+					name = $thisSelect.attr('name');
+					if(name){
+						var values = formData.getAll(name);
+						if(values && $.isArray(values)){
+							formData['delete'](name);
+							formData.append(name, values.join());
+						}
+					}
+				}catch(e){}
+			});
+		}();
+		+function(){
+			var $daterangepicker = $form.find('.cpf-daterangepicker.format-submit-value').filter('span,div');
+			$daterangepicker.each(function(){
+				var $this = $(this),
+					name = $this.attr('data-name');
+				if(name){
+					var fieldInput = $this.data('field-input');
+					if(fieldInput){
+						formData['delete'](name);
+						formData.append(name, fieldInput.getValue());
+					}
+				}
+			});
+		}();
+	}
+	
 	$CPF.putPageInitSequeue(4, function($page){
 		$('form', $page).not('.nform').submit(function(e){
 			if(typeof CKEDITOR === 'object'){
@@ -45,37 +78,7 @@ define(function(require, exports, module){
 					return false;
 				}
 			}
-			+function(){
-				var $select2 = $this.find('select.cpf-select2.format-submit-value');
-				$select2.each(function(){
-					try{
-						var $thisSelect = $(this),
-						name = $thisSelect.attr('name');
-						if(name){
-							var values = formData.getAll(name);
-							if(values && $.isArray(values)){
-								formData['delete'](name);
-								formData.append(name, values.join());
-							}
-						}
-					}catch(e){}
-				});
-			}();
-			+function(){
-				var $daterangepicker = $this.find('.cpf-daterangepicker.format-submit-value').filter('span,div');
-				$daterangepicker.each(function(){
-					var $this = $(this),
-						name = $this.attr('data-name');
-					if(name){
-						var fieldInput = $this.data('field-input');
-						if(fieldInput){
-							formData['delete'](name);
-							formData.append(name, fieldInput.getValue());
-						}
-					}
-				});
-				
-			}();
+			formatFormData($this, formData);
 			var url = $this.attr('action'),
 				confirm = $this.attr('confirm'),
 				Dialog = require('dialog'),
@@ -143,7 +146,6 @@ define(function(require, exports, module){
 						name	: name,
 						value	: value
 					});
-					range.setValue(value);
 					$div.append(range.getDom()).data('field-input', range);
 				}
 			}
@@ -154,7 +156,7 @@ define(function(require, exports, module){
 			$('form select.cpf-select2', $page).each(function(){
 				$(this).select2({
 					theme			: "bootstrap",
-					width			: 'style',
+					width			: null,
 					allowClear		: true,
 					placeholder		: '',
 				});
@@ -240,6 +242,7 @@ define(function(require, exports, module){
 			var $this = $(this);
 			$page.trigger('cpf-check-all-checkbox', [$this.attr('cpf-checkbox-group'),  $this.attr('cpf-checked') !== 'false'])
 		});
-		
 	});
+	
+	exports.formatFormData = formatFormData;
 });

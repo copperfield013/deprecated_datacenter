@@ -186,9 +186,36 @@
 		if('${dtmpl == null}' == 'true'){
 			Dialog.notice('当前没有选择默认模板', 'error');
 		}
+		function appendTo($doms, paramGetter){
+			var def = $.Deferred();
+			paramGetter = paramGetter || function($dom){
+				function attr(attrName){
+					return $dom.attr(attrName);
+				}
+				return {
+					type		: attr('fInp-type'),
+					name		: attr('fInp-name'),
+					id			: attr('fInp-id'),
+					value		: attr('fInp-value'),
+					styleClass	: attr('fInp-class'),
+					optionsKey	: attr('fInp-optkey'),
+					readonly	: attr('fInp-readonly'),
+					optionsSet	: attr('fInp-optset'),
+					fieldKey	: attr('fInp-fieldkey')
+				};
+			};
+			$doms.each(function(){
+				var $this = $(this);
+				var param = paramGetter($this);
+				var fInp = new FieldInput(param);
+				$this.append(fInp.getDom());
+			});
+			def.resolve();
+			return def.promise();
+		};
 		$CPF.showLoading();
 		FieldInput.loadGlobalOptions('admin/field/enum_json').done(function(){
-			FieldInput.appendTo($('.field-input', $page));
+			appendTo($('.field-input', $page));
 			$CPF.closeLoading();
 		});
 		
@@ -243,7 +270,7 @@
 			});
 			$dataRow.append('<td><span class="array-item-remove" title="移除当前行">×</span></td>');
 			$dataRow.appendTo($tbody);
-			FieldInput.appendTo($dataRow.find('.field-input')).done(function(){
+			appendTo($dataRow.find('.field-input')).done(function(){
 				refreshTable($table);
 			})
 		});

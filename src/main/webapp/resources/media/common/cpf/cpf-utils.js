@@ -4,7 +4,7 @@ define(function(require, exports){
 	var sFocus;
 	var bindOrTriggerMap = {};
 	var eventFieldMap = {};
-
+	var NOOP = function(){};
 	$.extend(exports, {
 		/**
 		 * 判断一个是否是整数，不包含判断类型
@@ -433,6 +433,39 @@ define(function(require, exports){
 		},
 		bind		: function(eventName, callback){
 			return this.bindInField('defaultField', eventName, callback);
+		},
+		botByDom	: function(dom, eventName, callback){
+			var $dom = $(dom);
+			if($dom.length == 1 && typeof eventName === 'string' && eventName){
+				var fullEventKey = 'cpf-botByDom-' + eventName;
+				if(callback === false){
+					$dom.off(fullEventKey);
+					$dom.removeData(fullEventKey);
+				}else{
+					var isUndefined = callback === undefined,
+						isFunction = typeof callback === 'function';
+					if(isUndefined){
+						//如果已经绑定了事件，那么就直接触发
+						//如果没有绑定事件，那么添加标记，令事件在绑定时直接触发
+						var events = $._data($dom[0], 'events')[fullEventKey];
+						if(events && events.length > 0){
+							$dom.trigger(fullEventKey);
+							$dom.removeData(fullEventKey);
+						}else{
+							$dom.data(fullEventKey, 1);
+						}
+					}else if(isFunction){
+						//如果标记不为空，那么直接触发回调
+						//如果标记为空，那么绑定回调
+						if($dom.data(fullEventKey)){
+							$dom.one(fullEventKey, callback).trigger(fullEventKey);
+							$dom.removeData(fullEventKey);
+						}else{
+							$dom.one(fullEventKey, callback);
+						}
+					}
+				}
+			}
 		},
 		/**
 		 * 绑定和触发

@@ -923,6 +923,9 @@ define(function(require, exports, module){
 			}
 			return this;
 		}
+		if(this.getType() === 'label'){
+			fieldInput.getDom().css('width', '85%');
+		}
 	}
 	
 	function initListTable($page, tmplData, columnData, module){

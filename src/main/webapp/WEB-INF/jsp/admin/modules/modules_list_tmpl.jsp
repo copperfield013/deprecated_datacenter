@@ -49,7 +49,7 @@
 									<input class="form-control datepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${vCriteriaMap[criteriaItem.id].value}"  />
 								</c:when>
 								<c:when test="${criteriaItem.inputType == 'label' }">
-									<select style="min-width: 70px" class="cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${vCriteriaMap[criteriaItem.id].value}">
+									<select style="min-width: 14em;" class="cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${vCriteriaMap[criteriaItem.id].value}">
 										<c:forEach var="label" items="${labelsMap[criteriaItem.fieldKey].subdomain}">
 											<option value="${label }">${label}</option>
 										</c:forEach>								
@@ -58,7 +58,8 @@
 								<c:when test="${criteriaItem.inputType == 'daterange' }">
 									<span class="cpf-daterangepicker format-submit-value" 
 										data-name="criteria_${criteriaItem.id }" 
-										data-value="${vCriteriaMap[criteriaItem.id].value}"></span>
+										data-value="${vCriteriaMap[criteriaItem.id].value}">
+									</span>
 								</c:when>
 								<c:otherwise>
 									<input type="text" disabled="disabled" placeholder="没有配置对应的控件${criteriaItem.inputType }" />
@@ -67,7 +68,9 @@
 						</div>
 					</c:if>
 				</c:forEach>
-				<button type="submit" class="btn btn-default" title="${hidenCriteriaDesc }">查询</button>
+				<div class="form-group">
+					<button type="submit" class="form-control btn btn-default" title="${hidenCriteriaDesc }">查询</button>
+				</div>
 			</c:if>
 		</form>
 		<div class="row list-area">
@@ -189,7 +192,7 @@
 	</div>
 </div>
 <script>
-	seajs.use(['utils', 'ajax'], function(Utils, Ajax){
+	seajs.use(['utils', 'ajax', 'form'], function(Utils, Ajax, Form){
 		var $page = $('#${module.name }-list-tmpl-${RES_STAMP}');
 		console.log($page);
 		$('#tmpl-list a[data-id]:not(.active)', $page).click(function(){
@@ -226,10 +229,24 @@
 				$btnBreak = $('#do-break', $page),
 				$btnDownload = $('#do-download', $page);
 			//页面一开始加载时的初始化表单参数
-			var initParam = $.extend(Utils.converteFormdata($('form', $page)), {
+			
+			var initParam = {};
+			Utils.botByDom($page.getLocatePage().getContent(), 'cpf-page-inited', function(){
+				var $form = $('form', $page),
+					formData = new FormData($form[0]);
+				Form.formatFormData($form, formData)
+				initParam = Utils.converteFormdata(formData);
+				$.extend(initParam, {
+					pageNo	: '${pageInfo.pageNo}',
+					pageSize: '${pageInfo.pageSize}'
+				});
+				console.log(initParam);
+			});
+			
+			/* var initParam = $.extend(Utils.converteFormdata($('form', $page)), {
 				pageNo	: '${pageInfo.pageNo}',
 				pageSize: '${pageInfo.pageSize}'
-			});
+			}); */
 			var $exportProgress = $('#export-progress', $page);
 			//轮询处理对象
 			var handler = Ajax.poll({

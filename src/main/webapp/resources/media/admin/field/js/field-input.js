@@ -211,8 +211,12 @@ define(function(require, exports, module){
 			}
 			
 			if(options){
-				var $div = $('<div style="width:85%;">');
+				var $div = $('<div>');
 				var $select = $('<select multiple="multiple" >').appendTo($div);
+				this.__setNormalAttrs($select);
+				if(param.styleClass){
+					$select.addClass(param.styleClass);
+				}
 				var S2 = require('select2');
 				if($.fn.select2){
 					$select.select2({
@@ -236,6 +240,9 @@ define(function(require, exports, module){
 						$select.val(value).trigger('change');
 						return $div;
 					}
+				}
+				if(param.value){
+					$div.val(param.value);
 				}
 				return $div;
 			}
@@ -269,6 +276,9 @@ define(function(require, exports, module){
 					}
 				}
 			};
+			if(param.value){
+				$div.val(param.value);
+			}
 			return $div;
 		}
 		
@@ -371,32 +381,6 @@ define(function(require, exports, module){
 	}
 	
 	$.extend(FieldInput, {
-		appendTo		: function($doms, paramGetter){
-			var def = $.Deferred();
-			paramGetter = paramGetter || function($dom){
-				function attr(attrName){
-					return $dom.attr(attrName);
-				}
-				return {
-					type		: attr('fInp-type'),
-					name		: attr('fInp-name'),
-					id			: attr('fInp-id'),
-					value		: attr('fInp-value'),
-					styleClass	: attr('fInp-class'),
-					optionsKey	: attr('fInp-optkey'),
-					readonly	: attr('fInp-readonly'),
-					optionsSet	: attr('fInp-optset'),
-					fieldKey	: attr('fInp-fieldkey')
-				};
-			};
-			$doms.each(function(){
-				var $this = $(this);
-				var fInp = new FieldInput(paramGetter($this));
-				$this.append(fInp.getDom());
-			});
-			def.resolve();
-			return def.promise();
-		},
 		globalOptionsCacheTimeLineMap	: {},
 		globalOptionsCacheMap			: {},
 		/**

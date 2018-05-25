@@ -290,11 +290,16 @@
 </div>
 <script>
 	seajs.use(['tmpl/js/ltmpl-update.js', 'utils'], function(LtmplUpdate, Utils){
-		var $page = $('#ltmpl-update-${RES_STAMP }');
-		var tmplData = Utils.parseJSON('${tmplDataJSON}'),
-			criteriaData = Utils.parseJSON('${criteriaDataJSON}'),
-			columnData = Utils.parseJSON('${columnDataJSON}')
-			;
-		LtmplUpdate.init($page, tmplData, criteriaData, columnData, '${module.name}');
+		try{
+			var $page = $('#ltmpl-update-${RES_STAMP }');
+			console.log($page);
+			var tmplData = Utils.parseJSON('${tmplDataJSON}'),
+				criteriaData = Utils.parseJSON('${criteriaDataJSON}'),
+				columnData = Utils.parseJSON('${columnDataJSON}')
+				;
+			LtmplUpdate.init($page, tmplData, criteriaData, columnData, '${module.name}');
+		}catch(e){
+			console.error(e);
+		}
 	});
 </script>

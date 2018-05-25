@@ -81,6 +81,7 @@ define(function(require, exports, module){
 			for(var i in pageInitSequeue){
 				pageInitSequeue[i].initFunc.call(this, $page);
 			}
+			Utils.botByDom($page, 'cpf-page-inited');
 		},
 		/**
 		 * 添加页面初始化序列

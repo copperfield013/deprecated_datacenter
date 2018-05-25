@@ -60,3 +60,11 @@
 }
 
 .module-list-tmpl #export-window div#export-msg {text-indent: 1em;line-height: 1em;height: 1.2em;word-break: keep-all;}
+.module-list-tmpl form.form-inline>.form-group{
+    height: 2.8em;
+    line-height: 2.8em;
+    margin-right: 0.7em;
+}
+.module-list-tmpl form.form-inline>.form-group label.control-label:after{
+	content: "：";
+}
