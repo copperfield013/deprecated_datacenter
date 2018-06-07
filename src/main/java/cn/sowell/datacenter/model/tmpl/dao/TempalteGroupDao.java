@@ -1,6 +1,7 @@
 package cn.sowell.datacenter.model.tmpl.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateGroup;
 
@@ -11,5 +12,7 @@ public interface TempalteGroupDao {
 	TemplateGroup getGroup(Long groupId);
 
 	TemplateGroup getTemplateGroup(String module, String templateGroupKey);
+
+	List<TemplateGroup> getTemplateGroups(Set<String> moduleNames);
 
 }

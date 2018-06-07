@@ -241,8 +241,7 @@
 								tmplId		: '${tmpl.id}',
 								fields		: fields,
 								title		: title,
-								module		: '${module.name}',
-								composite	: '${compositeName}'
+								module		: '${module.name}'
 							});
 						}
 					});
@@ -278,7 +277,7 @@
 		$('#btn-new', $page).click(function(){
 			Dialog.confirm('是否创建新的模板？当前模板若已修改，将不会被保存。', function(yes){
 				if(yes){
-					$page.getLocatePage().loadContent('admin/modules/import/tmpl/${module.name}/${compositeName}');
+					$page.getLocatePage().loadContent('admin/modules/import/tmpl/${module.name}');
 				}
 			});
 		});

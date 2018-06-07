@@ -32,11 +32,10 @@ import cn.sowell.datacenter.entityResolver.FieldDescCacheMap;
 import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
-import cn.sowell.datacenter.entityResolver.config.ModuleMeta;
 import cn.sowell.datacenter.model.admin.pojo.ExportStatus;
 import cn.sowell.datacenter.model.dict.service.DictionaryService;
-import cn.sowell.datacenter.model.modules.ModuleConstants;
 import cn.sowell.datacenter.model.modules.pojo.EntityHistoryItem;
+import cn.sowell.datacenter.model.modules.pojo.ModuleMeta;
 import cn.sowell.datacenter.model.modules.service.ExportService;
 import cn.sowell.datacenter.model.modules.service.ModulesService;
 import cn.sowell.datacenter.model.tmpl.bean.QueryEntityParameter;
@@ -110,13 +109,11 @@ public class AdminModulesController {
 			List<ModuleEntityPropertyParser> parserList = mService.queryEntities(queryParam);
 			model.addAttribute("parserList", parserList);
 			
-			if(moduleMeta.hasFunction(ModuleConstants.FUNCTION_EXPORT)) {
-				String uuid = (String) session.getAttribute(AdminConstants.EXPORT_PEOPLE_STATUS_UUID);
-				if(uuid != null){
-					ExportStatus exportStatus = eService.getExportStatus(uuid);
-					if(exportStatus != null && !exportStatus.isBreaked() && !exportStatus.isCompleted()){
-						model.addAttribute("exportStatus", exportStatus);
-					}
+			String uuid = (String) session.getAttribute(AdminConstants.EXPORT_PEOPLE_STATUS_UUID);
+			if(uuid != null){
+				ExportStatus exportStatus = eService.getExportStatus(uuid);
+				if(exportStatus != null && !exportStatus.isBreaked() && !exportStatus.isCompleted()){
+					model.addAttribute("exportStatus", exportStatus);
 				}
 			}
 			if(param.getListTemplate().getCriterias() != null){
@@ -190,7 +187,7 @@ public class AdminModulesController {
 		}
 		UserIdentifier user = UserUtils.getCurrentUser();
 		TemplateDetailTemplate dtmpl = coalesceDetailTempalte(tmplId, user, module);
-		FusionContextConfig config = fFactory.getDefaultConfig(module);
+		FusionContextConfig config = fFactory.getModuleConfig(module);
 		model.addAttribute("dtmpl", dtmpl);
 		model.addAttribute("dtmpls", tService.getAllDetailTemplateList(module, user, null, false));
 		model.addAttribute("module", mMeta);
@@ -216,7 +213,7 @@ public class AdminModulesController {
 				model.addAttribute("templateGroup", tGroup);
 			}
 		}
-		FusionContextConfig config = fFactory.getDefaultConfig(module);
+		FusionContextConfig config = fFactory.getModuleConfig(module);
 		UserIdentifier user = UserUtils.getCurrentUser();
 		ModuleEntityPropertyParser entity = mService.getEntity(module, code, null);
 		TemplateDetailTemplate dtmpl = coalesceDetailTempalte(tmplId, user, module);
@@ -224,7 +221,7 @@ public class AdminModulesController {
 		model.addAttribute("module", mMeta);
 		model.addAttribute("dtmpl", dtmpl);
 		model.addAttribute("dtmpls", tService.getAllDetailTemplateList(module, user, null, false));
-		model.addAttribute("config", fFactory.getDefaultConfig(module));
+		model.addAttribute("config", config);
 		model.addAttribute("fieldDescMap", new FieldDescCacheMap(config.getConfigResolver()));
 		return AdminConstants.JSP_MODULES + "/modules_update_tmpl.jsp";
 	}

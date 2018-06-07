@@ -50,7 +50,6 @@ import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigResolver;
 import cn.sowell.datacenter.entityResolver.ImportCompositeField;
-import cn.sowell.datacenter.entityResolver.config.ImportComposite;
 import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
 import cn.sowell.datacenter.model.modules.dao.ModulesImportDao;
 import cn.sowell.datacenter.model.modules.pojo.ImportStatus;
@@ -82,22 +81,12 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 	
 	
 	
-	private String getConfigKey(String module, String compositeName) {
-		return getImportCompositeMap(module).get(compositeName).getConfigId();
-	}
-	
 	@Override
-	public Map<String, ImportComposite> getImportCompositeMap(String module) {
-		return fFactory.getModuleImportMap(module);
-	}
-	
-	@Override
-	public void importData(Sheet sheet, ImportStatus importStatus, String module, String compositeName)
+	public void importData(Sheet sheet, ImportStatus importStatus, String module)
 			throws ImportBreakException {
 		Row headerRow = sheet.getRow(1);
-		String configKey = getConfigKey(module, compositeName);
-		if(configKey != null){
-			FusionContextConfig config = fFactory.getConfig(configKey);
+		if(module != null){
+			FusionContextConfig config = fFactory.getModuleConfig(module);
 			if(config != null) {
 				execute(sheet, headerRow, config, importStatus);
 			}
@@ -292,14 +281,6 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 
 
 	@Override
-	public Set<ImportCompositeField> getImportCompositeFields(String module, String compositeName) {
-		Map<String, ImportComposite> impMap = fFactory.getModuleImportMap(module);
-		ImportComposite composite = impMap.get(compositeName);
-		FusionContextConfig config = fFactory.getConfig(composite.getConfigId());
-		return config.getAllImportFields();
-	}
-	
-	@Override
 	public List<ModuleImportTemplate> getImportTemplates(ImportTemplateCriteria criteria) {
 		return impDao.getImportTemplates(criteria);
 	}
@@ -312,6 +293,12 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 		return tmpl;
 	}
 	
+	@Override
+	public Set<ImportCompositeField> getImportCompositeFields(String module) {
+		FusionContextConfig config = fFactory.getModuleConfig(module);
+		return config.getAllImportFields();
+
+	}
 	
 	
 }

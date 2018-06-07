@@ -1,6 +1,8 @@
 package cn.sowell.datacenter.model.tmpl.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dto.page.PageInfo;
@@ -128,7 +130,6 @@ public interface TemplateService {
 	 */
 	TemplateGroup getTemplateGroup(String module, String templateGroupKey);
 
-	
-
+	Map<String, List<TemplateGroup>> queryTemplateGroups(Set<String> moduleNames);
 
 }

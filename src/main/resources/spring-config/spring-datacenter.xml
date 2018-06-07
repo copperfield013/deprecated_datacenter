@@ -27,10 +27,22 @@
 
 	<import resource="spring-security.xml" />
 
-	<bean class="cn.sowell.datacenter.entityResolver.config.XMLFusionConfigContextFactory">
+	<!-- <bean class="cn.sowell.datacenter.entityResolver.config.XMLFusionConfigContextFactory">
 		<constructor-arg value="classpath:module-config.xml" />
 		<property name="fieldService" ref="dictionaryServiceImpl" />
+	</bean> -->
+	<bean id="dBFusionConfigContextFactory" class="cn.sowell.datacenter.entityResolver.config.DBFusionConfigContextFactory">
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="fieldService" ref="dictionaryServiceImpl" />
 	</bean>
+	<bean id="dBModuleConfigMediator" class="cn.sowell.datacenter.entityResolver.config.DBModuleConfigMediator">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<!-- <bean class="cn.sowell.datacenter.entityResolver.config.RmiModuleConfigureMediatorServer">
+		<property name="dBFusionConfigContextFactory" ref="dBFusionConfigContextFactory" />
+		<property name="moduleConfigMediator" ref="dBModuleConfigMediator" />
+	</bean> -->
 
 
 	<bean

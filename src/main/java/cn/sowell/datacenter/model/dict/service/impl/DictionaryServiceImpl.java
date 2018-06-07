@@ -69,8 +69,7 @@ public class DictionaryServiceImpl implements DictionaryService, FieldService{
 	
 	
 	private void handerWithConfig(String module, List<DictionaryComposite> composites) {
-		String configId = fFactory.getDefaultConfigId(module);
-		FusionContextConfig config = fFactory.getConfigDependented(configId);
+		FusionContextConfig config = fFactory.getModuleConfigDependended(module);
 		if(config.getConfigResolver() == null) {
 			config.loadResolver(null);
 		}
@@ -141,7 +140,7 @@ public class DictionaryServiceImpl implements DictionaryService, FieldService{
 	@Override
 	public Map<String, Set<Label>> getAllLabelsMap() {
 		Map<String, Set<Label>> labelsMap = new HashMap<>();
-		Set<FusionContextConfig> configs = fFactory.getAllDefaultConfig();
+		Set<FusionContextConfig> configs = fFactory.getAllConfigs();
 		configs.forEach(config->{
 			labelsMap.put(config.getModule(), config.getAllLabels());
 		});
@@ -150,7 +149,7 @@ public class DictionaryServiceImpl implements DictionaryService, FieldService{
 	
 	@Override
 	public Map<String, Label> getModuleLabelMap(String module) {
-		FusionContextConfig config = fFactory.getDefaultConfig(module);
+		FusionContextConfig config = fFactory.getModuleConfig(module);
 		return CollectionUtils.toMap(config.getAllLabels(), label->label.getFieldName());
 	}
 	

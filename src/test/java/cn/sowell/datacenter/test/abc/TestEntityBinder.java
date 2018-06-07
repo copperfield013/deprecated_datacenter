@@ -1,20 +1,28 @@
 package cn.sowell.datacenter.test.abc;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.jdbc.Work;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.abc.business.MappingContainer;
+import com.abc.mapping.conf.MappingContainer;
 import com.abc.mapping.entity.Entity;
 import com.abc.mapping.node.ABCNode;
 import com.abc.mapping.node.AttributeNode;
 
+import cn.sowell.datacenter.entityResolver.FieldConfigure;
 import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigResolver;
@@ -35,8 +43,36 @@ public class TestEntityBinder {
 	@Resource
 	ABCExecuteService abcService;
 	
+	@Resource
+	SessionFactory sFactory;
+	
+	@Test
+	public void 残疾人() {
+		FusionContextConfigResolver resolver = fFactory.getModuleResolver("disabledpeople");
+		FieldConfigure cnf = resolver.getFieldConfigure("子女信息");
+		System.out.println(cnf);
+	}
+	
+	
+	@Test
+	@Transactional
+	public void testSession() {
+		Session ss = sFactory.getCurrentSession();
+		ss.doWork(new Work() {
+			
+			@Override
+			public void execute(Connection connection) throws SQLException {
+				String catalog = connection.getCatalog();
+				String sql = "" + catalog;
+				PreparedStatement ps = connection.prepareStatement(sql);
+				ps.executeUpdate();
+			}
+		});
+	}
+	
+	
 	public void testNode() {
-		FusionContextConfig config = fFactory.getDefaultConfig("people");
+		FusionContextConfig config = fFactory.getModuleConfig("people");
 		ABCNode rootNode = MappingContainer.getABCNode(config.getMappingName());
 		AttributeNode node = rootNode.getAttribute("birthday");
 		System.out.println("getTitle--" + node.getTitle());
@@ -61,7 +97,7 @@ public class TestEntityBinder {
 	
 	
 	public void testABCNodeResolver() {
-		FusionContextConfig config = fFactory.getDefaultConfig("people");
+		FusionContextConfig config = fFactory.getModuleConfig("people");
 		try {
 			testResolver(config);
 		} catch (Exception e) {

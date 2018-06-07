@@ -1,7 +1,6 @@
 package cn.sowell.datacenter.model.abc.service.impl;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -50,8 +49,8 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	
 	@Override
-	public EntityPagingQueryProxy getModuleQueryProxy(String entityConfig, List<Criteria> cs, ExportDataPageInfo ePageInfo) {
-		FusionContextConfig config = fFactory.getConfig(entityConfig);
+	public EntityPagingQueryProxy getModuleQueryProxy(String moduleName, List<Criteria> cs, ExportDataPageInfo ePageInfo) {
+		FusionContextConfig config = fFactory.getModuleConfig(moduleName);
 		BizFusionContext context = config.createContext();
 		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(cs, "编辑时间");
@@ -65,8 +64,8 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	}
 	
 	
-	private List<Entity> queryEntityList(String entityConfig, List<Criteria> criterias, PageInfo pageInfo){
-		BizFusionContext context = fFactory.getConfig(entityConfig).createContext();
+	private List<Entity> queryEntityList(String moduleName, List<Criteria> criterias, PageInfo pageInfo){
+		BizFusionContext context = fFactory.getModuleConfig(moduleName).createContext();
 		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		
 		EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(criterias, "编辑时间");
@@ -79,38 +78,30 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	@Override
 	public List<Entity> queryModuleEntities(QueryEntityParameter param) {
 		return queryEntityList(
-				fFactory.getDefaultConfigId(param.getModule()), 
+				param.getModule(), 
 				param.getCriterias(), 
 				param.getPageInfo());
 	}
 	
 	
-	private Entity getHistoryEntity(String configKey, String code,
-			Date date, List<ErrorInfomation> errors) {
-		BizFusionContext context = fFactory.getConfig(configKey).createContext();
+	@Override
+	public Entity getHistoryEntity(QueryEntityParameter param, List<ErrorInfomation> errors) {
+		BizFusionContext context = fFactory.getModuleConfig(param.getModule()).createContext();
 		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		
-		HistoryTracker tracker = discoverer.track(code, date);
+		HistoryTracker tracker = discoverer.track(param.getCode(), param.getHistoryTime());
 		List<ErrorInfomation> errorInfomations = tracker.getErrorInfomations();
 		if(errors != null && errorInfomations != null && !errorInfomations.isEmpty()){
 			errors.addAll(errorInfomations);
 		}
 		return tracker.getEntity();
+		
 	}
 	
 	@Override
-	public Entity getHistoryEntity(QueryEntityParameter param, List<ErrorInfomation> errors) {
-		return getHistoryEntity(
-				fFactory.getDefaultConfigId(param.getModule()), 
-				param.getCode(), 
-				param.getHistoryTime(), 
-				errors);
-	}
-	
-	@Override
-	public List<EntityHistoryItem> queryHistory(String module, String code,
+	public List<EntityHistoryItem> queryHistory(String moduleName, String code,
 			Integer pageNo, Integer pageSize) {
-		BizFusionContext context = fFactory.getDefaultConfig(module).createContext();
+		BizFusionContext context = fFactory.getModuleConfig(moduleName).createContext();
 		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		
 		List<RecordHistory> historyList = discoverer.trackHistory(code, pageNo, pageSize);
@@ -132,8 +123,8 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	}
 	
 	@Override
-	public Entity getModuleEntity(String module, String code) {
-		BizFusionContext context = fFactory.getDefaultConfig(module).createContext();
+	public Entity getModuleEntity(String moduleName, String code) {
+		BizFusionContext context = fFactory.getModuleConfig(moduleName).createContext();
 		Discoverer discoverer=PanelFactory.getDiscoverer(context);
 		Entity result=discoverer.discover(code);
 		return result;
@@ -150,12 +141,12 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public String mergeEntity(String module, Map<String, Object> propMap) {
-		return fFactory.getModuleDefaultResolver(module).saveEntity(propMap, null);
+		return fFactory.getModuleResolver(module).saveEntity(propMap, null);
 	}	
 	
 	@Override
 	public String fuseEntity(String module, Map<String, Object> map) {
-		FusionContextConfig config = fFactory.getDefaultConfig(module);
+		FusionContextConfig config = fFactory.getModuleConfig(module);
 		String code = (String) map.remove(config.getCodeAttributeName());
 		map.remove(ABCNodeProxy.CODE_PROPERTY_NAME);
 		if(TextUtils.hasText(code)) {
@@ -172,7 +163,7 @@ public class ABCExecuteServiceImpl implements ABCExecuteService{
 	
 	@Override
 	public ModuleEntityPropertyParser getModuleEntityParser(String module, Entity entity) {
-		return fFactory.getModuleDefaultResolver(module).createParser(entity);
+		return fFactory.getModuleResolver(module).createParser(entity);
 	}
 
 

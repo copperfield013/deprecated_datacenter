@@ -41,13 +41,13 @@ import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.entityResolver.ImportCompositeField;
-import cn.sowell.datacenter.entityResolver.config.ModuleMeta;
 import cn.sowell.datacenter.entityResolver.impl.RelationEntityProxy;
 import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
 import cn.sowell.datacenter.model.modules.pojo.ImportStatus;
 import cn.sowell.datacenter.model.modules.pojo.ImportTemplateCriteria;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplate;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplateField;
+import cn.sowell.datacenter.model.modules.pojo.ModuleMeta;
 import cn.sowell.datacenter.model.modules.service.ModulesImportService;
 import cn.sowell.datacenter.model.modules.service.ModulesService;
 
@@ -72,7 +72,6 @@ public class AdminModulesImportController {
 	public String goImport(@PathVariable String module, Model model) {
 		ModuleMeta mMeta = mService.getModule(module);
 		model.addAttribute("module", mMeta);
-		model.addAttribute("composites", impService.getImportCompositeMap(module).values());
 		return AdminConstants.JSP_MODULES + "/modules_import_tmpl.jsp";
 	}
 	
@@ -121,7 +120,6 @@ public class AdminModulesImportController {
 	public ResponseJSON doImport(
 			MultipartFile file,
 			@PathVariable String module,
-			@RequestParam String dataType, 
 			HttpSession session) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
         jRes.setStatus("error");
@@ -150,7 +148,7 @@ public class AdminModulesImportController {
         			session.setAttribute(AdminConstants.KEY_IMPORT_STATUS + uuid, importStatus);
         			Thread thread = new Thread(()->{
         				try {
-        					impService.importData(sheet, importStatus, module, dataType);
+        					impService.importData(sheet, importStatus, module);
         				} catch (ImportBreakException e) {
         					logger.error("导入被用户停止", e);
         				} catch (Exception e) {
@@ -212,24 +210,21 @@ public class AdminModulesImportController {
         return jRes;
     }
 	
-	@RequestMapping("/tmpl/{module}/{composite}")
+	@RequestMapping("/tmpl/{module}")
 	public String tmpl(
 			@PathVariable String module,
-			@PathVariable String composite,
 			Model model
 			) {
 		UserIdentifier user = UserUtils.getCurrentUser();
 		ModuleMeta mMeta = mService.getModule(module);
-		Set<ImportCompositeField> fields = impService.getImportCompositeFields(module, composite);
+		Set<ImportCompositeField> fields = impService.getImportCompositeFields(module);
 		ImportTemplateCriteria criteria = new ImportTemplateCriteria();
 		criteria.setModule(module);
 		criteria.setUserId((Long) user.getId());
-		criteria.setComposite(composite);
 		List<ModuleImportTemplate> tmpls = impService.getImportTemplates(criteria);
 		model.addAttribute("tmpls", tmpls);
 		model.addAttribute("fields", fields);
 		model.addAttribute("module", mMeta);
-		model.addAttribute("compositeName", composite);
 		model.addAttribute("relationLabelKey", RelationEntityProxy.LABEL_KEY);
 		
 		return AdminConstants.JSP_MODULES + "/modules_import_download.jsp";
@@ -240,7 +235,7 @@ public class AdminModulesImportController {
 		ModuleImportTemplate tmpl = impService.getImportTempalte(tmplId);
 		model.addAttribute("tmpl", tmpl);
 		model.addAttribute("tmplFieldsJson", JSON.toJSON(tmpl.getFields()));
-		return tmpl(tmpl.getModule(), tmpl.getComposite(), model);
+		return tmpl(tmpl.getModule(), model);
 	}
 	
 	@ResponseBody
@@ -295,9 +290,7 @@ public class AdminModulesImportController {
 	}
 
 	private ModuleImportTemplate toImportTemplate(JSONObject reqJson) {
-		String composite = reqJson.getString("composite"),
-				module = reqJson.getString("module");
-		Assert.hasText(composite);
+		String module = reqJson.getString("module");
 		Assert.hasText(module);
 		
 		JSONArray fieldArray = reqJson.getJSONArray("fields");
@@ -325,7 +318,6 @@ public class AdminModulesImportController {
 			ModuleImportTemplate importTmpl = new ModuleImportTemplate();
 			importTmpl.setTitle(title);
 			importTmpl.setFields(fields);
-			importTmpl.setComposite(composite);
 			importTmpl.setModule(module);
 			importTmpl.setCreateUserId((Long) user.getId());
 			Long tmplId = reqJson.getLong("tmplId");

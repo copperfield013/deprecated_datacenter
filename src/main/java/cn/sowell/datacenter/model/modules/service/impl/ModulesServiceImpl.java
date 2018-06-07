@@ -33,7 +33,7 @@ import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
-import cn.sowell.datacenter.entityResolver.config.ModuleMeta;
+import cn.sowell.datacenter.entityResolver.config.abst.Module;
 import cn.sowell.datacenter.model.abc.service.ABCExecuteService;
 import cn.sowell.datacenter.model.dict.pojo.DictionaryComposite;
 import cn.sowell.datacenter.model.dict.service.DictionaryService;
@@ -41,6 +41,7 @@ import cn.sowell.datacenter.model.modules.bean.EntityPagingIterator;
 import cn.sowell.datacenter.model.modules.bean.EntityPagingQueryProxy;
 import cn.sowell.datacenter.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.datacenter.model.modules.pojo.EntityHistoryItem;
+import cn.sowell.datacenter.model.modules.pojo.ModuleMeta;
 import cn.sowell.datacenter.model.modules.service.ModulesImportService;
 import cn.sowell.datacenter.model.modules.service.ModulesService;
 import cn.sowell.datacenter.model.tmpl.bean.QueryEntityParameter;
@@ -138,7 +139,7 @@ public class ModulesServiceImpl implements ModulesService{
 	
 	@Override
 	public List<Criteria> toCriterias(Collection<NormalCriteria> nCriterias, String module){
-		FusionContext context = fFactory.getDefaultConfig(module).createContext();
+		FusionContext context = fFactory.getModuleConfig(module).createContext();
 		CriteriaFactory criteriaFactory = new CriteriaFactory(context);
 		ArrayList<Criteria> cs = new ArrayList<Criteria>();
 		nCriterias.forEach(nCriteria->{
@@ -300,7 +301,19 @@ public class ModulesServiceImpl implements ModulesService{
 	
 	@Override
 	public ModuleMeta getModule(String moduleKey) {
-		return fFactory.getModuleMeta(moduleKey);
+		Module module = fFactory.getModule(moduleKey);
+		return new ModuleMeta() {
+			
+			@Override
+			public String getTitle() {
+				return module.getTitle();
+			}
+			
+			@Override
+			public String getName() {
+				return module.getName();
+			}
+		};
 	}
 	
 	
@@ -352,8 +365,7 @@ public class ModulesServiceImpl implements ModulesService{
 			ExportDataPageInfo ePageInfo) {
 		PageInfo pageInfo = ePageInfo.getPageInfo();
 		List<Criteria> cs = toCriterias(nCriterias, ltmpl.getModule());
-		String configName = fFactory.getDefaultConfigId(ltmpl.getModule());
-		EntityPagingQueryProxy proxy = abcService.getModuleQueryProxy(configName, cs, ePageInfo);
+		EntityPagingQueryProxy proxy = abcService.getModuleQueryProxy(ltmpl.getModule(), cs, ePageInfo);
 		int dataCount = pageInfo.getPageSize();
 		int startPageNo = pageInfo.getPageNo();
 		int totalCount = proxy.getTotalCount();

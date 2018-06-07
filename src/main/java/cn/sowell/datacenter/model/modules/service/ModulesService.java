@@ -13,10 +13,10 @@ import org.springframework.beans.MutablePropertyValues;
 import com.abc.query.criteria.Criteria;
 
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
-import cn.sowell.datacenter.entityResolver.config.ModuleMeta;
 import cn.sowell.datacenter.model.modules.bean.EntityPagingIterator;
 import cn.sowell.datacenter.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.datacenter.model.modules.pojo.EntityHistoryItem;
+import cn.sowell.datacenter.model.modules.pojo.ModuleMeta;
 import cn.sowell.datacenter.model.tmpl.bean.QueryEntityParameter;
 import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
 import cn.sowell.datacenter.model.tmpl.param.ListTemplateParameter;
@@ -43,11 +43,11 @@ public interface ModulesService {
 	ListTemplateParameter exractTemplateParameter(Long tmplId, String module, HttpServletRequest request);
 
 	/**
-	 * 根据模块的key获得模块数据
+	 * 根据模块名获得模块数据
 	 * @param moduleKey
 	 * @return
 	 */
-	ModuleMeta getModule(String moduleKey);
+	ModuleMeta getModule(String moduleName);
 
 	/**
 	 * 根据模块和id以及历史时间获得该时间的实体数据

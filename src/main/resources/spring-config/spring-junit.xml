@@ -29,10 +29,18 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 	
-	<bean class="cn.sowell.datacenter.entityResolver.config.XMLFusionConfigContextFactory">
-		<constructor-arg value="classpath:module-config.xml" />
+	<bean class="cn.sowell.datacenter.entityResolver.config.DBFusionConfigContextFactory">
+		<property name="sessionFactory" ref="sessionFactory" />
 		<property name="fieldService" ref="dictionaryServiceImpl" />
 	</bean>
+	<bean class="cn.sowell.datacenter.entityResolver.config.LocalDBModuleConfigMediator">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<!-- <bean class="cn.sowell.datacenter.entityResolver.config.XMLFusionConfigContextFactory">
+		<constructor-arg value="classpath:module-config.xml" />
+		<property name="fieldService" ref="dictionaryServiceImpl" />
+	</bean> -->
 	
 	<bean class="cn.sowell.copframe.spring.propTranslator.PropertyValueTranslatorSet">
 		<property name="translatorSet">

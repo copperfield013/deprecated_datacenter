@@ -85,7 +85,7 @@ public class TemplateServiceImpl implements TemplateService{
 	public TemplateDetailTemplate getDetailTemplate(long tmplId) {
 		TemplateDetailTemplate data = nDao.get(TemplateDetailTemplate.class, tmplId);
 		if(data != null){
-			List<TemplateDetailFieldGroup> groups = getTemplateGroups(fFactory.getModuleDefaultResolver(data.getModule()), data.getId());
+			List<TemplateDetailFieldGroup> groups = getTemplateGroups(fFactory.getModuleResolver(data.getModule()), data.getId());
 			if(groups != null){
 				data.setGroups(groups);
 			}
@@ -174,7 +174,7 @@ public class TemplateServiceImpl implements TemplateService{
 			boolean loadDetail) {
 		List<TemplateDetailTemplate> list = dDao.getTemplateList(module, user, pageInfo);
 		if(loadDetail){
-			FusionContextConfigResolver resolver = fFactory.getModuleDefaultResolver(module);
+			FusionContextConfigResolver resolver = fFactory.getModuleResolver(module);
 			list.forEach(data->{
 				data.setGroups(getTemplateGroups(resolver, data.getId()));
 			});
@@ -242,6 +242,12 @@ public class TemplateServiceImpl implements TemplateService{
 	@Override
 	public TemplateGroup getTemplateGroup(String module, String templateGroupKey) {
 		return gDao.getTemplateGroup(module, templateGroupKey);
+	}
+	
+	@Override
+	public Map<String, List<TemplateGroup>> queryTemplateGroups(Set<String> moduleNames) {
+		List<TemplateGroup> groups = gDao.getTemplateGroups(moduleNames);
+		return CollectionUtils.toListMap(groups, group->group.getModule());
 	}
 	
 }

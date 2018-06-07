@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.entityResolver.config.ModuleMeta;
+import cn.sowell.datacenter.model.modules.pojo.ModuleMeta;
 import cn.sowell.datacenter.model.modules.service.ModulesService;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.datacenter.model.tmpl.service.TemplateService;
@@ -73,7 +73,7 @@ public class AdminTemplateGroupController {
 		Assert.hasText(group.getModule());
 		try {
 			tService.saveGroup(group, UserUtils.getCurrentUser());
-			return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("保存成功", "tmpl_group_list_" + group.getModule());
+			return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("保存成功", group.getModule() + "_tmpl_group_list");
 		}catch (Exception e) {
 			logger.error("保存失败", e);
 			if(e instanceof ConstraintViolationException) {

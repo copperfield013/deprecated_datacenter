@@ -8,7 +8,9 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.type.StandardBasicTypes;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.Assert;
 
 import cn.sowell.copframe.dao.deferedQuery.DeferedParamSnippet;
 import cn.sowell.copframe.dao.utils.QueryUtils;
@@ -29,11 +31,12 @@ public class TempalteGroupDaoImpl implements TempalteGroupDao{
 				"		LEFT JOIN t_tmpl_list_template l ON g.list_tmpl_id = l.id" +
 				"		LEFT JOIN t_tmpl_detail_template d ON g.detail_tmpl_id = d.id " +
 				"	WHERE" +
-				"		g.id is not null @moduleSnippet @keySnippet @groupIdsSnippet",
+				"		g.id is not null @moduleSnippet @keySnippet @groupIdsSnippet @modulesSnippet",
 				TemplateGroup.class, sFactory.getCurrentSession(), dQuery->{
 			DeferedParamSnippet moduleSnippet = dQuery.createSnippet("moduleSnippet", null),
 					groupIdsSnippet = dQuery.createSnippet("groupIdsSnippet", null),
-					keySnippet = dQuery.createSnippet("keySnippet", null);
+					keySnippet = dQuery.createSnippet("keySnippet", null),
+					modulesSnippet = dQuery.createSnippet("modulesSnippet", null);
 			if(criteria.getModule() != null) {
 				moduleSnippet.append("and g.c_module = :module");
 				dQuery.setParam("module", criteria.getModule());
@@ -41,6 +44,10 @@ public class TempalteGroupDaoImpl implements TempalteGroupDao{
 			if(criteria.getGroupIds() != null && !criteria.getGroupIds().isEmpty()) {
 				groupIdsSnippet.append("and g.id in (:groupIds)");
 				dQuery.setParam("groupIds", criteria.getGroupIds());
+			}
+			if(criteria.getModules() != null && !criteria.getModules().isEmpty()) {
+				modulesSnippet.append("and g.c_module in (:moduleNames)");
+				dQuery.setParam("moduleNames", criteria.getModules(), StandardBasicTypes.STRING);
 			}
 			if(TextUtils.hasText(criteria.getGroupKey())) {
 				keySnippet.append("and g.c_key = :groupKey");
@@ -78,8 +85,16 @@ public class TempalteGroupDaoImpl implements TempalteGroupDao{
 		}
 		return null;
 	}
+	@Override
+	public List<TemplateGroup> getTemplateGroups(Set<String> moduleNames) {
+		Assert.notEmpty(moduleNames);
+		GroupQueryCriteria criteria = new GroupQueryCriteria();
+		criteria.setModules(moduleNames);
+		return queryGroups(criteria);
+	}
 	
 	static class GroupQueryCriteria{
+		private Set<String> modules;
 		private String module;
 		private String groupKey;
 		private Set<Long> groupIds;
@@ -100,6 +115,12 @@ public class TempalteGroupDaoImpl implements TempalteGroupDao{
 		}
 		public void setGroupIds(Set<Long> groupIds) {
 			this.groupIds = groupIds;
+		}
+		public Set<String> getModules() {
+			return modules;
+		}
+		public void setModules(Set<String> modules) {
+			this.modules = modules;
 		}
 	}
 	

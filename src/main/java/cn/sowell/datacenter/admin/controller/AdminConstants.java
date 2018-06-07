@@ -43,6 +43,8 @@ public interface AdminConstants {
 	final String JSP_DEMO = JSP_BASE + "/demo";
 	
 	
+	final String URI_CONFIG = JSP_BASE + "/config";
+	
 	/**
 	 *  管理端人口资源路径
 	 */
@@ -104,6 +106,10 @@ public interface AdminConstants {
 	 * </ol>
 	 */
 	final String PATH_CHOOSE_TABLE = URI_BASE + "/common/choose_table.jsp";
+
+	final String JSP_CONFIG = JSP_BASE + "/config";
+
+	final String JSP_CONFIG_SIDEMENU = JSP_CONFIG + "/sidemenu";
 
 
 	
