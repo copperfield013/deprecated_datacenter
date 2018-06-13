@@ -54,6 +54,7 @@
 	</multiattribute>
 
 	<multiattribute name="手术信息" abcattr="手术信息" ops="写">
+	<attribute name="手术名称" abcattr="手术名称" />
 		<attribute name="手术时间" abcattr="手术时间" />
 		<attribute name="手术类别" abcattr="手术类别" />
 		<attribute name="手术医院" abcattr="手术医院" />
