@@ -1,5 +1,6 @@
 package cn.sowell.datacenter.model.tmpl.dao.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -10,7 +11,6 @@ import javax.annotation.Resource;
 import org.hibernate.SessionFactory;
 import org.hibernate.type.StandardBasicTypes;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.Assert;
 
 import cn.sowell.copframe.dao.deferedQuery.DeferedParamSnippet;
 import cn.sowell.copframe.dao.utils.QueryUtils;
@@ -87,10 +87,13 @@ public class TempalteGroupDaoImpl implements TempalteGroupDao{
 	}
 	@Override
 	public List<TemplateGroup> getTemplateGroups(Set<String> moduleNames) {
-		Assert.notEmpty(moduleNames);
-		GroupQueryCriteria criteria = new GroupQueryCriteria();
-		criteria.setModules(moduleNames);
-		return queryGroups(criteria);
+		if(moduleNames != null && !moduleNames.isEmpty()) {
+			GroupQueryCriteria criteria = new GroupQueryCriteria();
+			criteria.setModules(moduleNames);
+			return queryGroups(criteria);
+		}else {
+			return new ArrayList<TemplateGroup>();
+		}
 	}
 	
 	static class GroupQueryCriteria{
