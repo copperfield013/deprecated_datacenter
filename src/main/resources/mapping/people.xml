@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ABC name="people" abcattr="人口信息" class="" xmlns="http://www.w3school.com.cn"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<attribute name="peoplecode" alias="" abcattr="唯一编码" />
+	<attribute name="编码" alias="" abcattr="唯一编码" />
 	<attribute name="编辑时间" alias="编辑时间" datatype="datetime"
 		abcattr="更新时间" />
 	<attribute name="住所类型" abcattr="住所类型" /><!--基本信息 -->
@@ -10,7 +10,7 @@
 	<attribute name="出生日期" abcattr="出生日期" /><!--基本信息 -->
 	<attribute name="参加工作时间" abcattr="参加工作时间" /><!--基本信息 -->
 	<attribute name="国籍" abcattr="国籍" /><!--基本信息 -->
-	<attribute name="姓名" abcattr="姓名" /><!--基本信息 -->
+	<attribute name="name" abcattr="姓名" /><!--基本信息 -->
 	<attribute name="姓名汉语拼音" abcattr="姓名汉语拼音" /><!--基本信息 -->
 	<attribute name="婚姻状况" abcattr="婚姻状况" /><!--基本信息 -->
 	<attribute name="学位" abcattr="学位" /><!--基本信息 -->
@@ -253,6 +253,11 @@
 	<attribute name="艾滋收治情况" abcattr="艾滋收治情况" /><!--艾滋病信息 -->
 	<attribute name="艾滋收治机构名称" abcattr="艾滋收治机构名称" /><!--艾滋病信息 -->
 
+	<label name="人口类型" alias="" subdomain="户籍人口,流动人口" />
+
+	<label name="类别" alias="" subdomain="党员,预备党员,入党积极分子,入党申请人" ops="增" />
+	<attribute name="身份证" abcattr="身份证" /><!--二级属性 -->
+
 	<multiattribute name="证件信息" abcattr="证件信息">
 		<attribute name="证件类型" abcattr="证件类型" />
 		<attribute name="证件号码" abcattr="证件号码" />
@@ -355,7 +360,7 @@
 		<attribute name="妇育编号" abcattr="妇育编号" />
 	</multiattribute>
 
-	<multiattribute name="现状表现" abcattr="现状表现">
+	<multiattribute name="现状表现" abcattr="现状表现" ops='写'>
 		<attribute name="类型" abcattr="类型" />
 		<attribute name="内容" abcattr="内容" />
 		<attribute name="时间" abcattr="时间" />
@@ -379,6 +384,21 @@
 		<attribute name="上访类型" abcattr="上访类型" />
 		<attribute name="上访时间" abcattr="上访时间" />
 	</multiattribute>
-
+	
+	<relation name="子女信息" >
+		<label subdomain="子女" />
+		<ABC name="子女信息" abcattr="人口信息" ops='读' >
+			<attribute name="姓名" alias="" abcattr="姓名"  />
+			<attribute name="性别" alias="" abcattr="性别"  />
+		</ABC>
+	</relation>
+	
+	<relation name="培养联系人">
+		<label subdomain="入党联系人" />
+		<ABC name="培养联系人" abcattr="人口信息">
+			<attribute name="姓名" alias="" abcattr="姓名" />
+		</ABC>
+	</relation>
+	
 
 </ABC>
