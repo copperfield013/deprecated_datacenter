@@ -13,7 +13,7 @@
 		<version.cpfweb>0.2.9</version.cpfweb>
 		<version.abcitem>3.3.33.alphal</version.abcitem>
 		<version.abcbizz>2.1.15</version.abcbizz>
-		<version.entityResolver>1.0</version.entityResolver>
+		<version.entityResolver>1.4</version.entityResolver>
 		<cxf.version>3.2.2</cxf.version>
 	</properties>
 	
@@ -212,11 +212,6 @@
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
             <version>5.4.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>2.7</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

@@ -130,6 +130,8 @@ public class AdminModulesController {
 				model.addAttribute("hidenCriteriaDesc", hidenCriteriaDesc);
 			}
 		}
+		FusionContextConfig config = fFactory.getModuleConfig(module);
+		model.addAttribute("config", config);
 		model.addAttribute("vCriteriaMap", param.getNormalCriteriaMap());
 		model.addAttribute("ltmpl", param.getListTemplate());
 		model.addAttribute("pageInfo", pageInfo);
