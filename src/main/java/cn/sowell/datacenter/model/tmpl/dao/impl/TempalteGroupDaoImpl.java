@@ -80,7 +80,7 @@ public class TempalteGroupDaoImpl implements TempalteGroupDao{
 		GroupQueryCriteria criteria = new GroupQueryCriteria();
 		criteria.setGroupKey(templateGroupKey);
 		List<TemplateGroup> list = queryGroups(criteria);
-		if(list != null) {
+		if(list != null && !list.isEmpty()) {
 			return list.get(0);
 		}
 		return null;

@@ -89,6 +89,8 @@ define(function(require, exports, module){
 						//选择的字段是一个数组字段，锁定当前选择器的标签页
 						fieldSearch.lockTab();
 						//TODO: 将字段添加到数组当中
+					}else{
+						fieldSearch.hideArrayComposites();
 					}
 					appendFieldToGroup({
 						title		: field.title,
@@ -180,6 +182,8 @@ define(function(require, exports, module){
 			fieldSearch.enableField(fieldData.fieldId, false).done(function(field){
 				if(field.composite.isArray){
 					$group.attr('composite-id', field.composite.c_id);
+				}else{
+					fieldSearch.hideArrayComposites();
 				}
 			});
 			return true;

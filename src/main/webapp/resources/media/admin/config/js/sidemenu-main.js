@@ -96,6 +96,10 @@ define(function(require, exports, module){
 									$page.getLocatePage().refresh();
 								}
 							});
+						}else if(data.status === 'duplicateModule'){
+							Dialog.notice('保存失败，模块重复', 'error');
+						}else{
+							Dialog.notice('保存失败', 'error');
 						}
 					});
 				}

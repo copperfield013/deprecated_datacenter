@@ -933,7 +933,8 @@ define(function(require, exports, module){
 		
 		var addColSearcher = FieldSearch.bind($('#addcol-field-search', $page), {
 			afterChoose		: addColumn,
-			module			: module
+			module			: module,
+			showArrayComposite	: false
 		});
 		var $orderFieldSearch = $('#order-field-search', $page);
 		var orderField = null;

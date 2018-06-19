@@ -10,7 +10,7 @@
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/ltmpl-update.css" />
 <div class="ltmpl-update detail" id="ltmpl-update-${RES_STAMP }">
 	<script type="jquery/tmpl" id="col-row-tmpl">
-		<div class="row" column-id="\${columnId}" field-id="\${id}" field-key="\${(c_name?(c_name + '.'):'') + name}">
+		<div class="row" column-id="\${columnId}" field-id="\${id}" field-key="\${name}">
 			<span class="col-name">\${cname}</span>
 			{{if !withoutOpr}}
 				<span class="col-operates">

@@ -339,6 +339,7 @@ define(function(require, exports, module){
 			});
 			return def.promise();
 		}
+		this.hideArrayComposites = hideArrayComposites;
 		this.getLockedCompositeId = function(){
 			var def = $.Deferred();
 			if(locked){

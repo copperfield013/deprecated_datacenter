@@ -1,7 +1,9 @@
 package cn.sowell.datacenter.admin.controller.config;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -52,6 +54,15 @@ public class AdminConfigSidemenuController {
 		JSONObject req = jReq.getJsonObject();
 		try {
 			List<SideMenuModule> modules = toMenuModules(req);
+			Set<String> moduleNames = new HashSet<>();
+			for (SideMenuModule module : modules) {
+				if(moduleNames.contains(module.getModuleName())) {
+					jRes.setStatus("duplicateModule");
+					return jRes;
+				}else {
+					moduleNames.add(module.getModuleName());
+				}
+			}
 			configService.updateSideMenuModules(UserUtils.getCurrentUser(), modules);
 			jRes.setStatus("suc");
 		} catch (Exception e) {
