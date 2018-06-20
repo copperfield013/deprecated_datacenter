@@ -7,6 +7,8 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -38,6 +40,7 @@ public class ConfigureServiceImpl implements ConfigureService{
 	ModuleConfigureMediator moduleConfigMediator;
 	
 	@Override
+	@Transactional(propagation=Propagation.SUPPORTS)
 	public List<SideMenuModule> getSideMenuModules(UserIdentifier user) {
 		List<SideMenuModule> modules = cDao.getSideMenuModules();
 		Map<String, ConfigModule> configModuleMap = cDao.getConfigModule(CollectionUtils.toSet(modules, module->module.getModuleName()));
@@ -50,7 +53,6 @@ public class ConfigureServiceImpl implements ConfigureService{
 				itr.remove();
 			}else {
 				module.setConfigModule(cModule);
-				module.setTitle(cModule.getTitle());
 			}
 		}
 		
