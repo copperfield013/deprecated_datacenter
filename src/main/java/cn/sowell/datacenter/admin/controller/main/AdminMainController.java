@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.model.config.pojo.SideMenuModule;
+import cn.sowell.datacenter.model.config.pojo.SideMenuLevel1Menu;
 import cn.sowell.datacenter.model.config.service.ConfigureService;
 
 @Controller
@@ -33,8 +33,8 @@ public class  AdminMainController {
 	@RequestMapping({"/", ""})
 	public String index(Model model){
 		UserIdentifier user = UserUtils.getCurrentUser();
-		List<SideMenuModule> modules = configService.getSideMenuModules(user);
-		model.addAttribute("modules", modules);
+		List<SideMenuLevel1Menu> menus = configService.getSideMenuLevelMenus(user);
+		model.addAttribute("menus", menus);
 		return "/admin/index.jsp";
 	}
 	

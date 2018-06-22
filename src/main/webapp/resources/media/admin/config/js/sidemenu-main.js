@@ -8,69 +8,107 @@ define(function(require, exports, module){
 		Dialog = require('dialog');
 	exports.init = function($page, config){
 		var $moduleItemContainer = $('#level1-list', $page);
-		var $moduleSelect = null;
-		try{
-			$moduleSelect = $('<select class="module-select">');
-			for(var name in config.modules){
-				var module = config.modules[name];
-				$moduleSelect.append('<option value="' + module.name + '">' + module.title + '</option>');
-				$moduleSelect.change(function(){
-					var $moduleTitle = $(this).closest('.dd-handle').find('.level1-title :text');
-					$moduleTitle.val(Utils.getCheckedOption(this).text()).select();
-				});
-			}
-		}catch(e){}
 		var saveButtonShowed = false;
 		function bindSortable(target){
+			var newItem;
 			$(target).sortable({
-				update: function( event, ui ) {
+				update	: function( event, ui ) {
 					if(!saveButtonShowed){
 						toggleSaveButton(1);
 					}
+				},
+				beforeStop: function (event, ui) { 
+				      newItem = ui.item;
+				},
+				receive	: function(e, ui){
+					var $g = $(ui.sender),
+						$moduleWrapper = $g.closest('.module-wrapper');
+					var groupTitle = $g.text().trim();
+					var data = {
+						level2Title		: groupTitle,
+						tmplGroupId		: $g.attr('group-id'),
+						moduleTitle		: $moduleWrapper.find('.module-title').text().trim(),
+						tmplGroupTitle	: groupTitle,
+						moduleName		: $moduleWrapper.attr('module-name')
+					};
+					var $level2 = $('#level2-item-tmpl', $page).tmpl(data);
+					$(newItem).replaceWith($level2);
+					$level2.closest('li').attr('group-id', data.tmplGroupId);
+					toggleSaveButton(false);
+					toggleAddLevel1Button(false);
+					$level2.find(':text')
+							.on('keydown', enterTrigger)
+							.on('enter blur', confirmTitleEdit)
+							.select();
 				}
-			});
+			}).disableSelection();
 		}
-		bindSortable($('.dd-list', $page));
+		$('ul li', $page).disableSelection();
+		bindSortable($('.menu-container .dd-list', $page));
+		$('.mds-container .md-group-title', $page).draggable({
+			connectToSortable: '#' + $page.attr('id') + ' .menu-container #level1-list>.dd-item>.dd-list',
+			helper: 'clone',
+			scroll: true
+		});
+		function enterTrigger(e){if(e.keyCode == 13) $(this).trigger('enter')}
+		function confirmTitleEdit(){
+			var $text = $(this);
+			var title = $text.val();
+			if(!title){
+				Dialog.notice('内容不能为空', 'error');
+				return false;
+			}
+			$text.replaceWith(function(){
+				return $text.val();
+			});
+			toggleSaveButton(true);
+			toggleAddLevel1Button(true);
+		}
+		
 		function toggleSaveButton(toShow){
 			saveButtonShowed = true;
 			var $a = $('#save', $page).closest('a');
 			if(toShow){
-				Utils.removeStyle($a, 'display');
-			}else{
-				$a.hide();
+				if($(':text', $moduleItemContainer).length == 0){
+					Utils.removeStyle($a, 'display');
+					return;
+				}
 			}
+			$a.hide();
 		}
 		function toggleAddLevel1Button(toShow){
 			var $a = $('#add-level1', $page).closest('a');
 			if(toShow){
-				Utils.removeStyle($a, 'display');
-			}else{
-				$a.hide();
+				if($(':text', $moduleItemContainer).length == 0){
+					Utils.removeStyle($a, 'display');
+					return;
+				}
 			}
+			$a.hide();
 		}
 		
 		$('#add-level1', $page).click(function(){
 			var $li = $('#level1-item-tmpl', $page).tmpl()
-				.find('.dd-handle').append($moduleSelect)
-				.end()
 				.appendTo($moduleItemContainer)
 				;
 			bindSortable($li.find('.dd-list'));
-			$moduleSelect.trigger('change');
 			toggleSaveButton(false);
 			toggleAddLevel1Button(false);
+			$li.find(':text')
+				.on('keydown', enterTrigger)
+				.on('enter blur', confirmTitleEdit)
+				.select();
 		});
 		$('#save', $page).click(function(){
 			var submitData = {
 				modules	: []
 			};
-			$moduleItemContainer.find('li[module-name]').each(function(i){
+			$moduleItemContainer.find('>li').each(function(i){
 				var $level1Li = $(this);
 				var module = {
 					id			: $level1Li.attr('data-id'),
 					title		: $level1Li.find('.level1-title').text(),
 					order		: i,
-					moduleName	: $level1Li.attr('module-name'),
 					groups		: []
 				};
 				submitData.modules.push(module);
@@ -104,53 +142,6 @@ define(function(require, exports, module){
 					});
 				}
 			});
-		});
-		$moduleItemContainer.on('click', '.save-level1', function(){
-			var $handler = $(this).closest('.dd-handle');
-			$handler.find('.level1-title :text').replaceWith(function(){
-				return $(this).val();
-			});
-			$handler.find('.tip-level-title').text(Utils.getCheckedOption($moduleSelect).text());
-			$handler.closest('li').attr('module-name', $moduleSelect.val());
-			$moduleSelect.detach();
-			$(this).removeClass('save-level1 a-check').addClass('add-level2 fa-plus-square-o');
-			toggleSaveButton(true);
-			toggleAddLevel1Button(true);
-		});
-		$moduleItemContainer.on('click', '.add-level2', function(){
-			var $item = $(this).closest('.dd-item');
-			var $ol = $item.find('ol');
-			var $groupSelect = $('<select class="group-select">').change(function(){
-				var $moduleTitle = $(this).closest('.dd-handle').find('.level2-title :text');
-				$moduleTitle.val(Utils.getCheckedOption(this).text()).select();
-			});
-			var moduleName = $item.closest('li').attr('module-name');
-			var groups = config.modules[moduleName].groups;
-			$groupSelect.append('<option value="0">默认</option>')
-			for(var i in groups){
-				$groupSelect.append('<option value="' + groups[i].id + '">' + groups[i].title + '</option>')
-			}
-			$('#level2-item-tmpl', $page).tmpl()
-					.find('.dd-handle').append($groupSelect)
-					.end()
-					.appendTo($ol);
-			$groupSelect.trigger('change');
-			toggleSaveButton(false);
-			toggleAddLevel1Button(false);
-		});
-		$moduleItemContainer.on('click', '.save-level2', function(){
-			var $handler = $(this).closest('.dd-handle');
-			$handler.find('.level2-title :text').replaceWith(function(){
-				return $(this).val();
-			});
-			var $groupSelect = $('select.group-select', $handler);
-			$handler.closest('li')
-				.attr('group-id', $groupSelect.val());
-			$handler.find('.tip-level-title').text(Utils.getCheckedOption($groupSelect).text());
-			$groupSelect.remove();
-			$(this).closest('a').remove();
-			toggleSaveButton(true);
-			toggleAddLevel1Button(true);
 		});
 		$moduleItemContainer.on('dblclick', '.level2-title,.level1-title', function(){
 			var $this = $(this);

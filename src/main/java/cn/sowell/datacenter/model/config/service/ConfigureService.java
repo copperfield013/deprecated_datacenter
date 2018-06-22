@@ -5,14 +5,17 @@ import java.util.List;
 import com.alibaba.fastjson.JSONObject;
 
 import cn.sowell.copframe.common.UserIdentifier;
-import cn.sowell.datacenter.model.config.pojo.SideMenuModule;
+import cn.sowell.datacenter.entityResolver.config.abst.Module;
+import cn.sowell.datacenter.model.config.pojo.SideMenuLevel1Menu;
 
 public interface ConfigureService {
 
-	List<SideMenuModule> getSideMenuModules(UserIdentifier user);
+	List<SideMenuLevel1Menu> getSideMenuLevelMenus(UserIdentifier user);
 
-	void updateSideMenuModules(UserIdentifier user, List<SideMenuModule> modules);
+	void updateSideMenuModules(UserIdentifier user, List<SideMenuLevel1Menu> modules);
 
 	JSONObject getModuleConfigJson();
+
+	List<Module> getEnabledModules();
 	
 }

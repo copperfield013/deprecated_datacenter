@@ -207,6 +207,7 @@
 			$doms.each(function(){
 				var $this = $(this);
 				var param = paramGetter($this);
+				console.log(param);
 				var fInp = new FieldInput(param);
 				$this.append(fInp.getDom());
 			});

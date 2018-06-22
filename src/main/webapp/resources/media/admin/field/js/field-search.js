@@ -256,24 +256,26 @@ define(function(require, exports, module){
 				var $toDisable = $('a.fieldpicker-field-item[data-id="' + fieldId + '"]', $fieldpicker);
 				$toDisable.toggleClass('disabled', toEnable === false);
 				_this.getFieldData(fieldId).done(function(field){
-					if(toEnable === false){
-						if(!param.single){
-							if(field.composite.isArray){
-								//选择的字段是一个数组字段，锁定当前选择器的标签页
-								_this.lockTabByCompositeId(field.composite.c_id);
-							}else{
-								hideArrayComposites();
-							}
-						}
-						disabledFieldSet.add(fieldId.toString());
-					}else{
-						disabledFieldSet['delete'](fieldId.toString());
-						if(disabledFieldSet.size === 0){
+					if(field){
+						if(toEnable === false){
 							if(!param.single){
 								if(field.composite.isArray){
-									_this.lockTabByCompositeId(field.composite.c_id, false);
+									//选择的字段是一个数组字段，锁定当前选择器的标签页
+									_this.lockTabByCompositeId(field.composite.c_id);
 								}else{
-									hideArrayComposites(false);
+									hideArrayComposites();
+								}
+							}
+							disabledFieldSet.add(fieldId.toString());
+						}else{
+							disabledFieldSet['delete'](fieldId.toString());
+							if(disabledFieldSet.size === 0){
+								if(!param.single){
+									if(field.composite.isArray){
+										_this.lockTabByCompositeId(field.composite.c_id, false);
+									}else{
+										hideArrayComposites(false);
+									}
 								}
 							}
 						}
@@ -313,7 +315,7 @@ define(function(require, exports, module){
 			var def = $.Deferred();
 			if(locked){
 				_this.getFieldData(fieldId).done(function(field){
-					if(locked && field.composite.isArray){
+					if(locked && field && field.composite.isArray){
 						_this.getLockedCompositeId().done(function(compositeId){
 							def.resolve(field.composite.c_id.toString() != compositeId.toString());
 						});

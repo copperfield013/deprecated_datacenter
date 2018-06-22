@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
-<title>模板列表</title>
+<title>详情模板（${module.title }）</title>
 <div id="dtmpl-list" class="detail">
 	<div>
 		<form action="admin/tmpl/dtmpl/list">
@@ -9,13 +9,13 @@
 	</div>
 	<div class="page-header">
 		<div class="header-title">
-			<h1>模板列表</h1>
+			<h1>详情模板（${module.title }）</h1>
 		</div>
 		<div class="header-buttons">
 			<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
 				<i class="glyphicon glyphicon-refresh"></i>
 			</a>
-			<a class="tab"  href="admin/tmpl/dtmpl/to_create/${module }" title="创建模板" target="create_dtmpl">
+			<a class="tab"  href="admin/tmpl/dtmpl/to_create/${module.name }" title="创建模板" target="create_dtmpl">
 				<i class="fa fa-plus"></i>
 			</a>
 		</div>
@@ -46,21 +46,6 @@
 									<i class="fa fa-trash-o"></i>
 									删除
 								</a>
-								<c:choose>
-									<c:when test="${tmpl.id != defaultTemplate.id }">
-										<a href="admin/tmpl/dtmpl/as_default/${tmpl.id }" class="btn btn-warning btn-xs">
-											<i class="glyphicon glyphicon-star"></i>
-											设为默认
-										</a>
-									</c:when>
-									<c:otherwise>
-										<a disabled="disabled" class="btn btn-xs">
-											<i class="glyphicon glyphicon-star"></i>
-											默认模板
-										</a>
-										
-									</c:otherwise>
-								</c:choose>
 							</td>
 						</tr>
 					</c:forEach>

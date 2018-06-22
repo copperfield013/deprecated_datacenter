@@ -5,14 +5,14 @@ import java.util.Map;
 import java.util.Set;
 
 import cn.sowell.datacenter.model.config.pojo.ConfigModule;
-import cn.sowell.datacenter.model.config.pojo.SideMenuModule;
-import cn.sowell.datacenter.model.config.pojo.SideMenuModuleTempalteGroup;
+import cn.sowell.datacenter.model.config.pojo.SideMenuLevel1Menu;
+import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2;
 
 public interface ConfigureDao {
 
-	List<SideMenuModule> getSideMenuModules();
+	List<SideMenuLevel1Menu> getSideMenuModules();
 
-	Map<Long, List<SideMenuModuleTempalteGroup>> getSideMenuModuleTemplateGroupsMap(Set<Long> sideMenuModuleIds);
+	Map<Long, List<SideMenuLevel2>> getSideMenuLevel2Map(Set<Long> sideMenuModuleIds);
 
 	Map<String, ConfigModule> getConfigModule(Set<String> moduleNames);
 

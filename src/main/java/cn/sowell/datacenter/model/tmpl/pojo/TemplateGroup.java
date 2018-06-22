@@ -55,7 +55,7 @@ public class TemplateGroup {
 	
 	@Column(name="update_time")
 	private Date updateTime;
-
+	
 	public Long getId() {
 		return id;
 	}
@@ -160,5 +160,5 @@ public class TemplateGroup {
 	public void setKey(String key) {
 		this.key = key;
 	}
-	
+
 }

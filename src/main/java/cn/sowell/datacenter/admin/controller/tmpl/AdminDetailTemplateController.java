@@ -62,10 +62,12 @@ public class AdminDetailTemplateController {
 	@RequestMapping("/list/{module}")
 	public String tmplList(Model model, @PathVariable String module){
 		UserIdentifier user = UserUtils.getCurrentUser();
+		ModuleMeta moduleMeta = mService.getModule(module);
 		List<TemplateDetailTemplate> tmplList = tService.getAllDetailTemplateList(module, user, null, false);
 		TemplateDetailTemplate defDetailTemplate = tService.getDefaultDetailTemplate(user, module);
 		model.addAttribute("tmplList", tmplList);
 		model.addAttribute("defaultTemplate", defDetailTemplate);
+		model.addAttribute("module", moduleMeta);
 		return AdminConstants.JSP_TMPL_DETAIL + "/dtmpl_list.jsp";
 	}
 	

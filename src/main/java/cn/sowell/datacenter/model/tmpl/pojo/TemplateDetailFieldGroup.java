@@ -15,6 +15,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import com.alibaba.fastjson.annotation.JSONField;
 
 import cn.sowell.datacenter.model.dict.pojo.DictionaryComposite;
@@ -40,6 +43,7 @@ public class TemplateDetailFieldGroup {
 	
 	@ManyToOne
 	@JoinColumn(name = "composite_id",insertable = false, updatable = false)
+	@NotFound(action=NotFoundAction.IGNORE)
 	private DictionaryComposite composite;
 	
 	@Column(name="c_order")

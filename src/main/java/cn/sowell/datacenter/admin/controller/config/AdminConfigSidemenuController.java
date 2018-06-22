@@ -1,9 +1,8 @@
 package cn.sowell.datacenter.admin.controller.config;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -22,10 +21,15 @@ import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
+import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.model.config.pojo.SideMenuModule;
-import cn.sowell.datacenter.model.config.pojo.SideMenuModuleTempalteGroup;
+import cn.sowell.datacenter.entityResolver.config.abst.Module;
+import cn.sowell.datacenter.model.config.pojo.SideMenuLevel1Menu;
+import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2;
 import cn.sowell.datacenter.model.config.service.ConfigureService;
+import cn.sowell.datacenter.model.modules.service.ModulesService;
+import cn.sowell.datacenter.model.tmpl.pojo.TemplateGroup;
+import cn.sowell.datacenter.model.tmpl.service.TemplateService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_CONFIG + "/sidemenu")
@@ -34,16 +38,26 @@ public class AdminConfigSidemenuController {
 	@Resource
 	ConfigureService configService;
 	
+	@Resource
+	ModulesService mService;
+	
+	@Resource
+	TemplateService tService;
+	
 	Logger logger = Logger.getLogger(AdminConfigSidemenuController.class);
 	
 	
 	@RequestMapping({"", "/"})
 	public String main(Model model) {
 		UserIdentifier user = UserUtils.getCurrentUser();
-		List<SideMenuModule> modules = configService.getSideMenuModules(user);
+		List<SideMenuLevel1Menu> menus = configService.getSideMenuLevelMenus(user);
+		List<Module> modules = configService.getEnabledModules();
+		Map<String, List<TemplateGroup>> tmplGroupsMap = tService.queryTemplateGroups(CollectionUtils.toSet(modules, module->module.getName()));
 		JSONObject config = configService.getModuleConfigJson();
 		model.addAttribute("config", config);
 		model.addAttribute("modules", modules);
+		model.addAttribute("menus", menus);
+		model.addAttribute("tmplGroupsMap", tmplGroupsMap);
 		return AdminConstants.JSP_CONFIG_SIDEMENU + "/sidemenu_main.jsp";
 	}
 	
@@ -53,16 +67,7 @@ public class AdminConfigSidemenuController {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		JSONObject req = jReq.getJsonObject();
 		try {
-			List<SideMenuModule> modules = toMenuModules(req);
-			Set<String> moduleNames = new HashSet<>();
-			for (SideMenuModule module : modules) {
-				if(moduleNames.contains(module.getModuleName())) {
-					jRes.setStatus("duplicateModule");
-					return jRes;
-				}else {
-					moduleNames.add(module.getModuleName());
-				}
-			}
+			List<SideMenuLevel1Menu> modules = toMenuModules(req);
 			configService.updateSideMenuModules(UserUtils.getCurrentUser(), modules);
 			jRes.setStatus("suc");
 		} catch (Exception e) {
@@ -72,21 +77,20 @@ public class AdminConfigSidemenuController {
 		return jRes;
 	}
 
-	private List<SideMenuModule> toMenuModules(JSONObject req) {
+	private List<SideMenuLevel1Menu> toMenuModules(JSONObject req) {
 		JSONArray jModules = req.getJSONArray("modules");
-		List<SideMenuModule> modules = new ArrayList<>();
+		List<SideMenuLevel1Menu> modules = new ArrayList<>();
 		for (Object x : jModules) {
 			JSONObject jModule = (JSONObject) x;
-			SideMenuModule module = new SideMenuModule();
+			SideMenuLevel1Menu module = new SideMenuLevel1Menu();
 			module.setId(jModule.getLong("id"));
 			module.setTitle(jModule.getString("title"));
 			module.setOrder(jModule.getInteger("order"));
-			module.setModuleName(jModule.getString("moduleName"));
-			module.setGroups(new ArrayList<>());
+			module.setLevel2s(new ArrayList<>());
 			JSONArray jGroups = jModule.getJSONArray("groups");
 			for (Object y : jGroups) {
 				JSONObject jGroup = (JSONObject) y;
-				SideMenuModuleTempalteGroup group = new SideMenuModuleTempalteGroup();
+				SideMenuLevel2 group = new SideMenuLevel2();
 				group.setId(jGroup.getLong("id"));
 				group.setTitle(jGroup.getString("title"));
 				group.setOrder(jGroup.getInteger("order"));
@@ -95,7 +99,7 @@ public class AdminConfigSidemenuController {
 					group.setIsDefault(1);
 					group.setTemplateGroupId(null);
 				}
-				module.getGroups().add(group);
+				module.getLevel2s().add(group);
 			}
 			modules.add(module);
 		}

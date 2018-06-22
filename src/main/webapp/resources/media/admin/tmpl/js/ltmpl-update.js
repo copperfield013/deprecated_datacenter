@@ -475,9 +475,8 @@ define(function(require, exports, module){
 							}, item), true);
 							addCriteriaItem(index + 1);
 						});
-					}else{
-						$CPF.closeLoading();
 					}
+					$CPF.closeLoading();
 				}(0);
 			}else{
 				$CPF.closeLoading();

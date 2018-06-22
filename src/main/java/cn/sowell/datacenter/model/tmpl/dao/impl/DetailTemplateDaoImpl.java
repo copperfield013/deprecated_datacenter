@@ -54,7 +54,7 @@ public class DetailTemplateDaoImpl implements DetailTemplateDao{
 			Set<Long> groupIdSet) {
 		if(groupIdSet != null && !groupIdSet.isEmpty()){
 			String sql = "select f.*, df.c_type, df.optgroup_id from t_tmpl_detail_field f "
-					+ "left join t_dictionary_field df on f.field_id = df.id where f.group_id in (:groupIds) order by f.c_order asc ";
+					+ "left join v_dictionary_field df on f.field_id = df.id where f.group_id in (:groupIds) order by f.c_order asc ";
 			SQLQuery query = sFactory.getCurrentSession().createSQLQuery(sql);
 			
 			query.setParameterList("groupIds", groupIdSet);

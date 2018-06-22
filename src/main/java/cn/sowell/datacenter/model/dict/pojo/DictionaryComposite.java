@@ -1,6 +1,5 @@
 package cn.sowell.datacenter.model.dict.pojo;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -17,7 +16,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import cn.sowell.datacenter.entityResolver.Composite;
 
 @Entity
-@Table(name="t_dictionary_composite")
+@Table(name="v_dictionary_composite")
 public class DictionaryComposite implements Composite{
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -38,18 +37,6 @@ public class DictionaryComposite implements Composite{
 	@Column(name="c_is_array")
 	@JSONField(name="isArray")
 	private Integer isArray;
-	
-	@Column(name="create_time")
-	@JSONField(serialize=false)
-	private Date createTime;
-	
-	@Column(name="update_time")
-	@JSONField(serialize=false)
-	private Date updateTime;
-	
-	@Column(name="c_authority")
-	@JSONField(serialize=false)
-	private String authority;
 	
 	@Transient
 	private List<DictionaryField> fields;
@@ -74,24 +61,6 @@ public class DictionaryComposite implements Composite{
 	}
 	public void setTitle(String title) {
 		this.title = title;
-	}
-	public Date getCreateTime() {
-		return createTime;
-	}
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
-	public Date getUpdateTime() {
-		return updateTime;
-	}
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
-	}
-	public String getAuthority() {
-		return authority;
-	}
-	public void setAuthority(String authority) {
-		this.authority = authority;
 	}
 	public List<DictionaryField> getFields() {
 		return fields;

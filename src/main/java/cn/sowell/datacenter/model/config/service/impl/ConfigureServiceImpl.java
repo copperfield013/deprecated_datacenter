@@ -1,6 +1,5 @@
 package cn.sowell.datacenter.model.config.service.impl;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -20,9 +19,8 @@ import cn.sowell.datacenter.entityResolver.config.ModuleConfigureMediator;
 import cn.sowell.datacenter.entityResolver.config.abst.Module;
 import cn.sowell.datacenter.entityResolver.config.param.QueryModuleCriteria;
 import cn.sowell.datacenter.model.config.dao.ConfigureDao;
-import cn.sowell.datacenter.model.config.pojo.ConfigModule;
-import cn.sowell.datacenter.model.config.pojo.SideMenuModule;
-import cn.sowell.datacenter.model.config.pojo.SideMenuModuleTempalteGroup;
+import cn.sowell.datacenter.model.config.pojo.SideMenuLevel1Menu;
+import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2;
 import cn.sowell.datacenter.model.config.service.ConfigureService;
 import cn.sowell.datacenter.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.datacenter.model.tmpl.service.TemplateService;
@@ -41,47 +39,35 @@ public class ConfigureServiceImpl implements ConfigureService{
 	
 	@Override
 	@Transactional(propagation=Propagation.SUPPORTS)
-	public List<SideMenuModule> getSideMenuModules(UserIdentifier user) {
-		List<SideMenuModule> modules = cDao.getSideMenuModules();
-		Map<String, ConfigModule> configModuleMap = cDao.getConfigModule(CollectionUtils.toSet(modules, module->module.getModuleName()));
-		Iterator<SideMenuModule> itr = modules.iterator();
-		while(itr.hasNext()) {
-			SideMenuModule module = itr.next();
-			ConfigModule cModule = configModuleMap.get(module.getModuleName());
-			if(cModule == null) {
-				//如果没有找到对应的ConfigModule,那么该模块不可用，直接移除
-				itr.remove();
-			}else {
-				module.setConfigModule(cModule);
-			}
-		}
+	public List<SideMenuLevel1Menu> getSideMenuLevelMenus(UserIdentifier user) {
+		List<SideMenuLevel1Menu> modules = cDao.getSideMenuModules();
 		
-		Map<Long, List<SideMenuModuleTempalteGroup>> groupsMap 
-					= cDao.getSideMenuModuleTemplateGroupsMap(CollectionUtils.toSet(modules, module->module.getId()));
-		modules.forEach(module->module.setGroups(groupsMap.get(module.getId())));
+		Map<Long, List<SideMenuLevel2>> groupsMap 
+					= cDao.getSideMenuLevel2Map(CollectionUtils.toSet(modules, module->module.getId()));
+		modules.forEach(module->module.setLevel2s(groupsMap.get(module.getId())));
 		return modules;
 	}
 	
 	@Override
-	public void updateSideMenuModules(UserIdentifier user, List<SideMenuModule> modules) {
-		List<SideMenuModule> originModules = getSideMenuModules(user);
-		CollectionUpdateStrategy<SideMenuModule> updateModules = 
-				new CollectionUpdateStrategy<>(SideMenuModule.class, nDao,
+	public void updateSideMenuModules(UserIdentifier user, List<SideMenuLevel1Menu> modules) {
+		List<SideMenuLevel1Menu> originModules = getSideMenuLevelMenus(user);
+		CollectionUpdateStrategy<SideMenuLevel1Menu> updateModules = 
+				new CollectionUpdateStrategy<>(SideMenuLevel1Menu.class, nDao,
 						module->module.getId());
-		CollectionUpdateStrategy<SideMenuModuleTempalteGroup> updateGroups = 
-				new CollectionUpdateStrategy<>(SideMenuModuleTempalteGroup.class, nDao,
+		CollectionUpdateStrategy<SideMenuLevel2> updateGroups = 
+				new CollectionUpdateStrategy<>(SideMenuLevel2.class, nDao,
 						group->group.getId());
 		updateModules.setBeforeUpdate((origin, module)->{
 					origin.setTitle(module.getTitle());
 					origin.setOrder(module.getOrder());
 				});
 		updateModules.setAfterUpdate((origin, module)->{
-			module.getGroups().forEach(group->group.setSideMenuModuleId(origin.getId()));
-			updateGroups.doUpdate(origin.getGroups(), module.getGroups());
+			module.getLevel2s().forEach(group->group.setSideMenuLevel1Id(origin.getId()));
+			updateGroups.doUpdate(origin.getLevel2s(), module.getLevel2s());
 		});
 		updateModules.setAfterCreate(module->{
-			module.getGroups().forEach(group->group.setSideMenuModuleId(module.getId()));
-			updateGroups.doUpdate(null, module.getGroups());
+			module.getLevel2s().forEach(group->group.setSideMenuLevel1Id(module.getId()));
+			updateGroups.doUpdate(null, module.getLevel2s());
 		});
 		updateGroups.setBeforeUpdate((o, g)->{
 			o.setOrder(g.getOrder());
@@ -93,6 +79,15 @@ public class ConfigureServiceImpl implements ConfigureService{
 	
 	@Resource
 	TemplateService tService;
+	
+	@Override
+	public List<Module> getEnabledModules(){
+		QueryModuleCriteria criteria = new QueryModuleCriteria();
+		criteria.setFilterDisabled(true);
+		List<Module> modules = moduleConfigMediator.queryModules(criteria);
+		return modules;
+	}
+	
 	
 	@Override
 	public JSONObject getModuleConfigJson() {

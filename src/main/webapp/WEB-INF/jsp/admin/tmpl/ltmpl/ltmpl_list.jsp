@@ -1,20 +1,21 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
-<div id="tmpl-ltmpl-list-${module }" class="detail">
+<title>列表模板（${module.title }）</title>
+<div id="tmpl-ltmpl-list-${module.name }" class="detail">
 	<div>
-		<form action="admin/tmpl/ltmpl/list/${module }">
+		<form action="admin/tmpl/ltmpl/list/${module.name }">
 			
 		</form>
 	</div>
 	<div class="page-header">
 		<div class="header-title">
-			<h1>列表模板列表</h1>
+			<h1>列表模板（${module.title }）</h1>
 		</div>
 		<div class="header-buttons">
 			<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
 				<i class="glyphicon glyphicon-refresh"></i>
 			</a>
-			<a class="tab"  href="admin/tmpl/ltmpl/add/${module }" title="创建模板" target="add_ltmpl_${module }">
+			<a class="tab"  href="admin/tmpl/ltmpl/add/${module.name }" title="创建模板" target="add_ltmpl_${module.name }">
 				<i class="fa fa-plus"></i>
 			</a>
 		</div>
@@ -45,21 +46,6 @@
 									<i class="fa fa-trash-o"></i>
 									删除
 								</a>
-								<c:choose>
-									<c:when test="${ltmpl.id != defListTtemplate.id }">
-										<a href="admin/tmpl/ltmpl/as_default/${ltmpl.id }" class="btn btn-warning btn-xs">
-											<i class="glyphicon glyphicon-star"></i>
-											设为默认
-										</a>
-									</c:when>
-									<c:otherwise>
-										<a disabled="disabled" class="btn btn-xs">
-											<i class="glyphicon glyphicon-star"></i>
-											默认模板
-										</a>
-										
-									</c:otherwise>
-								</c:choose>
 							</td>
 						</tr>
 					</c:forEach>

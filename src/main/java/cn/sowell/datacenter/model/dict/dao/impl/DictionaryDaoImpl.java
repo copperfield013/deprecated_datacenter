@@ -93,7 +93,7 @@ public class DictionaryDaoImpl implements DictionaryDao{
 					"	SELECT" +
 							"		f.id field_id, o.c_title" +
 							"	FROM" +
-							"		t_dictionary_field f" +
+							"		v_dictionary_field f" +
 							"	LEFT JOIN v_dictionary_optiongroup og ON f.optgroup_id = og.id" +
 							"	LEFT JOIN v_dictionary_option o ON og.id = o.group_id" +
 							"	where f.id in (:fieldIds)" +

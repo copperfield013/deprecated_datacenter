@@ -1,7 +1,5 @@
 @charset "UTF-8";
 .sidemenu-main .modules-container{
-	width: 50%;
-    margin-left: 5%;
     min-height: 400px;
 }
 .sidemenu-main .modules-container .widget-header .widget-buttons{
@@ -9,7 +7,8 @@
 	float: right;
 }
 .sidemenu-main .modules-container .widget-buttons a{
-	font-size: 18px;
+	font-size: 20px;
+    color: #00BFFF;
 }
 .sidemenu-main .modules-container .widget-buttons a:hover{
 	opacity: 0.6;
@@ -17,18 +16,18 @@
 .sidemenu-main .modules-container a#save{
 	/* display: none */
 }
-.sidemenu-main .modules-container .dd-handle{
+.sidemenu-main .dd-handle{
 	cursor: pointer;
 }
-.sidemenu-main .modules-container span.level-operate {
+.sidemenu-main  span.level-operate {
     float: right;
     font-size: 1.5em;
 }
-.sidemenu-main .modules-container span.level-operate a{
+.sidemenu-main #level1-list>.dd-item>.dd-handle span.level-operate a{
     color: #666;
     margin-left: 5px;
 }
-.sidemenu-main .modules-container span.level-operate a:hover{
+.sidemenu-main span.level-operate a:hover{
     color: #aaa;
 }
 .sidemenu-main .modules-container .level1-title>input[type="text"],
@@ -63,4 +62,46 @@
     padding-top: 5px;
     padding-bottom: 5px;
     cursor: text;
+}
+
+.sidemenu-main #level1-list>li>ol.dd-list:empty {
+    padding-left:  0;
+    margin-left: 30px;
+    min-height: 50px;
+    border: 1px solid #bbb;
+}
+
+.sidemenu-main .widget-body.menu-container,
+.sidemenu-main .mds-container .widget-body {
+    max-height: 400px;
+    min-height: 100px;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.sidemenu-main .dd-item.module-wrapper>.dd-handle {
+    cursor: default;
+    background-color: #6cac87;
+    color: #fff;
+}
+
+.sidemenu-main #level1-list>.dd-item>.dd-handle {
+    background-color: #769de0;
+}
+.sidemenu-main #level1-list>.dd-item>.dd-handle * {
+    color: #fff;
+}
+
+.sidemenu-main .dd-item.module-wrapper>.dd-handle a {
+    color: #fff;
+}
+
+.sidemenu-main li.module-wrapper li>div {
+    border: 1px solid #ddd;
+}
+
+.sidemenu-main .level1-title>input[type="text"] {
+    background-color: #769de0 !important;
+    border: 1px solid #aaa;
 }

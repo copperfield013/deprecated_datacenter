@@ -11,8 +11,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
-@Table(name="t_config_sidemenu_module")
-public class SideMenuModule {
+@Table(name="t_config_sidemenu_level1")
+public class SideMenuLevel1Menu {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
@@ -23,14 +23,8 @@ public class SideMenuModule {
 	@Column(name="c_order")
 	private Integer order;
 	
-	@Column(name="module_name")
-	private String moduleName;
-	
 	@Transient
-	private ConfigModule configModule;
-	
-	@Transient
-	private List<SideMenuModuleTempalteGroup> groups;
+	private List<SideMenuLevel2> level2s;
 
 	public Long getId() {
 		return id;
@@ -57,29 +51,14 @@ public class SideMenuModule {
 		this.order = order;
 	}
 
-
-	public List<SideMenuModuleTempalteGroup> getGroups() {
-		return groups;
+	public List<SideMenuLevel2> getLevel2s() {
+		return level2s;
 	}
 
-	public void setGroups(List<SideMenuModuleTempalteGroup> groups) {
-		this.groups = groups;
+	public void setLevel2s(List<SideMenuLevel2> level2s) {
+		this.level2s = level2s;
 	}
 
-	public ConfigModule getConfigModule() {
-		return configModule;
-	}
 
-	public void setConfigModule(ConfigModule configModule) {
-		this.configModule = configModule;
-	}
-
-	public String getModuleName() {
-		return moduleName;
-	}
-
-	public void setModuleName(String moduleName) {
-		this.moduleName = moduleName;
-	}
 
 }

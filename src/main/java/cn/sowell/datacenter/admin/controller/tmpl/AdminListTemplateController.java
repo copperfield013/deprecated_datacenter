@@ -58,11 +58,12 @@ public class AdminListTemplateController {
 	@RequestMapping("/list/{module}")
 	public String list(Model model, @PathVariable String module){
 		UserIdentifier user = UserUtils.getCurrentUser();
+		ModuleMeta moduleMeta = mService.getModule(module);
 		List<TemplateListTempalte> ltmplList = tService.queryLtmplList(module, user);
 		TemplateListTempalte defListTtemplate = tService.getDefaultListTemplate(user, module);
 		model.addAttribute("ltmplList", ltmplList);
 		model.addAttribute("defListTtemplate", defListTtemplate);
-		model.addAttribute("module", module);
+		model.addAttribute("module", moduleMeta);
 		return AdminConstants.JSP_TMPL_LIST + "/ltmpl_list.jsp";
 	}
 	
