@@ -8,7 +8,7 @@
 		</div>
 	</div>
 	<div class="page-body">
-		<div class="col-lg-7">
+		<div class="col-lg-6">
 			<div class="widget radius-bordered modules-container">
 				<div class="widget-header bordered-left bordered-blueberry separated">
 					<span class="widget-caption">功能列表</span>
@@ -48,7 +48,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="col-lg-5">
+		<div class="col-lg-6">
 			<div class="widget radius-bordered mds-container">
 				<div class="widget-header bordered-left bordered-palegreen separated">
 					<span class="widget-caption">模块列表</span>

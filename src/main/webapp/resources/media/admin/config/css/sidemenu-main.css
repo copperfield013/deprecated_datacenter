@@ -64,10 +64,11 @@
     cursor: text;
 }
 
-.sidemenu-main #level1-list>li>ol.dd-list:empty {
+.sidemenu-main #level1-list>li>ol.dd-list {
     padding-left:  0;
     margin-left: 30px;
     min-height: 50px;
+    padding-left: 5px;
     border: 1px solid #bbb;
 }
 
