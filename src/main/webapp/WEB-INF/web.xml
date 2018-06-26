@@ -16,7 +16,7 @@
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
-	
+
 	<!-- 配置SpringMVC -->
 	<servlet>
 		<description>spring mvc servlet</description>
@@ -42,7 +42,17 @@
 		<filter-name>springSecurityFilterChain</filter-name>
 		<url-pattern>/admin/*</url-pattern>
 	</filter-mapping>
-
+	<!-- 配置CXF -->
+	<servlet>
+		<servlet-name>CXFServlet</servlet-name>
+		<servlet-class>
+			org.apache.cxf.transport.servlet.CXFServlet
+		</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CXFServlet</servlet-name>
+		<url-pattern>/services/*</url-pattern>
+	</servlet-mapping>
 
 	<!-- 设置字符集 -->
 	<filter>

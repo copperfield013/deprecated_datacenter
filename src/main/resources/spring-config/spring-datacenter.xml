@@ -3,7 +3,8 @@
 	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
 	xsi:schemaLocation="http://www.springframework.org/schema/mvc 
 		http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd 
 		http://www.springframework.org/schema/beans 
@@ -12,7 +13,9 @@
 		http://www.springframework.org/schema/context/spring-context-4.3.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
-        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd">
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
+		http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+		http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
 
 	<import resource="spring-mvc.xml" />
 
@@ -27,22 +30,23 @@
 
 	<import resource="spring-security.xml" />
 
-	<!-- <bean class="cn.sowell.datacenter.entityResolver.config.XMLFusionConfigContextFactory">
-		<constructor-arg value="classpath:module-config.xml" />
-		<property name="fieldService" ref="dictionaryServiceImpl" />
-	</bean> -->
-	<bean id="dBFusionConfigContextFactory" class="cn.sowell.datacenter.entityResolver.config.DBFusionConfigContextFactory">
+	<!-- <bean class="cn.sowell.datacenter.entityResolver.config.XMLFusionConfigContextFactory"> 
+		<constructor-arg value="classpath:module-config.xml" /> <property name="fieldService" 
+		ref="dictionaryServiceImpl" /> </bean> -->
+	<bean id="dBFusionConfigContextFactory"
+		class="cn.sowell.datacenter.entityResolver.config.DBFusionConfigContextFactory">
 		<property name="sessionFactory" ref="sessionFactory" />
 		<property name="fieldService" ref="dictionaryServiceImpl" />
 	</bean>
-	<bean id="dBModuleConfigMediator" class="cn.sowell.datacenter.entityResolver.config.DBModuleConfigMediator">
+	<bean id="dBModuleConfigMediator"
+		class="cn.sowell.datacenter.entityResolver.config.DBModuleConfigMediator">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
-	
-	<!-- <bean class="cn.sowell.datacenter.entityResolver.config.RmiModuleConfigureMediatorServer">
-		<property name="dBFusionConfigContextFactory" ref="dBFusionConfigContextFactory" />
-		<property name="moduleConfigMediator" ref="dBModuleConfigMediator" />
-	</bean> -->
+
+	<!-- <bean class="cn.sowell.datacenter.entityResolver.config.RmiModuleConfigureMediatorServer"> 
+		<property name="dBFusionConfigContextFactory" ref="dBFusionConfigContextFactory" 
+		/> <property name="moduleConfigMediator" ref="dBModuleConfigMediator" /> 
+		</bean> -->
 
 
 	<bean
@@ -67,4 +71,13 @@
 	<task:annotation-driven /> <!-- 定时器开关 -->
 	<bean class="cn.sowell.datacenter.model.modules.bean.PeopleExportHandlerTask" />
 
+	<jaxws:server id="ModelReLoadService" address="/modelReLoadService"
+		serviceClass="com.abc.service.ModelReLoadService">
+		<jaxws:serviceBean>
+			<bean class="com.abc.service.ModelReLoadServiceImpl"></bean>
+		</jaxws:serviceBean>
+		<jaxws:properties>
+			<entry key="mtom-enabled" value="true" />
+		</jaxws:properties>
+	</jaxws:server>
 </beans>
