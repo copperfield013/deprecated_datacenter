@@ -74,7 +74,7 @@
 	<jaxws:server id="ModelReLoadService" address="/modelReLoadService"
 		serviceClass="com.abc.service.ModelReLoadService">
 		<jaxws:serviceBean>
-			<bean class="com.abc.service.ModelReLoadServiceImpl"></bean>
+			<bean class="com.abc.service.impl.ModelReLoadServiceImpl"></bean>
 		</jaxws:serviceBean>
 		<jaxws:properties>
 			<entry key="mtom-enabled" value="true" />
