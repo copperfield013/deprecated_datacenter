@@ -25,11 +25,12 @@ import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.entityResolver.config.abst.Module;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel1Menu;
-import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2;
+import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.ConfigureService;
-import cn.sowell.datacenter.model.modules.service.ModulesService;
-import cn.sowell.datacenter.model.tmpl.pojo.TemplateGroup;
-import cn.sowell.datacenter.model.tmpl.service.TemplateService;
+import cn.sowell.datacenter.model.config.service.SideMenuService;
+import cn.sowell.dataserver.model.modules.service.ModulesService;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
+import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_CONFIG + "/sidemenu")
@@ -37,6 +38,9 @@ public class AdminConfigSidemenuController {
 	
 	@Resource
 	ConfigureService configService;
+	
+	@Resource
+	SideMenuService menuService;
 	
 	@Resource
 	ModulesService mService;
@@ -50,7 +54,7 @@ public class AdminConfigSidemenuController {
 	@RequestMapping({"", "/"})
 	public String main(Model model) {
 		UserIdentifier user = UserUtils.getCurrentUser();
-		List<SideMenuLevel1Menu> menus = configService.getSideMenuLevelMenus(user);
+		List<SideMenuLevel1Menu> menus = menuService.getSideMenuLevelMenus(user);
 		List<Module> modules = configService.getEnabledModules();
 		Map<String, List<TemplateGroup>> tmplGroupsMap = tService.queryTemplateGroups(CollectionUtils.toSet(modules, module->module.getName()));
 		JSONObject config = configService.getModuleConfigJson();
@@ -68,7 +72,7 @@ public class AdminConfigSidemenuController {
 		JSONObject req = jReq.getJsonObject();
 		try {
 			List<SideMenuLevel1Menu> modules = toMenuModules(req);
-			configService.updateSideMenuModules(UserUtils.getCurrentUser(), modules);
+			menuService.updateSideMenuModules(UserUtils.getCurrentUser(), modules);
 			jRes.setStatus("suc");
 		} catch (Exception e) {
 			jRes.setStatus("error");
@@ -90,7 +94,7 @@ public class AdminConfigSidemenuController {
 			JSONArray jGroups = jModule.getJSONArray("groups");
 			for (Object y : jGroups) {
 				JSONObject jGroup = (JSONObject) y;
-				SideMenuLevel2 group = new SideMenuLevel2();
+				SideMenuLevel2Menu group = new SideMenuLevel2Menu();
 				group.setId(jGroup.getLong("id"));
 				group.setTitle(jGroup.getString("title"));
 				group.setOrder(jGroup.getInteger("order"));

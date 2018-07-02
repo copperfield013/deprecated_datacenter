@@ -155,7 +155,6 @@ define(function(require, exports, module){
 			single			: true,
 			textPicked		: true,
 			module			: module,
-			hideCompositeFields	: true,
 			afterChoose		: function(field){
 				if(cField){
 					criteriaSearcher.enableField(cField.id);

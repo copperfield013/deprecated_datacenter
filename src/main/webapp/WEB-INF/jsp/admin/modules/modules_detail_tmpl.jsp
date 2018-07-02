@@ -12,9 +12,6 @@
 		<div class="history-container title-operate">
 			<a href="page:#timeline-area.toggle" title="查看历史" class="toggle-timeline btn-toggle"><i class="iconfont icon-historyrecord"></i></a>
 		</div>
-		<div class="template-container title-operate">
-			<a class="btn-toggle toggle-template" title="查看模板" href="page:#tmpl-list.toggle" ><i class="iconfont icon-template"></i></a>
-		</div>
 	</div>
 	<div class="page-body">
 		<div class="col-lg-offset-1 col-lg-10">
@@ -92,33 +89,6 @@
 			</div>
 		</div>
 	</div>
-	<div id="tmpl-list" class="blur-hidden" style="display: none;">
-		<ul class="tmpl-list-wrapper">
-			<c:if test="${dtmpl != null }">
-				<li data-id="${dtmpl.id }" class="active">
-					<span class="tmpl-icon"><i class="fa fa-lightbulb-o"></i></span>
-					<span class="tmpl-item-body">
-						<span class="tmpl-name">${dtmpl.title }</span>
-						<span class="tmpl-date"><fmt:formatDate value="${dtmpl.updateTime }" pattern="yyyy-MM-dd HH:mm:ss" /> </span>
-					</span>
-				</li>
-			</c:if>
-			<c:forEach var="dtmplItem" items="${dtmpls }">
-				<c:if test="${dtmplItem.id != dtmpl.id }">
-					<li data-id="${dtmplItem.id }">
-						<span class="tmpl-icon"><i class="fa fa-lightbulb-o"></i></span>
-						<span class="tmpl-item-body">
-							<span class="tmpl-name">${dtmplItem.title }</span>
-							<span class="tmpl-date"><fmt:formatDate value="${dtmplItem.updateTime }" pattern="yyyy-MM-dd HH:mm:ss" /> </span>
-						</span>
-					</li>
-				</c:if>
-			</c:forEach>
-		</ul>
-		<div class="tmpl-operate">
-			<a class="tab" title="配置模板" target="viewtmpl_list" href="admin/tmpl/dtmpl/list/people"><i class="icon glyphicon glyphicon-cog"></i></a>
-		</div>
-	</div>
 </div>
 <script>
 	seajs.use(['dialog', 'ajax', 'utils', 'tmpl/js/dtmpl-update.js', '$CPF'], function(Dialog, Ajax, Utils, ViewTmpl, $CPF){
@@ -141,7 +111,7 @@
 			var $this = $(this);
 			if(!$this.is('.disabled')){
 				$this.addClass('disabled').text('加载中');
-				Ajax.ajax('admin/modules/curd/paging_history/${module.name}/${entity.code}', {
+				Ajax.ajax('admin/modules/curd/paging_history/${menu.id}/${entity.code}', {
 					pageNo	: curPageNo + 1
 				}, function(data){
 					if(data.status === 'suc'){
@@ -159,7 +129,7 @@
 		});
 		$page.on('click', '.circ', function(){
 			var time = parseInt($(this).closest('dd').attr('data-time'));
-			$page.getLocatePage().loadContent('admin/modules/curd/detail/${module.name}/${entity.code}?tmplId=${tmpl.id}', null, {timestamp:time});
+			$page.getLocatePage().loadContent('admin/modules/curd/detail/${menu.id}/${entity.code}', null, {timestamp:time});
 			
 		});
 		var theTime = parseInt('${date.time}');
@@ -246,9 +216,8 @@
 			autoclose	: true,
 			startView	: 'day'
 		}).on('changeDate', function(e){
-			$page.getLocatePage().loadContent('admin/modules/curd/detail/${module.name}/${entity.code }', undefined, {
-				datetime	: $(this).val(),
-				tmplId		: '${tmpl.id}'
+			$page.getLocatePage().loadContent('admin/modules/curd/detail/${menu.id}/${entity.code }', undefined, {
+				datetime	: $(this).val()
 			});
 		});
 		var $errors = $('#errors', $page);
@@ -257,9 +226,8 @@
 		});
 		$('#tmpl-list li[data-id]:not(.active)', $page).click(function(){
 			var tmplId = $(this).attr('data-id');
-			$page.getLocatePage().loadContent('admin/modules/curd/detail/${module.name}/${entity.code}', undefined, {
-				timestamp	: '${timestamp}',
-				tmplId		: tmplId
+			$page.getLocatePage().loadContent('admin/modules/curd/detail/${menu.id}/${entity.code}', undefined, {
+				timestamp	: '${timestamp}'
 			});
 		});
 		

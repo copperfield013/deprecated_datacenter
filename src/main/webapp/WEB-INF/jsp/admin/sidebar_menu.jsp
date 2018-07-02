@@ -22,19 +22,10 @@
 		<ul class="submenu">
 			<c:forEach var="level2" items="${menu.level2s }">
 				<li>
-					<c:choose>
-						<c:when test="${level2.isDefault == 1 }">
-					   		<a class="tab" href="admin/modules/curd/list/${level2.templateModule }" target="${level2.templateModule }_list_tmpl" title="${group.title }">
-					   			<span class="menu-text">${level2.title }</span>
-					   		</a>
-						</c:when>
-						<c:otherwise>
-					   		<a class="tab" href="admin/modules/curd/list/${level2.templateModule }?tg=${level2.templateGroupKey}" 
-					   			target="${moduleName }_list_tmpl_${level2.templateGroupKey}" title="${level2.title }">
-					   			<span class="menu-text">${level2.title }</span>
-					   		</a>
-						</c:otherwise>
-					</c:choose>
+					<a class="tab" href="admin/modules/curd/list/${level2.id }" 
+			   			target="entity_list_${level2.id }" title="${level2.title }">
+			   			<span class="menu-text">${level2.title }</span>
+			   		</a>
 			   	</li>
 			</c:forEach>
 		</ul>

@@ -8,9 +8,10 @@ import org.springframework.stereotype.Service;
 
 import cn.sowell.datacenter.model.admin.dao.AdminUserDao;
 import cn.sowell.datacenter.model.admin.service.AdminUserService;
+import cn.sowell.dataserver.model.tmpl.service.AdminIdGetter;
 
 @Service("adminUserService")
-public class AdminUserServiceImpl implements AdminUserService{
+public class AdminUserServiceImpl implements AdminUserService, AdminIdGetter{
 
 	@Resource
 	AdminUserDao userDao;
@@ -19,6 +20,11 @@ public class AdminUserServiceImpl implements AdminUserService{
 	public UserDetails loadUserByUsername(String username)
 			throws UsernameNotFoundException {
 		return userDao.getUser(username);
+	}
+
+	@Override
+	public Long getSystemAdminIdByUserId(Long userId) {
+		return userDao.getSystemAdminIdByUserId(userId);
 	}
 
 }

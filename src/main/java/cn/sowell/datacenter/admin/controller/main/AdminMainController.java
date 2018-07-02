@@ -13,14 +13,14 @@ import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel1Menu;
-import cn.sowell.datacenter.model.config.service.ConfigureService;
+import cn.sowell.datacenter.model.config.service.SideMenuService;
 
 @Controller
 @RequestMapping("/admin")
 public class  AdminMainController {
 	
 	@Resource
-	ConfigureService configService;
+	SideMenuService menuService;
 	
 	
 	@RequestMapping("/login")
@@ -33,7 +33,7 @@ public class  AdminMainController {
 	@RequestMapping({"/", ""})
 	public String index(Model model){
 		UserIdentifier user = UserUtils.getCurrentUser();
-		List<SideMenuLevel1Menu> menus = configService.getSideMenuLevelMenus(user);
+		List<SideMenuLevel1Menu> menus = menuService.getSideMenuLevelMenus(user);
 		model.addAttribute("menus", menus);
 		return "/admin/index.jsp";
 	}

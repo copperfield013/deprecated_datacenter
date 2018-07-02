@@ -6,24 +6,19 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.NormalOperateDao;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.datacenter.entityResolver.config.ModuleConfigureMediator;
 import cn.sowell.datacenter.entityResolver.config.abst.Module;
 import cn.sowell.datacenter.entityResolver.config.param.QueryModuleCriteria;
 import cn.sowell.datacenter.model.config.dao.ConfigureDao;
-import cn.sowell.datacenter.model.config.pojo.SideMenuLevel1Menu;
-import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2;
 import cn.sowell.datacenter.model.config.service.ConfigureService;
-import cn.sowell.datacenter.model.tmpl.pojo.TemplateGroup;
-import cn.sowell.datacenter.model.tmpl.service.TemplateService;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
+import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
 @Service
 public class ConfigureServiceImpl implements ConfigureService{
@@ -36,46 +31,6 @@ public class ConfigureServiceImpl implements ConfigureService{
 	
 	@Resource
 	ModuleConfigureMediator moduleConfigMediator;
-	
-	@Override
-	@Transactional(propagation=Propagation.SUPPORTS)
-	public List<SideMenuLevel1Menu> getSideMenuLevelMenus(UserIdentifier user) {
-		List<SideMenuLevel1Menu> modules = cDao.getSideMenuModules();
-		
-		Map<Long, List<SideMenuLevel2>> groupsMap 
-					= cDao.getSideMenuLevel2Map(CollectionUtils.toSet(modules, module->module.getId()));
-		modules.forEach(module->module.setLevel2s(groupsMap.get(module.getId())));
-		return modules;
-	}
-	
-	@Override
-	public void updateSideMenuModules(UserIdentifier user, List<SideMenuLevel1Menu> modules) {
-		List<SideMenuLevel1Menu> originModules = getSideMenuLevelMenus(user);
-		CollectionUpdateStrategy<SideMenuLevel1Menu> updateModules = 
-				new CollectionUpdateStrategy<>(SideMenuLevel1Menu.class, nDao,
-						module->module.getId());
-		CollectionUpdateStrategy<SideMenuLevel2> updateGroups = 
-				new CollectionUpdateStrategy<>(SideMenuLevel2.class, nDao,
-						group->group.getId());
-		updateModules.setBeforeUpdate((origin, module)->{
-					origin.setTitle(module.getTitle());
-					origin.setOrder(module.getOrder());
-				});
-		updateModules.setAfterUpdate((origin, module)->{
-			module.getLevel2s().forEach(group->group.setSideMenuLevel1Id(origin.getId()));
-			updateGroups.doUpdate(origin.getLevel2s(), module.getLevel2s());
-		});
-		updateModules.setAfterCreate(module->{
-			module.getLevel2s().forEach(group->group.setSideMenuLevel1Id(module.getId()));
-			updateGroups.doUpdate(null, module.getLevel2s());
-		});
-		updateGroups.setBeforeUpdate((o, g)->{
-			o.setOrder(g.getOrder());
-			o.setTitle(g.getTitle());
-		});
-		updateModules.doUpdate(originModules, modules);
-	}
-	
 	
 	@Resource
 	TemplateService tService;

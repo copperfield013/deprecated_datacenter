@@ -6,7 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import cn.sowell.datacenter.model.tmpl.pojo.AbstractTemplate;
+import cn.sowell.dataserver.model.tmpl.pojo.AbstractTemplate;
+
 
 @Entity
 @Table(name="t_import_tmpl")

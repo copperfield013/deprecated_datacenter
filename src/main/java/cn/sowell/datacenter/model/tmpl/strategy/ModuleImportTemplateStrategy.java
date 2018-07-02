@@ -8,6 +8,8 @@ import cn.sowell.copframe.dao.utils.NormalOperateDao;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplate;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplateField;
 import cn.sowell.datacenter.model.modules.service.ModulesImportService;
+import cn.sowell.dataserver.model.tmpl.strategy.NormalDaoSetUpdateStrategy;
+import cn.sowell.dataserver.model.tmpl.strategy.TemplateUpdateStrategy;
 
 public class ModuleImportTemplateStrategy implements TemplateUpdateStrategy<ModuleImportTemplate>{
 

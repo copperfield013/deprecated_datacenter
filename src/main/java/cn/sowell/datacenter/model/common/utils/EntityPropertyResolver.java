@@ -2,9 +2,9 @@ package cn.sowell.datacenter.model.common.utils;
 
 import java.util.Map;
 
-import cn.sowell.datacenter.model.dict.pojo.DictionaryField;
-
 import com.abc.mapping.entity.Entity;
+
+import cn.sowell.dataserver.model.dict.pojo.DictionaryField;
 
 public class EntityPropertyResolver {
 	private Entity entity;

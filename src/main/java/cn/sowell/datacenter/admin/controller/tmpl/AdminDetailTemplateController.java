@@ -16,7 +16,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import cn.sowell.copFrame.dto.choose.ChooseTablePage;
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
@@ -24,19 +23,21 @@ import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
-import cn.sowell.datacenter.DataCenterConstants;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.common.choose.ChooseTablePage;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
-import cn.sowell.datacenter.model.modules.pojo.ModuleMeta;
-import cn.sowell.datacenter.model.modules.service.ModulesService;
-import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailField;
-import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailFieldGroup;
-import cn.sowell.datacenter.model.tmpl.pojo.TemplateDetailTemplate;
-import cn.sowell.datacenter.model.tmpl.service.TemplateService;
+import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
+import cn.sowell.dataserver.model.modules.service.ModulesService;
+import cn.sowell.dataserver.model.tmpl.DataServerConstants;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailField;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
+import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_TMPL + "/dtmpl")
 public class AdminDetailTemplateController {
+
 
 	@Resource
 	SystemAdminService adminService;
@@ -64,9 +65,7 @@ public class AdminDetailTemplateController {
 		UserIdentifier user = UserUtils.getCurrentUser();
 		ModuleMeta moduleMeta = mService.getModule(module);
 		List<TemplateDetailTemplate> tmplList = tService.getAllDetailTemplateList(module, user, null, false);
-		TemplateDetailTemplate defDetailTemplate = tService.getDefaultDetailTemplate(user, module);
 		model.addAttribute("tmplList", tmplList);
-		model.addAttribute("defaultTemplate", defDetailTemplate);
 		model.addAttribute("module", moduleMeta);
 		return AdminConstants.JSP_TMPL_DETAIL + "/dtmpl_list.jsp";
 	}
@@ -126,27 +125,13 @@ public class AdminDetailTemplateController {
 	public AjaxPageResponse remove(@PathVariable Long tmplId){
 		try {
 			UserIdentifier user = UserUtils.getCurrentUser();
-			tService.removeTemplate(user, tmplId, DataCenterConstants.TEMPLATE_TYPE_DETAIL);
+			tService.removeTemplate(user, tmplId, DataServerConstants.TEMPLATE_TYPE_DETAIL);
 			return AjaxPageResponse.REFRESH_LOCAL("删除成功");
 		} catch (Exception e) {
 			logger.error("删除失败", e);
 			return AjaxPageResponse.FAILD("删除失败");
 		}
 	}
-	
-	@ResponseBody
-	@RequestMapping("/as_default/{tmplId}")
-	public AjaxPageResponse setTmplAsDefault(@PathVariable Long tmplId){
-		UserIdentifier user = UserUtils.getCurrentUser();
-		try {
-			tService.setTemplateAsDefault(user, tmplId, DataCenterConstants.TEMPLATE_TYPE_DETAIL);
-			return AjaxPageResponse.REFRESH_LOCAL("设置成功");
-		} catch (Exception e) {
-			logger.error("设置用户默认模板失败", e);
-			return AjaxPageResponse.FAILD("操作失败");
-		}
-	}
-	
 	
 	private TemplateDetailTemplate parseToTmplData(JSONObject jo) {
 		if(jo != null){

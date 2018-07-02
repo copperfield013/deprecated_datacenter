@@ -50,14 +50,14 @@ import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigResolver;
 import cn.sowell.datacenter.entityResolver.ImportCompositeField;
-import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
 import cn.sowell.datacenter.model.modules.dao.ModulesImportDao;
+import cn.sowell.datacenter.model.modules.exception.ImportBreakException;
 import cn.sowell.datacenter.model.modules.pojo.ImportStatus;
 import cn.sowell.datacenter.model.modules.pojo.ImportTemplateCriteria;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplate;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplateField;
 import cn.sowell.datacenter.model.modules.service.ModulesImportService;
-import cn.sowell.datacenter.model.tmpl.service.TemplateService;
+import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
 @Service
 public class ModulesImportServiceImpl implements ModulesImportService {

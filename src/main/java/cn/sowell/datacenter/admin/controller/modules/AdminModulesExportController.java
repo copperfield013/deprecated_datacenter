@@ -33,12 +33,12 @@ import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.admin.pojo.ExportStatus;
-import cn.sowell.datacenter.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.datacenter.model.modules.service.ExportService;
-import cn.sowell.datacenter.model.modules.service.ModulesService;
-import cn.sowell.datacenter.model.tmpl.config.NormalCriteria;
-import cn.sowell.datacenter.model.tmpl.pojo.TemplateListTempalte;
-import cn.sowell.datacenter.model.tmpl.service.TemplateService;
+import cn.sowell.dataserver.model.modules.bean.ExportDataPageInfo;
+import cn.sowell.dataserver.model.modules.pojo.criteria.NormalCriteria;
+import cn.sowell.dataserver.model.modules.service.ModulesService;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
+import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_MODULES + "/export")
@@ -71,7 +71,7 @@ public class AdminModulesExportController {
 			JSONObject parameters = json.getJSONObject("parameters");
 			Long tmplId = parameters.getLong("tmplId");
 			if(tmplId != null){
-				TemplateListTempalte ltmpl = tService.getListTemplate(tmplId);
+				TemplateListTemplate ltmpl = tService.getListTemplate(tmplId);
 				if(ltmpl != null){
 					MutablePropertyValues pvs = new MutablePropertyValues();
 					String prefix = "criteria_";

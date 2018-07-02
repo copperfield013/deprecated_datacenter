@@ -6,7 +6,7 @@ import java.util.Set;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import cn.sowell.datacenter.entityResolver.ImportCompositeField;
-import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
+import cn.sowell.datacenter.model.modules.exception.ImportBreakException;
 import cn.sowell.datacenter.model.modules.pojo.ImportStatus;
 import cn.sowell.datacenter.model.modules.pojo.ImportTemplateCriteria;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplate;

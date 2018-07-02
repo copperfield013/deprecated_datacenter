@@ -42,14 +42,14 @@ import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.entityResolver.ImportCompositeField;
 import cn.sowell.datacenter.entityResolver.impl.RelationEntityProxy;
-import cn.sowell.datacenter.model.basepeople.service.impl.ImportBreakException;
+import cn.sowell.datacenter.model.modules.exception.ImportBreakException;
 import cn.sowell.datacenter.model.modules.pojo.ImportStatus;
 import cn.sowell.datacenter.model.modules.pojo.ImportTemplateCriteria;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplate;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplateField;
-import cn.sowell.datacenter.model.modules.pojo.ModuleMeta;
 import cn.sowell.datacenter.model.modules.service.ModulesImportService;
-import cn.sowell.datacenter.model.modules.service.ModulesService;
+import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
+import cn.sowell.dataserver.model.modules.service.ModulesService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_MODULES + "/import")

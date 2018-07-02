@@ -1,15 +1,15 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <link type="text/css" rel="stylesheet" href="media/admin/modules/css/modules-list-tmpl.css" />
-<c:set var="module" value="${view.module }" />
-<c:set var="templateGroup" value="${view.module }" />
-<c:set var="ltmpl" value="${view.listTemplate }" />
 <div id="${module.name }-list-tmpl-${RES_STAMP}" class="detail module-list-tmpl">
 	<div class="page-header">
 		<div class="header-title">
-			<h1>${menu.title }-列表</h1>
+			<h1>${module.title }列表</h1>
 		</div>
 		<div class="header-buttons">
+			<a title="切换模板" class="btn-toggle" href="page:#tmpl-list.toggle">
+				<i class="iconfont icon-template"></i>
+			</a>
 			<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
 				<i class="glyphicon glyphicon-refresh"></i>
 			</a>
@@ -19,14 +19,15 @@
 			<a class="import tab" href="admin/modules/import/go/${module.name }" title="导入" target="module_${module.name }_import">
 				<i class="glyphicon glyphicon-import"></i>
 			</a>
-			<a class="tab" href="admin/modules/curd/add/${menu.id }" title="创建" target="module_${module.name }_add">
+			<a class="tab" href="admin/modules/curd/add/${module.name }?tg=${templateGroup.key }" title="创建${module.title }" target="module_${module.name }_add">
 				<i class="fa fa-plus"></i>
 			</a>
 		</div>
 	</div>
 	<div class="page-body">
-		<form class="form-inline"  action="admin/modules/curd/list/${menu.id }">
+		<form class="form-inline"  action="admin/modules/curd/list/${module.name }">
 			<input type="hidden" id="tmplId" name="tmplId" value="${ltmpl.id }" />
+			<input type="hidden" name="tg" value="${templateGroup.key }"  />
 			<c:if test="${not empty ltmpl.criterias }">
 				<c:forEach var="criteriaItem" items="${ltmpl.criterias }">
 					<c:if test="${criteriaItem.queryShow != null }">
@@ -34,23 +35,23 @@
 							<label class="control-label">${criteriaItem.title }</label>
 							<c:choose>
 								<c:when test="${criteriaItem.inputType == 'text' }">
-									<input class="form-control" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}" placeholder="${criteriaItem.placeholder }" />
+									<input class="form-control" type="text" name="criteria_${criteriaItem.id }" value="${vCriteriaMap[criteriaItem.id].value}" placeholder="${criteriaItem.placeholder }" />
 								</c:when>
 								<c:when test="${criteriaItem.inputType == 'select' }">
-									<select class="form-control" name="criteria_${criteriaItem.id }" data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
+									<select class="form-control" name="criteria_${criteriaItem.id }" data-value="${vCriteriaMap[criteriaItem.id].value}">
 										<option value="">--请选择--</option>
-										<c:forEach var="option" items="${view.criteriaOptionMap[criteriaItem.fieldId]}">
+										<c:forEach var="option" items="${criteriaOptionsMap[criteriaItem.fieldId]}">
 											<option value="${option.value }">${option.title}</option>
 										</c:forEach>								
 									</select>
 								</c:when>
 								<c:when test="${criteriaItem.inputType == 'date' }">
-									<input class="form-control datepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}"  />
+									<input class="form-control datepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${vCriteriaMap[criteriaItem.id].value}"  />
 								</c:when>
 								<c:when test="${criteriaItem.inputType == 'label' }">
 									<span class="cpf-select2-container">
-										<select class="cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
-											<c:forEach var="label" items="${view.criteriaLabelMap[criteriaItem.fieldKey].subdomain}">
+										<select class="cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${vCriteriaMap[criteriaItem.id].value}">
+											<c:forEach var="label" items="${labelsMap[criteriaItem.fieldKey].subdomain}">
 												<option value="${label }">${label}</option>
 											</c:forEach>								
 										</select>
@@ -68,7 +69,7 @@
 								<c:when test="${criteriaItem.inputType == 'daterange' }">
 									<span class="cpf-daterangepicker format-submit-value" 
 										data-name="criteria_${criteriaItem.id }" 
-										data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
+										data-value="${vCriteriaMap[criteriaItem.id].value}">
 									</span>
 								</c:when>
 								<c:otherwise>
@@ -93,7 +94,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach items="${view.parsers }" var="parser" varStatus="i">
+					<c:forEach items="${parserList }" var="parser" varStatus="i">
 						<tr>
 							<c:forEach items="${ltmpl.columns }" var="column" varStatus="j" >
 								<td>
@@ -103,7 +104,7 @@
 										</c:when>
 										<c:when test="${fn:startsWith(column.specialField, 'operate')}">
 											<c:if test="${fn:contains(column.specialField, '-d') }">
-												<a href="admin/modules/curd/detail/${menu.id}/${parser.code}" 
+												<a href="admin/modules/curd/detail/${module.name }/${parser.code}?tg=${templateGroup.key }" 
 													target="module_detail_${parser.code }" 
 													title="详情-${parser.title }"
 													class="tab btn btn-success btn-xs">
@@ -113,14 +114,14 @@
 											<c:if test="${fn:contains(column.specialField, '-u') }">
 												<a target="module_update_${parser.code }" 
 													title="修改-${parser.title }" 
-													href="admin/modules/curd/update/${menu.id }/${parser.code }" 
+													href="admin/modules/curd/update/${module.name }/${parser.code }?tg=${templateGroup.key }" 
 													class="tab btn btn-info btn-xs edit">
 													<i class="fa fa-edit"></i>修改
 												</a>
 											</c:if>
 											<c:if test="${fn:contains(column.specialField, '-r') }">
 												<a confirm="确认删除？"
-													href="admin/modules/curd/delete/${menu.id }/${parser.code }" 
+													href="admin/modules/curd/delete/${module.name }/${parser.code }" 
 													class="btn btn-danger btn-xs delete">
 													<i class="fa fa-trash-o"></i>删除
 												</a>
@@ -136,7 +137,25 @@
 					</c:forEach>
 				</tbody>
 			</table>
-			<div class="cpf-paginator" pageNo="${criteria.pageInfo.pageNo }" pageSize="${criteria.pageInfo.pageSize }" count="${criteria.pageInfo.count }"></div>
+			<div class="cpf-paginator" pageNo="${pageInfo.pageNo }" pageSize="${pageInfo.pageSize }" count="${pageInfo.count }"></div>
+		</div>
+	</div>
+	<div id="tmpl-list" class="detail-toggle-sublist blur-hidden" style="display: none;">
+		<div class="detail-toggle-sublist-wrapper">
+			<c:forEach items="${ltmplList }" var="ltmplItem">
+				<a data-id="${ltmplItem.id }" class="${ltmplItem.id == ltmpl.id? 'active': '' }">
+					<span class="detail-toggle-sublist-icon"><i class="fa fa-lightbulb-o"></i></span>
+					<span class="detail-toggle-sublist-item-body">
+						<span class="detail-toggle-sublist-item-name">${ltmplItem.title }</span>
+						<span class="detail-toggle-sublist-item-date"><fmt:formatDate value="${ltmplItem.updateTime }" pattern="yyyy-MM-dd HH:mm:ss" /> </span>
+					</span>
+				</a>
+			</c:forEach>
+		</div>
+		<div class="detail-toggle-sublist-operate">
+			<a class="tab" title="配置模板" target="ltmpl_list" href="admin/tmpl/ltmpl/list">
+				<i class="icon glyphicon glyphicon-cog"></i>
+			</a>
 		</div>
 	</div>
 	<div id="export-window" class="detail-toggle-sublist blur-hidden" style="display: none;">
@@ -229,8 +248,8 @@
 				Form.formatFormData($form, formData)
 				initParam = Utils.converteFormdata(formData);
 				$.extend(initParam, {
-					pageNo	: '${criteria.pageInfo.pageNo}',
-					pageSize: '${criteria.pageInfo.pageSize}'
+					pageNo	: '${pageInfo.pageNo}',
+					pageSize: '${pageInfo.pageSize}'
 				});
 				console.log(initParam);
 			});

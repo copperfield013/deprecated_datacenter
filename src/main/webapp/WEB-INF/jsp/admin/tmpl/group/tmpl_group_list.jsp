@@ -39,8 +39,8 @@
 						<tr>
 							<td>${i.index + 1 }</td>
 							<td>${group.title }</td>
-							<td><a class="dialog" width="1000px" target="dialog_ltmpl_update_${group.listTemplateId }" href="admin/tmpl/ltmpl/update/${group.listTemplateId }">${group.listTemplateTitle }</a></td>
-							<td><a class="dialog" width="1000px" target="dialog_dtmpl_update_${group.detailTemplateId }" href="admin/tmpl/dtmpl/update/${group.detailTemplateId }">${group.detailTemplateTitle }</a></td>
+							<td><a class="tab" target="dtmpl_update_${group.listTemplateId }" href="admin/tmpl/ltmpl/update/${group.listTemplateId }">${group.listTemplateTitle }</a></td>
+							<td><a class="tab" target="viewtmpl_update_${group.detailTemplateId }" href="admin/tmpl/dtmpl/update/${group.detailTemplateId }">${group.detailTemplateTitle }</a></td>
 							<td>${group.key }</td>
 							<td><fmt:formatDate value="${group.updateTime }" pattern="yyyy-MM-dd HH:mm:ss" /> </td>
 							<td>

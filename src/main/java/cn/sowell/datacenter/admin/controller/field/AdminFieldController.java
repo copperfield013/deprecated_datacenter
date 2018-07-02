@@ -21,9 +21,9 @@ import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonArrayResponse;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.datacenter.entityResolver.Label;
-import cn.sowell.datacenter.model.dict.pojo.DictionaryComposite;
-import cn.sowell.datacenter.model.dict.pojo.DictionaryOption;
-import cn.sowell.datacenter.model.dict.service.DictionaryService;
+import cn.sowell.dataserver.model.dict.pojo.DictionaryComposite;
+import cn.sowell.dataserver.model.dict.pojo.DictionaryOption;
+import cn.sowell.dataserver.model.dict.service.DictionaryService;
 
 @Controller
 @RequestMapping("/admin/field")

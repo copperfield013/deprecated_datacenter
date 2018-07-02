@@ -291,7 +291,16 @@ define(function(require, exports, module){
 		this.isFieldDisabled = function(fieldId){
 			var def = $.Deferred();
 			isDisabledFieldWhenLocked(fieldId).done(function(isDisabledField){
-				def.resolve(disabledFieldSet.has(fieldId.toString()) || isDisabledField);
+				if(disabledFieldSet.has(fieldId.toString()) || isDisabledField){
+					return def.resolve(true);
+				}else{
+					_this.getFieldData(fieldId).done(function(field){
+						if(param.hideCompositeFields && field.composite.isArray){
+							return def.resolve(true);
+						}
+					});
+				}
+				def.resolve(false);
 			});
 			return def.promise();
 		}
@@ -315,7 +324,7 @@ define(function(require, exports, module){
 			var def = $.Deferred();
 			if(locked){
 				_this.getFieldData(fieldId).done(function(field){
-					if(locked && field && field.composite.isArray){
+					if(locked && field){
 						_this.getLockedCompositeId().done(function(compositeId){
 							def.resolve(field.composite.c_id.toString() != compositeId.toString());
 						});
@@ -337,6 +346,7 @@ define(function(require, exports, module){
 						$li.toggle(toHide === false);
 					}
 				});
+				param.hideCompositeFields = toHide != false;
 				def.resolve();
 			});
 			return def.promise();

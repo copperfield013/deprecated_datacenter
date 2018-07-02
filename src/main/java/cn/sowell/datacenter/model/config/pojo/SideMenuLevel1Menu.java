@@ -24,7 +24,7 @@ public class SideMenuLevel1Menu {
 	private Integer order;
 	
 	@Transient
-	private List<SideMenuLevel2> level2s;
+	private List<SideMenuLevel2Menu> level2s;
 
 	public Long getId() {
 		return id;
@@ -51,11 +51,11 @@ public class SideMenuLevel1Menu {
 		this.order = order;
 	}
 
-	public List<SideMenuLevel2> getLevel2s() {
+	public List<SideMenuLevel2Menu> getLevel2s() {
 		return level2s;
 	}
 
-	public void setLevel2s(List<SideMenuLevel2> level2s) {
+	public void setLevel2s(List<SideMenuLevel2Menu> level2s) {
 		this.level2s = level2s;
 	}
 

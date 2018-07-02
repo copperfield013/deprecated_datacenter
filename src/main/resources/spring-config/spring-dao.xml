@@ -24,6 +24,7 @@
         <property name="packagesToScan">
             <list>
             	<value>cn.sowell.datacenter.model.*.pojo</value>
+            	<value>cn.sowell.dataserver.model.*.pojo</value>
             	<value>com.abc.extface.dto</value>
         	</list>
         </property>
@@ -78,7 +79,11 @@
 		<aop:pointcut id="interceptorPointCuts"
 			expression="(execution(* cn.sowell.datacenter.model.*.service.impl.*.*(..)))
 			" />
+		<aop:pointcut id="interceptorPointCuts1"
+			expression="(execution(* cn.sowell.dataserver.model.*.service.impl.*.*(..)))
+			" />
 		<aop:advisor advice-ref="commonAdvice" pointcut-ref="interceptorPointCuts" />
+		<aop:advisor advice-ref="commonAdvice" pointcut-ref="interceptorPointCuts1" />
 	</aop:config>
 	
     

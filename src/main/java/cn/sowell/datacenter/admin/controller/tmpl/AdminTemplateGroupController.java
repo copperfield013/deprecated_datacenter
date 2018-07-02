@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.model.modules.pojo.ModuleMeta;
-import cn.sowell.datacenter.model.modules.service.ModulesService;
-import cn.sowell.datacenter.model.tmpl.pojo.TemplateGroup;
-import cn.sowell.datacenter.model.tmpl.service.TemplateService;
+import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
+import cn.sowell.dataserver.model.modules.service.ModulesService;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
+import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_TMPL + "/group")

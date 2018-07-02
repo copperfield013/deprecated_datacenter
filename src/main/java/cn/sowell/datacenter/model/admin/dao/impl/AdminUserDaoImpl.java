@@ -3,11 +3,13 @@ package cn.sowell.datacenter.model.admin.dao.impl;
 import javax.annotation.Resource;
 
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.datacenter.model.admin.dao.AdminUserDao;
 import cn.sowell.datacenter.model.admin.pojo.AdminUser;
 
@@ -27,6 +29,15 @@ public class AdminUserDaoImpl implements AdminUserDao{
 
 		}
 		return null;
+	}
+	
+	
+	@Override
+	public Long getSystemAdminIdByUserId(Long userId) {
+		String sql = "select a.id from t_sys_admin a where a.user_id = :userId";
+		SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+		query.setLong("userId", userId);
+		return FormatUtils.toLong(query.uniqueResult());
 	}
 
 }

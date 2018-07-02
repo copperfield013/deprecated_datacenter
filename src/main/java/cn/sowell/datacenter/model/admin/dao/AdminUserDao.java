@@ -6,4 +6,6 @@ public interface AdminUserDao {
 
 	AdminUser getUser(String username);
 
+	Long getSystemAdminIdByUserId(Long userId);
+
 }
