@@ -10,7 +10,7 @@
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/ltmpl-update.css" />
 <div class="ltmpl-update detail" id="ltmpl-update-${RES_STAMP }">
 	<script type="jquery/tmpl" id="col-row-tmpl">
-		<div class="row" column-id="\${columnId}" field-id="\${id}" field-key="\${name}">
+		<div class="row \${fieldAvailable? '': 'col-field-unavailable'}" column-id="\${columnId}" field-id="\${id}" field-key="\${name}">
 			<span class="col-name">\${cname}</span>
 			{{if !withoutOpr}}
 				<span class="col-operates">
@@ -166,6 +166,7 @@
 												</div>
 											</div>
 										</div>
+										<div id="criteria-detail-cover"></div>
 									</div>
 								</div>
 							</div>
@@ -295,9 +296,10 @@
 			console.log($page);
 			var tmplData = Utils.parseJSON('${tmplDataJSON}'),
 				criteriaData = Utils.parseJSON('${criteriaDataJSON}'),
-				columnData = Utils.parseJSON('${columnDataJSON}')
+				columnData = Utils.parseJSON('${columnDataJSON}'),
+				fieldInputTypeMap = Utils.parseJSON('${fieldInputTypeMap}')
 				;
-			LtmplUpdate.init($page, tmplData, criteriaData, columnData, '${module.name}');
+			LtmplUpdate.init($page, tmplData, criteriaData, columnData, '${module.name}', fieldInputTypeMap);
 		}catch(e){
 			console.error(e);
 		}

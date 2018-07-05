@@ -117,11 +117,12 @@ define(function(require, exports, module){
 			}else{*/
 			//构造新字段的内容
 			var fieldData = {
-					id			: groupFieldData.id,
-					title		: groupFieldData.title,
-					fieldId		: groupFieldData.fieldId,
-					dv			: groupFieldData.dv || 'XXXXX',
-					colNum		: groupFieldData.colNum
+					id				: groupFieldData.id,
+					title			: groupFieldData.title,
+					fieldId			: groupFieldData.fieldId,
+					dv				: groupFieldData.dv || 'XXXXX',
+					colNum			: groupFieldData.colNum,
+					fieldAvailable	: groupFieldData.fieldAvailable == undefined? true: groupFieldData.fieldAvailable
 			};
 			//将字段插入到字段组中
 			var $fieldContainer = getFieldContainer($group);
@@ -180,10 +181,12 @@ define(function(require, exports, module){
 			}
 			var fieldSearch = $group.data('fieldSearch');
 			fieldSearch.enableField(fieldData.fieldId, false).done(function(field){
-				if(field.composite.isArray){
-					$group.attr('composite-id', field.composite.c_id);
-				}else{
-					fieldSearch.hideArrayComposites();
+				if(field){
+					if(field.composite.isArray){
+						$group.attr('composite-id', field.composite.c_id);
+					}else{
+						fieldSearch.hideArrayComposites();
+					}
 				}
 			});
 			return true;

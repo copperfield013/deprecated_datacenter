@@ -16,8 +16,54 @@
         http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
 		http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
 		http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+		
+	<import resource="spring-core.xml"/>
+	<import resource="spring-dao.xml"/>
 
-	<import resource="spring-datacenter.xml" />
+	<context:component-scan base-package="com.abc" />
+
+	<!-- dao自动扫描 -->
+	<context:component-scan base-package="cn.sowell.datacenter.model.*.dao.impl" />
+	<!-- serivce自动扫描 -->
+	<context:component-scan base-package="cn.sowell.datacenter.model.*.service.impl" />
+
+
+	<!-- dao自动扫描 -->
+	<context:component-scan base-package="cn.sowell.dataserver.model.*.dao.impl" />
+	<!-- serivce自动扫描 -->
+	<context:component-scan base-package="cn.sowell.dataserver.model.*.service.impl" />
+
+	<bean class="cn.sowell.dataserver.model.tmpl.strategy.TemplateUpdateStrategyFactory">
+		<constructor-arg>
+			<map>
+				<entry key="cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplate" 
+				value="cn.sowell.datacenter.model.tmpl.strategy.ModuleImportTemplateStrategy" />
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<bean id="dBFusionConfigContextFactory" class="cn.sowell.datacenter.entityResolver.config.DBFusionConfigContextFactory">
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="fieldService" ref="dictionaryServiceImpl" />
+	</bean>
+	<bean id="dBModuleConfigMediator" class="cn.sowell.datacenter.entityResolver.config.DBModuleConfigMediator">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+
+
+	<bean
+		class="cn.sowell.copframe.spring.propTranslator.PropertyValueTranslatorSet">
+		<property name="translatorSet">
+			<set>
+				<bean
+					class="cn.sowell.copframe.spring.propTranslator.translator.DatePropertyValueTranlator" />
+			</set>
+		</property>
+	</bean>
+
+	<bean class="cn.sowell.copframe.dao.utils.NormalOperateDaoImpl" />
+
 
 	<task:annotation-driven /> <!-- 定时器开关 -->
 	<bean class="cn.sowell.datacenter.model.modules.bean.PeopleExportHandlerTask" />
@@ -37,4 +83,7 @@
 			<bean class="cn.sowell.datacenter.ws.impl.DatacenterReloadServiceImpl" />
 		</jaxws:serviceBean>
 	</jaxws:server>
+
+	<import resource="spring-security.xml" />
+
 </beans>

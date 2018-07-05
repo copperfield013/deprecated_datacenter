@@ -16,8 +16,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import cn.sowell.copframe.common.UserIdentifier;
-import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
@@ -28,7 +26,6 @@ import cn.sowell.datacenter.common.choose.ChooseTablePage;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
-import cn.sowell.dataserver.model.tmpl.DataServerConstants;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailField;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
@@ -62,9 +59,8 @@ public class AdminDetailTemplateController {
 	
 	@RequestMapping("/list/{module}")
 	public String tmplList(Model model, @PathVariable String module){
-		UserIdentifier user = UserUtils.getCurrentUser();
 		ModuleMeta moduleMeta = mService.getModule(module);
-		List<TemplateDetailTemplate> tmplList = tService.getAllDetailTemplateList(module, user, null, false);
+		List<TemplateDetailTemplate> tmplList = tService.queryDetailTemplates(module);
 		model.addAttribute("tmplList", tmplList);
 		model.addAttribute("module", moduleMeta);
 		return AdminConstants.JSP_TMPL_DETAIL + "/dtmpl_list.jsp";
@@ -73,8 +69,7 @@ public class AdminDetailTemplateController {
 
 	@RequestMapping("/choose/{module}")
 	public String dialogList(@PathVariable String module, Model model) {
-		UserIdentifier user = UserUtils.getCurrentUser();
-		List<TemplateDetailTemplate> tmplList = tService.getAllDetailTemplateList(module, user, null, false);
+		List<TemplateDetailTemplate> tmplList = tService.queryDetailTemplates(module);
 		ChooseTablePage<TemplateDetailTemplate> tpage = new ChooseTablePage<TemplateDetailTemplate>(
 				"ltmpl-choose-list", "ltmpl_");
 		tpage
@@ -124,8 +119,7 @@ public class AdminDetailTemplateController {
 	@RequestMapping("/remove/{tmplId}")
 	public AjaxPageResponse remove(@PathVariable Long tmplId){
 		try {
-			UserIdentifier user = UserUtils.getCurrentUser();
-			tService.removeTemplate(user, tmplId, DataServerConstants.TEMPLATE_TYPE_DETAIL);
+			tService.removeDetailTemplate(tmplId);
 			return AjaxPageResponse.REFRESH_LOCAL("删除成功");
 		} catch (Exception e) {
 			logger.error("删除失败", e);

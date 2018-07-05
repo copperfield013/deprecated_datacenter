@@ -230,9 +230,7 @@ define(function(require, exports, module){
 			var def = $.Deferred();
 			afterLoadFieldData(function(fData, cData, fieldKeyData){
 				var field = fieldKeyData['id_' + fieldId];
-				if(field){
-					(callback || $.noop)(field);
-				}
+				(callback || $.noop)(field);
 				def.resolve(field);
 			});
 			return def.promise();
@@ -295,7 +293,7 @@ define(function(require, exports, module){
 					return def.resolve(true);
 				}else{
 					_this.getFieldData(fieldId).done(function(field){
-						if(param.hideCompositeFields && field.composite.isArray){
+						if(param.hideCompositeFields && field && field.composite.isArray){
 							return def.resolve(true);
 						}
 					});

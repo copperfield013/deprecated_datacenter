@@ -30,51 +30,54 @@
 			<c:if test="${not empty ltmpl.criterias }">
 				<c:forEach var="criteriaItem" items="${ltmpl.criterias }">
 					<c:if test="${criteriaItem.queryShow != null }">
-						<div class="form-group">
+						<div class="form-group ${criteriaItem.fieldAvailable? '': 'criteria-field-unavailable'}"
+							title="${criteriaItem.fieldAvailable? '': '无效字段'}">
 							<label class="control-label">${criteriaItem.title }</label>
-							<c:choose>
-								<c:when test="${criteriaItem.inputType == 'text' }">
-									<input class="form-control" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}" placeholder="${criteriaItem.placeholder }" />
-								</c:when>
-								<c:when test="${criteriaItem.inputType == 'select' }">
-									<select class="form-control" name="criteria_${criteriaItem.id }" data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
-										<option value="">--请选择--</option>
-										<c:forEach var="option" items="${view.criteriaOptionMap[criteriaItem.fieldId]}">
-											<option value="${option.value }">${option.title}</option>
-										</c:forEach>								
-									</select>
-								</c:when>
-								<c:when test="${criteriaItem.inputType == 'date' }">
-									<input class="form-control datepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}"  />
-								</c:when>
-								<c:when test="${criteriaItem.inputType == 'label' }">
-									<span class="cpf-select2-container">
-										<select class="cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
-											<c:forEach var="label" items="${view.criteriaLabelMap[criteriaItem.fieldKey].subdomain}">
-												<option value="${label }">${label}</option>
+							<c:if test="${criteriaItem.fieldAvailable }">
+								<c:choose>
+									<c:when test="${criteriaItem.inputType == 'text' }">
+										<input class="form-control" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}" placeholder="${criteriaItem.placeholder }" />
+									</c:when>
+									<c:when test="${criteriaItem.inputType == 'select' }">
+										<select class="form-control" name="criteria_${criteriaItem.id }" data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
+											<option value="">--请选择--</option>
+											<c:forEach var="option" items="${view.criteriaOptionMap[criteriaItem.fieldId]}">
+												<option value="${option.value }">${option.title}</option>
 											</c:forEach>								
 										</select>
-										<c:choose>
-											<c:when test="${criteriaItem.comparator == 'l1' }">
-												<c:set var="labelSelectClass" value="cpf-select2-sign-or"></c:set>
-											</c:when>
-											<c:when test="${criteriaItem.comparator == 'l2' }">
-												<c:set var="labelSelectClass" value="cpf-select2-sign-and"></c:set>
-											</c:when>
-										</c:choose>
-										<span class="cpf-select2-sign ${labelSelectClass }"></span>
-									</span>
-								</c:when>
-								<c:when test="${criteriaItem.inputType == 'daterange' }">
-									<span class="cpf-daterangepicker format-submit-value" 
-										data-name="criteria_${criteriaItem.id }" 
-										data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
-									</span>
-								</c:when>
-								<c:otherwise>
-									<input type="text" disabled="disabled" placeholder="没有配置对应的控件${criteriaItem.inputType }" />
-								</c:otherwise>
-							</c:choose>
+									</c:when>
+									<c:when test="${criteriaItem.inputType == 'date' }">
+										<input class="form-control datepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}"  />
+									</c:when>
+									<c:when test="${criteriaItem.inputType == 'label' }">
+										<span class="cpf-select2-container">
+											<select class="cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
+												<c:forEach var="label" items="${view.criteriaLabelMap[criteriaItem.fieldKey].subdomain}">
+													<option value="${label }">${label}</option>
+												</c:forEach>								
+											</select>
+											<c:choose>
+												<c:when test="${criteriaItem.comparator == 'l1' }">
+													<c:set var="labelSelectClass" value="cpf-select2-sign-or"></c:set>
+												</c:when>
+												<c:when test="${criteriaItem.comparator == 'l2' }">
+													<c:set var="labelSelectClass" value="cpf-select2-sign-and"></c:set>
+												</c:when>
+											</c:choose>
+											<span class="cpf-select2-sign ${labelSelectClass }"></span>
+										</span>
+									</c:when>
+									<c:when test="${criteriaItem.inputType == 'daterange' }">
+										<span class="cpf-daterangepicker format-submit-value" 
+											data-name="criteria_${criteriaItem.id }" 
+											data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
+										</span>
+									</c:when>
+									<c:otherwise>
+										<input type="text" disabled="disabled" placeholder="没有配置对应的控件${criteriaItem.inputType }" />
+									</c:otherwise>
+								</c:choose>
+							</c:if>
 						</div>
 					</c:if>
 				</c:forEach>
@@ -88,7 +91,8 @@
 				<thead>
 					<tr>
 						<c:forEach items="${ltmpl.columns }" var="column">
-							<th>${column.title }</th>
+							<th class="${column.fieldAvailable? '': 'col-field-unavailable' }"
+								title="${column.fieldAvailable? '': '无效字段'}">${column.title }</th>
 						</c:forEach>
 					</tr>
 				</thead>
@@ -96,7 +100,7 @@
 					<c:forEach items="${view.parsers }" var="parser" varStatus="i">
 						<tr>
 							<c:forEach items="${ltmpl.columns }" var="column" varStatus="j" >
-								<td>
+								<td class="${column.fieldAvailable? '': 'col-field-unavailable' }">
 									<c:choose >
 										<c:when test="${column.specialField == 'number' }">
 											${i.index + 1 }
@@ -127,7 +131,7 @@
 											</c:if>
 										</c:when>
 										<c:otherwise>
-											${parser.smap[column.fieldKey] }
+											${column.fieldAvailable? parser.smap[column.fieldKey] : '' }
 										</c:otherwise>
 									</c:choose>
 								</td>

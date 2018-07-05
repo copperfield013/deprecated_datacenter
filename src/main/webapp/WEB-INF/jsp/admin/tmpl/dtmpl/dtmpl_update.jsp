@@ -49,7 +49,9 @@
 		</div>
 	</script>
 	<script type="jquery/tmpl" id="tmpl-field-array-title">
-		<th data-id="\${id}" field-id="\${fieldId}">
+		<th data-id="\${id}" field-id="\${fieldId}" 
+			class="\${fieldAvailable? '': 'field-unavailable'}"
+			title="\${fieldAvailable? '': '无效字段' }">
 			<span>\${title }</span>
 			<div class="operate-buttons">     
 				<a class="remove-array-field" title="删除字段">
@@ -62,10 +64,11 @@
 		</th>
 	</script>
 	<script type="jquery/tmpl" id="tmpl-field-array-value">
-		<td field-id="\${fieldId}">\${dv }</td>
+		<td field-id="\${fieldId}" class="\${fieldAvailable? '': 'field-unavailable'}">\${dv }</td>
 	</script>
 	<script type="jquery/tmpl" id="tmpl-field">
-		<div class="form-group field-item movable \${colNum == 2? 'dbcol': ''}" field-id="\${fieldId}" data-id="\${id}">
+		<div class="form-group field-item movable \${fieldAvailable? '': 'field-unavailable'} \${colNum == 2? 'dbcol': ''}" field-id="\${fieldId}" data-id="\${id}"
+			title="\${fieldAvailable? '': '无效字段' }">
 			<label class="control-label field-title">\${title}</label>
 			<div class="field-value">
 				<span class="field-view">\${dv}</span>

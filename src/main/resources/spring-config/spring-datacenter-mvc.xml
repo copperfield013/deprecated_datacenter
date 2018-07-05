@@ -8,13 +8,12 @@ http://www.springframework.org/schema/beans
 http://www.springframework.org/schema/beans/spring-beans-4.3.xsd 
 http://www.springframework.org/schema/context 
 http://www.springframework.org/schema/context/spring-context-4.3.xsd">
-		
-		
-		
+
+	
 	<import resource="spring-core.xml"/>
-	<import resource="spring-dao.xml"/>
 	
-	
+	<!-- controller自动扫描(自动注入) -->
+	<context:component-scan base-package="cn.sowell.datacenter.*.controller.*" />
 	
 	<!-- 请求映射处理，位置放在前面表示这些配置的优先级高于spring的默认处理器 -->
 	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
@@ -100,7 +99,20 @@ http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 		<constructor-arg value="${upload_uri}" />
 	</bean>
 	
-	<mvc:resources mapping="/media/**" location="/resources/media/" />
+	<mvc:interceptors>
+		<!-- 用于在请求中设置一些常用的变量 -->
+		<bean
+			class="cn.sowell.datacenter.common.interceptor.CommonRequestAttributeSetInterceptor" />
+	</mvc:interceptors>
 	
+	<bean class="cn.sowell.datacenter.resource.ResourceController" >
+		<property name="fileLocation">
+			<map>
+				<entry key="field-input-typemap.json" value="classpath*:field-input-typemap.json" />
+			</map>
+		</property>
+	</bean>
+	
+	<mvc:resources mapping="/media/**" location="/resources/media/" />
 	
 </beans>

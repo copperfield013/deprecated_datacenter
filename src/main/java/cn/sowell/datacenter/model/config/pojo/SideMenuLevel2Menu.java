@@ -48,6 +48,9 @@ public class SideMenuLevel2Menu {
 	@Transient
 	@Column(name="tmpl_module_title")
 	private String templateModuleTitle;
+	
+	@Transient
+	private SideMenuLevel1Menu level1Menu;
 
 	public Long getId() {
 		return id;
@@ -128,5 +131,14 @@ public class SideMenuLevel2Menu {
 	public void setSideMenuLevel1Id(Long sideMenuLevel1Id) {
 		this.sideMenuLevel1Id = sideMenuLevel1Id;
 	}
+
+	public SideMenuLevel1Menu getLevel1Menu() {
+		return level1Menu;
+	}
+
+	public void setLevel1Menu(SideMenuLevel1Menu level1Menu) {
+		this.level1Menu = level1Menu;
+	}
+
 
 }

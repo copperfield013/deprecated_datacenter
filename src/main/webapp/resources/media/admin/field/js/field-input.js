@@ -391,7 +391,7 @@ define(function(require, exports, module){
 		loadGlobalOptions	: function(url, reqParam){
 			var deferred = $.Deferred();
 			var originOptions = FieldInput.GLOBAL_OPTIONS;
-			var TIMELINE = 30000;
+			var TIMELINE = 300000;
 			if(typeof url === 'string'){
 				var timeline = this.globalOptionsCacheTimeLineMap[url];
 				var now = (new Date()).getTime();

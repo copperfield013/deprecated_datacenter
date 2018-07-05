@@ -29,9 +29,9 @@ import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.common.choose.ChooseTablePage;
 import cn.sowell.datacenter.model.admin.service.SystemAdminService;
+import cn.sowell.dataserver.model.dict.service.DictionaryService;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
-import cn.sowell.dataserver.model.tmpl.DataServerConstants;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListColumn;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
@@ -51,6 +51,9 @@ public class AdminListTemplateController {
 
 	@Resource
 	FrameDateFormat dateFormat;
+	
+	@Resource
+	DictionaryService dictService;
 
 	@Resource
 	private ModulesService mService;
@@ -60,7 +63,7 @@ public class AdminListTemplateController {
 	public String list(Model model, @PathVariable String module){
 		UserIdentifier user = UserUtils.getCurrentUser();
 		ModuleMeta moduleMeta = mService.getModule(module);
-		List<TemplateListTemplate> ltmplList = tService.queryLtmplList(module, user);
+		List<TemplateListTemplate> ltmplList = tService.queryListTemplateList(module, user);
 		model.addAttribute("ltmplList", ltmplList);
 		model.addAttribute("module", moduleMeta);
 		return AdminConstants.JSP_TMPL_LIST + "/ltmpl_list.jsp";
@@ -69,7 +72,7 @@ public class AdminListTemplateController {
 	@RequestMapping("/choose/{module}")
 	public String dialogList(@PathVariable String module, Model model) {
 		UserIdentifier user = UserUtils.getCurrentUser();
-		List<TemplateListTemplate> list = tService.queryLtmplList(module, user);
+		List<TemplateListTemplate> list = tService.queryListTemplateList(module, user);
 		ChooseTablePage<TemplateListTemplate> tpage = new ChooseTablePage<TemplateListTemplate>(
 				"ltmpl-choose-list", "ltmpl_");
 		tpage
@@ -92,6 +95,7 @@ public class AdminListTemplateController {
 	@RequestMapping("/add/{module}")
 	public String add(@PathVariable String module, Model model){
 		ModuleMeta moduleMeta = mService.getModule(module);
+		model.addAttribute("fieldInputTypeMap", JSON.toJSON(dictService.getFieldInputTypeMap()));
 		model.addAttribute("module", moduleMeta);
 		return AdminConstants.JSP_TMPL_LIST + "/ltmpl_update.jsp";
 	}
@@ -105,6 +109,7 @@ public class AdminListTemplateController {
 		ModuleMeta moduleMeta = mService.getModule(ltmpl.getModule());
 		model.addAttribute("module", moduleMeta);
 		model.addAttribute("ltmpl", ltmpl);
+		model.addAttribute("fieldInputTypeMap", JSON.toJSON(dictService.getFieldInputTypeMap()));
 		model.addAttribute("tmplDataJSON", tmplDataJSON);
 		model.addAttribute("columnDataJSON", columnDataJSON);
 		model.addAttribute("criteriaDataJSON", criteriaDataJSON);
@@ -124,7 +129,7 @@ public class AdminListTemplateController {
 	@RequestMapping("/remove/{ltmplId}")
 	public AjaxPageResponse remove(@PathVariable Long ltmplId){
 		try {
-			tService.removeTemplate(UserUtils.getCurrentUser(), ltmplId, DataServerConstants.TEMPLATE_TYPE_LIST);
+			tService.removeListTemplate(ltmplId);
 			return AjaxPageResponse.REFRESH_LOCAL("删除成功");
 		} catch (Exception e) {
 			logger.error("删除模板时发生错误", e);
@@ -157,6 +162,7 @@ public class AdminListTemplateController {
 				compositeName = fieldName.substring(0, dotIndex);
 				fieldName = fieldName.substring(dotIndex + 1, fieldName.length());
 			}
+			col.put("fieldAvailable", column.getFieldAvailable());
 			col.put("compositeName", compositeName);
 			col.put("fieldName", fieldName);
 			col.put("title", column.getTitle());
@@ -209,7 +215,6 @@ public class AdminListTemplateController {
 						column.setSpecialField(src.getString("specField"));
 					}else{
 						column.setFieldId(src.getLong("fieldId"));
-						column.setFieldKey(src.getString("fieldKey"));
 					}
 					column.setOrder(i++);
 					columns.add(column);
@@ -227,29 +232,22 @@ public class AdminListTemplateController {
 					criteria.setRelation("and");
 					criteria.setId(item.getLong("id"));
 					criteria.setTitle(item.getString("title"));
-					criteria.setFieldId(item.getLong("fieldId"));
-					criteria.setFieldKey(item.getString("fieldKey"));
-					criteria.setRelationLabel(item.getString("relationLabel"));
-					criteria.setCreateUserId(tmpl.getCreateUserId());
 					criteria.setOrder(order++);
-					//条件需要显示
-					criteria.setComparator(item.getString("comparator"));
-					criteria.setInputType(item.getString("inputType"));
-					criteria.setDefaultValue(item.getString("defVal"));
-					criteria.setTitle(item.getString("title"));
-					Boolean queryShow = item.getBoolean("queryShow");
-					if(queryShow != null && queryShow){
-						criteria.setQueryShow(1);
-						criteria.setPlaceholder(item.getString("placeholder"));
-					}else{
-						//隐藏条件
-						/*
-						JSONArray partitions = item.getJSONArray("partitions");
-						for (Object p : partitions) {
-							JSONObject partition = (JSONObject) p;
-							criteria.setRelation(relation);
-						}*/
-						
+					criteria.setCreateUserId(tmpl.getCreateUserId());
+					if(item.getBooleanValue("fieldAvailable")) {
+						criteria.setFieldId(item.getLong("fieldId"));
+						criteria.setRelationLabel(item.getString("relationLabel"));
+						//条件需要显示
+						criteria.setComparator(item.getString("comparator"));
+						criteria.setInputType(item.getString("inputType"));
+						criteria.setDefaultValue(item.getString("defVal"));
+						Boolean queryShow = item.getBoolean("queryShow");
+						if(queryShow != null && queryShow){
+							criteria.setQueryShow(1);
+							criteria.setPlaceholder(item.getString("placeholder"));
+						}
+					}else {
+						criteria.setFieldUnavailable();
 					}
 					criterias.add(criteria);
 				}

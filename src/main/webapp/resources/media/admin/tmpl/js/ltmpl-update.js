@@ -1,19 +1,20 @@
 define(function(require, exports, module){
 	var FieldSearch = require('field/js/field-search.js');
 	var FieldInput = require('field/js/field-input.js');
-	var fieldInputTypeMap = {
-			text		: '文本框',
-			select		: '单选下拉框',
-			date		: '日期选择',
-			label		: '标签选择',
-			daterange	: '日期范围'
-	};
 	
-	var selectableType	= {
-			text	: ['text'],
-			select	: ['text', 'select'],
-			date	: ['date', 'daterange'],
-			label	: ['label']
+	var m_fieldInputType;
+	function getFieldInputType(){
+		var def = $.Deferred();
+		if(!m_fieldInputType){
+			require('ajax').loadResource('resource/field-input-typemap.json')
+			.done(function(obj){
+				m_fieldInputType = obj;
+				def.resolve(m_fieldInputType);
+			});
+		}else{
+			def.resolve(m_fieldInputType);
+		}
+		return def.promise();
 	}
 	exports.init = function($page, tmplData, criteriaData, columnData, module){
 		console.log($page);
@@ -94,26 +95,32 @@ define(function(require, exports, module){
 			var criteriaData = [];
 			$('.criterias-container', $page).children('.criteria-item').each(function(){
 				var criteria = $(this).data('criteria-data');
-				var field = criteria.getField();
-				if(!field){
-					require('dialog').notice('条件必须选择一个字段', 'error');
-					$.error();
-				}
-				var relationLabelInput = criteria.getRelationLabelInput();
 				var itemData = {
 					id				: criteria.getId(),
 					title			: criteria.getTitle(),
-					fieldId			: field.id,
-					fieldKey		: field.name,
-					relation		: 'and',
-					comparator		: criteria.getComparatorName(),
-					inputType		: criteria.getDefaultValueInput().getType(),
-					defVal			: criteria.getDefaultValueInput().getValue(),
-					placeholder		: criteria.getPlaceholder(),
-					partitions		: [],
-					queryShow		: criteria.isQueryShow(),
-					relationLabel 	: relationLabelInput && relationLabelInput.getValue()
+					fieldAvailable	: false
 				};
+				if(criteria.isFieldAvailable()){
+					var field = criteria.getField();
+					if(!field){
+						require('dialog').notice('条件必须选择一个字段', 'error');
+						$.error();
+					}
+					var relationLabelInput = criteria.getRelationLabelInput();
+					$.extend(itemData, {
+						fieldId			: field.id,
+						fieldKey		: field.name,
+						relation		: 'and',
+						comparator		: criteria.getComparatorName(),
+						inputType		: criteria.getDefaultValueInput().getType(),
+						defVal			: criteria.getDefaultValueInput().getValue(),
+						placeholder		: criteria.getPlaceholder(),
+						partitions		: [],
+						queryShow		: criteria.isQueryShow(),
+						relationLabel 	: relationLabelInput && relationLabelInput.getValue(),
+						fieldAvailable	: true
+					});
+				}
 				var partitions = criteria.getPartitions();
 				for(var i in partitions){
 					var partition = partitions[i];
@@ -198,16 +205,20 @@ define(function(require, exports, module){
 		
 		
 		function filterFieldInputSelectable($select, field){
-			$select.empty();
-			var set = new Set();
-			set.add('text');
-			var types = require('utils').merge(set, field && selectableType[field.type]);
-			if(types){
-				types.forEach(function(type){
-					$select.append($('<option value="' + type + '">' + fieldInputTypeMap[type] + '</option>'))
-				});
-				
-			}
+			var def = $.Deferred();
+			getFieldInputType().done(function(map){
+				$select.empty();
+				var set = new Set();
+				set.add('text');
+				var types = require('utils').merge(set, field && map.selectableType[field.type]);
+				if(types){
+					types.forEach(function(type){
+						$select.append($('<option value="' + type + '">' + map.inputTypeTitleMap[type] + '</option>'))
+					});
+				}
+				def.resolve();
+			});
+			return def.promise();
 		}
 		
 		function toggleRelationLabelInput($relationLabelRow, labelInput){
@@ -222,6 +233,12 @@ define(function(require, exports, module){
 		}
 		
 		function showCriteria(criteria){
+			if(!criteria.isFieldAvailable()){
+				//条件详情遮罩
+				$('#criteria-detail-cover', $page).addClass('cover-active');
+				return ;
+			}
+			$('#criteria-detail-cover', $page).removeClass('cover-active')
 			var field = criteria.getField();
 			if(field){
 				$fieldSearchInput.typeahead('val', field.cname);
@@ -238,13 +255,14 @@ define(function(require, exports, module){
 				$defVal.detach();
 				criteria.detailHandler(function($$){
 					var defValInput = criteria.getDefaultValueInput();
-					filterFieldInputSelectable($$('#field-input-type'), field);
-					$$('#field-input-type').val(defValInput.getType());
-					criteria.setDefaultInputType(criteria.getDefaultValueInput());
-					$$('#criteria-detail-comparator').val(criteria.getComparatorName());
-					$$('#criteria-default-value-container').append(defValInput.getInput());
-					$$('#criteria-detail-placeholder').val(criteria.getPlaceholder());
-					toggleRelationLabelInput($$('#relation-label-row'), criteria.getRelationLabelInput())
+					filterFieldInputSelectable($$('#field-input-type'), field).done(function(){
+						$$('#field-input-type').val(defValInput.getType());
+						criteria.setDefaultInputType(criteria.getDefaultValueInput());
+						$$('#criteria-detail-comparator').val(criteria.getComparatorName());
+						$$('#criteria-default-value-container').append(defValInput.getInput());
+						$$('#criteria-detail-placeholder').val(criteria.getPlaceholder());
+						toggleRelationLabelInput($$('#relation-label-row'), criteria.getRelationLabelInput())
+					})
 				});
 			//}
 			
@@ -297,9 +315,10 @@ define(function(require, exports, module){
 				afterSetField		: function(field){
 					$criteria.find('.criteria-property-name span').text(field.cname);
 					criteria.detailHandler(function($$){
-						filterFieldInputSelectable($$('#field-input-type'), field);
-						criteria.setDefaultInputType($$('#field-input-type').val());
-						toggleRelationLabelInput($$('#relation-label-row'), criteria.getRelationLabelInput());
+						filterFieldInputSelectable($$('#field-input-type'), field).done(function(){
+							criteria.setDefaultInputType($$('#field-input-type').val());
+							toggleRelationLabelInput($$('#relation-label-row'), criteria.getRelationLabelInput());
+						})
 					});
 				},
 				afterSetPlaceholder	: function(placeholder){
@@ -369,6 +388,9 @@ define(function(require, exports, module){
 			$criteria.appendTo($criteriaContainer).data('criteria-data', criteria);
 			if(_criteriaData){
 				criteria.initFromData(_criteriaData);
+			}
+			if(!criteria.isFieldAvailable()){
+				$criteria.addClass('criteria-field-unavailable');
 			}
 			if(ignoreShow !== true){
 				showCriteriaDetail($criteria);
@@ -468,12 +490,17 @@ define(function(require, exports, module){
 				+function addCriteriaItem(index){
 					var item = criteriaData[index];
 					if(item){
-						criteriaSearcher.getFieldData(item.fieldId, function(field){
-							addCriteria($.extend({
-								fieldData	: field
-							}, item), true);
+						if(item.fieldAvailable){
+							criteriaSearcher.getFieldData(item.fieldId, function(field){
+								addCriteria($.extend({
+									fieldData	: field
+								}, item), true);
+								addCriteriaItem(index + 1);
+							});
+						}else{
+							addCriteria(item, true);
 							addCriteriaItem(index + 1);
-						});
+						}
 					}
 					$CPF.closeLoading();
 				}(0);
@@ -496,11 +523,12 @@ define(function(require, exports, module){
 	 */
 	function Criteria(_param, $page){
 		var defaultParam = {
-			field		: null,
-			queryShow	: true,
-			title		: '',
-			field		: null,
-			module		: null
+			field			: null,
+			queryShow		: true,
+			title			: '',
+			field			: null,
+			module			: null,
+			fieldAvailable	: true
 		};
 		
 		var param = $.extend({}, defaultParam, _param);
@@ -512,7 +540,8 @@ define(function(require, exports, module){
 		var relationLabelFieldInput = null;
 		
 		this.initFromData = function(data){
-			if(data && data.fieldData){
+			if(data){
+				param.fieldAvailable = data.fieldAvailable != false;
 				param.id = data.id;
 				this.setField(data.fieldData);
 				this.toggleQueryShow(data.queryShow == 1);
@@ -521,7 +550,11 @@ define(function(require, exports, module){
 				this.setComparatorName(data.comparator);
 				this.setPlaceholder(data.placeholder);
 				this.setRelationLabelValue(data.relationLabel);
-				defaultValueInput = new ValueInput($.extend({}, data.fieldData, {type:data.inputType}), $page);
+				if(param.fieldAvailable){
+					defaultValueInput = new ValueInput($.extend({}, data.fieldData, {type:data.inputType}), $page);
+				}else{
+					defaultValueInput = new ValueInput(data.inputType, $page);
+				}
 				defaultValueInput.setValue(data.defaultValue);
 			}else{
 				$.error();
@@ -556,7 +589,7 @@ define(function(require, exports, module){
 				param.title = field.cname;
 				//this.setDefaultInputType(field);
 				callbackMap.fire('afterSetField', [field]);
-			}else{
+			}else if(field !== undefined){
 				$.error('setField方法只能从传入field数据对象');
 			}
 		};
@@ -566,6 +599,10 @@ define(function(require, exports, module){
 		 */
 		this.getTitle = function(){
 			return param.title;
+		}
+		
+		this.isFieldAvailable = function(){
+			return param.fieldAvailable;
 		}
 		
 		/**
@@ -977,12 +1014,13 @@ define(function(require, exports, module){
 					var $row = $(this);
 					var fieldId = $row.attr('field-id');
 					var column = new Column({
-						$domination	: $row,
-						$head		: $('thead th[field-id=""]', $previewTable),
-						$cells		: $('thead th[field-id="' + fieldId + '"], tbody td[field-id="' + fieldId + '"]', $previewTable),
-						table		: colTable,
-						colId		: fieldId.toString(),
-						name		: $row.find('.col-name').text()
+						$domination		: $row,
+						$head			: $('thead th[field-id=""]', $previewTable),
+						$cells			: $('thead th[field-id="' + fieldId + '"], tbody td[field-id="' + fieldId + '"]', $previewTable),
+						table			: colTable,
+						colId			: fieldId.toString(),
+						name			: $row.find('.col-name').text(),
+						fieldAvailable	: !$row.is('.col-field-unavailable')
 					});
 					columns.push(column);
 				});
@@ -991,6 +1029,7 @@ define(function(require, exports, module){
 			$table			: $previewTable,
 			headCell		: function($th, column, i, $row){
 				$th.text(column.getName());
+				$th.addClass(column.isFieldAvailable()? '': 'col-field-unavailable');
 			},
 			bodyCell		: function($td, column, i, $row){
 				if(column.getId() === 'row-number'){
@@ -1007,6 +1046,7 @@ define(function(require, exports, module){
 					}
 					
 				}else{
+					$td.addClass(column.isFieldAvailable()? '': 'col-field-unavailable');
 					//TODO:设置单元格的默认值
 				}
 			}
@@ -1064,10 +1104,11 @@ define(function(require, exports, module){
 			if(flag){
 				if($numberCol.length == 0){
 					$colRowTmpl.tmpl({
-						id			: 'row-number',
-						cname		: '#',
-						withoutOpr	: true,
-						c_name		: ''
+						id				: 'row-number',
+						cname			: '#',
+						withoutOpr		: true,
+						c_name			: '',
+						fieldAvailable	: true
 					}).addClass('number-col').prependTo($colsContainer);
 					colTable.syncByColumns();
 				}
@@ -1086,7 +1127,8 @@ define(function(require, exports, module){
 						id			: 'row-operates',
 						cname		: '操作',
 						withoutOpr	: true,
-						c_name		: ''
+						c_name		: '',
+						fieldAvailable	: true
 					}).addClass('operate-col').appendTo($colsContainer);
 					colTable.syncByColumns();
 				}
@@ -1163,12 +1205,13 @@ define(function(require, exports, module){
 						$('#show-operate-remove', $page).prop('checked', !!res[3]).trigger('change');
 					}else{
 						addColumn({
-							columnId 	: column.id,
-							id			: column.fieldId,
-							c_name		: column.compositeName,
-							name		: column.fieldName,
-							cname		: column.title,
-							withoutOpr	: !!column.specialField
+							columnId 		: column.id,
+							id				: column.fieldId,
+							c_name			: column.compositeName,
+							name			: column.fieldName,
+							cname			: column.title,
+							withoutOpr		: !!column.specialField,
+							fieldAvailable	: column.fieldAvailable != false
 						}, false);
 						addColSearcher.enableField(column.fieldId, false);
 					}
@@ -1292,17 +1335,18 @@ define(function(require, exports, module){
 	function Column(_param){
 		var defaultParam = {
 			//主导控制对象
-			$domination	: $(),
+			$domination		: $(),
 			//表头单元格
-			$head		: $(),
+			$head			: $(),
 			//列的所有单元格（包含表头）
-			$cells		: $(),
+			$cells			: $(),
 			//列所在的表格对象
-			table		: null,
+			table			: null,
 			//列的id
-			colId		: '',
-			name		: '',
-			data		: ''
+			colId			: '',
+			name			: '',
+			data			: '',
+			fieldAvailable	: true
 		};
 		
 		var param = $.extend({}, defaultParam, _param);
@@ -1379,6 +1423,10 @@ define(function(require, exports, module){
 					move($cell, index, 'td,th');
 				});
 			}
+		}
+		
+		this.isFieldAvailable = function(){
+			return param.fieldAvailable;
 		}
 	}
 	

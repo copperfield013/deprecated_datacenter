@@ -9,12 +9,10 @@ import java.util.Set;
 import javax.annotation.Resource;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.ServletRequestParameterPropertyValues;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,12 +21,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
 
-import cn.sowell.copframe.common.UserIdentifier;
-import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
-import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
@@ -45,17 +40,12 @@ import cn.sowell.datacenter.model.modules.service.ExportService;
 import cn.sowell.dataserver.model.dict.service.DictionaryService;
 import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
-import cn.sowell.dataserver.model.modules.pojo.criteria.NormalCriteria;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.modules.service.ViewDataService;
 import cn.sowell.dataserver.model.modules.service.impl.ListTemplateEntityView;
 import cn.sowell.dataserver.model.modules.service.impl.ListTemplateEntityViewCriteria;
-import cn.sowell.dataserver.model.tmpl.bean.QueryEntityParameter;
-import cn.sowell.dataserver.model.tmpl.param.ListTemplateParameter;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
-import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListCriteria;
-import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
 import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
 @Controller
@@ -124,7 +114,7 @@ public class AdminModulesController {
 		if(tCriterias != null){
 			StringBuffer hidenCriteriaDesc = new StringBuffer();
 			for (TemplateListCriteria tCriteria : tCriterias) {
-				if(tCriteria.getQueryShow() == null && TextUtils.hasText(tCriteria.getDefaultValue())) {
+				if(tCriteria.getQueryShow() == null && TextUtils.hasText(tCriteria.getDefaultValue()) && tCriteria.getFieldAvailable()) {
 					hidenCriteriaDesc.append(tCriteria.getTitle() + ":" + tCriteria.getDefaultValue() + "&#10;");
 				}
 			}
@@ -148,88 +138,6 @@ public class AdminModulesController {
 		return criteriaMap;
 	}
 
-	/**
-	 * 通用各个模块的列表入口
-	 * @return
-	 */
-	public String list1(
-			@PathVariable String module,
-			Long tmplId, 
-			@RequestParam(name="tg", required=false) String templateGroupKey,
-			PageInfo pageInfo,
-			Model model,
-			HttpServletRequest request, HttpSession session) {
-		ModuleMeta moduleMeta = mService.getModule(module);
-		Assert.notNull(moduleMeta);
-		if(TextUtils.hasText(templateGroupKey)) {
-			TemplateGroup tGroup = tService.getTemplateGroup(module, templateGroupKey);
-			if(tGroup != null) {
-				tmplId = tGroup.getListTemplateId();
-				model.addAttribute("templateGroup", tGroup);
-			}
-		}
-		ListTemplateParameter param = exractTemplateParameter(tmplId, module, request);
-		if(param == null || param.getListTemplate() == null) {
-			if(tmplId == null) {
-				logger.error("没有指定模块[" + module + "]的默认列表模板");
-			}else {
-				logger.error("根据模板id[" + module + "]无法获得对应的列表模板");
-			}
-			return null;
-		}
-		if(param != null && param.getListTemplate() != null){
-			QueryEntityParameter queryParam = new QueryEntityParameter();
-			queryParam.setCriterias(mService.toCriterias(param.getNormalCriteriaMap().values(), module));
-			queryParam.setModule(module);
-			queryParam.setPageInfo(pageInfo);
-			List<ModuleEntityPropertyParser> parserList = mService.queryEntities(queryParam);
-			model.addAttribute("parserList", parserList);
-			
-			String uuid = (String) session.getAttribute(AdminConstants.EXPORT_PEOPLE_STATUS_UUID);
-			if(uuid != null){
-				ExportStatus exportStatus = eService.getExportStatus(uuid);
-				if(exportStatus != null && !exportStatus.isBreaked() && !exportStatus.isCompleted()){
-					model.addAttribute("exportStatus", exportStatus);
-				}
-			}
-			if(param.getListTemplate().getCriterias() != null){
-				model.addAttribute("criteriaOptionsMap", dictService.getOptionsMap(CollectionUtils.toSet(param.getListTemplate().getCriterias(), criteria->criteria.getFieldId())));
-				model.addAttribute("labelsMap", dictService.getModuleLabelMap(module));
-				
-				StringBuffer hidenCriteriaDesc = new StringBuffer();
-				for (TemplateListCriteria criteria : param.getListTemplate().getCriterias()) {
-					if(criteria.getQueryShow() == null && TextUtils.hasText(criteria.getDefaultValue())) {
-						hidenCriteriaDesc.append(criteria.getTitle() + ":" + criteria.getDefaultValue() + "&#10;");
-					}
-				}
-				model.addAttribute("hidenCriteriaDesc", hidenCriteriaDesc);
-			}
-		}
-		model.addAttribute("vCriteriaMap", param.getNormalCriteriaMap());
-		model.addAttribute("ltmpl", param.getListTemplate());
-		model.addAttribute("pageInfo", pageInfo);
-		model.addAttribute("ltmplList", tService.queryLtmplList(module, param.getUser()));
-		model.addAttribute("module", moduleMeta);
-		return AdminConstants.JSP_MODULES + "/modules_list_tmpl.jsp";
-	}
-	
-	private ListTemplateParameter exractTemplateParameter(Long tmplId,
-			String module,
-			HttpServletRequest request) {
-		TemplateListTemplate ltmpl = null;
-		UserIdentifier user = UserUtils.getCurrentUser();
-		ltmpl = tService.getListTemplate(tmplId);
-		Assert.notNull(ltmpl, "根据[id=" + ltmpl + "]无法获得列表模板");
-		Map<Long, NormalCriteria> vCriteriaMap = mService.getCriteriasFromRequest(
-				new ServletRequestParameterPropertyValues(request, "criteria", "_"), 
-				CollectionUtils.toMap(ltmpl.getCriterias(), c->c.getId())); 
-		ListTemplateParameter param = new ListTemplateParameter();
-		param.setListTemplate(ltmpl);
-		param.setNormalCriteriaMap(vCriteriaMap);
-		param.setUser(user);
-		return param;
-	}
-	
 	@RequestMapping("/detail/{menuId}/{code}")
 	public String detail(@PathVariable String code, 
 			@PathVariable Long menuId,

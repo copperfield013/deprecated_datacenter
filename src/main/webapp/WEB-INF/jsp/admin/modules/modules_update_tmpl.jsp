@@ -42,7 +42,9 @@
 							<c:choose>
 								<c:when test="${tmplGroup.isArray != 1 }">
 									<c:forEach var="tmplField" items="${tmplGroup.fields }">
-										<div class="form-group field-item ${tmplField.colNum == 2? 'dbcol': '' }">
+										<div class="form-group field-item ${tmplField.fieldAvailable? '': 'field-unavailable' } ${tmplField.colNum == 2? 'dbcol': '' }"
+											title="${tmplField.fieldAvailable? '': '无效字段' }"
+										>
 											<label class="control-label field-title">${tmplField.title }</label>
 											<div class="field-value">
 												<span class="field-input" 
@@ -73,7 +75,8 @@
 													</c:if>
 													<c:forEach var="field" items="${tmplGroup.fields }">
 														<th 
-															class="th-field-title"
+															class="th-field-title ${field.fieldAvailable? '': 'field-unavailable'}"
+															title="${field.fieldAvailable? '': '无效字段' }"
 															fname-format="${fieldDescMap[field.fieldId].arrayFieldNameFormat }"
 															fInp-type="${field.type }"
 															fInp-optkey="${field.optionGroupId }"
@@ -105,7 +108,7 @@
 															</td>
 														</c:if>
 														<c:forEach var="tmplField" items="${tmplGroup.fields }">
-															<td>
+															<td class="${tmplField.fieldAvailable? '': 'field-unavailable'}">
 																<span class="field-value">
 																	<span class="field-input" 
 																		fInp-type="${tmplField.type }"
@@ -230,14 +233,18 @@
 			$titleRow.children('th.th-field-title').each(function(){
 				var $title = $(this);
 				var $td = $('<td>');
-				var $fieldInput = $('<span class="field-input"></span></span>');
-				$fieldInput
-					.attr('fInp-type', $title.attr('fInp-type'))
-					.attr('fInp-optkey', $title.attr('fInp-optkey'))
-					.attr('fInp-fieldkey', $title.attr('fInp-fieldkey'))
-					.appendTo($('<span class="field-value"></span>').appendTo($td));
-				if($title.attr('fInp-optset')){
-					$fieldInput.attr('fInp-optset', $title.attr('fInp-optset'));
+				if($title.is('.field-unavailable')){
+					$td.addClass('field-unavailable');
+				}else{
+					var $fieldInput = $('<span class="field-input"></span></span>');
+					$fieldInput
+						.attr('fInp-type', $title.attr('fInp-type'))
+						.attr('fInp-optkey', $title.attr('fInp-optkey'))
+						.attr('fInp-fieldkey', $title.attr('fInp-fieldkey'))
+						.appendTo($('<span class="field-value"></span>').appendTo($td));
+					if($title.attr('fInp-optset')){
+						$fieldInput.attr('fInp-optset', $title.attr('fInp-optset'));
+					}
 				}
 				$dataRow.append($td);
 			});

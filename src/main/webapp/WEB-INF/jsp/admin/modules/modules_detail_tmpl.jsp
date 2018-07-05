@@ -27,10 +27,11 @@
 							<c:choose>
 								<c:when test="${tmplGroup.isArray != 1 }">
 									<c:forEach var="tmplField" items="${tmplGroup.fields }">
-										<div class="form-group field-item ${tmplField.colNum == 2? 'dbcol': '' }">
+										<div class="form-group field-item ${tmplField.fieldAvailable? '': 'field-unavailable' } ${tmplField.colNum == 2? 'dbcol': '' }"
+											title="${tmplField.fieldAvailable? '': '无效字段' }">
 											<label class="control-label field-title">${tmplField.title }</label>
 											<div class="field-value">
-												<span class="field-view">${entity.smap[tmplField.fieldName] }</span>
+												<span class="field-view">${tmplField.fieldAvailable? entity.smap[tmplField.fieldName]: '' }</span>
 											</div>
 										</div>
 									</c:forEach>
@@ -45,7 +46,8 @@
 														<th>关系</th>
 													</c:if>
 													<c:forEach var="field" items="${tmplGroup.fields }">
-														<th>${field.title }</th>
+														<th class="${field.fieldAvailable? '': 'field-unavailable'}" 
+															title="${field.fieldAvailable? '': '无效字段' }">${field.title }</th>
 													</c:forEach>
 												</tr>
 											</thead>
@@ -58,7 +60,7 @@
 															<td>${entityItem.smap[relationName] }</td>
 														</c:if>
 														<c:forEach var="field" items="${tmplGroup.fields }">
-															<td>${entityItem.smap[field.fieldName] }</td>
+															<td class="${field.fieldAvailable? '': 'field-unavailable'}">${field.availableField? entityItem.smap[field.fieldName] : ''}</td>
 														</c:forEach>
 													</tr>
 												</c:forEach>

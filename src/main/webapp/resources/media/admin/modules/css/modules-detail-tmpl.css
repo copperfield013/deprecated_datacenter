@@ -363,3 +363,34 @@ div#tmpl-list span.tmpl-date {
 .template-container.title-operate>* {
     margin-right: 8px;
 }
+
+.field-item.field-unavailable,
+th.field-unavailable,
+td.field-unavailable {
+    background-color: #888 !important;
+    border: 1px solid #888 !important;
+    position: relative;
+}
+.field-item.field-unavailable:before {
+    content: "\e73d";
+    font-family: "iconfont" !important;
+    font-size: 2em;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    position: absolute;
+    -moz-osx-font-smoothing: grayscale;
+    left: 0;
+    top:0;
+    color: #FFff00;
+}
+th.field-unavailable:before {
+	content: "\e73d";
+    font-family: "iconfont" !important;
+    font-size: 2em;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    position: absolute;
+    -moz-osx-font-smoothing: grayscale;
+    top:0;
+    color: #FFff00;
+}

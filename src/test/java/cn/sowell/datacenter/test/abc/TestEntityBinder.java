@@ -27,8 +27,8 @@ import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigResolver;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
-import cn.sowell.datacenter.model.abc.service.ABCExecuteService;
-import cn.sowell.datacenter.model.dict.service.DictionaryService;
+import cn.sowell.dataserver.model.abc.service.ABCExecuteService;
+import cn.sowell.dataserver.model.dict.service.DictionaryService;
 
 
 @ContextConfiguration(locations = "classpath*:spring-config/spring-junit.xml")
