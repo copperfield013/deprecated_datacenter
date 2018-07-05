@@ -1086,6 +1086,9 @@ define(function(require, exports, module){
 		 * 添加普通字段列的方法
 		 */
 		function addColumn(field, withSync){
+			if(field.fieldAvailable === undefined){
+				field.fieldAvailable = true;
+			}
 			var $colRow = $colRowTmpl.tmpl($.extend({}, {
 				withoutOpr	: false
 			}, field)).appendTo($colsContainer);

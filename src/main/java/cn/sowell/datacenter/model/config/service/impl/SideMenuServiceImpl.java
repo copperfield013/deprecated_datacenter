@@ -70,7 +70,7 @@ public class SideMenuServiceImpl implements SideMenuService{
 								l2.setTemplateModuleTitle(module.getTitle());
 								l2.setTemplateModule(module.getName());
 								l2.setLevel1Menu(level1);
-								return ;
+								continue ;
 							}
 						}
 						itr.remove();
