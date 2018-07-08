@@ -45,6 +45,11 @@
 										<div class="form-group field-item ${tmplField.fieldAvailable? '': 'field-unavailable' } ${tmplField.colNum == 2? 'dbcol': '' }"
 											title="${tmplField.fieldAvailable? '': '无效字段' }"
 										>
+											<div class="dtmpl-field-validates">
+												<c:if test="${fn:contains(tmplField.validators, 'required')}">
+													<i validate-name="required"></i>
+												</c:if>
+											</div>
 											<label class="control-label field-title">${tmplField.title }</label>
 											<div class="field-value">
 												<span class="field-input" 
@@ -195,17 +200,48 @@
 			$CPF.closeLoading();
 		});
 		
+		function validate(form){
+			switch(form.validateName){
+				case 'required'	:
+					if(form.value === ''){
+						validateError(form);
+						return false
+					}
+					return true;
+					break;
+				default :
+					return true;
+			}
+		}
+		
+		function validateError(form){
+			form.$item.addClass('field-validate-error');
+		}
+		
 		var fuseMode = false;
 		$('#save i', $page).click(function(){
-			var msg = '是否保存？';
-			if(fuseMode){
-				msg = '是否保存（当前为融合模式）？'
-			}
-			Dialog.confirm(msg, function(yes){
-				if(yes){
-					$('form', $page).submit();
-				}
+			var validateResult = true;
+			$('.dtmpl-field-validates>i', $page).each(function(){
+				var $item = $(this).closest('.field-item');
+				$item.removeClass('field-validate-error');
+				validateResult = validate({
+					$item 			: $item,
+					validateName	: $(this).attr('validate-name'),
+					title 			: $item.find('label.field-item').text(),
+					value 			: $item.find(':input').val()
+				}) && validateResult;
 			});
+			if(validateResult){
+				var msg = '是否保存？';
+				if(fuseMode){
+					msg = '是否保存（当前为融合模式）？'
+				}
+				Dialog.confirm(msg, function(yes){
+					if(yes){
+						$('form', $page).submit();
+					}
+				});
+			}
 		});
 		$('form', $page).on('cpf-submit', function(e, formData){
 			formData.append('%fuseMode%', fuseMode);

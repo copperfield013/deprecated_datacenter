@@ -160,6 +160,7 @@ public class AdminDetailTemplateController {
 									Boolean dbcol = jField.getBoolean("dbcol");
 									field.setColNum((dbcol == null || !dbcol) ? 1: 2);
 									field.setOrder(j++);
+									field.setValidators(jField.getString("validators"));
 									group.getFields().add(field);
 								}
 							}

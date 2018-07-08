@@ -394,3 +394,43 @@ th.field-unavailable:before {
     top:0;
     color: #FFff00;
 }
+
+
+
+
+.entity-detail-tmpl .dtmpl-field-validates{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: block;
+    height: 1em;
+    line-height: 1em;
+}
+.entity-detail-tmpl .dtmpl-field-validates:before{
+    content: "";
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    right:0;
+    top:0;
+    bottom: 0;
+    background-color: #fff;
+    opacity: 0.3;
+}
+.entity-detail-tmpl .dtmpl-field-validates>i{
+    display: inline-block;
+    height: 100%;
+    width: 1em;
+    margin-left: 5px;
+    cursor: pointer !important;
+    z-index: 10000;
+}
+.entity-detail-tmpl .dtmpl-field-validates>i[validate-name="required"]:before{
+	content: "*";
+    color: #f00;
+}
+
+
+.entity-detail-tmpl .form-group.field-item.field-validate-error .field-value {
+	border: 1px solid #f00;
+}

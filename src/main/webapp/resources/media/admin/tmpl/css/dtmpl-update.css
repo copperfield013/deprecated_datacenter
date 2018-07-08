@@ -26,6 +26,9 @@
     position: relative;
     margin: 7px 0;
 }
+.dtmpl-update .field-item:hover{
+    background-color: #eee;
+}
 .dtmpl-update .field-item-placeholder{
 	background-color: #888;
 }
@@ -254,4 +257,89 @@ th.field-unavailable:before {
     -moz-osx-font-smoothing: grayscale;
     top:0;
     color: #FFff00;
+}
+
+
+
+
+
+.dtmpl-update .dtmpl-field-validates{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: block;
+    height: 1em;
+    line-height: 1em;
+}
+.dtmpl-update .dtmpl-field-validates:before{
+    content: "";
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    right:0;
+    top:0;
+    bottom: 0;
+    background-color: #fff;
+    opacity: 0.3;
+}
+.dtmpl-update .dtmpl-field-validates>i{
+    display: none;
+    height: 100%;
+    width: 1em;
+    margin-left: 5px;
+    cursor: pointer !important;
+    z-index: 10000;
+}
+.dtmpl-update .dtmpl-field-validates>i.active-validator{
+	display: inline-block;
+}
+
+.dtmpl-update .dtmpl-field-validates i {
+    cursor: pointer !important;
+}
+
+.dtmpl-update i.dtmpl-field-validate-required:before{
+	content: "*";
+    color: #f00;
+}
+
+
+.dtmpl-update ul.field-validate-menu {
+    display: none;
+    position: absolute;
+    left: 5em;
+    background-color: #fff;
+    top: 1.6em;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding: 0;
+}
+.dtmpl-update .field-validate-a:hover+ul.field-validate-menu,
+.dtmpl-update ul.field-validate-menu:hover
+{
+    display: block;
+}
+
+.dtmpl-update ul.field-validate-menu>li {
+    font-size: 13px;
+    line-height: 25px;
+    list-style-type: none;
+    margin-left: 0;
+    padding: 0 10px;
+    border-bottom: 1px solid #ccc;
+    min-width: 10em;
+    cursor: pointer;
+}
+
+.dtmpl-update ul.field-validate-menu>li:hover {
+    background-color: #57b5e3;
+}
+
+.dtmpl-update li.checked-validate:before {
+    content: "\e775";
+    font-family: "iconfont" !important;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding-right: 7px;
 }

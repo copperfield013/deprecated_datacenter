@@ -122,8 +122,16 @@ define(function(require, exports, module){
 					fieldId			: groupFieldData.fieldId,
 					dv				: groupFieldData.dv || 'XXXXX',
 					colNum			: groupFieldData.colNum,
-					fieldAvailable	: groupFieldData.fieldAvailable == undefined? true: groupFieldData.fieldAvailable
+					fieldAvailable	: groupFieldData.fieldAvailable == undefined? true: groupFieldData.fieldAvailable,
+					validators		: []
 			};
+			var VALIDATORS = ['required'];
+			if(!$.isArray(groupFieldData.validators)){
+				groupFieldData.validators = [];
+			}
+			for(var i in VALIDATORS){
+				fieldData.validators[VALIDATORS[i]] = groupFieldData.validators.indexOf(VALIDATORS[i]) >= 0;
+			}
 			//将字段插入到字段组中
 			var $fieldContainer = getFieldContainer($group);
 			if(option.isArrayField){
@@ -277,12 +285,19 @@ define(function(require, exports, module){
 					$group.find('.field-item').each(function(){
 						var $field = $(this);
 						var field = {
-								id		: $field.attr('data-id'),
-								fieldId	: $field.attr('field-id'),
-								title	: $field.find('label.field-title').text(),
-								viewVal	: $field.find('span.field-view').text(),
-								dbcol	: $field.is('.dbcol')
+								id			: $field.attr('data-id'),
+								fieldId		: $field.attr('field-id'),
+								title		: $field.find('label.field-title').text(),
+								viewVal		: $field.find('span.field-view').text(),
+								dbcol		: $field.is('.dbcol'),
+								validators	: ''
 						};
+						$field.find('.field-validate-menu>li.checked-validate').each(function(){
+							field.validators += $(this).attr('validate-name') + ';';
+						});
+						if(field.validators){
+							field.validators = field.validators.substring(0, field.validators.length - 1);
+						}
 						group.fields.push(field);
 					});
 				}
@@ -402,6 +417,15 @@ define(function(require, exports, module){
 			});
 		});
 		
+		bindPageEvent('click', 'ul.field-validate-menu>li', function(e){
+			var $field = getLocateField(e.target);
+			var $li = $(this);
+			var toChecked = !$li.is('.checked-validate');
+			var validateName = $li.attr('validate-name');
+			$field.find('.dtmpl-field-validates>.dtmpl-field-validate-' + validateName).toggleClass('active-validator', toChecked);
+			$li.toggleClass('checked-validate', toChecked);
+		});
+		
 		//删除数组字段
 		bindPageEvent('click', '.remove-array-field i', function(e){
 			var $title = $(this).closest('th'),
@@ -482,6 +506,9 @@ define(function(require, exports, module){
 				initGroupFieldSearchAutocomplete($group);
 				for(var j in group.fields){
 					var field = group.fields[j];
+					if(field.validators){
+						field.validators = field.validators.split(';');
+					}
 					appendFieldToGroup(field, $group, {
 						isArrayField	: group.isArray == 1,
 						relations		: group.relationSubdomain

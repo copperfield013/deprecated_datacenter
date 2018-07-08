@@ -69,6 +69,9 @@
 	<script type="jquery/tmpl" id="tmpl-field">
 		<div class="form-group field-item movable \${fieldAvailable? '': 'field-unavailable'} \${colNum == 2? 'dbcol': ''}" field-id="\${fieldId}" data-id="\${id}"
 			title="\${fieldAvailable? '': '无效字段' }">
+			<div class="dtmpl-field-validates">
+				<i class="dtmpl-field-validate-required \${validators.required? 'active-validator': ''}"></i>
+			</div>
 			<label class="control-label field-title">\${title}</label>
 			<div class="field-value">
 				<span class="field-view">\${dv}</span>
@@ -77,6 +80,10 @@
 				<a class="remove-field" title="删除字段"><i class="fa fa-trash-o"></i></a>
 				<a class="toggle-expand-field" title="拓展字段显示长度"><i class="fa fa-expand"></i></a>
 				<a class="recover-field" title="恢复默认名称"><i class="iconfont icon-recover"></i></a>
+				<a class="field-validate-a" title="字段约束"><i class="icon iconfont icon-rule"></i></a>
+				<ul class="field-validate-menu">
+					<li validate-name="required" class="\${validators.required? 'checked-validate': ''}">必填</li>
+				</ul>
 			</div>
 		</div>
 	</script>
