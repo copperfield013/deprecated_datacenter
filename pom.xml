@@ -42,7 +42,7 @@
 		<dependency>
 			<groupId>cn.sowell.datacenter</groupId>
 			<artifactId>dataserver</artifactId>
-			<version>0.4</version>
+			<version>0.5</version>
 			<exclusions>
 				<exclusion>
 					<groupId>cn.sowell.copframe</groupId>
