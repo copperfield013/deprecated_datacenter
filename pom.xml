@@ -10,8 +10,8 @@
 	
 	<properties>
 		<version.kie>6.5.0.Final</version.kie>
-		<version.cpfweb>0.2.9</version.cpfweb>
-		<version.abcitem>3.3.43.alphal</version.abcitem>
+		<version.cpfweb>0.2.10</version.cpfweb>
+		<version.abcitem>3.4.46.alphal</version.abcitem>
 		<version.abcbizz>2.1.15</version.abcbizz>
 		<version.entityResolver>1.6</version.entityResolver>
 		<cxf.version>3.2.2</cxf.version>
@@ -32,7 +32,7 @@
 		<dependency>
 			<groupId>cn.sowell.copframe</groupId>
 			<artifactId>cpf-spring</artifactId>
-			<version>0.3.13</version>
+			<version>0.3.14</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.sowell.copframe</groupId>
@@ -42,7 +42,7 @@
 		<dependency>
 			<groupId>cn.sowell.datacenter</groupId>
 			<artifactId>dataserver</artifactId>
-			<version>0.5</version>
+			<version>0.6</version>
 			<exclusions>
 				<exclusion>
 					<groupId>cn.sowell.copframe</groupId>
