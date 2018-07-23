@@ -2,7 +2,7 @@ package cn.sowell.datacenter.model.modules.pojo;
 
 public class ImportTemplateCriteria {
 	private String module;
-	private Long userId;
+	private String userCode;
 	private String composite;
 	private boolean loadFields = false;
 	public String getModule() {
@@ -11,11 +11,11 @@ public class ImportTemplateCriteria {
 	public void setModule(String module) {
 		this.module = module;
 	}
-	public Long getUserId() {
-		return userId;
+	public String getUserCode() {
+		return userCode;
 	}
-	public void setUserId(Long userId) {
-		this.userId = userId;
+	public void setUserId(String userCode) {
+		this.userCode = userCode;
 	}
 	public String getComposite() {
 		return composite;

@@ -22,6 +22,30 @@ define(function(require, exports){
 			return str;
 		},
 		/**
+		 * 将数组内的元素用特定的分隔符连接成字符串
+		 * @param array 数组对象，数组内元素可以是任意类型，不可省略
+		 * @param spliter 字符串，作为数组元素的连接符。可省略，默认为","
+		 * @param itemGetter 函数对象，用于将array的元素对象构造出字符串内每一节的子串，可省略，默认直接获取元素对象
+		 */
+		join		: function(array, spliter, itemGetter){
+			if(typeof spliter === 'function'){
+				itemGetter = spliter;
+				spliter = undefined;
+			}
+			spliter = spliter || ',';
+			itemGetter = itemGetter || function(ele){return ele}
+			var str = '';
+			if($.isArray(array)){
+				for(var i in array){
+					str += itemGetter.apply(array, [array[i]]) + spliter;
+				}
+				if(str.length > 0){
+					str = str.substring(0, str.length - spliter.length);
+				}
+			}
+			return str;
+		},
+		/**
 		 * 获得dom的位置和尺寸
 		 * 如果没有传入参数，则获取body的位置和尺寸
 		 */

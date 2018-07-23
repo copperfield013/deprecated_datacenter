@@ -227,7 +227,11 @@ define(function(require, exports, module){
 		    	var Dialog = require('dialog');
 		    	if(errResult !== false){
 		    		if(Dialog){
-		    			Dialog.notice('请求时发生错误', 'error');
+		    			if(jqXHR.status === 403){
+		    				Dialog.notice('无访问权限', 'error');
+		    			}else{
+		    				Dialog.notice('请求时发生错误', 'error');
+		    			}
 		    		}else{
 		    			console.error('请求时发生错误');
 		    		}

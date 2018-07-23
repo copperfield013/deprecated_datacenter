@@ -24,6 +24,7 @@ import com.alibaba.fastjson.JSON;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
@@ -35,6 +36,7 @@ import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.admin.pojo.ExportStatus;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
+import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.config.service.SideMenuService;
 import cn.sowell.datacenter.model.modules.service.ExportService;
 import cn.sowell.dataserver.model.dict.service.DictionaryService;
@@ -45,6 +47,8 @@ import cn.sowell.dataserver.model.modules.service.ViewDataService;
 import cn.sowell.dataserver.model.modules.service.impl.ListTemplateEntityView;
 import cn.sowell.dataserver.model.modules.service.impl.ListTemplateEntityViewCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupPremise;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
@@ -77,6 +81,9 @@ public class AdminModulesController {
 	@Resource
 	SideMenuService menuService;
 	
+	@Resource
+	AuthorityService authService;
+	
 	
 	Logger logger = Logger.getLogger(AdminModulesController.class);
 
@@ -86,14 +93,13 @@ public class AdminModulesController {
 			PageInfo pageInfo,
 			HttpServletRequest request, Model model, ServletRequest session) {
 		
-		SideMenuLevel2Menu menu = menuService.getLevel2Menu(menuId);
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		String moduleName = menu.getTemplateModule();
-		String templateGroupKey = menu.getTemplateGroupKey();
 		//创建条件对象
 		ListTemplateEntityViewCriteria criteria = new ListTemplateEntityViewCriteria();
 		//设置条件
 		criteria.setModule(moduleName);
-		criteria.setTemplateGroupKey(templateGroupKey);
+		criteria.setTemplateGroupId(menu.getTemplateGroupId());
 		Map<Long, String> criteriaMap = exractTemplateCriteriaMap(request);
 		criteria.setListTemplateCriteria(criteriaMap);
 		criteria.setPageInfo(pageInfo);
@@ -111,15 +117,21 @@ public class AdminModulesController {
 		}
 		//隐藏条件拼接成文件用于提示
 		Set<TemplateListCriteria> tCriterias = view.getListTemplate().getCriterias();
+		StringBuffer hidenCriteriaDesc = new StringBuffer();
 		if(tCriterias != null){
-			StringBuffer hidenCriteriaDesc = new StringBuffer();
 			for (TemplateListCriteria tCriteria : tCriterias) {
 				if(tCriteria.getQueryShow() == null && TextUtils.hasText(tCriteria.getDefaultValue()) && tCriteria.getFieldAvailable()) {
 					hidenCriteriaDesc.append(tCriteria.getTitle() + ":" + tCriteria.getDefaultValue() + "&#10;");
 				}
 			}
-			model.addAttribute("hidenCriteriaDesc", hidenCriteriaDesc);
 		}
+		TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
+		if(tmplGroup.getPremises() != null) {
+			for (TemplateGroupPremise premise : tmplGroup.getPremises()) {
+				hidenCriteriaDesc.append(premise.getFieldTitle() + ":" + premise.getFieldValue() + "&#10;");
+			}
+		}
+		model.addAttribute("hidenCriteriaDesc", hidenCriteriaDesc);
 		model.addAttribute("menu", menu);
 		model.addAttribute("criteria", criteria);
 		
@@ -144,7 +156,7 @@ public class AdminModulesController {
 			String datetime, 
     		Long timestamp,
     		Model model) {
-		SideMenuLevel2Menu menu = menuService.getLevel2Menu(menuId);
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		String moduleName = menu.getTemplateModule();
 		
 		Object moduleMeta = mService.getModule(moduleName);
@@ -153,7 +165,8 @@ public class AdminModulesController {
         if(timestamp != null){
         	date = new Date(timestamp);
         }
-        TemplateDetailTemplate dtmpl = tService.getDetailTemplateByGroupId(menu.getTemplateGroupId());
+        TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
+        TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
         
         ModuleEntityPropertyParser entity = mService.getEntity(moduleName, code, date);
         model.addAttribute("menu", menu);
@@ -161,6 +174,7 @@ public class AdminModulesController {
         model.addAttribute("entity", entity);
         model.addAttribute("datetime", datetime);
         model.addAttribute("dtmpl", dtmpl);
+        model.addAttribute("groupPremises", tmplGroup.getPremises());
         model.addAttribute("timestamp", timestamp);
 		model.addAttribute("module", moduleMeta);
 		return AdminConstants.JSP_MODULES + "/modules_detail_tmpl.jsp";
@@ -169,13 +183,16 @@ public class AdminModulesController {
 	
 	@RequestMapping("/add/{menuId}")
 	public String add(@PathVariable Long menuId, Model model) {
-		SideMenuLevel2Menu menu = menuService.getLevel2Menu(menuId);
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		String moduleName = menu.getTemplateModule();
 		ModuleMeta mMeta = mService.getModule(moduleName);
-		TemplateDetailTemplate dtmpl = tService.getDetailTemplateByGroupId(menu.getTemplateGroupId());
+		TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
+		TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
 		FusionContextConfig config = fFactory.getModuleConfig(moduleName);
 		model.addAttribute("menu", menu);
 		model.addAttribute("dtmpl", dtmpl);
+		model.addAttribute("groupPremises", tmplGroup.getPremises());
+		model.addAttribute("groupPremisesMap", CollectionUtils.toMap(tmplGroup.getPremises(), premise->premise.getFieldName()));
 		model.addAttribute("module", mMeta);
 		model.addAttribute("config", config);
 		model.addAttribute("fieldDescMap", new FieldDescCacheMap(config.getConfigResolver()));
@@ -189,16 +206,18 @@ public class AdminModulesController {
 			@PathVariable String code,
 			Model model
 			) {
-		SideMenuLevel2Menu menu = menuService.getLevel2Menu(menuId);
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		String moduleName = menu.getTemplateModule();
 		ModuleMeta mMeta = mService.getModule(moduleName);
+		TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
 		FusionContextConfig config = fFactory.getModuleConfig(moduleName);
 		ModuleEntityPropertyParser entity = mService.getEntity(moduleName, code, null);
-		TemplateDetailTemplate dtmpl = tService.getDetailTemplateByGroupId(menu.getTemplateGroupId());
+		TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
 		model.addAttribute("menu", menu);
 		model.addAttribute("entity", entity);
 		model.addAttribute("module", mMeta);
 		model.addAttribute("dtmpl", dtmpl);
+		model.addAttribute("groupPremises", tmplGroup.getPremises());
 		model.addAttribute("config", config);
 		model.addAttribute("fieldDescMap", new FieldDescCacheMap(config.getConfigResolver()));
 		return AdminConstants.JSP_MODULES + "/modules_update_tmpl.jsp";
@@ -213,7 +232,7 @@ public class AdminModulesController {
     		@PathVariable Long menuId,
     		@RequestParam(value=KEY_FUSE_MODE, required=false) Boolean fuseMode,
     		RequestParameterMapComposite composite){
-		SideMenuLevel2Menu menu = menuService.getLevel2Menu(menuId);
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		String moduleName = menu.getTemplateModule();
     	 try {
     		 composite.getMap().remove(KEY_FUSE_MODE);
@@ -238,7 +257,7 @@ public class AdminModulesController {
     		@PathVariable String code, 
     		@RequestParam Integer pageNo, 
     		@RequestParam(defaultValue="100") Integer pageSize){
-		SideMenuLevel2Menu menu = menuService.getLevel2Menu(menuId);
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
     	JSONObjectResponse response = new JSONObjectResponse();
     	try {
 			List<EntityHistoryItem> historyItems = mService.queryHistory(menu.getTemplateModule(), code, pageNo, pageSize);
@@ -260,6 +279,7 @@ public class AdminModulesController {
 			@PathVariable Long menuId,
 			@PathVariable String code
 			) {
+		authService.vaidateL2MenuAccessable(menuId);
 		try {
 			mService.deleteEntity(code);
 			return AjaxPageResponse.REFRESH_LOCAL("删除成功");

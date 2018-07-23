@@ -27,7 +27,7 @@ public class ModulesImportDaoImpl implements ModulesImportDao{
 		DeferedParamQuery dQuery = new DeferedParamQuery("from ModuleImportTemplate t where t.module = :module and t.createUserId = :createUserId");
 		dQuery
 			.setParam("module", criteria.getModule())
-			.setParam("createUserId", criteria.getUserId());
+			.setParam("createUserId", criteria.getUserCode());
 		return dQuery.createQuery(sFactory.getCurrentSession(), false, null).list();
 	}
 	

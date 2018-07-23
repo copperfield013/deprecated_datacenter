@@ -11,5 +11,5 @@ public interface ConfigureService {
 	JSONObject getModuleConfigJson();
 
 	List<Module> getEnabledModules();
-	
+
 }

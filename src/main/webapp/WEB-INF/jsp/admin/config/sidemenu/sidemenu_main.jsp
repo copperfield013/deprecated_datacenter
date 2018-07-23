@@ -6,6 +6,11 @@
 		<div class="header-title">
 			<h1>功能列表管理</h1>
 		</div>
+		<div class="header-buttons">
+			<a confirm="确认重载系统数据？" href="admin/config/sidemenu/reload" >
+				<i class="fa fa-bolt"></i>
+			</a>
+		</div>
 	</div>
 	<div class="page-body">
 		<div class="col-lg-6">
@@ -20,10 +25,11 @@
 				<div class="widget-body menu-container">
 					<ol id="level1-list" class="dd-list">
 						<c:forEach items="${menus }" var="menu">
-							<li class="dd-item" data-id="${menu.id }">
+							<li class="dd-item" data-id="${menu.id }" data-auths="${menu.authorities }">
 								<div class="dd-handle">
 									<span class="level1-title">${menu.title }</span>
 									<span class="level-operate">
+										<a href="#" title="权限：(${fn:join(level1AuthorityDescriptionMap[menu.id], ';') })"><i class="authority-config icon iconfont icon-authority"></i></a>
 										<a href="#"><i class="del-level fa fa-trash-o"></i></a>
 									</span>
 								</div>
@@ -85,6 +91,7 @@
 			<div class="dd-handle">
 				<span class="level1-title"><input type="text" value="" /></span>
 				<span class="level-operate">
+					<a href="#"><i class="icon icon-authority"></i></a>
 					<a href="#"><i class="del-level fa fa-trash-o"></i></a>
 				</span>
 				<span class="tip-level-title"></span>

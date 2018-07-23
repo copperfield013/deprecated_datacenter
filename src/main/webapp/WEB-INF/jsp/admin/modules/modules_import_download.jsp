@@ -59,7 +59,7 @@
 	<div id="tmpl-list" class="detail-toggle-sublist blur-hidden" style="display: none;">
 		<div class="detail-toggle-sublist-wrapper">
 			<c:forEach items="${tmpls }" var="tmplItem">
-				<a href="admin/modules/import/tmpl/show/${tmplItem.id}" data-id="${tmplItem.id }" class="${tmplItem.id == tmpl.id? 'active': '' }">
+				<a href="admin/modules/import/tmpl/show/${menu.id }/${tmplItem.id}" data-id="${tmplItem.id }" class="${tmplItem.id == tmpl.id? 'active': '' }">
 					<span class="detail-toggle-sublist-icon"><i class="fa fa-lightbulb-o"></i></span>
 					<span class="detail-toggle-sublist-item-body">
 						<span class="detail-toggle-sublist-item-name">${tmplItem.title }</span>
@@ -253,7 +253,7 @@
 		$('#btn-download', $page).click(function(){
 			checkSubmitData('下载').done(function(sData){
 				$CPF.showLoading();
-				Ajax.postJson('admin/modules/import/submit_field_names', sData, function(data){
+				Ajax.postJson('admin/modules/import/submit_field_names/${menu.id}', sData, function(data){
 					if(data.uuid){
 						Ajax.download('admin/modules/import/download_tmpl/' + data.uuid);
 					}
@@ -264,10 +264,10 @@
 		
 		$('#btn-save', $page).click(function(){
 			checkSubmitData('保存').done(function(sData){
-				Ajax.postJson('admin/modules/import/save_tmpl', sData, function(data){
+				Ajax.postJson('admin/modules/import/save_tmpl/${menu.id}', sData, function(data){
 					if(data.status === 'suc'){
 						Dialog.notice('保存成功', 'success');
-						$page.getLocatePage().loadContent('admin/modules/import/tmpl/show/' + data.tmplId);
+						$page.getLocatePage().loadContent('admin/modules/import/tmpl/show/${menu.id}/' + data.tmplId);
 					}else{
 						Dialog.notice('保存失败', 'error');
 					}
@@ -277,7 +277,7 @@
 		$('#btn-new', $page).click(function(){
 			Dialog.confirm('是否创建新的模板？当前模板若已修改，将不会被保存。', function(yes){
 				if(yes){
-					$page.getLocatePage().loadContent('admin/modules/import/tmpl/${module.name}');
+					$page.getLocatePage().loadContent('admin/modules/import/tmpl/${menu.id}');
 				}
 			});
 		});

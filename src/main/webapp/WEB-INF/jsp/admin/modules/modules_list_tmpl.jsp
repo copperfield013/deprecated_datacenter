@@ -16,7 +16,7 @@
 			<a class="export btn-toggle" title="导出" id="btn-export " href="page:#export-window.toggle">
 				<i class="glyphicon glyphicon-export"></i>
 			</a>
-			<a class="import tab" href="admin/modules/import/go/${module.name }" title="导入" target="module_${module.name }_import">
+			<a class="import tab" href="admin/modules/import/go/${menu.id }" title="导入" target="module_${module.name }_import">
 				<i class="glyphicon glyphicon-import"></i>
 			</a>
 			<a class="tab" href="admin/modules/curd/add/${menu.id }" title="创建" target="module_${module.name }_add">
@@ -188,159 +188,16 @@
 	</div>
 </div>
 <script>
-	seajs.use(['utils', 'ajax', 'form'], function(Utils, Ajax, Form){
+	seajs.use(['modules/js/modules-list.js'], function(ModulesList){
 		var $page = $('#${module.name }-list-tmpl-${RES_STAMP}');
-		console.log($page);
-		$('#tmpl-list a[data-id]:not(.active)', $page).click(function(){
-			var $this = $(this);
-			$('#tmplId', $page).val($this.attr('data-id'));
-			$('form', $page).submit();
+		ModulesList.init($page, '${module.name}', '${menu.id}', {
+			pageNo	: '${criteria.pageInfo.pageNo}',
+			pageSize: '${criteria.pageInfo.pageSize}'
+		},{
+			uuid		: '${exportStatus.uuid}',
+			scope		: '${exportStatus.exportPageInfo.scope}',
+			rangeStart	: '${exportStatus.exportPageInfo.rangeStart}',
+			rangeEnd	: '${exportStatus.exportPageInfo.rangeEnd}'
 		});
-		+function(){
-			var $exportAll = $('#export-all', $page),
-				$exportCur = $('#export-current-page', $page),
-				$exportMsg = $('#export-msg', $page),
-				$msg = $('p', $exportMsg);
-				
-			$exportAll.change(function(e, flag){
-				var checked = $exportAll.prop('checked');
-				if(!flag){
-					$exportCur.prop('checked', !checked).trigger('change', [true]);
-				}
-			});
-			
-			$exportCur.change(function(e, flag){
-				var checked = $exportCur.prop('checked');
-				if(!flag){
-					$exportAll.prop('checked', !checked).trigger('change', [true]);
-				}
-				var $dataRange = $('.data-range', $page);
-				if(checked){
-					$dataRange.hide();
-				}else{
-					$dataRange.show();
-				}
-			});
-			var $btnExport = $('#do-export', $page),
-				$btnBreak = $('#do-break', $page),
-				$btnDownload = $('#do-download', $page);
-			//页面一开始加载时的初始化表单参数
-			
-			var initParam = {};
-			Utils.botByDom($page.getLocatePage().getContent(), 'cpf-page-inited', function(){
-				var $form = $('form', $page),
-					formData = new FormData($form[0]);
-				Form.formatFormData($form, formData)
-				initParam = Utils.converteFormdata(formData);
-				$.extend(initParam, {
-					pageNo	: '${criteria.pageInfo.pageNo}',
-					pageSize: '${criteria.pageInfo.pageSize}'
-				});
-				console.log(initParam);
-			});
-			
-			/* var initParam = $.extend(Utils.converteFormdata($('form', $page)), {
-				pageNo	: '${pageInfo.pageNo}',
-				pageSize: '${pageInfo.pageSize}'
-			}); */
-			var $exportProgress = $('#export-progress', $page);
-			//轮询处理对象
-			var handler = Ajax.poll({
-				startupURL			: 'admin/modules/export/start/${module.name}',
-				progressURL			: 'admin/modules/export/status',
-				whenStartupResponse	: function(data, uuid){
-					$msg.text('开始导出');
-				},
-				progressHandler	: function(progress, res){
-					var progressText = parseFloat(progress * 100).toFixed(0);
-					var percent = progressText + '%';
-					$msg.text(res.statusMsg || '');
-					$exportProgress.find('.progress-text').text(percent).css('left', (parseFloat(progressText) - 3) + '%');
-					$exportProgress.find('.progress-bar').attr('aria-valuenow', percent).css('width', percent);
-				},
-				whenComplete		: function(res){
-					if(res.uuid){
-						$msg.text('导出完成');
-						$btnDownload.removeAttr('disabled').off('click').click(function(){
-							Ajax.download('admin/modules/export/download/' + res.uuid);
-						}).show();
-						$btnBreak.off('click').click(function(){
-							resetExport(res.uuid);
-						});
-					}
-				},
-				whenUnsuccess		: function(res){
-					
-				}
-			});
-			$page.getLocatePage().getEventCallbacks(['afterClose', 'beforeReload'], null, function(callbacks){
-				callbacks.add(function(){
-					handler.disconnect();
-				});
-			});
-			//判断当前session是否有导出工作正在处理
-			var sessionExportStatus = {
-				uuid		: '${exportStatus.uuid}',
-				scope		: '${exportStatus.exportPageInfo.scope}',
-				rangeStart	: '${exportStatus.exportPageInfo.rangeStart}',
-				rangeEnd	: '${exportStatus.exportPageInfo.rangeEnd}'
-			}
-			if(sessionExportStatus.uuid && sessionExportStatus.scope){
-				if(sessionExportStatus.scope === 'current'){
-					$exportCur.prop('checked', true).trigger('change');
-				}else if(sessionExportStatus.scope === 'all'){
-					$('#export-range-start', $page).val(sessionExportStatus.rangeStart);
-					$('#export-range-end', $page).val(sessionExportStatus.rangeEnd);
-					$exportAll.prop('checked', true).trigger('change');
-				}
-				handler.pollWith(sessionExportStatus.uuid);
-				startPolling();
-			}
-			$btnExport.click(function(){
-				var scope = $exportAll.prop('checked')? 'all': $exportCur.prop('checked')? 'current': null;
-				if(scope){
-					var rangeStart = scope == 'all' && $('#export-range-start', $page).val() || undefined,
-						rangeEnd = scope == 'all' && $('#export-range-end', $page).val() || undefined;
-					handler.start({
-						scope		: scope,
-						rangeStart	: rangeStart,
-						rangeEnd	: rangeEnd,
-						parameters	: initParam
-					});
-					startPolling();
-				}else{
-					$.error('导出范围不能为null');
-				}
-				
-			});
-			function startPolling(){
-				$exportMsg.show();
-				$exportAll.attr('disabled', 'disabled');
-				$exportCur.attr('disabled', 'disabled');
-				$exportProgress.find('.progress-text').text('0%').css('left', 0);
-				$exportProgress.find('.progress-bar').attr('aria-valuenow', 0).css('width', 0);
-				$exportProgress.show();
-				$btnExport.hide();
-				$btnDownload.show().attr('disabled', 'disabled');
-				$('.data-range :input', $page).attr('disabled', 'disabled');
-				$btnBreak.show().off('click').click(function(){
-					$btnBreak.attr('disabled', 'disabled');
-					handler.breaks().done(function(){
-						$btnBreak.removeAttr('disabled');
-						resetExport();
-					});
-				});
-			}
-			function resetExport(){
-				$exportMsg.hide();
-				$('#export-progress', $page).hide();
-				$btnExport.show();
-				$btnBreak.removeAttr('disabled').hide();
-				$btnDownload.hide();
-				$exportAll.removeAttr('disabled');
-				$exportCur.removeAttr('disabled');
-				$('.data-range :input', $page).removeAttr('disabled');
-			}
-		}();
 	});
 </script>

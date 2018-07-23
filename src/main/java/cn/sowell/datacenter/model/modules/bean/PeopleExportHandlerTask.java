@@ -15,7 +15,7 @@ public class PeopleExportHandlerTask {
 	Logger logger = Logger.getLogger(PeopleExportHandlerTask.class);
 	
 	
-	@Scheduled(cron="0 */1 * * * ?")
+	@Scheduled(cron="0 0 */1 * * ?")
 	public void checkCacheTimeout(){
 		logger.info("+++++++开始清除导出缓存+++++++++++++++");
 		eService.clearExportCache();

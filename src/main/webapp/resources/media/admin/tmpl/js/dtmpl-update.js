@@ -93,9 +93,9 @@ define(function(require, exports, module){
 						fieldSearch.hideArrayComposites();
 					}
 					appendFieldToGroup({
-						title		: field.title,
-						fieldId		: field.id,
-						colNum		: 1
+						title			: field.title,
+						fieldId			: field.id,
+						colNum			: 1
 					}, $group, {
 						isArrayField	: field.composite.isArray == 1,
 						relations		: field.composite.relationSubdomain
@@ -109,12 +109,6 @@ define(function(require, exports, module){
 		 * @param groupFieldData 字段数据，必须包含fieldId属性
 		 */
 		function appendFieldToGroup(groupFieldData, $group, option){
-			//判断字段在页面中是否存在
-			//var $existsField = $page.find('.field-item[field-id="' + groupFieldData.fieldId + '"]');
-			/*if($existsField.length > 0){
-				require('dialog').notice('该字段已存在，不能重复添加', 'error');
-				return false;
-			}else{*/
 			//构造新字段的内容
 			var fieldData = {
 					id				: groupFieldData.id,
@@ -122,6 +116,7 @@ define(function(require, exports, module){
 					fieldId			: groupFieldData.fieldId,
 					dv				: groupFieldData.dv || 'XXXXX',
 					colNum			: groupFieldData.colNum,
+					fieldOriginTitle: groupFieldData.fieldOriginTitle,
 					fieldAvailable	: groupFieldData.fieldAvailable == undefined? true: groupFieldData.fieldAvailable,
 					validators		: []
 			};
@@ -134,68 +129,71 @@ define(function(require, exports, module){
 			}
 			//将字段插入到字段组中
 			var $fieldContainer = getFieldContainer($group);
-			if(option.isArrayField){
-				//添加数组字段
-				var $arrayTable = $('.field-array-table', $fieldContainer);
-				if($arrayTable.length == 0){
-					$arrayTable = $('#tmpl-field-array-table', $page).tmpl();
-					$arrayTable.appendTo($fieldContainer);
-					if($.isArray(option.relations)){
-						var $titleCell = $('<th>关系</th>')
-						var $relationSelect = $('<select class="tmpl-relation-labels">');
-						for(var i in option.relations){
-							$relationSelect.append('<option value="' + option.relations[i] + '">' + option.relations[i] + '</option>');
-						}
-						$arrayTable.find('.title-row').append($titleCell);
-						$arrayTable.find('.value-row').append($('<td>').append($relationSelect));
-					}
-					$arrayTable.find('.title-row').sortable({
-						helper		: 'original',
-						cursor		: 'move',
-						axis		: 'x',
-						opacity		: 0.5,
-						tolerance 	: 'pointer',
-						stop		: function(e, ui){
-							var Utils = require('utils');
-							$(this).children().each(function(index){
-								var $title = $(this);
-								var fieldId = $title.attr('field-id');
-								$arrayTable.find('tbody').children('tr').each(function(){
-									var $row = $(this);
-									var $cell = null;
-									if(fieldId){
-										$cell = $row.find('td[field-id="' + fieldId + '"]');
-									}else if($title.is('.number-col')){
-										$cell = $row.find('td.number-col');
-									}
-									if($cell != null){
-										Utils.prependTo($cell, $row, index);
-									}
-								});
-							});
-							console.log(this);
-							console.log(ui);
-						}
-					});
-				}
-				var $titleCell = $('#tmpl-field-array-title', $page).tmpl(fieldData);
-				$titleCell.data('field-data', fieldData);
-				$arrayTable.find('.title-row').append($titleCell);
-				$arrayTable.find('.value-row').append($('#tmpl-field-array-value', $page).tmpl(fieldData));
-			}else{
-				var $field = $tmplField.tmpl(fieldData);
-				$field.data('field-data', fieldData).appendTo($fieldContainer);
-				adjustFieldTitle($field.find('.field-title'));
-			}
 			var fieldSearch = $group.data('fieldSearch');
-			fieldSearch.enableField(fieldData.fieldId, false).done(function(field){
-				if(field){
-					if(field.composite.isArray){
-						$group.attr('composite-id', field.composite.c_id);
-					}else{
-						fieldSearch.hideArrayComposites();
+			fieldSearch.getFieldData(fieldData.fieldId).done(function(field){
+				fieldData.fieldOriginTitle = field? (field.c_cname + '-' + field.title) : '';
+				if(option.isArrayField){
+					//添加数组字段
+					var $arrayTable = $('.field-array-table', $fieldContainer);
+					if($arrayTable.length == 0){
+						$arrayTable = $('#tmpl-field-array-table', $page).tmpl();
+						$arrayTable.appendTo($fieldContainer);
+						if($.isArray(option.relations)){
+							var $titleCell = $('<th>关系</th>')
+							var $relationSelect = $('<select class="tmpl-relation-labels">');
+							for(var i in option.relations){
+								$relationSelect.append('<option value="' + option.relations[i] + '">' + option.relations[i] + '</option>');
+							}
+							$arrayTable.find('.title-row').append($titleCell);
+							$arrayTable.find('.value-row').append($('<td>').append($relationSelect));
+						}
+						$arrayTable.find('.title-row').sortable({
+							helper		: 'original',
+							cursor		: 'move',
+							axis		: 'x',
+							opacity		: 0.5,
+							tolerance 	: 'pointer',
+							stop		: function(e, ui){
+								var Utils = require('utils');
+								$(this).children().each(function(index){
+									var $title = $(this);
+									var fieldId = $title.attr('field-id');
+									$arrayTable.find('tbody').children('tr').each(function(){
+										var $row = $(this);
+										var $cell = null;
+										if(fieldId){
+											$cell = $row.find('td[field-id="' + fieldId + '"]');
+										}else if($title.is('.number-col')){
+											$cell = $row.find('td.number-col');
+										}
+										if($cell != null){
+											Utils.prependTo($cell, $row, index);
+										}
+									});
+								});
+								console.log(this);
+								console.log(ui);
+							}
+						});
 					}
+					var $titleCell = $('#tmpl-field-array-title', $page).tmpl(fieldData);
+					$titleCell.data('field-data', fieldData);
+					$arrayTable.find('.title-row').append($titleCell);
+					$arrayTable.find('.value-row').append($('#tmpl-field-array-value', $page).tmpl(fieldData));
+				}else{
+					var $field = $tmplField.tmpl(fieldData);
+					$field.data('field-data', fieldData).appendTo($fieldContainer);
+					adjustFieldTitle($field.find('.field-title'));
 				}
+				fieldSearch.enableField(fieldData.fieldId, false).done(function(field){
+					if(field){
+						if(field.composite.isArray){
+							$group.attr('composite-id', field.composite.c_id);
+						}else{
+							fieldSearch.hideArrayComposites();
+						}
+					}
+				});
 			});
 			return true;
 		}

@@ -42,10 +42,29 @@
 									<i class="fa fa-edit"></i>
 									修改
 								</a>
-								<a confirm="确认删除模板(${tmpl.title })?" href="admin/tmpl/dtmpl/remove/${tmpl.id }" class="btn btn-danger btn-xs delete">
-									<i class="fa fa-trash-o"></i>
-									删除
-								</a>
+								<c:choose>
+									<c:when test="${empty relatedGroupsMap[tmpl.id] }">
+										<a confirm="确认删除模板(${tmpl.title })?" href="admin/tmpl/dtmpl/remove/${tmpl.id }" class="btn btn-danger btn-xs delete">
+											<i class="fa fa-trash-o"></i>
+											删除
+										</a>
+									</c:when>
+									<c:otherwise>
+										<a title="查看绑定的所有模板组合" href="admin/tmpl/dtmpl/group_list/${tmpl.id }"
+											target="dtmpl_group_list_${tmpl.id }" 
+											class="tab btn btn-success btn-xs">
+											<i class="fa fa-th-list"></i>
+											模板组合
+										</a>
+										<a href="javascript:STATICS.TMPL.switchTemplateGroup('dtmpl', '${module.name }', ${tmpl.id });" 
+											class="btn btn-warning btn-xs "
+											title="为所有已经绑定到当前列表模板的组合重新指定一个列表模板">
+											<i class="fa fa-exchange"></i>
+											解绑
+										</a>
+									</c:otherwise>
+								</c:choose>
+								
 							</td>
 						</tr>
 					</c:forEach>
@@ -54,3 +73,12 @@
 		</div>
 	</div>
 </div>
+<script>
+	window.TMPL = {
+		switchTemplateGroup		: function(){
+			seajs.use(['dialog'], function(){
+				
+			});
+		}
+	}
+</script>

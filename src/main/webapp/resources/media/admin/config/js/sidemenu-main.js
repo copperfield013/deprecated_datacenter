@@ -109,6 +109,7 @@ define(function(require, exports, module){
 					id			: $level1Li.attr('data-id'),
 					title		: $level1Li.find('.level1-title').text(),
 					order		: i,
+					authorities	: $level1Li.attr('data-auths'),
 					groups		: []
 				};
 				submitData.modules.push(module);
@@ -163,6 +164,24 @@ define(function(require, exports, module){
 					toggleAddLevel1Button(true);
 				}
 			});
+		});
+		
+		$moduleItemContainer.on('click', '.authority-config', function(){
+			var $item = $(this).closest('.dd-item');
+			var $a = $(this).closest('a');
+			var auths = $item.attr('data-auths');
+			Dialog.openDialog('admin/config/sidemenu/authority_choose', undefined, undefined, {
+				reqParam	: {
+					auths	: auths
+				},
+				onSubmit	: function(data){
+					var auths = Utils.join(data, ';', function(auth){return auth.code}), 
+						descs = Utils.join(data, ';', function(auth){return auth.name});
+					$item.attr('data-auths', auths);
+					$a.attr('title', '权限：(' + descs + ')');
+					toggleSaveButton(true);
+				}
+			})
 		});
 	}
 });

@@ -45,6 +45,7 @@
 	<bean id="dBFusionConfigContextFactory" class="cn.sowell.datacenter.entityResolver.config.DBFusionConfigContextFactory">
 		<property name="sessionFactory" ref="sessionFactory" />
 		<property name="fieldService" ref="dictionaryServiceImpl" />
+		<property name="userCodeService" ref="adminUserService" />
 	</bean>
 	<bean id="dBModuleConfigMediator" class="cn.sowell.datacenter.entityResolver.config.DBModuleConfigMediator">
 		<property name="sessionFactory" ref="sessionFactory" />
@@ -78,9 +79,11 @@
 		</jaxws:properties>
 	</jaxws:server>
 	
+	<bean name="datacenterReloadServiceImpl" class="cn.sowell.datacenter.ws.impl.DatacenterReloadServiceImpl" />
+	
 	<jaxws:server address="/configReloadService" serviceClass="cn.sowell.datacenter.ws.DatacenterReloadService">
 		<jaxws:serviceBean>
-			<bean class="cn.sowell.datacenter.ws.impl.DatacenterReloadServiceImpl" />
+			<ref bean="datacenterReloadServiceImpl"/>
 		</jaxws:serviceBean>
 	</jaxws:server>
 

@@ -106,7 +106,6 @@
 					'control'	: 'COMMON/cpf/cpf-control.js?v=${cpfVersion}',
 					'checkbox'	: 'COMMON/cpf/cpf-checkbox.js?v=${cpfVersion}',
 					'innerpage'	: 'COMMON/cpf/cpf-innerpage.js?v=$${cpfVersion}',
-					'bloodhound': '${basePath}media/admin/plugins/typeahead/dist/typeahead.bundle.js?v=$${cpfVersion}',
 					'tmpl'		: 'COMMON/cpf/cpf-tmpl.js?v=${cpfVersion}',
 					'select2'	: '${basePath}media/admin/plugins/select2/js/select2.full.js'
 				}

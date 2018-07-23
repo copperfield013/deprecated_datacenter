@@ -42,6 +42,8 @@ import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.entityResolver.ImportCompositeField;
 import cn.sowell.datacenter.entityResolver.impl.RelationEntityProxy;
+import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
+import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.modules.exception.ImportBreakException;
 import cn.sowell.datacenter.model.modules.pojo.ImportStatus;
 import cn.sowell.datacenter.model.modules.pojo.ImportTemplateCriteria;
@@ -65,19 +67,25 @@ public class AdminModulesImportController {
 	@Resource
 	FileUtils fileUtils;
 	
+	@Resource
+	AuthorityService authService;
+	
 	Logger logger = Logger.getLogger(AdminModulesImportController.class);
 	
 	
-	@RequestMapping("/go/{module}")
-	public String goImport(@PathVariable String module, Model model) {
-		ModuleMeta mMeta = mService.getModule(module);
+	@RequestMapping("/go/{menuId}")
+	public String goImport(@PathVariable Long menuId, Model model) {
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		ModuleMeta mMeta = mService.getModule(menu.getTemplateModule());
 		model.addAttribute("module", mMeta);
+		model.addAttribute("menu", menu);
 		return AdminConstants.JSP_MODULES + "/modules_import_tmpl.jsp";
 	}
 	
 	@ResponseBody
-	@RequestMapping("/resolve_file")
-	public ResponseJSON resolveFile(MultipartFile file) {
+	@RequestMapping("/resolve_file/{menuId}")
+	public ResponseJSON resolveFile(@PathVariable Long menuId, MultipartFile file) {
+		authService.vaidateL2MenuAccessable(menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		String fileName = file.getOriginalFilename();
 		String suffix = null;
@@ -116,14 +124,15 @@ public class AdminModulesImportController {
 	}
 	
 	@ResponseBody
-    @RequestMapping("/do/{module}")
+    @RequestMapping("/do/{menuId}")
 	public ResponseJSON doImport(
 			MultipartFile file,
-			@PathVariable String module,
+			@PathVariable Long menuId,
 			HttpSession session) {
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
         jRes.setStatus("error");
-        ModuleMeta mData = mService.getModule(module);
+        ModuleMeta mData = mService.getModule(menu.getTemplateModule());
         if(mData != null) {
         	String uuid = TextUtils.uuid();
         	jRes.put("uuid", uuid);
@@ -148,7 +157,7 @@ public class AdminModulesImportController {
         			session.setAttribute(AdminConstants.KEY_IMPORT_STATUS + uuid, importStatus);
         			Thread thread = new Thread(()->{
         				try {
-        					impService.importData(sheet, importStatus, module);
+        					impService.importData(sheet, importStatus, menu.getTemplateModule());
         				} catch (ImportBreakException e) {
         					logger.error("导入被用户停止", e);
         				} catch (Exception e) {
@@ -210,37 +219,42 @@ public class AdminModulesImportController {
         return jRes;
     }
 	
-	@RequestMapping("/tmpl/{module}")
+	@RequestMapping("/tmpl/{menuId}")
 	public String tmpl(
-			@PathVariable String module,
+			@PathVariable Long  menuId,
 			Model model
 			) {
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		UserIdentifier user = UserUtils.getCurrentUser();
-		ModuleMeta mMeta = mService.getModule(module);
-		Set<ImportCompositeField> fields = impService.getImportCompositeFields(module);
+		ModuleMeta mMeta = mService.getModule(menu.getTemplateModule());
+		Set<ImportCompositeField> fields = impService.getImportCompositeFields(menu.getTemplateModule());
 		ImportTemplateCriteria criteria = new ImportTemplateCriteria();
-		criteria.setModule(module);
-		criteria.setUserId((Long) user.getId());
+		criteria.setModule(menu.getTemplateModule());
+		criteria.setUserId((String) user.getId());
 		List<ModuleImportTemplate> tmpls = impService.getImportTemplates(criteria);
 		model.addAttribute("tmpls", tmpls);
 		model.addAttribute("fields", fields);
 		model.addAttribute("module", mMeta);
+		model.addAttribute("menu", menu);
 		model.addAttribute("relationLabelKey", RelationEntityProxy.LABEL_KEY);
 		
 		return AdminConstants.JSP_MODULES + "/modules_import_download.jsp";
 	}
 	
-	@RequestMapping("/tmpl/show/{tmplId}")
-	public String showTemplate(@PathVariable Long tmplId, Model model) {
+	@RequestMapping("/tmpl/show/{menuId}/{tmplId}")
+	public String showTemplate(@PathVariable Long menuId, @PathVariable Long tmplId, Model model) {
+		authService.vaidateL2MenuAccessable(menuId);
 		ModuleImportTemplate tmpl = impService.getImportTempalte(tmplId);
 		model.addAttribute("tmpl", tmpl);
 		model.addAttribute("tmplFieldsJson", JSON.toJSON(tmpl.getFields()));
-		return tmpl(tmpl.getModule(), model);
+		return tmpl(menuId, model);
 	}
 	
 	@ResponseBody
-	@RequestMapping("/submit_field_names")
-	public ResponseJSON submitFieldNames(@RequestBody JsonRequest jReq, HttpSession session) {
+	@RequestMapping("/submit_field_names/{menuId}")
+	public ResponseJSON submitFieldNames(@PathVariable Long menuId, 
+			@RequestBody JsonRequest jReq, HttpSession session) {
+		authService.vaidateL2MenuAccessable(menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		JSONObject reqJson = jReq.getJsonObject();
 		ModuleImportTemplate tmpl = toImportTemplate(reqJson);
@@ -272,8 +286,11 @@ public class AdminModulesImportController {
 	}
 	
 	@ResponseBody
-	@RequestMapping("/save_tmpl")
-	public ResponseJSON saveTmpl(@RequestBody JsonRequest jReq) {
+	@RequestMapping("/save_tmpl/{menuId}")
+	public ResponseJSON saveTmpl(
+			@PathVariable Long menuId, 
+			@RequestBody JsonRequest jReq) {
+		authService.vaidateL2MenuAccessable(menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		JSONObject reqJson = jReq.getJsonObject();
 		try {
@@ -319,7 +336,7 @@ public class AdminModulesImportController {
 			importTmpl.setTitle(title);
 			importTmpl.setFields(fields);
 			importTmpl.setModule(module);
-			importTmpl.setCreateUserId((Long) user.getId());
+			importTmpl.setCreateUserCode((String) user.getId());
 			Long tmplId = reqJson.getLong("tmplId");
 			if(tmplId != null) {
 				importTmpl.setId(tmplId);

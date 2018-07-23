@@ -1,6 +1,8 @@
 package cn.sowell.datacenter.model.config.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel1Menu;
@@ -12,4 +14,8 @@ public interface SideMenuService {
 	List<SideMenuLevel1Menu> getSideMenuLevelMenus(UserIdentifier user);
 
 	void updateSideMenuModules(UserIdentifier user, List<SideMenuLevel1Menu> modules);
+
+	SideMenuLevel1Menu getLevel1Menu(Long menuId);
+
+	Map<Long, String[]> getMenuAuthNameMap(Set<Long> level1MenuId);
 }

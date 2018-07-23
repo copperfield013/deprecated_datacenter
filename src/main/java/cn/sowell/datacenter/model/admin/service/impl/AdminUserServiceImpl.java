@@ -6,25 +6,39 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.abc.auth.pojo.UserInfo;
+import com.abc.auth.service.ServiceFactory;
+
+import cn.sowell.copframe.dao.utils.UserUtils;
+import cn.sowell.datacenter.entityResolver.UserCodeService;
 import cn.sowell.datacenter.model.admin.dao.AdminUserDao;
+import cn.sowell.datacenter.model.admin.pojo.ABCUser;
 import cn.sowell.datacenter.model.admin.service.AdminUserService;
-import cn.sowell.dataserver.model.tmpl.service.AdminIdGetter;
 
 @Service("adminUserService")
-public class AdminUserServiceImpl implements AdminUserService, AdminIdGetter{
+public class AdminUserServiceImpl implements AdminUserService, UserCodeService{
 
 	@Resource
 	AdminUserDao userDao;
 	
+	
 	@Override
 	public UserDetails loadUserByUsername(String username)
 			throws UsernameNotFoundException {
-		return userDao.getUser(username);
+		UserInfo u = ServiceFactory.getUserInfoService().getUserInfoByUserName(username);
+		if(u != null) {
+			return new ABCUser(u);
+		}else {
+			return null;
+		}
+		
+		//return userDao.getUser(username);
 	}
-
+	
 	@Override
-	public Long getSystemAdminIdByUserId(Long userId) {
-		return userDao.getSystemAdminIdByUserId(userId);
+	public String getCurrentUserCode() {
+		ABCUser user = (ABCUser) UserUtils.getCurrentUser();
+		return user.getCode();
 	}
 
 }

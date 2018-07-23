@@ -34,5 +34,9 @@ public class ChooseTableRow extends ChooseTableElement{
 	public void addCell(ChooseTableCell cell){
 		cells.add(cell);
 	}
+
+	public void setSelected(boolean selected) {
+		tag.addClass("selected");
+	}
 	
 }

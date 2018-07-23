@@ -1,6 +1,8 @@
 package cn.sowell.datacenter.model.config.pojo;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,9 +25,17 @@ public class SideMenuLevel1Menu {
 	@Column(name="c_order")
 	private Integer order;
 	
+	@Column(name="c_authorities")
+	private String authorities;
+	
+	@Transient
+	private Set<String> authoritySet = new LinkedHashSet<>();
+	
+	
 	@Transient
 	private List<SideMenuLevel2Menu> level2s;
 
+	
 	public Long getId() {
 		return id;
 	}
@@ -58,6 +68,23 @@ public class SideMenuLevel1Menu {
 	public void setLevel2s(List<SideMenuLevel2Menu> level2s) {
 		this.level2s = level2s;
 	}
+
+	public String getAuthorities() {
+		return authorities;
+	}
+
+	public void setAuthorities(String authorities) {
+		this.authorities = authorities;
+	}
+
+	public Set<String> getAuthoritySet() {
+		return authoritySet;
+	}
+
+	public void setAuthoritySet(Set<String> authoritySet) {
+		this.authoritySet = authoritySet;
+	}
+
 
 
 

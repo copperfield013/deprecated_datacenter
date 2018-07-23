@@ -31,6 +31,29 @@
 		<div class="col-lg-offset-1 col-lg-10">
 			<form class="form-horizontal group-container" action="admin/modules/curd/save/${menu.id }/${module.name }">
 				<input type="hidden" name="${config.codeAttributeName }" value="${entity.code }" />
+				<c:if test="${!empty groupPremises }">
+					<div class="widget field-group">
+						<div class="widget-header">
+							<span class="widget-caption">
+								<span class="group-title">默认字段（不可修改）</span>
+							</span>
+						</div>
+						<div class="widget-body field-container premises-container">
+							<c:forEach var="premise" items="${groupPremises }">
+								<c:if test="${premise.fieldName != null }">
+									<div class="form-group field-item">
+										<label class="control-label field-title">${premise.fieldTitle }</label>
+										<div class="field-value" value-field-name="${premise.fieldName }">
+											${entity== null? premise.fieldValue: entity.smap[premise.fieldName] }
+											<input type="hidden" name="${premise.fieldName }" value="${entity== null? premise.fieldValue: entity.smap[premise.fieldName] }" />
+										</div>
+									</div>
+								</c:if>
+							</c:forEach>
+						</div>
+					</div>
+				</c:if>
+				
 				<c:forEach var="tmplGroup" items="${dtmpl.groups }">
 					<div class="widget field-group">
 						<div class="widget-header">
@@ -39,9 +62,34 @@
 							</span>
 						</div>
 						<div class="widget-body field-container">
+							<!-- <div class="form-group field-item ">
+								<label class="control-label field-title">image</label>
+								<div class="field-value" >
+									<span class="field-input" 
+										fInp-type="file"
+										fInp-name="照片1"
+										fInp-value="https://ss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=1140314544,2770167379&fm=173&app=25&f=JPEG?w=218&h=146&s=8834CF1054274B0FBE99C0D5030070E3"
+										fInp-optkey=""
+										fInp-fieldkey="people@照片1"
+									>
+										<span class="cpf-file-input-container">
+											<span class="cpf-file-input-thumb">
+												<img src="https://ss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=1140314544,2770167379&fm=173&app=25&f=JPEG?w=218&h=146&s=8834CF1054274B0FBE99C0D5030070E3" />
+												<span class="cpf-file-input-operates">
+													<i class="fa fa-times"></i>
+													<i class="fa fa-download"></i>
+												</span>
+											</span>
+										</span>
+									</span>
+								</div>
+							</div> -->
+						
+						
 							<c:choose>
 								<c:when test="${tmplGroup.isArray != 1 }">
 									<c:forEach var="tmplField" items="${tmplGroup.fields }">
+										<c:set var="premise" value="${groupPremisesMap[tmplField.fieldName] }" />
 										<div class="form-group field-item ${tmplField.fieldAvailable? '': 'field-unavailable' } ${tmplField.colNum == 2? 'dbcol': '' }"
 											title="${tmplField.fieldAvailable? '': '无效字段' }"
 										>
@@ -51,11 +99,11 @@
 												</c:if>
 											</div>
 											<label class="control-label field-title">${tmplField.title }</label>
-											<div class="field-value">
+											<div class="field-value"  value-field-name="${tmplField.fieldName }">
 												<span class="field-input" 
 													fInp-type="${tmplField.type }"
 													fInp-name="${tmplField.fieldName }"
-													fInp-value="${entity.smap[tmplField.fieldName] }"
+													fInp-value="${entity != null? entity.smap[tmplField.fieldName] : premise != null? premise.fieldValue: '' }"
 													fInp-optkey="${tmplField.optionGroupId }"
 													fInp-fieldkey="${module.name }@${tmplField.fieldName }"
 												>
@@ -142,173 +190,11 @@
 	</div>
 </div>
 <script>
-	seajs.use(['dialog', 'ajax', 'utils', 'tmpl/js/dtmpl-update.js', '$CPF',
-	           'field/js/field-input.js'], function(Dialog, Ajax, Utils, ViewTmpl, $CPF, FieldInput){
-		"use strict";
+	seajs.use(['modules/js/modules-update'], function(ModulesUpdate){
 		var $page = $('#${module.name }-update-tmpl-${entity.code }-${RES_STAMP}');
-		
-		var isUpdateMode = 'true' === '${entity != null}';
-		
-		
-		$('.toggle-template i', $page).click(function(){
-			$('#tmpl-list', $page).toggle();
-			return false;
-		});
-		$('#tmpl-list li[data-id]:not(.active)', $page).click(function(){
-			var tmplId = $(this).attr('data-id');
-			var url = 'admin/modules/curd' + (isUpdateMode? '/update/${module.name}/${entity.code}': '/add/${module.name}');
-			$page.getLocatePage().loadContent(url, undefined, {
-				timestamp	: '${timestamp}',
-				tmplId		: tmplId
-			});
-		});
-		
-		if('${dtmpl == null}' == 'true'){
-			Dialog.notice('当前没有选择默认模板', 'error');
-		}
-		function appendTo($doms, paramGetter){
-			var def = $.Deferred();
-			paramGetter = paramGetter || function($dom){
-				function attr(attrName){
-					return $dom.attr(attrName);
-				}
-				return {
-					type		: attr('fInp-type'),
-					name		: attr('fInp-name'),
-					id			: attr('fInp-id'),
-					value		: attr('fInp-value'),
-					styleClass	: attr('fInp-class'),
-					optionsKey	: attr('fInp-optkey'),
-					readonly	: attr('fInp-readonly'),
-					optionsSet	: attr('fInp-optset'),
-					fieldKey	: attr('fInp-fieldkey')
-				};
-			};
-			$doms.each(function(){
-				var $this = $(this);
-				var param = paramGetter($this);
-				console.log(param);
-				var fInp = new FieldInput(param);
-				$this.append(fInp.getDom());
-			});
-			def.resolve();
-			return def.promise();
-		};
-		$CPF.showLoading();
-		FieldInput.loadGlobalOptions('admin/field/enum_json').done(function(){
-			appendTo($('.field-input', $page));
-			$CPF.closeLoading();
-		});
-		
-		function validate(form){
-			switch(form.validateName){
-				case 'required'	:
-					if(form.value === ''){
-						validateError(form);
-						return false
-					}
-					return true;
-					break;
-				default :
-					return true;
-			}
-		}
-		
-		function validateError(form){
-			form.$item.addClass('field-validate-error');
-		}
-		
-		var fuseMode = false;
-		$('#save i', $page).click(function(){
-			var validateResult = true;
-			$('.dtmpl-field-validates>i', $page).each(function(){
-				var $item = $(this).closest('.field-item');
-				$item.removeClass('field-validate-error');
-				validateResult = validate({
-					$item 			: $item,
-					validateName	: $(this).attr('validate-name'),
-					title 			: $item.find('label.field-item').text(),
-					value 			: $item.find(':input').val()
-				}) && validateResult;
-			});
-			if(validateResult){
-				var msg = '是否保存？';
-				if(fuseMode){
-					msg = '是否保存（当前为融合模式）？'
-				}
-				Dialog.confirm(msg, function(yes){
-					if(yes){
-						$('form', $page).submit();
-					}
-				});
-			}
-		});
-		$('form', $page).on('cpf-submit', function(e, formData){
-			formData.append('%fuseMode%', fuseMode);
-		});
-		$('#fuse-switch', $page).change(function(){
-			fuseMode = $(this).prop('checked');
-			$('#save', $page).toggleClass('fuse-mode', fuseMode);
-		});
-		
-		$page.on('click', '.array-item-remove', function(){
-			var $row = $(this).closest('tr');
-			Dialog.confirm('确认删除该行？', function(yes){
-				if(yes){
-					var $table = $row.closest('table');
-					$row.remove();
-					refreshTable($table);
-				}
-			});
-		});
-		$('.array-item-add', $page).click(function(){
-			var $table = $(this).closest('table');
-			var $tbody = $table.children('tbody');
-			var $titleRow = $table.find('.title-row');
-			var $dataRow = $('<tr>').append('<td><span></span></td>')
-			$titleRow.children('th.th-field-title').each(function(){
-				var $title = $(this);
-				var $td = $('<td>');
-				if($title.is('.field-unavailable')){
-					$td.addClass('field-unavailable');
-				}else{
-					var $fieldInput = $('<span class="field-input"></span></span>');
-					$fieldInput
-						.attr('fInp-type', $title.attr('fInp-type'))
-						.attr('fInp-optkey', $title.attr('fInp-optkey'))
-						.attr('fInp-fieldkey', $title.attr('fInp-fieldkey'))
-						.appendTo($('<span class="field-value"></span>').appendTo($td));
-					if($title.attr('fInp-optset')){
-						$fieldInput.attr('fInp-optset', $title.attr('fInp-optset'));
-					}
-				}
-				$dataRow.append($td);
-			});
-			$dataRow.append('<td><span class="array-item-remove" title="移除当前行">×</span></td>');
-			$dataRow.appendTo($tbody);
-			appendTo($dataRow.find('.field-input')).done(function(){
-				refreshTable($table);
-			})
-		});
-		
-		function refreshTable($table){
-			var $titles = $('thead tr.title-row th', $table); 
-			$('tbody tr', $table).each(function(i){
-				var $tr = $(this);
-				var $tds = $tr.children('td');
-				$tds.eq(0).children('span').text(i + 1);
-				for(var j = 1; j < $tds.length - 1; j ++){
-					var nameFormat = $titles.eq(j).attr('fname-format');
-					var inputName = nameFormat.replace('ARRAY_INDEX_REPLACEMENT', i);
-					$tds.eq(j).find(':text,select,textarea,input[type="hidden"]').each(function(){
-						$(this).attr('name', inputName);
-					});
-				}
-			});
-		}
-		setTimeout(function(){
-			$('.field-title', $page).each(function(){ViewTmpl.adjustFieldTitle($(this))});
-		}, 100);
-		
+		ModulesUpdate.init(
+				$page, 
+				'${module.name}', 
+				'${entity.code}');
 	});
 </script>

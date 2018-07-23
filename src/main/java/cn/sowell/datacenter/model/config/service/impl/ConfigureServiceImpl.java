@@ -72,6 +72,5 @@ public class ConfigureServiceImpl implements ConfigureService{
 		jConfig.put("modules", jModules);
 		return jConfig;
 	}
-
-
+	
 }

@@ -51,7 +51,7 @@
 	<script type="jquery/tmpl" id="tmpl-field-array-title">
 		<th data-id="\${id}" field-id="\${fieldId}" 
 			class="\${fieldAvailable? '': 'field-unavailable'}"
-			title="\${fieldAvailable? '': '无效字段' }">
+			title="\${fieldAvailable? fieldOriginTitle: '无效字段' }">
 			<span>\${title }</span>
 			<div class="operate-buttons">     
 				<a class="remove-array-field" title="删除字段">
@@ -68,7 +68,7 @@
 	</script>
 	<script type="jquery/tmpl" id="tmpl-field">
 		<div class="form-group field-item movable \${fieldAvailable? '': 'field-unavailable'} \${colNum == 2? 'dbcol': ''}" field-id="\${fieldId}" data-id="\${id}"
-			title="\${fieldAvailable? '': '无效字段' }">
+			title="\${fieldAvailable? fieldOriginTitle: '无效字段' }">
 			<div class="dtmpl-field-validates">
 				<i class="dtmpl-field-validate-required \${validators.required? 'active-validator': ''}"></i>
 			</div>
@@ -117,7 +117,6 @@
 <script>
 	console.log(1);
 	seajs.use(['tmpl/js/dtmpl-update.js'], function(ViewTmpl){
-		console.log(2);
 		var $page = $('#dtmpl-update-${module.name}-${tmpl.id }');
 		console.log($page);
 		var updateMode = '${tmplJson != null}' == 'true';

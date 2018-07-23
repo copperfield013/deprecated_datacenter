@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.springframework.util.Assert;
 
@@ -30,6 +31,8 @@ public class ChooseTablePage<T> {
 	private Map<String, String> hiddens = new HashMap<String, String>();
 	
 	private Boolean isMulti = true;
+	
+	private Predicate<T> rowSelectedPredicate;
 	
 	/**
 	 * 
@@ -153,6 +156,9 @@ public class ChooseTablePage<T> {
 				column.getConsumer().accept(cell, data);
 				row.addCell(cell);
 			});
+			if(this.rowSelectedPredicate != null && rowSelectedPredicate.test(data)) {
+				row.setSelected(true);
+			}
 			JSON dataJson = FormatUtils.coalesce(handler.getDataJson(data), (JSON)JSON.toJSON(data));
 			if(dataKey != null && dataJson != null){
 				addJsonData(dataKey, dataJson);
@@ -237,6 +243,11 @@ public class ChooseTablePage<T> {
 
 	public ChooseTablePage<T> setIsMulti(Boolean isMulti) {
 		this.isMulti = isMulti;
+		return this;
+	}
+	
+	public ChooseTablePage<T> setSelectedPredicate(Predicate<T> rowSelectedPredicate){
+		this.rowSelectedPredicate = rowSelectedPredicate;
 		return this;
 	}
 	

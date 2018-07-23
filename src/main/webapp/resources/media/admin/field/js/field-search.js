@@ -158,7 +158,6 @@ define(function(require, exports, module){
 			}
 			if($search && $search.length > 0){
 				afterLoadFieldData(function(fieldData){
-					var Bloodhound = require('bloodhound');
 					//数据源
 					var bloodhound = new Bloodhound({
 						datumTokenizer 	: Bloodhound.tokenizers.obj.whitespace(['cname', 'c_cname']),

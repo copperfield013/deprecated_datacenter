@@ -16,6 +16,29 @@
 	<div class="page-body">
 		<div class="col-lg-offset-1 col-lg-10">
 			<form class="form-horizontal group-container">
+				<c:if test="${!empty groupPremises }">
+					<div class="widget field-group">
+						<div class="widget-header">
+							<span class="widget-caption">
+								<span class="group-title">默认字段</span>
+							</span>
+						</div>
+						<div class="widget-body field-container">
+							<c:forEach var="premise" items="${groupPremises }">
+								<c:if test="${premise.fieldName != null }">
+									<div class="form-group field-item">
+										<label class="control-label field-title">${premise.fieldTitle }</label>
+										<div class="field-value">
+											${entity== null? premise.fieldValue: entity.smap[premise.fieldName] }
+											<input type="hidden" name="${premise.fieldName }" value="${entity== null? premise.fieldValue: entity.smap[premise.fieldName] }" />
+										</div>
+									</div>
+								</c:if>
+							</c:forEach>
+						</div>
+					</div>
+				</c:if>
+			
 				<c:forEach var="tmplGroup" items="${dtmpl.groups }">
 					<div class="widget field-group">
 						<div class="widget-header">
@@ -60,7 +83,7 @@
 															<td>${entityItem.smap[relationName] }</td>
 														</c:if>
 														<c:forEach var="field" items="${tmplGroup.fields }">
-															<td class="${field.fieldAvailable? '': 'field-unavailable'}">${field.availableField? entityItem.smap[field.fieldName] : ''}</td>
+															<td class="${field.fieldAvailable? '': 'field-unavailable'}">${field.fieldAvailable? entityItem.smap[field.fieldName] : ''}</td>
 														</c:forEach>
 													</tr>
 												</c:forEach>
@@ -93,155 +116,14 @@
 	</div>
 </div>
 <script>
-	seajs.use(['dialog', 'ajax', 'utils', 'tmpl/js/dtmpl-update.js', '$CPF'], function(Dialog, Ajax, Utils, ViewTmpl, $CPF){
+	seajs.use(['modules/js/modules-detail.js'], function(ModulesDetail){
 		var $page = $('#${moduke.key }-detail-tmpl-${entity.code }-${RES_STAMP}');
-		var hasRecord = '${entity != null}';
-		if(hasRecord != 'true'){
-			Dialog.notice('数据不存在', 'warning');
-			$('.header-title h1').text('数据不存在');
-		}
-		var timelineInited = false;
-		$('a.toggle-timeline', $page).click(function(){
-			if(!timelineInited){
-				$('.show-more-history', $page).trigger('click');
-			}
-		});
-		
-		//下一页
-		var curPageNo = 0;
-		$('.show-more-history', $page).click(function(){
-			var $this = $(this);
-			if(!$this.is('.disabled')){
-				$this.addClass('disabled').text('加载中');
-				Ajax.ajax('admin/modules/curd/paging_history/${menu.id}/${entity.code}', {
-					pageNo	: curPageNo + 1
-				}, function(data){
-					if(data.status === 'suc'){
-						appendHistory(data.history);
-						curPageNo ++;
-						timelineInited = true;
-					}
-					if(data.isLast){
-						$this.text('没有更多了');					
-					}else{
-						$this.text('查看更多').removeClass('disabled');
-					}
-				});
-			}
-		});
-		$page.on('click', '.circ', function(){
-			var time = parseInt($(this).closest('dd').attr('data-time'));
-			$page.getLocatePage().loadContent('admin/modules/curd/detail/${menu.id}/${entity.code}', null, {timestamp:time});
-			
-		});
-		var theTime = parseInt('${date.time}');
-		function appendHistory(history){
-			if(history.length > 0){
-				var $dl = $('dl', $page);
-				
-				for(var i in history){
-					var item = history[i];
-					var $month = $('dt[data-month="' + item.monthKey + '"]', $dl);
-					if($month.length == 0){
-						var month = new Date(item.monthKey);
-						$month = $('<dt data-month="' + item.monthKey + '">').text(Utils.formatDate(month, 'yyyy年MM月'));
-						var inserted = false;
-						$('dt', $dl).each(function(){
-							var thisMonth = parseInt($(this).attr('data-month'));
-							if(thisMonth <= month){
-								$month.insertBefore(this);
-								inserted = true;
-								return false;
-							}
-						});
-						if(!inserted){
-							$('.show-more-history', $page).parent('dt').before($month);
-							//$dl.append($month);
-						}
-					}
-					$item = $(
-							'<dd class="pos-right clearfix">' +
-								'<div class="circ"></div>' + 
-								'<div class="time"></div>' +
-								'<div class="events">' + 
-			 						'<div class="events-header"></div>' + 
-									'<div class="events-body"></div>' + 
-								'</div>' +
-							'</dd>');
-					$item.find('.time').text(Utils.formatDate(new Date(item.timeKey), 'yyyy-MM-dd hh:mm:ss'));
-					$item.find('.events-header').text('操作人：' + item.userName);
-					$item.find('.events-body').text('详情');
-					$item.attr('data-id', item.id).attr('data-time', item.timeKey);
-					var inserted = false;
-					var $dds = $month.nextUntil('dt');
-					if($dds.length > 0){
-						$dds.each(function(){
-							var $this = $(this);
-							if($this.is('dd[data-time]')){
-								var thisTimeKey = parseInt($this.attr('data-time'));
-								if(thisTimeKey <= item.timeKey){
-									$item.insertBefore(this);
-									inserted = true;
-									return false;
-								}
-							}
-						});
-						if(!inserted){
-							$dds.last().after($item);
-						}
-					}else{
-						$month.after($item);
-					}
-				}
-				var $dd = $('dd', $dl);
-				var checked = false;
-				$dd.each(function(i){
-					var $this = $(this);
-					if(!checked){
-						var thisTime = parseInt($this.attr('data-time'));
-						if(theTime >= thisTime){
-							$this.addClass('current');
-							checked = true;
-						}
-					}
-					Utils.switchClass($this, 'pos-right', 'pos-left', i % 2 == 0);
-				});
-				
-			}
-		}
-		
-		
-		$('#datetime', $page).datetimepicker({
-			language	: 'zh-CN',
-			format		: 'yyyy-mm-dd hh:ii:ss',
-			minuteStep	: 1,
-			autoclose	: true,
-			startView	: 'day'
-		}).on('changeDate', function(e){
-			$page.getLocatePage().loadContent('admin/modules/curd/detail/${menu.id}/${entity.code }', undefined, {
-				datetime	: $(this).val()
-			});
-		});
-		var $errors = $('#errors', $page);
-		$('#showErrors', $page).mouseenter(function(e){
-			$errors.show();
-		});
-		$('#tmpl-list li[data-id]:not(.active)', $page).click(function(){
-			var tmplId = $(this).attr('data-id');
-			$page.getLocatePage().loadContent('admin/modules/curd/detail/${menu.id}/${entity.code}', undefined, {
-				timestamp	: '${timestamp}'
-			});
-		});
-		
-		if('${dtmpl == null}' == 'true'){
-			Dialog.notice('当前没有选择默认模板', 'error');
-		}
-		
-		setTimeout(function(){
-			$CPF.showLoading();
-			$('.field-title', $page).each(function(){ViewTmpl.adjustFieldTitle($(this))});
-			$CPF.closeLoading();
-		}, 100);
+		ModulesDetail.init(
+				$page,
+				'${module.name}',
+				'${entity.code}',
+				'${menu.id}',
+				'${date.time}');
 		
 	});
 </script>

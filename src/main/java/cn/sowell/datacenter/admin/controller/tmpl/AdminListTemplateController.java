@@ -1,13 +1,17 @@
 package cn.sowell.datacenter.admin.controller.tmpl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
 import org.apache.log4j.Logger;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,13 +29,16 @@ import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
+import cn.sowell.copframe.utils.CollectionUtils;
+import cn.sowell.copframe.utils.FormatUtils;
+import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.common.choose.ChooseTablePage;
-import cn.sowell.datacenter.model.admin.service.SystemAdminService;
 import cn.sowell.dataserver.model.dict.service.DictionaryService;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListColumn;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
@@ -39,10 +46,8 @@ import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_TMPL + "/ltmpl")
+@PreAuthorize("hasAuthority(@propConfig.getProperty('admin_config_authen'))")
 public class AdminListTemplateController {
-	
-	@Resource
-	SystemAdminService adminService;
 	
 	@Resource
 	TemplateService tService;
@@ -64,15 +69,21 @@ public class AdminListTemplateController {
 		UserIdentifier user = UserUtils.getCurrentUser();
 		ModuleMeta moduleMeta = mService.getModule(module);
 		List<TemplateListTemplate> ltmplList = tService.queryListTemplateList(module, user);
+		Map<Long, Set<TemplateGroup>> relatedGroupsMap = tService.getListTemplateRelatedGroupsMap(CollectionUtils.toSet(ltmplList, ltmpl->ltmpl.getId()));
 		model.addAttribute("ltmplList", ltmplList);
 		model.addAttribute("module", moduleMeta);
+		model.addAttribute("relatedGroupsMap", relatedGroupsMap);
 		return AdminConstants.JSP_TMPL_LIST + "/ltmpl_list.jsp";
 	}
 	
 	@RequestMapping("/choose/{module}")
-	public String dialogList(@PathVariable String module, Model model) {
+	public String dialogList(@PathVariable String module, String except, Model model) {
 		UserIdentifier user = UserUtils.getCurrentUser();
 		List<TemplateListTemplate> list = tService.queryListTemplateList(module, user);
+		if(TextUtils.hasText(except)) {
+			Set<Long> excepts = TextUtils.split(except, ",", HashSet::new, FormatUtils::toLong);
+			list = list.stream().filter(tmpl->!excepts.contains(tmpl.getId())).collect(Collectors.toList());
+		}
 		ChooseTablePage<TemplateListTemplate> tpage = new ChooseTablePage<TemplateListTemplate>(
 				"ltmpl-choose-list", "ltmpl_");
 		tpage
@@ -91,6 +102,29 @@ public class AdminListTemplateController {
 		model.addAttribute("tpage", tpage);
 		return AdminConstants.PATH_CHOOSE_TABLE;
 	}
+	
+	@ResponseBody
+	@RequestMapping("/switch_groups/{ltmplId}/{targetLtmplId}")
+	public AjaxPageResponse switchGroups(@PathVariable Long ltmplId, @PathVariable Long targetLtmplId) {
+		try {
+			TemplateListTemplate ltmpl = tService.getListTemplate(ltmplId),
+									targerTemplate = tService.getListTemplate(targetLtmplId);
+			if(ltmpl != null) {
+				if(targerTemplate != null) {
+					tService.switchAllGroupsListTemplate(ltmplId, targetLtmplId);
+					return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("切换成功", ltmpl.getModule() + "_dtmpl_list");
+				}else {
+					throw new Exception("切换详情模板的列表模板[id=" + targetLtmplId + "]不存在");
+				}
+			}else {
+				throw new Exception("原详情模板[id=" + ltmplId + "]不存在");
+			}
+		} catch (Exception e) {
+			logger.error("切换时发生错误", e);
+		}
+		return AjaxPageResponse.FAILD("切换失败");
+	}
+	
 	
 	@RequestMapping("/add/{module}")
 	public String add(@PathVariable String module, Model model){
@@ -115,6 +149,19 @@ public class AdminListTemplateController {
 		model.addAttribute("criteriaDataJSON", criteriaDataJSON);
 		return AdminConstants.JSP_TMPL_LIST + "/ltmpl_update.jsp";
 	}
+	
+	
+	@RequestMapping("/group_list/{ltmplId}")
+	public String groupList(@PathVariable Long ltmplId, Model model) {
+		TemplateListTemplate ltmpl = tService.getListTemplate(ltmplId);
+		Set<TemplateGroup> tmplGroups = tService.getListTemplateRelatedGroups(ltmplId);
+		model.addAttribute("tmplGroups", tmplGroups);
+		model.addAttribute("tmplType", "list");
+		model.addAttribute("tmplId", ltmplId);
+		model.addAttribute("tmpl", ltmpl);
+		return AdminConstants.JSP_TMPL_GROUP + "/tmpl_group_list_from_tmpl.jsp";
+	}
+	
 	
 	private JSONArray toCriteriaData(Set<TemplateListCriteria> criterias) {
 		JSONArray array = new JSONArray();
@@ -198,7 +245,7 @@ public class AdminListTemplateController {
 			tmpl.setDefaultPageSize(json.getInteger("defPageSize"));
 			tmpl.setDefaultOrderFieldId(json.getLong("defOrderFieldId"));
 			tmpl.setDefaultOrderDirection(json.getString("defOrderDir"));
-			tmpl.setCreateUserId((Long) UserUtils.getCurrentUser().getId());
+			tmpl.setCreateUserCode((String) UserUtils.getCurrentUser().getId());
 			tmpl.setUnmodifiable(null);
 			tmpl.setModule(json.getString("module"));
 			JSONArray columnData = json.getJSONArray("columnData");
@@ -210,7 +257,6 @@ public class AdminListTemplateController {
 					TemplateListColumn column = new TemplateListColumn();
 					column.setTitle(src.getString("title"));
 					column.setOrderable(src.getInteger("orderable"));
-					column.setCreateUserId(tmpl.getCreateUserId());
 					if(src.getString("specField") != null){
 						column.setSpecialField(src.getString("specField"));
 					}else{
@@ -233,7 +279,6 @@ public class AdminListTemplateController {
 					criteria.setId(item.getLong("id"));
 					criteria.setTitle(item.getString("title"));
 					criteria.setOrder(order++);
-					criteria.setCreateUserId(tmpl.getCreateUserId());
 					if(item.getBooleanValue("fieldAvailable")) {
 						criteria.setFieldId(item.getLong("fieldId"));
 						criteria.setRelationLabel(item.getString("relationLabel"));

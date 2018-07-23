@@ -33,10 +33,13 @@ import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.admin.pojo.ExportStatus;
+import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
+import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.modules.service.ExportService;
 import cn.sowell.dataserver.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.dataserver.model.modules.pojo.criteria.NormalCriteria;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
 import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
@@ -55,12 +58,21 @@ public class AdminModulesExportController {
 	@Resource
 	FrameDateFormat dateFormat;
 	
+	@Resource
+	AuthorityService authService;
+	
 	Logger logger = Logger.getLogger(AdminModulesExportController.class);
 	
 	@ResponseBody
-	@RequestMapping("/start/{module}")
+	@RequestMapping("/start/{menuId}")
 	public ResponseJSON doImport(
+			@PathVariable Long menuId,
 			@RequestBody JsonRequest jReq, HttpSession session){
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
+		TemplateListTemplate ltmpl = tService.getListTemplate(tmplGroup.getListTemplateId());
+		
+		
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		JSONObject json = jReq.getJsonObject();
 		String uuid = TextUtils.uuid();
@@ -69,35 +81,31 @@ public class AdminModulesExportController {
 				isAllScope = "all".equals(scope);
 		if(isCurrentScope || isAllScope){
 			JSONObject parameters = json.getJSONObject("parameters");
-			Long tmplId = parameters.getLong("tmplId");
-			if(tmplId != null){
-				TemplateListTemplate ltmpl = tService.getListTemplate(tmplId);
-				if(ltmpl != null){
-					MutablePropertyValues pvs = new MutablePropertyValues();
-					String prefix = "criteria_";
-					parameters.forEach((key, val)->{
-						if(key.startsWith(prefix)){
-							String name = key.substring(prefix.length());
-							if(val instanceof JSONArray){
-								for (Object item : (JSONArray)val) {
-									pvs.add(name, item);
-								}
-							}else{
-								pvs.add(name, val);
+			if(ltmpl != null){
+				MutablePropertyValues pvs = new MutablePropertyValues();
+				String prefix = "criteria_";
+				parameters.forEach((key, val)->{
+					if(key.startsWith(prefix)){
+						String name = key.substring(prefix.length());
+						if(val instanceof JSONArray){
+							for (Object item : (JSONArray)val) {
+								pvs.add(name, item);
 							}
+						}else{
+							pvs.add(name, val);
 						}
-					});
-					ExportDataPageInfo ePageInfo = new ExportDataPageInfo();
-					CommonPageInfo pageInfo = new CommonPageInfo();
-					ePageInfo.setPageInfo(pageInfo);
-					ePageInfo.setScope(scope);
-					ePageInfo.setRangeStart(json.getInteger("rangeStart"));
-					ePageInfo.setRangeEnd(json.getInteger("rangeEnd"));
-					pageInfo.setPageNo(parameters.getInteger("pageNo"));
-					pageInfo.setPageSize(parameters.getInteger("pageSize"));
-					Map<Long, NormalCriteria> vCriteriaMap = mService.getCriteriasFromRequest(pvs, CollectionUtils.toMap(ltmpl.getCriterias(), c->c.getId()));
-					eService.startExport(uuid, ltmpl, new HashSet<NormalCriteria>(vCriteriaMap.values()), ePageInfo);
-				}
+					}
+				});
+				ExportDataPageInfo ePageInfo = new ExportDataPageInfo();
+				CommonPageInfo pageInfo = new CommonPageInfo();
+				ePageInfo.setPageInfo(pageInfo);
+				ePageInfo.setScope(scope);
+				ePageInfo.setRangeStart(json.getInteger("rangeStart"));
+				ePageInfo.setRangeEnd(json.getInteger("rangeEnd"));
+				pageInfo.setPageNo(parameters.getInteger("pageNo"));
+				pageInfo.setPageSize(parameters.getInteger("pageSize"));
+				Map<Long, NormalCriteria> vCriteriaMap = mService.getCriteriasFromRequest(pvs, CollectionUtils.toMap(ltmpl.getCriterias(), c->c.getId()));
+				eService.startExport(uuid, ltmpl, new HashSet<NormalCriteria>(vCriteriaMap.values()), ePageInfo);
 			}
 		}
 		jRes.put("uuid", uuid);

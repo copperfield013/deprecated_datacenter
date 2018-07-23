@@ -56,5 +56,8 @@ define(function(require){
 			}
 		}
 	});
+    try{
+    	require('main/js/statis-func.js');
+    }catch(e){}
     $CPF.closeLoading();
 });

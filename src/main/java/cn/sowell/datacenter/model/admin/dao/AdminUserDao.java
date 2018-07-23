@@ -1,11 +1,9 @@
 package cn.sowell.datacenter.model.admin.dao;
 
-import cn.sowell.datacenter.model.admin.pojo.AdminUser;
+import cn.sowell.datacenter.model.admin.pojo.AdminUserX;
 
 public interface AdminUserDao {
 
-	AdminUser getUser(String username);
-
-	Long getSystemAdminIdByUserId(Long userId);
+	AdminUserX getUser(String username);
 
 }

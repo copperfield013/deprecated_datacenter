@@ -11,7 +11,7 @@
 		<div class="row">
 			<div class="col-lg-12">
 				<form class="bv-form form-horizontal validate-form" 
-					start-url="admin/modules/import/do/${module.name }"
+					start-url="admin/modules/import/do/${menu.id }"
 					status-url="admin/modules/import/status"
 					break-url="admin/modules/import/break">
 					<div class="form-group">
@@ -70,29 +70,6 @@
 		var uuid = null;
 		var $form = $('form', $page);
 		var fileUUID = null;
-		/* $('#file').change(function(){
-			var formData = new FormData();
-			if(this.files && this.files.length > 0){
-				formData.append('file', this.files[0]);
-				$CPF.showLoading();
-				Ajax.ajax('admin/modules/import/resolve_file', formData, function(data){
-					if(data.status === 'suc'){
-						var $sheetName = $('#sheetName', $page).empty();
-						for(var i in data.names){
-							$sheetName.append('<option value="' + data.names[i] + '">' + data.names[i] + '</option>');	
-						}
-						fileUUID = data.fileName;
-					}else{
-						Dialog.notice('文件错误', 'error');
-					}
-				}, {
-					afterLoad	: function(){
-						$CPF.closeLoading();
-					}
-				});
-			}
-		}); */
-		
 		
 		$('#submit', $page).click(function(){
 			Dialog.confirm('确认导入？', function(yes){
@@ -167,7 +144,7 @@
 			}
 		});
 		$('#link-import-tmpl', $page).click(function(){
-			Dialog.openDialog('admin/modules/import/tmpl/${module.name}', '字段', undefined, {
+			Dialog.openDialog('admin/modules/import/tmpl/${menu.id}', '字段', undefined, {
 				width	: 1000,
 				height	: 500
 			});

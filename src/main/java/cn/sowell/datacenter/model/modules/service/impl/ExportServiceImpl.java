@@ -24,7 +24,7 @@ import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 
-import cn.sowell.copframe.common.property.PropertyPlaceholder;
+import cn.sowell.copframe.spring.properties.PropertyPlaceholder;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.admin.pojo.ExportStatus;

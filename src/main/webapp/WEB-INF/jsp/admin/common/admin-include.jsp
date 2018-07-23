@@ -32,3 +32,4 @@
 <script src="${basePath }media/sea-debug.js"></script>
 <script src="${basePath }media/seajs-css-debug.js"></script>
 <script src="${basePath }media/admin/plugins/typeahead/dist/handlebars.js"></script>
+<script src="${basePath }media/admin/plugins/typeahead/dist/typeahead.bundle.js?v=$${cpfVersion}"></script>
