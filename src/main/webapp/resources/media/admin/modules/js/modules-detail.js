@@ -139,6 +139,23 @@ define(function(require, exports, module){
 		$('#showErrors', $page).mouseenter(function(e){
 			$errors.show();
 		});
+		var FieldInput = require('field/js/field-input.js');
+		$('.field-view[field-type],.value-row>td[field-type]', $page).each(function(){
+			var $this = $(this);
+			var type = $this.attr('field-type');
+			switch(type){
+				case 'file':
+					var src = $this.text().trim();
+					var fieldInput = new FieldInput({
+						type	: 'file',
+						value	: src,
+						readonly: true
+					});
+					$this.empty().append(fieldInput.getDom());
+					break;
+				default:
+			}
+		});
 		
 		setTimeout(function(){
 			$CPF.showLoading();

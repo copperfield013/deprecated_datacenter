@@ -50,6 +50,7 @@ import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigResolver;
 import cn.sowell.datacenter.entityResolver.ImportCompositeField;
+import cn.sowell.datacenter.entityResolver.impl.EntityComponent;
 import cn.sowell.datacenter.model.modules.dao.ModulesImportDao;
 import cn.sowell.datacenter.model.modules.exception.ImportBreakException;
 import cn.sowell.datacenter.model.modules.pojo.ImportStatus;
@@ -100,7 +101,7 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 		int rownum = 2;
 		importStatus.appendMessage("开始导入");
 		Integration integration = PanelFactory.getIntegration();
-		BizFusionContext context = config.createContext();
+		BizFusionContext context = config.getCurrentContext();
 		context.setSource(FusionContext.SOURCE_COMMON);
 		int failed = 0;
 		while(true){
@@ -183,8 +184,8 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 			Cell cell = row.getCell(i);
 			map.put(getStringWithBlank(headerRow.getCell(i)), getStringWithBlank(cell));
 		}
-		Entity entity = fusionContextConfigResolver.createEntityIgnoreUnsupportedElement(map);
-		return entity;
+		EntityComponent entity = fusionContextConfigResolver.createEntityIgnoreUnsupportedElement(map);
+		return entity == null? null: entity.getEntity();
 	}
 	
 	@Override

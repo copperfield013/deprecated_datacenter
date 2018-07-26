@@ -680,6 +680,7 @@ span.cpf-select2-sign.cpf-select2-sign-or:after {
     margin-top: 10px;
     margin-bottom: 10px;
     height: 60px;
+    min-width: 4em;
 }
 
 .cpf-file-input-container .cpf-file-input-thumb {

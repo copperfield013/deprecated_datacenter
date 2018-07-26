@@ -54,7 +54,7 @@
 											title="${tmplField.fieldAvailable? '': '无效字段' }">
 											<label class="control-label field-title">${tmplField.title }</label>
 											<div class="field-value">
-												<span class="field-view">${tmplField.fieldAvailable? entity.smap[tmplField.fieldName]: '' }</span>
+												<span class="field-view" field-type="${tmplField.type }">${tmplField.fieldAvailable? entity.smap[tmplField.fieldName]: '' }</span>
 											</div>
 										</div>
 									</c:forEach>
@@ -83,7 +83,7 @@
 															<td>${entityItem.smap[relationName] }</td>
 														</c:if>
 														<c:forEach var="field" items="${tmplGroup.fields }">
-															<td class="${field.fieldAvailable? '': 'field-unavailable'}">${field.fieldAvailable? entityItem.smap[field.fieldName] : ''}</td>
+															<td class="${field.fieldAvailable? '': 'field-unavailable'}" field-type="${field.type }">${field.fieldAvailable? entityItem.smap[field.fieldName] : ''}</td>
 														</c:forEach>
 													</tr>
 												</c:forEach>

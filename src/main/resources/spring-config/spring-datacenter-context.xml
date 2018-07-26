@@ -87,6 +87,20 @@
 		</jaxws:serviceBean>
 	</jaxws:server>
 
+
+	<bean class="cn.sowell.copframe.spring.CPFSpringContextLoader" />
+	
+	<bean class="cn.sowell.copframe.spring.file.FilePublisher" >
+		<property name="fileUtils">
+			<bean class="cn.sowell.copframe.spring.file.FileUtils" >
+				<constructor-arg value="${file_publish_path}" />
+				<!-- 这个要与web.xml中的servlet一致 -->
+				<constructor-arg value="/download-files/" />
+			</bean>
+		</property>
+	</bean>
+
+
 	<import resource="spring-security.xml" />
 
 </beans>

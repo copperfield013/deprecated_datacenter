@@ -27,8 +27,10 @@ import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigResolver;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
+import cn.sowell.datacenter.entityResolver.impl.EntityComponent;
 import cn.sowell.dataserver.model.abc.service.ABCExecuteService;
 import cn.sowell.dataserver.model.dict.service.DictionaryService;
+import cn.sowell.dataserver.model.modules.service.ModulesService;
 
 
 @ContextConfiguration(locations = "classpath*:spring-config/spring-junit.xml")
@@ -109,8 +111,8 @@ public class TestEntityBinder {
 	private void testResolver(FusionContextConfig config) {
 		Map<String, Object> map = getDataMap();
 		FusionContextConfigResolver resolver = config.getConfigResolver();
-		Entity entity = resolver.createEntity(map);
-		ModuleEntityPropertyParser parser = resolver.createParser(entity);
+		EntityComponent entity = resolver.createEntity(map);
+		ModuleEntityPropertyParser parser = resolver.createParser(entity.getEntity());
 		System.out.println(parser.getProperty("name"));
 		System.out.println(parser.getProperty("code"));
 		System.out.println(parser.getProperty("lowIncomeInsureType"));
@@ -209,6 +211,18 @@ public class TestEntityBinder {
 		map.put("任职情况[0].任职名称", "杭州设维");
 		map.put("任职情况[0].任职起始时间", "2015-6-3");
 		return map;
+	}
+	
+	@Resource
+	ModulesService mService;
+	
+	@Test
+	public void testCreate() {
+		Map<String, Object> map = new HashMap<>();
+		map.put("姓名", "sssss");
+		map.put("性别", "男性");
+		String moduleName = "DSNc5a274h";
+		mService.mergeEntity(moduleName, map);
 	}
 
 }

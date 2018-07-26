@@ -32,7 +32,15 @@
 		<servlet-name>spring-mvc</servlet-name>
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
-
+	
+	<servlet>
+		<servlet-name>FileDownloadServlet</servlet-name>
+		<servlet-class>cn.sowell.copframe.spring.file.FilePublishServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>FileDownloadServlet</servlet-name>
+		<url-pattern>/download-files/*</url-pattern>
+	</servlet-mapping>
 
 	<filter>
 		<filter-name>springSecurityFilterChain</filter-name>

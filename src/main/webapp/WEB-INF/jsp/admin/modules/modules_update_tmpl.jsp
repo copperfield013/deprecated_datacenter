@@ -62,30 +62,6 @@
 							</span>
 						</div>
 						<div class="widget-body field-container">
-							<!-- <div class="form-group field-item ">
-								<label class="control-label field-title">image</label>
-								<div class="field-value" >
-									<span class="field-input" 
-										fInp-type="file"
-										fInp-name="照片1"
-										fInp-value="https://ss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=1140314544,2770167379&fm=173&app=25&f=JPEG?w=218&h=146&s=8834CF1054274B0FBE99C0D5030070E3"
-										fInp-optkey=""
-										fInp-fieldkey="people@照片1"
-									>
-										<span class="cpf-file-input-container">
-											<span class="cpf-file-input-thumb">
-												<img src="https://ss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=1140314544,2770167379&fm=173&app=25&f=JPEG?w=218&h=146&s=8834CF1054274B0FBE99C0D5030070E3" />
-												<span class="cpf-file-input-operates">
-													<i class="fa fa-times"></i>
-													<i class="fa fa-download"></i>
-												</span>
-											</span>
-										</span>
-									</span>
-								</div>
-							</div> -->
-						
-						
 							<c:choose>
 								<c:when test="${tmplGroup.isArray != 1 }">
 									<c:forEach var="tmplField" items="${tmplGroup.fields }">

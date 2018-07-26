@@ -293,7 +293,7 @@ define(function(require, exports, module){
 			'file'			: function(_param){
 				var fileParam = $.extend({
 					//multiple	: false,	//是否多选
-					maxSize		: 2048		//文件不得大于2M
+					maxSize		: 4096		//文件不得大于4M
 				}, _param);
 				
 				var $container = $('<span class="cpf-file-input-container cpf-field-input">');
@@ -326,8 +326,7 @@ define(function(require, exports, module){
 						}))
 						.append($('<i class="fa fa-download">').click(function(){
 							if(originFileURL){
-								location.href = originFileURL;
-								//require('ajax').download(originFileURL);
+								require('ajax').download(originFileURL);
 							}
 						}));
 								
@@ -343,34 +342,67 @@ define(function(require, exports, module){
 							//图片文件，进行预览
 							var reader = new FileReader();
 							reader.onload = function(e1) {
-								setFile({
-									src			: e1.target.result, 
-									fileName	: fileData.fileName,
-									isLocated	: true
-								});
-								$operates.find('.fa-download').hide();
+								showPicFile(fileData.file.name, e1.target.result, true)
 							};
 							reader.readAsDataURL(fileData.file);
 						}else{
 							//其他类型文件，展示内置图标
-							showUnpicFile(fileData);
+							showUnpicFile(fileData.file.name, true);
 						}
 						inputFile = fileData.file;
-					}else{
-						$operates.detach();
-						$thumb.empty()
-							.append($('<img>')
-									.attr('src', fileData.src)
-									.attr('alt', fileData.fileName)
-									.addClass(fileData.isLocated? 'cpf-file-located': ''))
-							.append($operates);
-						originFileURL = fileData.src;
+						$operates.find('.fa-download').hide();
 						fileChanged = true;
+					}else if(fileData.src){
+						var index = fileData.src.lastIndexOf('/');
+						if(index >= 0){
+							var fileName = fileData.src.substring(index + 1, fileData.src.length);
+							if(/.*\.jpg/.test(fileName) 
+								|| /.*\.png/.test(fileName) 
+								|| /.*\.gif/.test(fileName)
+								|| /.*\.jpeg/.test(fileName)
+								|| /.*\.bmp/.test(fileName)
+								|| /.*\.ico/.test(fileName)
+								){
+								//图片文件
+								showPicFile(fileName, fileData.src, false);
+							}else{
+								showUnpicFile(fileName, false);
+							}
+							originFileURL = fileData.src;
+						}
 					}
 				}
+				function showPicFile(fileName, fileSrc, isLocated){
+					$operates.detach();
+					$thumb.empty()
+						.append($('<img>')
+								.attr('src', fileSrc)
+								.attr('alt', fileName)
+								.attr('title', fileName)
+								.addClass(isLocated? 'cpf-file-located': '')
+								.attr('onerror', 'this.src="media/common/plugins/icons/OTHER.ico"'))
+						.append($operates);
+				}
+				function showUnpicFile(fileName, isLocated){
+					$operates.detach();
+					$thumb.empty()
+						.append($('<img>')
+								.attr('src', getFileIconSrc(fileName))
+								.attr('alt', fileName)
+								.attr('title', fileName)
+								.addClass(isLocated? 'cpf-file-located': '')
+								.attr('onerror', 'this.src="media/common/plugins/icons/OTHER.ico"'))
+								
+						.append($operates);
+				}
 				
-				function showUnpicFile(fileData){
-					
+				function getFileIconSrc(fileName){
+					var dotIndex = fileName.lastIndexOf('.');
+					if(dotIndex >= 0){
+						var suffix = fileName.substring(dotIndex + 1, fileName.length);
+						return 'media/common/plugins/icons/' + suffix.toUpperCase() + '.png';
+					}
+					return ;
 				}
 				
 				function showError(msg){
@@ -402,10 +434,7 @@ define(function(require, exports, module){
 						}else{
 							//其他情况下是传入文件的url，
 							//那么返回当前控件的文件是否有被修改过的标记
-							return {
-								src		: originFileURL,
-								changed	: fileChanged
-							};
+							return '';
 						}
 					}else{
 						//设置值
@@ -425,23 +454,35 @@ define(function(require, exports, module){
 				$container.funcMap = {
 					setDisabled	: function(toDisabled){
 						if(toDisabled){
-							
+							$operates.find('.fa-times').hide();
 						}else{
-							
+							$operates.find('.fa-times').show();
 						}
 					},
 					setReadonly	: function(toReadonly){
 						if(toReadonly){
-							
+							$operates.find('.fa-times').hide();
+							if(inputFile == null && !originFileURL){
+								$thumb.text('无文件');
+							}
 						}else{
-							
+							$operates.find('.fa-times').show();
+							if(inputFile == null && !originFileURL){
+								$thumb.html('<i></i>');
+							}
 						}
 					},
 					getSubmitData	: function(){
 						return $container.val();
+					},
+					isValueChanged		: function(){
+						return fileChanged;
 					}
 				};
-				$container.data('fieldInputObject', this);
+				$container.data('fieldInputObject', _this);
+				if(param.readonly === true){
+					$container.funcMap.setReadonly(true);
+				}
 				return $container;
 				
 			}
@@ -633,6 +674,13 @@ define(function(require, exports, module){
 				return $dom.funcMap.getSubmitData();
 			}
 		}
+		
+		this.isValueChanged = function(){
+			var $dom = this.getDom();
+			if($dom && $dom.funcMap && $dom.funcMap.isValueChanged){
+				return $dom.funcMap.isValueChanged();
+			}
+		}
 	}
 	
 	$.extend(FieldInput, {
@@ -698,9 +746,9 @@ define(function(require, exports, module){
 				var fieldInputObject = $(this).data('fieldInputObject');
 				if(fieldInputObject instanceof FieldInput){
 					var formName = fieldInputObject.getName();
-					if(formName && !formData.has(formName)){
+					if(fieldInputObject.isValueChanged() && formName && !formData.has(formName)){
 						var submitData = fieldInputObject.getSubmitData(); 
-						if(submitData){
+						if(submitData || submitData === ''){
 							formData.append(formName, submitData);
 						}
 					}
@@ -708,15 +756,6 @@ define(function(require, exports, module){
 			});
 		}
 	});
-	
-	function getFileIconSrc(file){
-		var dotIndex = file.name.indexOf('.');
-		if(dotIndex >= 0){
-			var suffix = file.name.substring(dotIndex + 1, file.name.length);
-			return 
-		}
-		return 
-	}
 	
 	module.exports = FieldInput;
 });
