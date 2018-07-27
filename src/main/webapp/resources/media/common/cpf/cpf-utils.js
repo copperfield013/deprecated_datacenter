@@ -21,6 +21,12 @@ define(function(require, exports){
 			}
 			return str;
 		},
+		isPhoto		: function(fileName){
+			if(typeof fileName === 'string'){
+				var reg = /.*\.(gif|jpg|jpeg|png|bmp|ico)$/i;
+				return reg.test(fileName);
+			}
+		},
 		/**
 		 * 将数组内的元素用特定的分隔符连接成字符串
 		 * @param array 数组对象，数组内元素可以是任意类型，不可省略

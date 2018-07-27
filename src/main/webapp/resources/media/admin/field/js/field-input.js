@@ -356,13 +356,7 @@ define(function(require, exports, module){
 						var index = fileData.src.lastIndexOf('/');
 						if(index >= 0){
 							var fileName = fileData.src.substring(index + 1, fileData.src.length);
-							if(/.*\.jpg/.test(fileName) 
-								|| /.*\.png/.test(fileName) 
-								|| /.*\.gif/.test(fileName)
-								|| /.*\.jpeg/.test(fileName)
-								|| /.*\.bmp/.test(fileName)
-								|| /.*\.ico/.test(fileName)
-								){
+							if(require('utils').isPhoto(fileName)){
 								//图片文件
 								showPicFile(fileName, fileData.src, false);
 							}else{
@@ -379,8 +373,7 @@ define(function(require, exports, module){
 								.attr('src', fileSrc)
 								.attr('alt', fileName)
 								.attr('title', fileName)
-								.addClass(isLocated? 'cpf-file-located': '')
-								.attr('onerror', 'this.src="media/common/plugins/icons/OTHER.ico"'))
+								.addClass(isLocated? 'cpf-file-located': ''))
 						.append($operates);
 				}
 				function showUnpicFile(fileName, isLocated){
@@ -475,7 +468,7 @@ define(function(require, exports, module){
 					getSubmitData	: function(){
 						return $container.val();
 					},
-					isValueChanged		: function(){
+					isValueChanged	: function(){
 						return fileChanged;
 					}
 				};
@@ -668,17 +661,25 @@ define(function(require, exports, module){
 			return FieldInput.getGlobalComparators(param.type, callback);
 		}
 		
-		this.getSubmitData = function(){
-			var $dom = this.getDom();
-			if($dom && $dom.funcMap && $dom.funcMap.getSubmitData){
-				return $dom.funcMap.getSubmitData();
+		function doDomFuncMap(funcName, args){
+			var $dom = _this.getDom();
+			if($dom && $dom.funcMap && $dom.funcMap[funcName]){
+				return $dom.funcMap[funcName].apply(_this, args);
 			}
 		}
 		
+		this.getSubmitData = function(){
+			return doDomFuncMap('getSubmitData');
+		}
+		
 		this.isValueChanged = function(){
-			var $dom = this.getDom();
-			if($dom && $dom.funcMap && $dom.funcMap.isValueChanged){
-				return $dom.funcMap.isValueChanged();
+			return doDomFuncMap('isValueChanged');
+		}
+		
+		this.setFormName = function(formName){
+			if(formName !== undefined){
+				param.name = formName;
+				doDomFuncMap('setFormName', [formName]);
 			}
 		}
 	}

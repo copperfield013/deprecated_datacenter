@@ -51,6 +51,7 @@ define(function(require, exports, module){
 			$('#save', $page).toggleClass('fuse-mode', fuseMode);
 		});
 		
+		
 		$page.on('click', '.array-item-remove', function(){
 			var $row = $(this).closest('tr');
 			Dialog.confirm('确认删除该行？', function(yes){
@@ -170,6 +171,12 @@ define(function(require, exports, module){
 				var inputName = nameFormat.replace('ARRAY_INDEX_REPLACEMENT', i);
 				$tds.eq(j).find(':text,select,textarea,input[type="hidden"]').each(function(){
 					$(this).attr('name', inputName);
+				})
+				.end().find('.cpf-field-input').each(function(){
+					var fieldInputObject = $(this).data('fieldInputObject');
+					if(fieldInputObject){
+						fieldInputObject.setFormName(inputName);
+					}
 				});
 			}
 		});

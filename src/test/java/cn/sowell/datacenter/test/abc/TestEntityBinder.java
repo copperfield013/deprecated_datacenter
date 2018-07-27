@@ -22,7 +22,6 @@ import com.abc.mapping.entity.Entity;
 import com.abc.mapping.node.ABCNode;
 import com.abc.mapping.node.AttributeNode;
 
-import cn.sowell.datacenter.entityResolver.FieldConfigure;
 import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigResolver;
@@ -50,9 +49,7 @@ public class TestEntityBinder {
 	
 	@Test
 	public void 残疾人() {
-		FusionContextConfigResolver resolver = fFactory.getModuleResolver("disabledpeople");
-		FieldConfigure cnf = resolver.getFieldConfigure("子女信息");
-		System.out.println(cnf);
+		abcService.delete("65c64ee142784e818dc636a23667149c");
 	}
 	
 	

@@ -1,13 +1,11 @@
 package cn.sowell.datacenter.model.config.service.impl;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Resource;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -17,7 +15,6 @@ import com.google.common.collect.Lists;
 
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.utils.CollectionUtils;
-import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.datacenter.model.admin.pojo.ABCUser;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel1Menu;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;

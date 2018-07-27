@@ -465,7 +465,16 @@ define(function(require, exports, module){
 		}
 	}
 	
-	function download(url){
+	function download(url, fileName){
+		if(utils.isPhoto(url)){
+			var a = document.createElement('a');
+			if(a.download !== undefined){
+				a.download = fileName || url.substring(url.lastIndexOf('/') + 1);
+				a.href = url;
+				a.click();
+				return;
+			}
+		}
 		var $downloadFrame = $('#cpf-download-frame');
 		if($downloadFrame.length === 0){
 			$downloadFrame = $('<iframe>');
@@ -475,7 +484,6 @@ define(function(require, exports, module){
 		}else{
 			$downloadFrame[0].contentWindow.location.href = url;
 		}
-		
 	}
 	
 	exports.ajax = ajax;
