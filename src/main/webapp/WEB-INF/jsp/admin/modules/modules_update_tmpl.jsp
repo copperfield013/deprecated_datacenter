@@ -93,7 +93,9 @@
 										<table class="table table-striped table-bordered table-hover">
 											<thead>
 												<tr class="title-row">
-													<th>#</th>
+													<th
+														fname-format="${tmplGroup.composite.name }[ARRAY_INDEX_REPLACEMENT].唯一编码"
+													>#</th>
 													<c:if test="${tmplGroup.relationSubdomain != null }">
 														<th
 															class="th-field-title"

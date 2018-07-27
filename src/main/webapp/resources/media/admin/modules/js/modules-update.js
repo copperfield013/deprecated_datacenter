@@ -166,7 +166,7 @@ define(function(require, exports, module){
 			var $tr = $(this);
 			var $tds = $tr.children('td');
 			$tds.eq(0).children('span').text(i + 1);
-			for(var j = 1; j < $tds.length - 1; j ++){
+			for(var j = 0; j < $tds.length - 1; j ++){
 				var nameFormat = $titles.eq(j).attr('fname-format');
 				var inputName = nameFormat.replace('ARRAY_INDEX_REPLACEMENT', i);
 				$tds.eq(j).find(':text,select,textarea,input[type="hidden"]').each(function(){
