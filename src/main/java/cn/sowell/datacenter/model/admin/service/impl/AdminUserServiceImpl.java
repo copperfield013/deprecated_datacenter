@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.abc.auth.pojo.UserInfo;
 import com.abc.auth.service.ServiceFactory;
 
-import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.datacenter.entityResolver.UserCodeService;
 import cn.sowell.datacenter.model.admin.dao.AdminUserDao;
 import cn.sowell.datacenter.model.admin.pojo.ABCUser;
@@ -35,9 +34,10 @@ public class AdminUserServiceImpl implements AdminUserService, UserCodeService{
 		//return userDao.getUser(username);
 	}
 	
+
 	@Override
-	public String getCurrentUserCode() {
-		ABCUser user = (ABCUser) UserUtils.getCurrentUser();
+	public String getUserCode(Object userPrinciple) {
+		ABCUser user = (ABCUser) userPrinciple;
 		return user.getCode();
 	}
 

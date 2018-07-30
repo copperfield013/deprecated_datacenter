@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
 
+import cn.sowell.copframe.common.UserIdentifier;
+import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.page.PageInfo;
@@ -103,6 +105,7 @@ public class AdminModulesController {
 		Map<Long, String> criteriaMap = exractTemplateCriteriaMap(request);
 		criteria.setListTemplateCriteria(criteriaMap);
 		criteria.setPageInfo(pageInfo);
+		criteria.setUser(UserUtils.getCurrentUser());
 		//执行查询
 		ListTemplateEntityView view = (ListTemplateEntityView) vService.query(criteria);
 		model.addAttribute("view", view);
@@ -168,7 +171,7 @@ public class AdminModulesController {
         TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
         TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
         
-        ModuleEntityPropertyParser entity = mService.getEntity(moduleName, code, date);
+        ModuleEntityPropertyParser entity = mService.getEntity(moduleName, code, date, UserUtils.getCurrentUser());
         model.addAttribute("menu", menu);
         model.addAttribute("date", date);
         model.addAttribute("entity", entity);
@@ -211,7 +214,7 @@ public class AdminModulesController {
 		ModuleMeta mMeta = mService.getModule(moduleName);
 		TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
 		FusionContextConfig config = fFactory.getModuleConfig(moduleName);
-		ModuleEntityPropertyParser entity = mService.getEntity(moduleName, code, null);
+		ModuleEntityPropertyParser entity = mService.getEntity(moduleName, code, null, UserUtils.getCurrentUser());
 		TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
 		model.addAttribute("menu", menu);
 		model.addAttribute("entity", entity);
@@ -236,10 +239,11 @@ public class AdminModulesController {
 		String moduleName = menu.getTemplateModule();
     	 try {
     		 composite.getMap().remove(KEY_FUSE_MODE);
+    		 UserIdentifier user = UserUtils.getCurrentUser();
     		 if(Boolean.TRUE.equals(fuseMode)) {
-    			 mService.fuseEntity(moduleName, composite.getMap());
+    			 mService.fuseEntity(moduleName, composite.getMap(), user);
     		 }else {
-    			 mService.mergeEntity(moduleName, composite.getMap());
+    			 mService.mergeEntity(moduleName, composite.getMap(), user);
     		 }
              return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("保存成功", "entity_list_" + menuId);
          } catch (Exception e) {
@@ -260,7 +264,7 @@ public class AdminModulesController {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
     	JSONObjectResponse response = new JSONObjectResponse();
     	try {
-			List<EntityHistoryItem> historyItems = mService.queryHistory(menu.getTemplateModule(), code, pageNo, pageSize);
+			List<EntityHistoryItem> historyItems = mService.queryHistory(menu.getTemplateModule(), code, pageNo, pageSize, UserUtils.getCurrentUser());
 			response.put("history", JSON.toJSON(historyItems));
 			response.setStatus("suc");
 			if(historyItems.size() < pageSize){

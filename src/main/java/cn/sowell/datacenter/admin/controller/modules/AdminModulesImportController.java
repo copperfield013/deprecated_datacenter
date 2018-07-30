@@ -157,7 +157,7 @@ public class AdminModulesImportController {
         			session.setAttribute(AdminConstants.KEY_IMPORT_STATUS + uuid, importStatus);
         			Thread thread = new Thread(()->{
         				try {
-        					impService.importData(sheet, importStatus, menu.getTemplateModule());
+        					impService.importData(sheet, importStatus, menu.getTemplateModule(), UserUtils.getCurrentUser());
         				} catch (ImportBreakException e) {
         					logger.error("导入被用户停止", e);
         				} catch (Exception e) {

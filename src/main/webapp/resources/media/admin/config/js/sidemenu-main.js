@@ -54,6 +54,7 @@ define(function(require, exports, module){
 		function confirmTitleEdit(){
 			var $text = $(this);
 			var title = $text.val();
+			var $title = $text.parent();
 			if(!title){
 				Dialog.notice('内容不能为空', 'error');
 				return false;
@@ -61,6 +62,10 @@ define(function(require, exports, module){
 			$text.replaceWith(function(){
 				return $text.val();
 			});
+			if(!$title.data('level1-munu-title')){
+				$title.data('level1-munu-title', $title.text());
+				$title.closest('.dd-handle').find('.authority-config').click();
+			}
 			toggleSaveButton(true);
 			toggleAddLevel1Button(true);
 		}
@@ -170,7 +175,7 @@ define(function(require, exports, module){
 			var $item = $(this).closest('.dd-item');
 			var $a = $(this).closest('a');
 			var auths = $item.attr('data-auths');
-			Dialog.openDialog('admin/config/sidemenu/authority_choose', undefined, undefined, {
+			Dialog.openDialog('admin/config/sidemenu/authority_choose', '选择访问权限', undefined, {
 				reqParam	: {
 					auths	: auths
 				},

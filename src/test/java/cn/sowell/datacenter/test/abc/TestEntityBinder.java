@@ -22,6 +22,7 @@ import com.abc.mapping.entity.Entity;
 import com.abc.mapping.node.ABCNode;
 import com.abc.mapping.node.AttributeNode;
 
+import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigResolver;
@@ -109,7 +110,7 @@ public class TestEntityBinder {
 		Map<String, Object> map = getDataMap();
 		FusionContextConfigResolver resolver = config.getConfigResolver();
 		EntityComponent entity = resolver.createEntity(map);
-		ModuleEntityPropertyParser parser = resolver.createParser(entity.getEntity());
+		ModuleEntityPropertyParser parser = resolver.createParser(entity.getEntity(), UserUtils.getCurrentUser());
 		System.out.println(parser.getProperty("name"));
 		System.out.println(parser.getProperty("code"));
 		System.out.println(parser.getProperty("lowIncomeInsureType"));
@@ -126,8 +127,8 @@ public class TestEntityBinder {
 	public void testMerge() {
 		Map<String, Object> map = getDataMap();
 		try {
-			String code = abcService.mergeEntity("people", map);
-			ModuleEntityPropertyParser parser = abcService.getModuleEntityParser("people", code);
+			String code = abcService.mergeEntity("people", map, UserUtils.getCurrentUser());
+			ModuleEntityPropertyParser parser = abcService.getModuleEntityParser("people", code, UserUtils.getCurrentUser());
 			System.out.println(parser.getProperty("家庭关系.姓名"));
 			System.out.println(parser.getProperty("任职情况[0].任职名称"));
 			System.out.println(parser.getProperty("任职情况[1].任职起始时间"));
@@ -141,8 +142,8 @@ public class TestEntityBinder {
 	public void testMergeStudent() {
 		Map<String, Object> map = getStudentDataMap();
 		try {
-			String code = abcService.mergeEntity("student", map);
-			ModuleEntityPropertyParser parser = abcService.getModuleEntityParser("student", code);
+			String code = abcService.mergeEntity("student", map, UserUtils.getCurrentUser());
+			ModuleEntityPropertyParser parser = abcService.getModuleEntityParser("student", code, UserUtils.getCurrentUser());
 			System.out.println(parser.getProperty("家庭关系.姓名"));
 			System.out.println(parser.getProperty("workExperience.companyName"));
 			System.out.println(parser.getProperty("workExperience.workAddress"));
@@ -160,9 +161,9 @@ public class TestEntityBinder {
 		propMap.put("证件信息[1].证件类型", "市民卡");
 		propMap.put("证件信息[1].证件号码", "1111");*/
 		propMap.put("人口标签", "户籍人口");
-		String peopleCode = abcService.mergeEntity("people", propMap);
+		String peopleCode = abcService.mergeEntity("people", propMap, UserUtils.getCurrentUser());
 		
-		Entity entity = abcService.getModuleEntity("people", peopleCode);
+		Entity entity = abcService.getModuleEntity("people", peopleCode, UserUtils.getCurrentUser());
 		System.out.println(entity);
 		
 	}
@@ -174,7 +175,7 @@ public class TestEntityBinder {
 	
 	@Test
 	public void 唯一编码() {
-		ModuleEntityPropertyParser parser = abcService.getModuleEntityParser("people", "6338f82d4d8e47a5832079e02987628b");
+		ModuleEntityPropertyParser parser = abcService.getModuleEntityParser("people", "6338f82d4d8e47a5832079e02987628b", UserUtils.getCurrentUser());
 		System.out.println(parser.getProperty("证件信息[1].证件类型"));
 		System.out.println(parser.getProperty("证件信息[1].唯一编码"));
 	}
@@ -191,7 +192,7 @@ public class TestEntityBinder {
 
 
 	public void testGet() {
-		Entity entity = abcService.getModuleEntity("people", "234f3a52528c491a8c129d713bdfda99");
+		Entity entity = abcService.getModuleEntity("people", "234f3a52528c491a8c129d713bdfda99", UserUtils.getCurrentUser());
 		System.out.println(entity.getStringValue("name"));
 	}
 	
@@ -219,7 +220,7 @@ public class TestEntityBinder {
 		map.put("姓名", "sssss");
 		map.put("性别", "男性");
 		String moduleName = "DSNc5a274h";
-		mService.mergeEntity(moduleName, map);
+		mService.mergeEntity(moduleName, map, UserUtils.getCurrentUser());
 	}
 
 }

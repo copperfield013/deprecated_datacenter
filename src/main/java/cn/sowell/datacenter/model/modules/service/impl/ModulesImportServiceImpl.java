@@ -42,6 +42,7 @@ import com.abc.mapping.entity.Entity;
 import com.abc.panel.Integration;
 import com.abc.panel.PanelFactory;
 
+import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.NormalOperateDao;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
@@ -83,25 +84,25 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 	
 	
 	@Override
-	public void importData(Sheet sheet, ImportStatus importStatus, String module)
+	public void importData(Sheet sheet, ImportStatus importStatus, String module, UserIdentifier user)
 			throws ImportBreakException {
 		Row headerRow = sheet.getRow(1);
 		if(module != null){
 			FusionContextConfig config = fFactory.getModuleConfig(module);
 			if(config != null) {
-				execute(sheet, headerRow, config, importStatus);
+				execute(sheet, headerRow, config, importStatus, user);
 			}
 		}
 	}
 	
-	private void execute(Sheet sheet, Row headerRow, FusionContextConfig config, ImportStatus importStatus) throws ImportBreakException {
+	private void execute(Sheet sheet, Row headerRow, FusionContextConfig config, ImportStatus importStatus, UserIdentifier user) throws ImportBreakException {
 		logger.debug("导入表格【" + sheet.getSheetName() + "】");
 		importStatus.appendMessage("正在计算总行数");
 		importStatus.setTotal(colculateRowCount(sheet));
 		int rownum = 2;
 		importStatus.appendMessage("开始导入");
 		Integration integration = PanelFactory.getIntegration();
-		BizFusionContext context = config.getCurrentContext();
+		BizFusionContext context = config.getCurrentContext(user);
 		context.setSource(FusionContext.SOURCE_COMMON);
 		int failed = 0;
 		while(true){

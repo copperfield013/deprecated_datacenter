@@ -24,6 +24,7 @@ import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 
+import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.spring.properties.PropertyPlaceholder;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
@@ -99,7 +100,7 @@ public class ExportServiceImpl implements ExportService {
 	
 	DecimalFormat df = new DecimalFormat("0.00");
 	@Override
-	public void startExport(String uuid, TemplateListTemplate ltmpl, Set<NormalCriteria> criteria, ExportDataPageInfo ePageInfo) {
+	public void startExport(String uuid, TemplateListTemplate ltmpl, Set<NormalCriteria> criteria, ExportDataPageInfo ePageInfo, UserIdentifier user) {
 		ExportStatus status = new ExportStatus(uuid);
 		status.setExportPageInfo(ePageInfo);
 		statusMap.put(uuid, status);
@@ -125,7 +126,7 @@ public class ExportServiceImpl implements ExportService {
 					}
 					status.setCurrent(13);
 					status.setMessage("开始查询数据...");
-					EntityPagingIterator itr = mService.queryIterator(ltmpl, criteria, ePageInfo);
+					EntityPagingIterator itr = mService.queryIterator(ltmpl, criteria, ePageInfo, user);
 					status.setMessage("数据查找完成，共有" + itr.getDataCount() + "条数据。开始处理数据...");
 					status.setCurrent(20);
 					i = 1;

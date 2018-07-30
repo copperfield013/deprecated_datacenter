@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
@@ -105,7 +106,7 @@ public class AdminModulesExportController {
 				pageInfo.setPageNo(parameters.getInteger("pageNo"));
 				pageInfo.setPageSize(parameters.getInteger("pageSize"));
 				Map<Long, NormalCriteria> vCriteriaMap = mService.getCriteriasFromRequest(pvs, CollectionUtils.toMap(ltmpl.getCriterias(), c->c.getId()));
-				eService.startExport(uuid, ltmpl, new HashSet<NormalCriteria>(vCriteriaMap.values()), ePageInfo);
+				eService.startExport(uuid, ltmpl, new HashSet<NormalCriteria>(vCriteriaMap.values()), ePageInfo, UserUtils.getCurrentUser());
 			}
 		}
 		jRes.put("uuid", uuid);

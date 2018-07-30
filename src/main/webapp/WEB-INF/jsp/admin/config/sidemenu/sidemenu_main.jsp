@@ -89,9 +89,9 @@
 	<script type="jquery/tmpl" id="level1-item-tmpl">
 		<li class="dd-item">
 			<div class="dd-handle">
-				<span class="level1-title"><input type="text" value="" /></span>
+				<span class="level1-title"><input type="text" value="新功能菜单" /></span>
 				<span class="level-operate">
-					<a href="#"><i class="icon icon-authority"></i></a>
+					<a href="#"><i class="authority-config icon iconfont icon-authority"></i></a>
 					<a href="#"><i class="del-level fa fa-trash-o"></i></a>
 				</span>
 				<span class="tip-level-title"></span>

@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.apache.poi.ss.usermodel.Sheet;
 
+import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.datacenter.entityResolver.ImportCompositeField;
 import cn.sowell.datacenter.model.modules.exception.ImportBreakException;
 import cn.sowell.datacenter.model.modules.pojo.ImportStatus;
@@ -12,8 +13,6 @@ import cn.sowell.datacenter.model.modules.pojo.ImportTemplateCriteria;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplate;
 
 public interface ModulesImportService {
-
-	void importData(Sheet sheet, ImportStatus importStatus, String module) throws ImportBreakException;
 
 	byte[] createImportTempalteBytes(ModuleImportTemplate tmpl) throws Exception;
 
@@ -24,5 +23,8 @@ public interface ModulesImportService {
 	ModuleImportTemplate getImportTempalte(Long tmplId);
 
 	Set<ImportCompositeField> getImportCompositeFields(String module);
+
+	void importData(Sheet sheet, ImportStatus importStatus, String module, UserIdentifier user)
+			throws ImportBreakException;
 
 }
