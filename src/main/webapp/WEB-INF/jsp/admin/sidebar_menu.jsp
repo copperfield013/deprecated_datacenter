@@ -35,3 +35,17 @@
 		</ul>
 	</li>
 </c:forEach>
+<li>
+	<a href="#" class="menu-dropdown">
+		<i class="menu-icon fa fa-bookmark"></i>
+		<span class="menu-text">demo</span>
+		<i></i>
+	</a>
+	<ul class="submenu">
+	   	<li>
+	   		<a class="tab" href="admin/treeview/treeView?id=2adba5c2ab424be69cedd0f52a776631&mappingName=角色权限" target="treeview" title="树形控件">
+	   			<span class="menu-text">树形控件</span>
+	   		</a>
+	   	</li>
+	</ul>
+</li>

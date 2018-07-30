@@ -15,7 +15,8 @@
 	    <script src="media/admin/plugins/beyond/js/datetime/bootstrap-timepicker.js"></script>
 	    <script src="media/admin/plugins/beyond/js/datetime/moment.js"></script>
 	    <script src="media/admin/plugins/beyond/js/datetime/daterangepicker.js"></script>
-	    <script src="media/admin/plugins/bootstrapt-treeview/dist/bootstrap-treeview.min.js"></script>
+	    <script src="media/admin/plugins/bootstrapt-treeview/dist/bootstrap-treeview.js"></script>
+		<!-- <script src="media/admin/plugins/bootstrapt-treeview/dist/bootstrap-treeview.min.js"></script> -->
 	    <script src="media/admin/plugins/beyond/js/validation/bootstrapValidator.js"></script>
 	    <script src="media/admin/plugins/beyond/js/tagsinput/bootstrap-tagsinput.js"></script>
 	    <link href="media/admin/plugins/select2/css/select2.min.css" rel="stylesheet" />
