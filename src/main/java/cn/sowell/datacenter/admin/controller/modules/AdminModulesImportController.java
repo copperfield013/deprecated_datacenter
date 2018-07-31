@@ -155,9 +155,10 @@ public class AdminModulesImportController {
         			final Workbook workbook = wk;
         			ImportStatus importStatus = new ImportStatus();
         			session.setAttribute(AdminConstants.KEY_IMPORT_STATUS + uuid, importStatus);
+        			UserIdentifier user = UserUtils.getCurrentUser();
         			Thread thread = new Thread(()->{
         				try {
-        					impService.importData(sheet, importStatus, menu.getTemplateModule(), UserUtils.getCurrentUser());
+							impService.importData(sheet, importStatus, menu.getTemplateModule(), user);
         				} catch (ImportBreakException e) {
         					logger.error("导入被用户停止", e);
         				} catch (Exception e) {

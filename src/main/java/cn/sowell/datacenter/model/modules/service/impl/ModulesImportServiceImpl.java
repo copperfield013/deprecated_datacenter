@@ -162,7 +162,12 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 			if(CellTypeUtils.isCellDateFormatted(cell)){
 				return trim(defaultDateFormat.format(HSSFDateUtil.getJavaDate(cell.getNumericCellValue())));
 			}
-			return trim(FormatUtils.toString(FormatUtils.toLong(cell.getNumericCellValue())));
+			double val = cell.getNumericCellValue();
+			if(val == 0 || val > 0 && Math.ceil(val) == val || val < 0 && Math.floor(val) == val) {
+				return trim(FormatUtils.toString(FormatUtils.toLong(cell.getNumericCellValue())));
+			}else {
+				return trim(Double.toString(val));
+			}
 		}else if(cellType == CellType.FORMULA){
 			FormulaEvaluator evaluator = cell.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator();
 			CellValue cellValue = evaluator.evaluate(cell);
