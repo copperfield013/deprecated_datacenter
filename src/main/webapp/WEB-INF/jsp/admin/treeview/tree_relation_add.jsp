@@ -6,11 +6,12 @@
 			<div class="col-lg-12">
 				<form id="tree-relation-add-form" class="bv-form form-horizontal validate-form">
 					<input type="hidden" id="parentNodeId" name="parentNodeId" value="${parentNodeId }"/>
-					<input type="hidden" id="parentMappingName" value="${mappingName }">
+					<input type="hidden" id="parentMappingName" name="parentMappingName" value="${mappingName }">
 					<div id="select-entity-div" class="form-group">
 						<label class="col-lg-2 control-label" for="select-entity">关系名称</label>
 						<div class="col-lg-5">
-							<select id="select-entity" name="mappingName">
+							<input type="hidden" id="mappingName" name="mappingName">
+							<select id="select-entity">
 								<option value="">--请选择--</option>
 								<c:forEach items="${nameList }" var="entityName">
 									<option value="${entityName }" >${entityName }</option>
@@ -46,6 +47,7 @@
 									'</div>';
 							//var mappingName = $("#parentMappingName").val() + "." + checkedVal;
 							var mappingName = mappingNameMap[checkedVal];
+							$("#mappingName").val(mappingName);
 							console.log(mappingNameMap);
 							console.log("mapping name is : " + mappingName);
 							Ajax.ajax('admin/treeview/getNodeAttr', {
@@ -75,7 +77,8 @@
 						
 						$("#close-and-submit-btn").on('click', function(){
 							$(this).attr("disabled","true"); //设置变灰按钮,防止多次提交
-							var $page = $("#tree_view_${rootId}");
+							//var $page = $("#tree_view_${rootId}");
+							var $page = $("#tree_view_panel");
 							console.log($page);
 							var mappingName = $("#select-entity").val();
 							var relation = $("#relation").val();

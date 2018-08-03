@@ -35,9 +35,16 @@ public class AdminTreeViewController {
 	TreeViewService treeService;
 	
 	@RequestMapping("/treeView")
-	public String treeView(@RequestParam String id, @RequestParam String mappingName, PageInfo pageInfo, Model model) {
+	public String treeView(@RequestParam String id, @RequestParam String mappingName, @RequestParam(defaultValue="") Integer nodeAttrCount, PageInfo pageInfo, Model model) {
 		//ABCNode node = treeService.getABCNode(mappingName);
 		//model.addAttribute("node", node);
+		List<AttributeNode> abcNodeAttrList = getAbcNodeList(nodeAttrCount, mappingName);
+		if(abcNodeAttrList != null && abcNodeAttrList.size() > 0) {
+			model.addAttribute("abcNodeAttrSize", abcNodeAttrList.size());
+		}else {
+			model.addAttribute("abcNodeAttrSize", 0);
+		}
+		
 		List<String> nameList = new ArrayList<String>();
 		Map<String, String> mappingNameMap = new HashMap<>();
 		Map<String, List> labelSetMap = new HashMap<>();
@@ -54,25 +61,82 @@ public class AdminTreeViewController {
 		return "/admin/treeview/tree_view.jsp";
 	}
 	
+	@RequestMapping("/tree_view_new")
+	public String treeViewNew(@RequestParam String id, @RequestParam String mappingName, @RequestParam(defaultValue="") Integer nodeAttrCount, PageInfo pageInfo, Model model) {
+		//ABCNode node = treeService.getABCNode(mappingName);
+		//model.addAttribute("node", node);
+		List<AttributeNode> abcNodeAttrList = getAbcNodeList(null, mappingName);
+		int abcNodeAttrSize = 0;
+		if(abcNodeAttrList != null && abcNodeAttrList.size() > 0) {
+			abcNodeAttrSize = abcNodeAttrList.size();
+			model.addAttribute("abcNodeAttrSize", abcNodeAttrSize);
+		}
+		
+		nodeAttrCount = (nodeAttrCount == null || nodeAttrCount .equals("")) ? abcNodeAttrSize : nodeAttrCount;
+		
+		model.addAttribute("abcNodeAttrSize", abcNodeAttrList.size());
+		model.addAttribute("abcNodeAttrCount", nodeAttrCount);
+		
+		List<String> nameList = new ArrayList<String>();
+		Map<String, String> mappingNameMap = new HashMap<>();
+		Map<String, List> labelSetMap = new HashMap<>();
+		Map<String, String> subAbcNodeNameMap = new HashMap<>();
+		getNodeInfo(mappingName, nameList, mappingNameMap, labelSetMap, subAbcNodeNameMap);
+		
+		List result = getDataNew(id, mappingName, nodeAttrCount);
+		
+		model.addAttribute("nameList", nameList);
+		model.addAttribute("mappingNameMap", JSONObject.toJSON(mappingNameMap));
+		model.addAttribute("labelSetMap", JSONObject.toJSON(labelSetMap));
+		model.addAttribute("subAbcNodeNameMap", JSONObject.toJSON(subAbcNodeNameMap));
+		
+		model.addAttribute("id", id);
+		model.addAttribute("mappingName", mappingName);
+		model.addAttribute("resultList", result);
+		return "/admin/treeview/treeview.jsp";
+	}
+	
 	@SuppressWarnings("unchecked")
 	@ResponseBody
 	@RequestMapping("/data")
-	public String getData(@RequestParam(defaultValue="") String code, @RequestParam String configName) {
+	public String getData(@RequestParam(defaultValue="") String code, @RequestParam String configName, @RequestParam(defaultValue="1") Integer nodeAttrCount) {
 		String dataJsonStr = treeService.getData(configName, code);
 		JSONObject dataJsonObj = JSONObject.parseObject(dataJsonStr);
-		List<AttributeNode> abcAttrNodeList = getAbcNodeList(configName);
+		List<AttributeNode> abcAttrNodeList = getAbcNodeList(nodeAttrCount, configName);
 		List resultList = new ArrayList<>();
 		resultList.add(dataJsonObj.get("唯一编码"));
 		abcAttrNodeList.forEach(key -> {
 			resultList.add(dataJsonObj.get(key.getAbcattrName()));
 		});
 		return JSONObject.toJSONString(resultList);
+		//return resultList;
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private List getDataNew(String code, String configName, Integer nodeAttrCount) {
+		String dataJsonStr = treeService.getData(configName, code);
+		JSONObject dataJsonObj = JSONObject.parseObject(dataJsonStr);
+		List<AttributeNode> abcAttrNodeList = getAbcNodeList(nodeAttrCount, configName);
+		List resultList = new ArrayList<>();
+		resultList.add(dataJsonObj.get("唯一编码"));
+		abcAttrNodeList.forEach(key -> {
+			resultList.add(dataJsonObj.get(key.getAbcattrName()));
+		});
+		return resultList;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@ResponseBody
+	@RequestMapping("/getNodeSelf")
+	public String getNodeSelf(@RequestParam String id, @RequestParam String mappingName, @RequestParam(defaultValue="") Integer nodeAttrCount) {
+		List result = getDataNew(id, mappingName, nodeAttrCount);
+		return JSONObject.toJSONString(result);
 	}
 	
 	@SuppressWarnings("unchecked")
 	@ResponseBody
 	@RequestMapping("/getChildrenNode")
-	public String getChildrenNode(@RequestParam(defaultValue="") String code, @RequestParam String mappingName) {
+	public String getChildrenNode(@RequestParam(defaultValue="") String code, @RequestParam String mappingName, @RequestParam(defaultValue="") Integer nodeAttrCount) {
 		Entity dataEntity = treeService.getEntity(mappingName, code);
 		Set<String> relationNames = dataEntity.getRelationNames();
 		Map<String, List> relationsMap = new HashMap<>();
@@ -85,23 +149,32 @@ public class AdminTreeViewController {
 		Map<String, String> subAbcNodeNameMap = new HashMap<>();
 		getNodeInfo(mappingName, nameList, mappingNameMap, labelSetMap, subAbcNodeNameMap);
 		resultMap.put("mappingNameMap", mappingNameMap);
+		resultMap.put("labelSetMap", labelSetMap);
 		
-		List<AttributeNode> abcAttrNodeList = getAbcNodeList(mappingName);
+		List<AttributeNode> abcAttrNodeList = getAbcNodeList(nodeAttrCount, mappingName);
+		Map<String, List> relationListMap = new HashMap<>(); 
 		for(String relationName : relationNames) {
 			List<RelationEntity> relationList = dataEntity.getRelations(relationName);
+			List<AttributeNode> abcAttrNodeList1 = getAbcNodeList(nodeAttrCount, mappingNameMap.get(relationName));
+			relationListMap.put(relationName, abcAttrNodeList1);
 			if(relationList != null && relationList.size() > 0) {
 				for(RelationEntity relationEntity : relationList) {
 					JSONObject nodeJsonObj = JSONObject.parseObject(relationEntity.getEntity().toJson());
 					List result = new ArrayList<>();
 					result.add(relationName);
-					for(AttributeNode attributeNode : abcAttrNodeList) {
+					for(AttributeNode attributeNode : abcAttrNodeList1) {
 						result.add(nodeJsonObj.get(attributeNode.getAbcattrName()));
 					}
+					//relationListMap.put(relationName, result);
 					relationsMap.put(nodeJsonObj.getString("唯一编码"), result);
 				}
 			}
 		}
+		
 		resultMap.put("relations", relationsMap);
+		resultMap.put("abcAttrNodeList", abcAttrNodeList);
+		resultMap.put("relationNames", relationNames);
+		resultMap.put("relationNameAttrMap", relationListMap);
 		System.out.println("\n\n------------------------------------------");
 		System.out.println(resultMap);
 		return JSONObject.toJSONString(resultMap);
@@ -123,8 +196,8 @@ public class AdminTreeViewController {
 	
 	@ResponseBody
 	@RequestMapping("/getNodeAttr")
-	public String getAbcNode(String mappingName) {
-		List<AttributeNode> attributesNameList = getAbcNodeList(mappingName);
+	public String getAbcNode(Integer nodeAttrCount,String mappingName) {
+		List<AttributeNode> attributesNameList = getAbcNodeList(nodeAttrCount, mappingName);
 		JSONObject result = new JSONObject();
 		result.put("AttributesName", attributesNameList);
 		return result.toString();
@@ -135,13 +208,21 @@ public class AdminTreeViewController {
 	 * @param mappingName
 	 * @return
 	 */
-	private List<AttributeNode> getAbcNodeList(String mappingName) {
+	private List<AttributeNode> getAbcNodeList(Integer nodeAttrCount, String mappingName) {
 		ABCNode abcNode = treeService.getABCNode(mappingName);
 		List<AttributeNode> attributesNameCollection = abcNode.getOrderAttributes();
 		List<AttributeNode> attributesNameList = new ArrayList<>();
-		for(AttributeNode attributeNode : attributesNameCollection) {
-			if(attributeNode.getOrder() > 0) {
-				attributesNameList.add(attributeNode);
+		if(nodeAttrCount != null && nodeAttrCount>0) {
+			for(Integer i=0; i<nodeAttrCount; i++) {
+				if(attributesNameCollection.get(i).getOrder() > 0) {
+					attributesNameList.add(attributesNameCollection.get(i));
+				}
+			}
+		}else {
+			for(AttributeNode attributeNode : attributesNameCollection) {
+				if(attributeNode.getOrder() > 0) {
+					attributesNameList.add(attributeNode);
+				}
 			}
 		}
 		return attributesNameList;
@@ -172,7 +253,7 @@ public class AdminTreeViewController {
 	@RequestMapping("/edit")
 	public String edit(String mappingName, String id, String rootId, Model model) {
 		String nodeStr = treeService.getData(mappingName, id);
-		List<AttributeNode> abcAttrNodeList = getAbcNodeList(mappingName);
+		List<AttributeNode> abcAttrNodeList = getAbcNodeList(null, mappingName);
 		JSONObject nodeJsonObj = JSONObject.parseObject(nodeStr);
 		Map<String, Object> nodeMap = new HashMap<>();
 		for(Map.Entry<String, Object> entry : nodeJsonObj.entrySet()) {
@@ -205,9 +286,9 @@ public class AdminTreeViewController {
 	
 	@ResponseBody
 	@RequestMapping("/saveNode")
-	public String saveNode(String mappingName, String paramJson) {
+	public String saveNode(String paramJson) {
 		//String code = treeService.saveRole();
-		String code = treeService.saveTree(mappingName, paramJson);
+		String code = treeService.saveTree(paramJson);
 		return "true";
 	}
 	

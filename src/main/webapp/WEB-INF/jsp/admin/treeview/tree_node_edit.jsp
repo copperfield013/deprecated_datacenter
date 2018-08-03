@@ -7,6 +7,7 @@
 				<form id="edit-node-form" class="bv-form form-horizontal validate-form" action="#">
 					<input type="hidden" id="parentNodeId" name="parentNodeId" value="${parentNodeId }"/>
 					<input type="hidden" id="parentMappingName" name="parentMappingName" value="${mappingName }">
+					<input type="hidden" id="parentMappingName" name="mappingName" value="${mappingName }">
 					<c:forEach items="${abcAttrNodeList }" var="abcAttrNode">
 						<div class="form-group">
 							<label class="col-lg-2 control-label" for="${abcAttrNode.abcattrName }">${abcAttrNode.abcattrName }</label>
@@ -26,7 +27,8 @@
 				<script type="text/javascript">
 					seajs.use(['ajax'], function(Ajax){
 						$("#close-and-submit-btn").on('click', function(){
-							var $page = $("#tree_view_${rootId}");
+							//var $page = $("#tree_view_${rootId}");
+							var $page = $("#tree_view_panel");
 							console.log($("#edit-node-form").serializeJson());
 							$page.data("editSubmit")($("#edit-node-form").serializeJson());
 						});

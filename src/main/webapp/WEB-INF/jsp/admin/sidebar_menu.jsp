@@ -47,5 +47,10 @@
 	   			<span class="menu-text">树形控件</span>
 	   		</a>
 	   	</li>
+	   	<li>
+	   		<a class="tab" href="admin/treeview/tree_view_new?id=f0e47e1f25a747a492e3ea0e75f3603b&mappingName=角色权限" target="treeview" title="树形控件">
+	   			<span class="menu-text">树形控件</span>
+	   		</a>
+	   	</li>
 	</ul>
 </li>

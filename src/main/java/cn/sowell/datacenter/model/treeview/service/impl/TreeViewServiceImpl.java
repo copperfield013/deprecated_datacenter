@@ -19,9 +19,11 @@ import cn.sowell.datacenter.model.treeview.service.TreeViewService;
 public class TreeViewServiceImpl implements TreeViewService {
 	
 	@Override
-	public String saveTree(String mappingName, String paramJson) {
+	public String saveTree(String paramJson) {
 		// TODO Auto-generated method stub
 		JSONObject paramJsonObj = JSONObject.parseObject(paramJson);
+		String mappingName = paramJsonObj.getString("parentMappingName");	
+		paramJsonObj.remove("parentMappingName");
 		String[] mappingNameList = mappingName.split("\\.");
 		BizFusionContext context = new BizFusionContext();
 		context.setMappingName(mappingNameList[0]);
@@ -37,6 +39,7 @@ public class TreeViewServiceImpl implements TreeViewService {
 		//Entity entity = new Entity(mappingName);
 		
 		String newMappingName = paramJsonObj.getString("mappingName");
+		String[] newMappingNameList = newMappingName.split("\\.");
 		paramJsonObj.remove("mappingName");
 		String relation = paramJsonObj.getString("relation");
 		paramJsonObj.remove("relation");
@@ -45,7 +48,7 @@ public class TreeViewServiceImpl implements TreeViewService {
 			paramJsonObj.forEach((key, value) -> {
 				newEntity.putValue(key, value);
 			});
-			entity.putRelationEntity(newMappingName, relation, newEntity);
+			entity.putRelationEntity(newMappingNameList[newMappingNameList.length - 2], relation, newEntity);
 		}else {		//保存普通属性
 			paramJsonObj.forEach((key, value) -> {
 				entity.putValue(key, value);

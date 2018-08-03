@@ -5,7 +5,7 @@ import com.abc.mapping.node.ABCNode;
 
 public interface TreeViewService {
 	
-	String saveTree(String mappingName, String paramJson);
+	String saveTree(String paramJson);
 	
 	String getData(String mappingName, String code);
 	
