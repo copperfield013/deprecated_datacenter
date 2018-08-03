@@ -35,10 +35,10 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import com.abc.application.BizFusionContext;
 import com.abc.application.FusionContext;
-import com.abc.mapping.entity.Entity;
 import com.abc.panel.Integration;
 import com.abc.panel.PanelFactory;
 
@@ -47,14 +47,13 @@ import cn.sowell.copframe.dao.utils.NormalOperateDao;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.excel.CellTypeUtils;
+import cn.sowell.copframe.web.poll.WorkProgress;
 import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
-import cn.sowell.datacenter.entityResolver.FusionContextConfigResolver;
 import cn.sowell.datacenter.entityResolver.ImportCompositeField;
 import cn.sowell.datacenter.entityResolver.impl.EntityComponent;
 import cn.sowell.datacenter.model.modules.dao.ModulesImportDao;
 import cn.sowell.datacenter.model.modules.exception.ImportBreakException;
-import cn.sowell.datacenter.model.modules.pojo.ImportStatus;
 import cn.sowell.datacenter.model.modules.pojo.ImportTemplateCriteria;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplate;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplateField;
@@ -84,52 +83,64 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 	
 	
 	@Override
-	public void importData(Sheet sheet, ImportStatus importStatus, String module, UserIdentifier user)
+	public void importData(Sheet sheet, WorkProgress progress, String module, UserIdentifier user)
 			throws ImportBreakException {
 		Row headerRow = sheet.getRow(1);
 		if(module != null){
 			FusionContextConfig config = fFactory.getModuleConfig(module);
 			if(config != null) {
-				execute(sheet, headerRow, config, importStatus, user);
+				execute(sheet, headerRow, config, progress, user);
 			}
 		}
 	}
 	
-	private void execute(Sheet sheet, Row headerRow, FusionContextConfig config, ImportStatus importStatus, UserIdentifier user) throws ImportBreakException {
+	private void execute(Sheet sheet, Row headerRow, FusionContextConfig config, WorkProgress progress, UserIdentifier user) throws ImportBreakException {
 		logger.debug("导入表格【" + sheet.getSheetName() + "】");
-		importStatus.appendMessage("正在计算总行数");
-		importStatus.setTotal(colculateRowCount(sheet));
+		progress.appendMessage("正在计算总行数");
+		progress.setTotal(colculateRowCount(sheet));
 		int rownum = 2;
-		importStatus.appendMessage("开始导入");
+		progress.appendMessage("开始导入");
 		Integration integration = PanelFactory.getIntegration();
 		BizFusionContext context = config.getCurrentContext(user);
 		context.setSource(FusionContext.SOURCE_COMMON);
 		int failed = 0;
 		while(true){
-			if(importStatus.breaked()){
+			if(progress.isBreaked()){
+				progress.getLogger().warn("导入中断");
 				throw new ImportBreakException();
 			}
 			Row row = sheet.getRow(rownum++);
 			if(row == null || row.getCell(0) == null || !TextUtils.hasText(getStringWithBlank(row.getCell(0)))){
 				break;
 			}
-			importStatus.setCurrent(rownum - 2);
-			importStatus.startItemTimer().appendMessage("导入第" + importStatus.getCurrent() + "条数据");
+			progress.setCurrent(rownum - 2);
+			progress.startItemTimer().appendMessage("导入第" + progress.getCurrent() + "条数据");
 			try {
-				Entity entity = createImportEntity(config.getConfigResolver(), headerRow, row);
-				String code = integration.integrate(entity, context);
+				Map<String, Object> map = createImportData(headerRow, row);
+				progress.appendMessage("解析数据：\r\n" + displayRow(map));
+				EntityComponent entityC = config.getConfigResolver().createEntityIgnoreUnsupportedElement(map);
+				Assert.isTrue(entityC != null && entityC.getEntity() != null, "创建的实体为null");
+				String code = integration.integrate(entityC.getEntity(), context);
 				logger.debug("修改记录" + code);
-				importStatus.endItemTimer().appendMessage("第" + importStatus.getCurrent() + "条数据导入完成，用时" + numberFormat.format(importStatus.lastInterval()));
+				progress.endItemTimer().getLogger().success("第" + progress.getCurrent() + "条数据导入完成，用时" + numberFormat.format(progress.getLastItemInterval() / 1000f) + "秒");
 			} catch (Exception e) {
 				failed++;
 				logger.error("导入第" + rownum + "行时发生异常", e);
-				importStatus.endItemTimer().appendMessage("第" + importStatus.getCurrent() + "条数据导入异常，用时" + numberFormat.format(importStatus.lastInterval()));
+				progress.endItemTimer().getLogger().error("第" + progress.getCurrent() + "条数据导入异常，用时" + numberFormat.format(progress.getLastItemInterval() / 1000f) + "秒");
 			}
 		}
-		importStatus.appendMessage("导入完成,共导入" + (importStatus.getTotal() - failed) + "/" + importStatus.getTotal() + "条");
-		importStatus.setEnded();
+		progress.getLogger().success("导入完成,共导入" + (progress.getTotal() - failed) + "/" + progress.getTotal() + "条");
+		progress.setCompleted();
 		
 		
+	}
+
+	private String displayRow(Map<String, Object> map) {
+		StringBuffer buffer = new StringBuffer();
+		map.forEach((key, value)->{
+			buffer.append("\t" + key + ":" + value + "\r\n");
+		});
+		return buffer.toString();
 	}
 
 	private Integer colculateRowCount(Sheet sheet) {
@@ -182,16 +193,14 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 		return null;
 	}
 	
-	private Entity createImportEntity(FusionContextConfigResolver fusionContextConfigResolver, Row headerRow,
-			Row row) {
+	private Map<String, Object> createImportData(Row headerRow, Row row){
 		Map<String, Object> map = new HashMap<String, Object>();
 		int length = headerRow.getPhysicalNumberOfCells();
 		for (int i = 0; i < length; i++) {
 			Cell cell = row.getCell(i);
 			map.put(getStringWithBlank(headerRow.getCell(i)), getStringWithBlank(cell));
 		}
-		EntityComponent entity = fusionContextConfigResolver.createEntityIgnoreUnsupportedElement(map);
-		return entity == null? null: entity.getEntity();
+		return map;
 	}
 	
 	@Override

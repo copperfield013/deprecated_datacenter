@@ -30,13 +30,13 @@ import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
+import cn.sowell.copframe.web.poll.WorkProgress;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.common.RequestParameterMapComposite;
 import cn.sowell.datacenter.entityResolver.FieldDescCacheMap;
 import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
-import cn.sowell.datacenter.model.admin.pojo.ExportStatus;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.config.service.SideMenuService;
@@ -113,9 +113,9 @@ public class AdminModulesController {
 		//导出状态获取
 		String uuid = (String) session.getAttribute(AdminConstants.EXPORT_PEOPLE_STATUS_UUID);
 		if(uuid != null){
-			ExportStatus exportStatus = eService.getExportStatus(uuid);
-			if(exportStatus != null && !exportStatus.isBreaked() && !exportStatus.isCompleted()){
-				model.addAttribute("exportStatus", exportStatus);
+			WorkProgress progress = eService.getExportProgress(uuid);
+			if(progress != null && !progress.isBreaked() && !progress.isCompleted()){
+				model.addAttribute("exportStatus", progress);
 			}
 		}
 		//隐藏条件拼接成文件用于提示
@@ -168,12 +168,12 @@ public class AdminModulesController {
         if(timestamp != null){
         	date = new Date(timestamp);
         }
+        model.addAttribute("date", date == null? new Date(): date);
         TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
         TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
         
         ModuleEntityPropertyParser entity = mService.getEntity(moduleName, code, date, UserUtils.getCurrentUser());
         model.addAttribute("menu", menu);
-        model.addAttribute("date", date);
         model.addAttribute("entity", entity);
         model.addAttribute("datetime", datetime);
         model.addAttribute("dtmpl", dtmpl);

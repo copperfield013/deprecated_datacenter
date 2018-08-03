@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -35,17 +38,20 @@ import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
+import cn.sowell.copframe.dto.ajax.PollStatusResponse;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.copframe.spring.file.FileUtils;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.copframe.web.poll.ProgressPollableThread;
+import cn.sowell.copframe.web.poll.ProgressPollableThreadFactory;
+import cn.sowell.copframe.web.poll.WorkProgress;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.entityResolver.ImportCompositeField;
 import cn.sowell.datacenter.entityResolver.impl.RelationEntityProxy;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.modules.exception.ImportBreakException;
-import cn.sowell.datacenter.model.modules.pojo.ImportStatus;
 import cn.sowell.datacenter.model.modules.pojo.ImportTemplateCriteria;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplate;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplateField;
@@ -72,6 +78,12 @@ public class AdminModulesImportController {
 	
 	Logger logger = Logger.getLogger(AdminModulesImportController.class);
 	
+	
+	ProgressPollableThreadFactory pFactory = new ProgressPollableThreadFactory() {
+		{
+			setThreadExecutor(new ThreadPoolExecutor(6, 10, 5, TimeUnit.SECONDS, new SynchronousQueue<Runnable>()));
+		}
+	};
 	
 	@RequestMapping("/go/{menuId}")
 	public String goImport(@PathVariable Long menuId, Model model) {
@@ -126,16 +138,14 @@ public class AdminModulesImportController {
 	@ResponseBody
     @RequestMapping("/do/{menuId}")
 	public ResponseJSON doImport(
-			MultipartFile file,
-			@PathVariable Long menuId,
-			HttpSession session) {
+			@RequestParam MultipartFile file,
+			@PathVariable Long menuId) {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
         jRes.setStatus("error");
         ModuleMeta mData = mService.getModule(menu.getTemplateModule());
         if(mData != null) {
-        	String uuid = TextUtils.uuid();
-        	jRes.put("uuid", uuid);
+        	
         	Workbook wk = null;
         	try {
         		String fileName = file.getOriginalFilename();
@@ -153,24 +163,24 @@ public class AdminModulesImportController {
         		Sheet sheet = wk.getSheetAt(0);
         		if(sheet != null){
         			final Workbook workbook = wk;
-        			ImportStatus importStatus = new ImportStatus();
-        			session.setAttribute(AdminConstants.KEY_IMPORT_STATUS + uuid, importStatus);
         			UserIdentifier user = UserUtils.getCurrentUser();
-        			Thread thread = new Thread(()->{
-        				try {
-							impService.importData(sheet, importStatus, menu.getTemplateModule(), user);
-        				} catch (ImportBreakException e) {
-        					logger.error("导入被用户停止", e);
-        				} catch (Exception e) {
-        					logger.error("导入时发生未知异常", e);
-        				}finally{
-        					try {
-        						workbook.close();
-        					} catch (Exception e) {
-        						logger.error("关闭workbook时发生错误", e);
-        					}
-        				}
-        			});
+        			WorkProgress progress = new WorkProgress();
+                	jRes.put("uuid", progress.getUUID());
+                	ProgressPollableThread thread = pFactory.createThread(progress, p->{
+                		impService.importData(sheet, p, menu.getTemplateModule(), user);
+                	}, (p,e)->{
+                		if(e instanceof ImportBreakException) {
+							logger.error("导入被用户停止", e);
+						}else {
+							logger.error("导入时发生未知异常", e);
+						}
+                	}, e->{
+                		try {
+    						workbook.close();
+    					} catch (Exception e1) {
+    						logger.error("关闭workbook时发生错误", e1);
+    					}
+                	});
         			thread.start();
         			jRes.setStatus("suc");
         			jRes.put("msg", "开始导入");
@@ -186,29 +196,41 @@ public class AdminModulesImportController {
 	
 	@ResponseBody
     @RequestMapping("/status")
-    public JSONObjectResponse statusOfImport(HttpSession session, @RequestParam String uuid){
-    	JSONObjectResponse jRes = new JSONObjectResponse();
-        ImportStatus importStatus = (ImportStatus) session.getAttribute(AdminConstants.KEY_IMPORT_STATUS + uuid);
-        if(importStatus != null){
-            jRes.put("totalCount", importStatus.getTotal());
-            jRes.put("current", importStatus.getCurrent());
-            jRes.put("message", importStatus.getCurrentMessage());
-            jRes.put("lastInterval", importStatus.lastInterval());
-            if(importStatus.breaked()){
-                jRes.put("breaked", true);
-                session.removeAttribute(AdminConstants.KEY_IMPORT_STATUS + uuid);
-            }else if(importStatus.ended()){
-                jRes.put("ended", true);
-                session.removeAttribute(AdminConstants.KEY_IMPORT_STATUS + uuid);
+    public PollStatusResponse statusOfImport(HttpSession session,
+    		@RequestParam String uuid, 
+    		Boolean interrupted, 
+    		Integer msgIndex){
+		PollStatusResponse status = new PollStatusResponse();
+		WorkProgress progress = pFactory.getProgress(uuid);
+        if(progress != null){
+            if(progress.isCompleted()){
+            	status.setCompleted();
+            	pFactory.removeProgress(uuid);
+            }else {
+            	if(interrupted == true) {
+            		pFactory.stopWork(uuid);
+            	}
+            	if(progress.isBreaked()) {
+            		status.setBreaked();
+            		pFactory.removeProgress(uuid);
+            	}
             }
-            jRes.setStatus("suc");
+            status.setCurrent(progress.getCurrent());
+        	status.setTotalCount(progress.getTotal());
+        	if(msgIndex != null) {
+        		status.setMessageSequeue(progress.getLogger().getMessagesFrom(msgIndex));
+        	}
+        	status.put("message", progress.getLastMessage());
+        	status.put("lastInterval", progress.getLastItemInterval());
+        	status.setUUID(uuid);
+        	status.setSuccessStatus();
         }else{
-            jRes.setStatus("no found import progress");
+        	status.setStatus("no found import progress");
         }
-        return jRes;
+        return status;
     }
 	
-	@ResponseBody
+	/*@ResponseBody
     @RequestMapping("/break")
     public JSONObjectResponse breakImport(HttpSession session, @RequestParam String uuid){
         JSONObjectResponse jRes = new JSONObjectResponse();
@@ -218,7 +240,7 @@ public class AdminModulesImportController {
             jRes.setStatus("suc");
         }
         return jRes;
-    }
+    }*/
 	
 	@RequestMapping("/tmpl/{menuId}")
 	public String tmpl(

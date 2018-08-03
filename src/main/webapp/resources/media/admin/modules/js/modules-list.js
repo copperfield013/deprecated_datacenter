@@ -71,6 +71,9 @@ define(function(require, exports, module){
 					});
 				}
 			},
+			whenBreaked			: function(){
+				
+			},
 			whenUnsuccess		: function(res){
 				
 			}

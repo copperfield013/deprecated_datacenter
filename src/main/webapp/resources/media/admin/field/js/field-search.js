@@ -17,7 +17,9 @@ define(function(require, exports, module){
 			//是否显示数组字段
 			showArrayComposite	: true,
 			//是否显示复合字段
-			hideCompositeFields	: false
+			hideCompositeFields	: false,
+			//字段过滤器
+			fieldFilters	: []
 		};
 		
 		var param = $.extend({}, defaultParam, _param);
@@ -93,6 +95,23 @@ define(function(require, exports, module){
 					var composite = composites[i];
 					if(!param.showArrayComposite && composite.isArray == 1){
 						continue;
+					}
+					if(composite.fields){
+						for(var j in composite.fields){
+							var field = composite.fields[j];
+							field.isShow = true;
+							if($.isArray(param.fieldFilters) && param.fieldFilters.length > 0){
+								for(var k in param.fieldFilters){
+									var filter = param.fieldFilters[k];
+									try{
+										if(field.type == filter){
+											field.isShow = false;
+											break;
+										}
+									}catch(e){}
+								}
+							}
+						}
 					}
 					result.push(composite);
 				}

@@ -162,6 +162,7 @@ define(function(require, exports, module){
 			single			: true,
 			textPicked		: true,
 			module			: module,
+			fieldFilters	: ['file'], 
 			afterChoose		: function(field){
 				if(cField){
 					criteriaSearcher.enableField(cField.id);
@@ -969,7 +970,8 @@ define(function(require, exports, module){
 		var addColSearcher = FieldSearch.bind($('#addcol-field-search', $page), {
 			afterChoose		: addColumn,
 			module			: module,
-			showArrayComposite	: false
+			showArrayComposite	: false,
+			fieldFilters	: ['file']
 		});
 		var $orderFieldSearch = $('#order-field-search', $page);
 		var orderField = null;

@@ -59,7 +59,7 @@
 										<div class="form-group"> 
 											<label class="col-lg-3 control-label" for="name">模板Key</label>
 											<div class="col-lg-9">
-												<input type="text" placeholder="不填写时自动生成5位随机码" class="form-control"  name="key" value="${group.key }" />
+												<input type="text" ${group == null? '': 'disabled="disabled"' } placeholder="不填写时自动生成5位随机码" class="form-control"  name="key" value="${group.key }" />
 											</div>
 										</div>
 									</div>

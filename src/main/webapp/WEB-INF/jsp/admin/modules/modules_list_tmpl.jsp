@@ -194,10 +194,10 @@
 			pageNo	: '${criteria.pageInfo.pageNo}',
 			pageSize: '${criteria.pageInfo.pageSize}'
 		},{
-			uuid		: '${exportStatus.uuid}',
-			scope		: '${exportStatus.exportPageInfo.scope}',
-			rangeStart	: '${exportStatus.exportPageInfo.rangeStart}',
-			rangeEnd	: '${exportStatus.exportPageInfo.rangeEnd}'
+			uuid		: '${exportProgress.uuid}',
+			scope		: '${exportProgress.dataMap["exportPageInfo"].scope}',
+			rangeStart	: '${exportProgress.dataMap["exportPageInfo"].rangeStart}',
+			rangeEnd	: '${exportProgress.dataMap["exportPageInfo"].rangeEnd}'
 		});
 	});
 </script>

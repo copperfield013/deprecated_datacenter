@@ -1,10 +1,15 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <title>${module.title }导入</title>
-<div id="modules-import-${module.name }">
+<div class="modules-import-page" id="modules-import-${module.name }">
 	<div class="page-header">
 		<div class="header-title">
 			<h1>${module.title }导入</h1>
+		</div>
+		<div class="header-buttons">
+			<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
+				<i class="glyphicon glyphicon-refresh"></i>
+			</a>
 		</div>
 	</div>
 	<div class="page-body">
@@ -21,12 +26,6 @@
 						</div>
 						<a href="javascript:;" id="link-import-tmpl">模板</a>
 					</div>
-					<!-- <div class="form-group">
-						<label class="col-lg-2 control-label">表格名</label>
-						<div class="col-lg-6">
-							<select id="sheetName" name="sheetName" class="form-control"></select>
-						</div>
-					</div> -->
 					<div class="form-group">
 						<label class="col-lg-2 control-label">进度</label>
 						<div class="col-lg-6">
@@ -53,8 +52,38 @@
 				        </div>
 					</div>
 					<div class="form-group">
-						<div class="col-lg-6 col-lg-offset-2" id="feedback-msg">
-							
+						<div class="col-lg-6 col-lg-offset-2">
+							<div class="widget" id="feedback-msg-container">
+								<div class="widget-header">
+									<span class="widget-caption">导入日志</span>
+									<div class="widget-buttons" id="message-filter">
+										<label msg-type="INFO"> 
+											<input type="checkbox" checked="checked" class="inverted" />
+											<span class="text">常规</span>
+										</label>
+										<label msg-type="SUC"> 
+											<input type="checkbox" checked="checked" class="inverted" />
+											<span class="text">成功</span>
+										</label>
+										<label msg-type="ERROR"> 
+											<input type="checkbox" checked="checked" class="inverted" />
+											<span class="text">错误</span>
+										</label>
+										<label msg-type="WARN"> 
+											<input type="checkbox" checked="checked" class="inverted" />
+											<span class="text">警告</span>
+										</label>
+									</div>
+									<div class="widget-buttons buttons-bordered">
+                                        <button class="btn btn-blue btn-xs" id="btn-copy-feedback-msg" >复制</button>
+                                    </div>
+								</div>
+								<div class="widget-body" id="feedback-msg">
+								</div>
+								<div class="widge-footer" id="feedback-instance">
+									
+								</div>
+							</div>
 						</div>
 					</div>
 				</form>
@@ -63,91 +92,7 @@
 	</div>
 </div>
 <script>
-	seajs.use(['ajax', 'dialog', '$CPF'], function(Ajax, Dialog, $CPF){
-		var $page = $('#modules-import-${module.name }');
-		console.log($page);
-		var $feedback = $('#feedback-msg', $page);
-		var uuid = null;
-		var $form = $('form', $page);
-		var fileUUID = null;
-		
-		$('#submit', $page).click(function(){
-			Dialog.confirm('确认导入？', function(yes){
-				if(yes){
-					var formData = new FormData($form[0]);
-					$CPF.showLoading();
-					Ajax.ajax($form.attr('start-url'), formData, function(data){
-						if(data.status === 'suc' && data.uuid){
-							$('#break', $page).show();
-							$('#submit', $page).attr('disabled', 'disabled');
-							var timer = setInterval(function(){
-								uuid = data.uuid;
-								Ajax.ajax($form.attr('status-url'),{uuid: data.uuid}, function(data){
-									if(data.status === 'suc'){
-										if(typeof data.current === 'number' && typeof data.totalCount === 'number'){
-											var progress = data.current/data.totalCount;
-											var percent = parseFloat(progress * 100).toFixed(0);
-											$('#progress', $page)
-												.find('.progress-bar')
-												.attr('aria-valuenow', percent)
-												.css('width', percent + '%')
-												.find('span')
-													.text(percent + '%');
-											var remain = data.totalCount - data.current;
-											
-											if(progress >= 1){
-												Dialog.notice('导入完成', 'success');
-												$('#progress span', $page).text('导入完成');
-												clearInterval(timer);
-												$feedback.text(data.message);
-												$('#submit', $page).removeAttr('disabled').text('重新导入');
-												uuid = null;
-											}else{
-												var msg = data.message + ',' 
-															+ '剩余' + remain + '条';
-												if(data.lastInterval && data.lastInterval > 0){
-													msg += '，当前速率' + parseFloat(1000 / data.lastInterval).toFixed(2) + '条/秒，'
-													+ '预计剩余时间' + parseFloat(remain * data.lastInterval / 1000).toFixed(0) + '秒';
-												}
-												$feedback.text(msg);
-											}
-										}
-									}else{
-										clearInterval(timer);
-										$('#submit', $page).removeAttr('disabled').text('重新导入');
-										uuid = null;
-									}
-								});
-							}, 1000);
-						}else{
-							if(data.status === 'error' && data.msg){
-								Dialog.notice(data.msg, 'error');
-							}
-						}
-					}, {
-						afterLoad	: function(){
-							$CPF.closeLoading();
-						}
-					});
-				}
-			});
-		});
-		$('#break', $page).click(function(){
-			if(uuid){
-				Dialog.confirm('确认停止当前的导入任务？', function(){
-						Ajax.ajax($form.attr('break-url'), {uuid: uuid}, function(data){
-							if(data.status === 'suc'){
-								$('#break', $page).hide();
-							}
-						});
-				});
-			}
-		});
-		$('#link-import-tmpl', $page).click(function(){
-			Dialog.openDialog('admin/modules/import/tmpl/${menu.id}', '字段', undefined, {
-				width	: 1000,
-				height	: 500
-			});
-		});
+	seajs.use(['modules/js/modules-import.js'], function(Imp){
+		Imp.initPage($('#modules-import-${module.name }') ,'${menu.id}')
 	});
 </script>

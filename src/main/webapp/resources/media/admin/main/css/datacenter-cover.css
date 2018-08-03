@@ -657,32 +657,71 @@ input.search-input:hover {
 	}
 }
 
-/* 
-.page-sidebar .sidebar-menu>li {
-    height: auto;
-    min-height: 40px;
-    display: block;
-}
-.page-sidebar .sidebar-menu>li>a {
-    height: auto;
-    min-height: 40px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+
+
+.modules-import-page div#feedback-msg {
+    height: 240px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    padding: 10px 0;
 }
 
-.page-sidebar .sidebar-menu>li>a>span {
-    display: inline-block;
-    float: left;
-}
-.page-sidebar .sidebar-menu>li>a>span.icon-span {
-    width: 30%;
-    height: auto;
+.modules-import-page div#feedback-msg>p {
+   border-bottom: 1px solid #f9f9f9;
+   padding: 3px 1em;
 }
 
-.page-sidebar .sidebar-menu>li>a>span.text-span {
-    width: 60%;
-    height: auto;
-    line-height: 2em;
-    margin-left: 10%;
-} */
+.modules-import-page div#feedback-msg>p>.content {margin-left: 1em;}
+.modules-import-page div#feedback-msg>p:hover {
+  	background-color: #eee;
+}
+
+
+
+.modules-import-page div#feedback-msg>p.ERROR>.content, 
+.modules-import-page div#feedback-msg-container label[msg-type="ERROR"]{
+    color: #d73d32;
+    font-weight: bold;
+}
+.modules-import-page div#feedback-msg-container label[msg-type="ERROR"] input[type=checkbox].inverted:checked+.text:before{
+	background-color: #d73d32;
+    border-color: #d73d32;
+    color: #fff;
+}
+
+
+.modules-import-page div#feedback-msg>p.SUC>.content, 
+.modules-import-page div#feedback-msg-container label[msg-type="SUC"]{
+    color: #53a93f;
+    font-weight: bold;
+}
+
+.modules-import-page div#feedback-msg-container label[msg-type="SUC"] input[type=checkbox].inverted:checked+.text:before{
+	background-color: #53a93f;
+    border-color: #53a93f;
+    color: #fff;
+}
+
+.modules-import-page div#feedback-msg>p.WARN>.content, 
+.modules-import-page div#feedback-msg-container label[msg-type="WARN"]{
+    color: #f4b400;
+    font-weight: bold;
+}
+
+.modules-import-page div#feedback-msg-container label[msg-type="WARN"] input[type=checkbox].inverted:checked+.text:before{
+	background-color: #f4b400;
+    border-color: #f4b400;
+    color: #fff;
+}
+
+div.widge-footer {
+    position: relative;
+    min-height: 30px;
+    line-height: 30px;
+    background: #fff;
+    -webkit-box-shadow: 0 0 4px rgba(0,0,0,.3);
+    -moz-box-shadow: 0 0 4px rgba(0,0,0,.3);
+    box-shadow: 0 0 4px rgba(0,0,0,.3);
+    color: #555;
+    padding-left: 12px;
+}

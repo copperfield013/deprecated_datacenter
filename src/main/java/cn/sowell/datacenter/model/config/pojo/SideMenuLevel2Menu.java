@@ -9,7 +9,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
-@Table(name="t_config_sidemenu_level2")
+@Table(name="t_sa_config_sidemenu_level2")
 public class SideMenuLevel2Menu {
 	
 	@Id

@@ -12,7 +12,7 @@ import javax.persistence.Table;
 import com.alibaba.fastjson.annotation.JSONField;
 
 @Entity
-@Table(name="t_import_tmpl_field")
+@Table(name="t_sa_import_tmpl_field")
 public class ModuleImportTemplateField {
 	
 	@Id

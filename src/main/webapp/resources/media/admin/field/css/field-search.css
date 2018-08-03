@@ -206,3 +206,6 @@ div.fieldpicker-container ul.nav li.array-field>a{
 .field-search a.disabled.fieldpicker-field-item {
     color: #ccc !important;
 }
+.field-search a.fieldpicker-field-item.field-hidden {
+    display: none;
+}

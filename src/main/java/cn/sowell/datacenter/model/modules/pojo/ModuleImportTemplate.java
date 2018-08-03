@@ -10,7 +10,7 @@ import cn.sowell.dataserver.model.tmpl.pojo.AbstractTemplate;
 
 
 @Entity
-@Table(name="t_import_tmpl")
+@Table(name="t_sa_import_tmpl")
 public class ModuleImportTemplate extends AbstractTemplate{
 	
 	@Transient

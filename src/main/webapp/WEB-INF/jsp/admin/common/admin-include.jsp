@@ -33,3 +33,4 @@
 <script src="${basePath }media/seajs-css-debug.js"></script>
 <script src="${basePath }media/admin/plugins/typeahead/dist/handlebars.js"></script>
 <script src="${basePath }media/admin/plugins/typeahead/dist/typeahead.bundle.js?v=$${cpfVersion}"></script>
+<script src="${basePath }media/admin/plugins/clipboard/clipboard.js?v=$${cpfVersion}"></script>

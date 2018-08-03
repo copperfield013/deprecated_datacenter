@@ -41,13 +41,13 @@ define(function(require, exports, module){
 				});
 			}
 		});
-		$('.show-more-history', $page).on('click', '.circ', function(){
+		$('.VivaTimeline', $page).on('click', '.circ', function(){
 			var time = parseInt($(this).closest('dd').attr('data-time'));
 			$page.getLocatePage().loadContent('admin/modules/curd/detail/' + menuId + '/' + entityCode, null, {timestamp:time});
 			
 		});
 		
-		var theTime = parseInt();
+		theTime = parseInt(theTime);
 		function appendHistory(history){
 			if(history.length > 0){
 				var $dl = $('dl', $page);
