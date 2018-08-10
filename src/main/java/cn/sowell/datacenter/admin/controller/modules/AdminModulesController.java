@@ -2,6 +2,7 @@ package cn.sowell.datacenter.admin.controller.modules;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,11 +21,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
+import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.FormatUtils;
@@ -33,10 +36,12 @@ import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.copframe.web.poll.WorkProgress;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.common.RequestParameterMapComposite;
+import cn.sowell.datacenter.entityResolver.CEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.FieldDescCacheMap;
 import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
+import cn.sowell.datacenter.entityResolver.impl.ABCNodeProxy;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.config.service.SideMenuService;
@@ -48,10 +53,14 @@ import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.modules.service.ViewDataService;
 import cn.sowell.dataserver.model.modules.service.impl.ListTemplateEntityView;
 import cn.sowell.dataserver.model.modules.service.impl.ListTemplateEntityViewCriteria;
+import cn.sowell.dataserver.model.modules.service.impl.SelectionTemplateEntityView;
+import cn.sowell.dataserver.model.modules.service.impl.SelectionTemplateEntityViewCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupPremise;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListCriteria;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionCriteria;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionTemplate;
 import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
 @Controller
@@ -283,9 +292,9 @@ public class AdminModulesController {
 			@PathVariable Long menuId,
 			@PathVariable String code
 			) {
-		authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		try {
-			mService.deleteEntity(code);
+			mService.deleteEntity(menu.getTemplateModule(), code, UserUtils.getCurrentUser());
 			return AjaxPageResponse.REFRESH_LOCAL("删除成功");
 		} catch (Exception e) {
 			logger.error("删除失败", e);
@@ -293,5 +302,81 @@ public class AdminModulesController {
 		}
 	}
 	
+	
+	@RequestMapping("/open_selection/{menuId}/{stmplId}")
+	public String openSelection(
+			@PathVariable Long menuId, 
+			@PathVariable Long stmplId,
+			String exists,
+			PageInfo pageInfo,
+			HttpServletRequest request,
+			Model model) {
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		TemplateSelectionTemplate stmpl = tService.getSelectionTemplate(stmplId);
+		
+		//创建条件对象
+		Map<Long, String> criteriaMap = exractTemplateCriteriaMap(request);
+		SelectionTemplateEntityViewCriteria criteria = new SelectionTemplateEntityViewCriteria(stmpl, criteriaMap);
+		//设置条件
+		criteria.setExistCodes(TextUtils.split(exists, ",", HashSet<String>::new, e->e));
+		criteria.setPageInfo(pageInfo);
+		criteria.setUser(UserUtils.getCurrentUser());
+		//执行查询
+		SelectionTemplateEntityView view = (SelectionTemplateEntityView) vService.query(criteria);
+		model.addAttribute("view", view);
+		
+		//隐藏条件拼接成文件用于提示
+		Set<TemplateSelectionCriteria> tCriterias = view.getSelectionTemplate().getCriterias();
+		StringBuffer hidenCriteriaDesc = new StringBuffer();
+		if(tCriterias != null){
+			for (TemplateSelectionCriteria tCriteria : tCriterias) {
+				if(tCriteria.getQueryShow() == null && TextUtils.hasText(tCriteria.getDefaultValue()) && tCriteria.getFieldAvailable()) {
+					hidenCriteriaDesc.append(tCriteria.getTitle() + ":" + tCriteria.getDefaultValue() + "&#10;");
+				}
+			}
+		}
+		
+		model.addAttribute("menu", menu);
+		model.addAttribute("stmpl", stmpl);
+		model.addAttribute("criteria", criteria);
+		return AdminConstants.JSP_MODULES + "/modules_selection.jsp";
+	}
+	
+	
+	@ResponseBody
+	@RequestMapping("/load_entities/{menuId}/{stmplId}")
+	public ResponseJSON loadEntities(
+			@PathVariable Long menuId,
+			@PathVariable Long stmplId,
+			@RequestParam String codes, 
+			@RequestParam String fields) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		authService.vaidateL2MenuAccessable(menuId);
+		TemplateSelectionTemplate stmpl = tService.getSelectionTemplate(stmplId);
+		Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(
+				stmpl.getModule(), 
+				stmpl.getRelationName(), 
+				TextUtils.split(codes, ",", HashSet<String>::new, c->c), UserUtils.getCurrentUser())
+				;
+		JSONObject entities = toEntitiesJson(parsers, TextUtils.split(fields, ",", HashSet<String>::new, f->f));
+		jRes.put("entities", entities);
+		jRes.setStatus("suc");
+		return jRes;
+	}
+
+	private JSONObject toEntitiesJson(Map<String, CEntityPropertyParser> parsers, Set<String> fieldNames) {
+		JSONObject entities = new JSONObject();
+		if(parsers != null && fieldNames != null) {
+			parsers.forEach((code, parser)->{
+				JSONObject entity = new JSONObject();
+				entity.put(ABCNodeProxy.CODE_PROPERTY_NAME, parser.getCode());
+				entities.put(parser.getCode(), entity);
+				for (String fieldName : fieldNames) {
+					entity.put(fieldName, parser.getFormatedProperty(fieldName));
+				}
+			});
+		}
+		return entities;
+	}
 	
 }

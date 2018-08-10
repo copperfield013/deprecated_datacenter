@@ -511,7 +511,7 @@ define(function(require, exports, module){
 	}
 	
 	function download(url, fileName){
-		if(utils.isPhoto(url)){
+		if(utils.isPhoto(url) || /.*\.pdf$/i.test(url)){
 			var a = document.createElement('a');
 			if(a.download !== undefined){
 				a.download = fileName || url.substring(url.lastIndexOf('/') + 1);

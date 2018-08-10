@@ -343,3 +343,13 @@ th.field-unavailable:before {
     -moz-osx-font-smoothing: grayscale;
     padding-right: 7px;
 }
+
+.dtmpl-update .select-arrayitem-control{
+	
+}
+
+.dtmpl-update .field-group .btn-select {
+    padding: 0px 5px;
+    font-size: 12px;
+    line-height: 20px;
+}

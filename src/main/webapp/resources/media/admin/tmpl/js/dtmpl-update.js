@@ -136,6 +136,7 @@ define(function(require, exports, module){
 					//添加数组字段
 					var $arrayTable = $('.field-array-table', $fieldContainer);
 					if($arrayTable.length == 0){
+						//还没有添加字段过
 						$arrayTable = $('#tmpl-field-array-table', $page).tmpl();
 						$arrayTable.appendTo($fieldContainer);
 						if($.isArray(option.relations)){
@@ -175,6 +176,37 @@ define(function(require, exports, module){
 								console.log(ui);
 							}
 						});
+						$group.find('.select-arrayitem-control')
+							.find(':checkbox').change(function(){
+								//勾选是否显示选择按钮
+								var $checkbox = $(this);
+								var $a = $checkbox.closest('label').prev('a');
+								$a.toggle($checkbox.prop('checked'));
+							})
+							.end().find('a.btn-select').click(function(){
+								var reqParam = {};
+								var stmplId = $group.attr('stmpl-id'); 
+								if(!stmplId){
+									reqParam.moduleName = param.module;
+									reqParam.compositeId = field.c_id;
+								}
+								require('dialog').openDialog(
+										'admin/tmpl/stmpl/' + (stmplId? ('update/' + stmplId) : 'create')
+										, '编辑选择模板' + field.c_title, undefined, {
+									reqParam	: reqParam,
+									width		: 1000,
+									height		: 500,
+									events		: {
+										afterSave	: function(stmplId){
+											if(stmplId){
+												console.log(stmplId);
+												$group.attr('stmpl-id', stmplId);
+											}
+										}
+									}
+								});
+							})
+							.end().show();
 					}
 					var $titleCell = $('#tmpl-field-array-title', $page).tmpl(fieldData);
 					$titleCell.data('field-data', fieldData);
@@ -268,6 +300,7 @@ define(function(require, exports, module){
 				saveData.groups.push(group);
 				if(isArray){
 					group.compositeId = $group.attr('composite-id');
+					group.selectionTemplateId = $group.attr('stmpl-id');
 					$arrayTable.find('.title-row>th[field-id]').each(function(){
 						var $th = $(this);
 						var field = $th.data('field-data');

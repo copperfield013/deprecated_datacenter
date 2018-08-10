@@ -434,3 +434,17 @@ th.field-unavailable:before {
 .entity-detail-tmpl .form-group.field-item.field-validate-error .field-value {
 	border: 1px solid #f00;
 }
+
+.entity-detail-tmpl a.open-select-dialog {
+    font-size: 14px;
+    color: #fff;
+    background-color: #126def;
+    border-radius: 11px;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+}
+.entity-detail-tmpl a.open-select-dialog:hover {
+    background-color: #52adff;
+}

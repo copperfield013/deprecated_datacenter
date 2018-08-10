@@ -12,12 +12,22 @@
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/dtmpl-update.css" />
 <div id="dtmpl-update-${module.name}-${tmpl.id }" class="dtmpl-update">
 	<script type="jquery/tmpl" id="tmpl-field-group">
-		<div class="widget field-group" data-id="\${id}">
+		<div class="widget field-group" data-id="\${id}" stmpl-id="\${selectionTemplateId}">
 			<div class="widget-header">
 				<span class="widget-caption">
 					<span class="group-title">\${title}</span>
 				</span>
-				<div class="widget-buttons">
+				<div class="widget-buttons select-arrayitem-control" style="display:none">
+					<a class="btn btn-info btn-xs btn-select">
+						<i class="fa fa-link"></i>
+						选择
+					</a>
+          	         <label title="是否显示选择按钮">
+         	            <input type="checkbox" class="colored-blue" checked="checked">
+         	            <span class="text"></span>
+         	         </label>
+             	</div>
+				<div class="widget-buttons buttons-bordered">
 					<div class="input-icon field-search">
 						<span class="search-input-wrapper">
 							<input type="text" class="search-text-input form-control input-xs glyphicon-search-input" autocomplete="off" placeholder="输入添加的字段名">
@@ -92,6 +102,11 @@
 	<div class="page-header">
 		<div class="header-title">
 			<h1>${title }</h1>
+		</div>
+		<div class="header-buttons">
+			<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
+				<i class="glyphicon glyphicon-refresh"></i>
+			</a>
 		</div>
 	</div>
 	<div class="page-body">

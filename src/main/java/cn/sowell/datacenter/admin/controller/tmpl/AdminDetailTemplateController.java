@@ -190,6 +190,7 @@ public class AdminDetailTemplateController {
 						group.setTitle(jGroup.getString("title"));
 						group.setIsArray(jGroup.getBoolean("isArray")?1:null);
 						group.setCompositeId(jGroup.getLong("compositeId"));
+						group.setSelectionTemplateId(jGroup.getLong("selectionTemplateId"));
 						group.setOrder(i++);
 						data.getGroups().add(group);
 						JSONArray jFields = jGroup.getJSONArray("fields");
@@ -220,5 +221,6 @@ public class AdminDetailTemplateController {
 		}
 		return null;
 	}
+	
 	
 }

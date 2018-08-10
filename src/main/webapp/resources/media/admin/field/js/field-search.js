@@ -8,7 +8,7 @@ define(function(require, exports, module){
 			//是否单选.未完成
 			single			: false,
 			$container		: $(),
-			reqDataURL		: 'admin/field/json/people',
+			reqDataURL		: '',
 			reqDataParam	: {},
 			disablePicked	: true,
 			afterPicked		: $.noop,
@@ -19,7 +19,8 @@ define(function(require, exports, module){
 			//是否显示复合字段
 			hideCompositeFields	: false,
 			//字段过滤器
-			fieldFilters	: []
+			fieldFilters	: [],
+			compositeId		: undefined
 		};
 		
 		var param = $.extend({}, defaultParam, _param);
@@ -93,6 +94,9 @@ define(function(require, exports, module){
 			if($.isArray(composites)){
 				for(var i in composites){
 					var composite = composites[i];
+					if(param.compositeId && composite.c_id != param.compositeId){
+						continue;
+					}
 					if(!param.showArrayComposite && composite.isArray == 1){
 						continue;
 					}

@@ -109,12 +109,18 @@
 															class="th-field-title ${field.fieldAvailable? '': 'field-unavailable'}"
 															title="${field.fieldAvailable? '': '无效字段' }"
 															fname-format="${fieldDescMap[field.fieldId].arrayFieldNameFormat }"
+															fname-full="${fieldDescMap[field.fieldId].fullKey }"
 															fInp-type="${field.type }"
 															fInp-optkey="${field.optionGroupId }"
-															fInp-fieldkey="${module.name }@${tmplField.fieldName }"
+															fInp-fieldkey="${module.name }@${field.fieldName }"
 															>${field.title }</th>
 													</c:forEach>
-													<th width="10px"><span class="array-item-add" title="添加一行">+</span></th>
+													<th width="20px">
+														<c:if test="${tmplGroup.selectionTemplateId != null}">
+															<a title="选择" stmpl-id="${tmplGroup.selectionTemplateId }" href="javascript:;" class="open-select-dialog fa fa-link"></a>
+														</c:if>
+														<span class="array-item-add" title="添加一行">+</span>
+													</th>
 												</tr>
 											</thead>
 											<tbody>
@@ -122,7 +128,7 @@
 													<tr class="value-row">
 														<td>
 															<span>${i.index + 1 }</span>
-															<input type="hidden" name="${entityItem.codeName }" value="${entityItem.code }" />
+															<input class="entity-code" type="hidden" name="${entityItem.codeName }" value="${entityItem.code }" />
 														</td>
 														<c:if test="${tmplGroup.relationSubdomain != null }">
 															<c:set var="relationName" value="${tmplGroup.composite.name }[${i.index }].$$label$$" />
@@ -143,6 +149,7 @@
 																<span class="field-value">
 																	<span class="field-input" 
 																		fInp-type="${tmplField.type }"
+																		fname-full="${fieldDescMap[tmplField.fieldId].fullKey }"
 																		fInp-name="${fieldDescMap[tmplField.fieldId].arrayFieldNameMap[i.index] }"
 																		fInp-value="${entityItem.smap[tmplField.fieldName] }"
 																		fInp-optkey="${tmplField.optionGroupId }"
@@ -173,6 +180,7 @@
 		ModulesUpdate.init(
 				$page, 
 				'${module.name}', 
-				'${entity.code}');
+				'${entity.code}',
+				'${menu.id }');
 	});
 </script>

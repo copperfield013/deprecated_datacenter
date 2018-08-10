@@ -143,7 +143,6 @@ public class AdminListTemplateController {
 		ModuleMeta moduleMeta = mService.getModule(ltmpl.getModule());
 		model.addAttribute("module", moduleMeta);
 		model.addAttribute("ltmpl", ltmpl);
-		model.addAttribute("fieldInputTypeMap", JSON.toJSON(dictService.getFieldInputTypeMap()));
 		model.addAttribute("tmplDataJSON", tmplDataJSON);
 		model.addAttribute("columnDataJSON", columnDataJSON);
 		model.addAttribute("criteriaDataJSON", criteriaDataJSON);

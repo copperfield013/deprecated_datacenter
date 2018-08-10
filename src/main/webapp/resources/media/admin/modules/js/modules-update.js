@@ -7,12 +7,15 @@ define(function(require, exports, module){
 		DtmplUpdate = require('tmpl/js/dtmpl-update.js'),
 		Utils = require('utils')
 	
-	exports.init = function($page, moduleName, entityCode){
+	exports.init = function($page, moduleName, entityCode, menuId){
 		var isUpdateMode = entityCode !== '';
 		
 		$CPF.showLoading();
 		FieldInput.loadGlobalOptions('admin/field/enum_json').done(function(){
-			appendTo($page, $('.field-input', $page));
+			appendTo($page, $('.field-input', $page)).done(function(initInput, refreshRowTable){
+				initInput();
+				refreshRowTable();
+			});
 			$CPF.closeLoading();
 		});
 		
@@ -62,8 +65,76 @@ define(function(require, exports, module){
 				}
 			});
 		});
+		$('.open-select-dialog[stmpl-id]', $page).click(function(){
+			var $this = $(this);
+			var stmplId = $this.attr('stmpl-id');
+			var existCodes = []; 
+			$this.closest('table').find('value-row').each(function(){
+				var entityCode = $(this).find(':hidden.entity-code').val();
+				if(entityCode){
+					existCodes.push(entityCode);
+				}
+			});
+			
+			Dialog.openDialog('admin/modules/curd/open_selection/' + menuId + '/' + stmplId, 
+					undefined, undefined, {
+				reqParam	: {
+					exists	: existCodes.join()
+				},
+				width		: 1000,
+				height		: 400,
+				onSubmit	: function(entitiesLoader){
+					var fields = [];
+					$this.closest('table').find('thead .th-field-title[fname-full]').each(function(){
+						var fieldName = $(this).attr('fname-full');
+						fields.push(fieldName);
+					});
+					entitiesLoader(fields).done(function(entities){
+						console.log(entities);
+						function _(i){
+							if(entitiesLoader.codes.length > i){
+								addRow($this.closest('table')).done(function(initInput, refreshRowTable, $row, $doms){
+									setFieldValue(entities[entitiesLoader.codes[i]], $row, $doms);
+									initInput();
+									if(entitiesLoader.codes.length > i + 1){
+										_(i + 1);
+									}else{
+										refreshRowTable();
+									}
+								});
+							}
+						}
+						_(0);
+					});
+				}
+			});
+			
+		});
+		
+		function setFieldValue(entity, $row){
+			var $codeInput = $('<input type="hidden" class="entity-code" />');
+			$codeInput.val(entity['唯一编码']);
+			$row.children('td').first().append($codeInput);
+			$row.find('.field-input[fname-full]').each(function(){
+				var $this = $(this);
+				var value = entity[$this.attr('fname-full')];
+				if(value){
+					$this.attr('fInp-value', value);
+				}
+			});
+			console.log(arguments);
+		}
+		
+		
 		$('.array-item-add', $page).click(function(){
 			var $table = $(this).closest('table');
+			addRow($table).done(function(initInput, refreshRowTable){
+				initInput();
+				refreshRowTable();
+			});
+		});
+		
+		function addRow($table){
 			var $tbody = $table.children('tbody');
 			var $titleRow = $table.find('.title-row');
 			var $dataRow = $('<tr>').append('<td><span></span></td>')
@@ -75,10 +146,11 @@ define(function(require, exports, module){
 				}else{
 					var $fieldInput = $('<span class="field-input"></span></span>');
 					$fieldInput
-						.attr('fInp-type', $title.attr('fInp-type'))
-						.attr('fInp-optkey', $title.attr('fInp-optkey'))
-						.attr('fInp-fieldkey', $title.attr('fInp-fieldkey'))
-						.appendTo($('<span class="field-value"></span>').appendTo($td));
+					.attr('fInp-type', $title.attr('fInp-type'))
+					.attr('fInp-optkey', $title.attr('fInp-optkey'))
+					.attr('fInp-fieldkey', $title.attr('fInp-fieldkey'))
+					.attr('fname-full', $title.attr('fname-full'))
+					.appendTo($('<span class="field-value"></span>').appendTo($td));
 					if($title.attr('fInp-optset')){
 						$fieldInput.attr('fInp-optset', $title.attr('fInp-optset'));
 					}
@@ -87,16 +159,19 @@ define(function(require, exports, module){
 			});
 			$dataRow.append('<td><span class="array-item-remove" title="移除当前行">×</span></td>');
 			$dataRow.appendTo($tbody);
-			appendTo($page, $dataRow.find('.field-input')).done(function(){
-				refreshTable($table);
-			})
-		});
+			var deferred = $.Deferred();
+			appendTo($page, $dataRow.find('.field-input')).done(function(initInput, refreshRowTable, $doms){
+				deferred.resolve(initInput, refreshRowTable, $dataRow, $doms);
+			});
+			return deferred;
+		}
 		
 		setTimeout(function(){
 			$('.field-title', $page).each(function(){DtmplUpdate.adjustFieldTitle($(this))});
 		}, 100);
 		
 	}
+	
 	
 	function appendTo($page, $doms, paramGetter){
 		var def = $.Deferred();
@@ -116,26 +191,41 @@ define(function(require, exports, module){
 				fieldKey	: attr('fInp-fieldkey')
 			};
 		};
+		var $tables = [];
 		$doms.each(function(){
-			var $this = $(this);
-			var param = paramGetter($this);
-			var fInp = new FieldInput(param);
-			var $sames = $page.find('.field-value[value-field-name="' + param.name + '"]');
-			//字段与模板组合默认字段相同时，禁用字段编辑
-			if($sames.filter('.premises-container *').length > 0){
-				fInp.setDisabled();
-			}
-			//fieldName相同的字段，将其统一
-			$sames.not('.premises-container *').each(function(){
-				var otherInput = $(this).find('.field-input').data('field-input');
-				if(otherInput){
-					fInp.relateInput(otherInput);
-					fInp.removeFormName();
+			var $table = $(this).closest('table');
+			for(var i in $tables){
+				if($table.is($tables[i])){
+					return;
 				}
-			});
-			$this.append(fInp.getDom()).data('field-input', fInp);
+			}
+			$tables.push($table);
 		});
-		def.resolve();
+		def.resolve(function(){
+			$doms.each(function(){
+				var $this = $(this);
+				var param = paramGetter($this);
+				var fInp = new FieldInput(param);
+				var $sames = $page.find('.field-value[value-field-name="' + param.name + '"]');
+				//字段与模板组合默认字段相同时，禁用字段编辑
+				if($sames.filter('.premises-container *').length > 0){
+					fInp.setDisabled();
+				}
+				//fieldName相同的字段，将其统一
+				$sames.not('.premises-container *').each(function(){
+					var otherInput = $(this).find('.field-input').data('field-input');
+					if(otherInput){
+						fInp.relateInput(otherInput);
+						fInp.removeFormName();
+					}
+				});
+				$this.append(fInp.getDom()).data('field-input', fInp);
+			});
+		}, function(){
+			for(var i in $tables){
+				refreshTable($tables[i]);
+			}
+		}, $doms);
 		return def.promise();
 	};
 	

@@ -82,6 +82,8 @@ public interface AdminConstants {
 	
 	final String JSP_TMPL_GROUP = JSP_TMPL + "/group";
 	
+	final String JSP_TMPL_SELECTION = JSP_TMPL + "/stmpl";
+	
 	final String JSP_MODULES = JSP_BASE + "/modules";
 	
 	/**
@@ -110,6 +112,8 @@ public interface AdminConstants {
 	final String JSP_CONFIG = JSP_BASE + "/config";
 
 	final String JSP_CONFIG_SIDEMENU = JSP_CONFIG + "/sidemenu";
+
+	
 
 
 	
