@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -29,8 +30,6 @@ public class AuthorityServiceImpl implements AuthorityService{
 	@Resource
 	SideMenuService menuService;
 	
-	
-	
 	@Override
 	public SideMenuLevel2Menu vaidateL2MenuAccessable(Long level2MenuId) throws NonAuthorityException{
 		Assert.notNull(level2MenuId, "二级菜单的id不能为空");
@@ -50,7 +49,7 @@ public class AuthorityServiceImpl implements AuthorityService{
 		
 		SideMenuLevel1Menu l1 = menuService.getLevel1Menu(level1MenuId);
 		if(l1 != null) {
-			ABCUser user = (ABCUser) UserUtils.getCurrentUser();
+			UserDetails user = (UserDetails) UserUtils.getCurrentUser();
 			Set<String> userAuthorities = CollectionUtils.toSet(user.getAuthorities(), GrantedAuthority::getAuthority);
 			
 			//只有当用户至少包含菜单的其中一个权限时，才能验证成功

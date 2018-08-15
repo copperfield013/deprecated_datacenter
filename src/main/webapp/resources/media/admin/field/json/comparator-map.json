@@ -34,8 +34,7 @@
 			},
 			{
 				"title"	: "不等于",
-				"key"	: "t4n",
-				"class"	: "negative"
+				"key"	: "t4n"
 			}
 		]
 	},
@@ -52,8 +51,7 @@
 			},
 			{
 				"title"	: "不为",
-				"key"	: "s1n",
-				"class"	: "negative"
+				"key"	: "s1n"
 			}
 		]
 	},
@@ -92,8 +90,7 @@
 			},
 			{
 				"title"	: "不在",
-				"key"	: "d1n",
-				"class"	: "negative"
+				"key"	: "d1n"
 			},
 			{
 				"title"	: "不早于",
@@ -169,6 +166,19 @@
 				"title"	: "不包含",
 				"key"	: "l1n",
 				"class"	: "negative"
+			}
+		]
+	},
+	"none"			: {
+		"class"		: "hidden-only",
+		"comparators"		: [
+			{
+				"title"	: "不为空",
+				"key"	: "none1"
+			},
+			{
+				"title"	: "为空",
+				"key"	: "none1n"
 			}
 		]
 	}

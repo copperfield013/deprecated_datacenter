@@ -207,6 +207,7 @@ define(function(require, exports, module){
 								});
 							})
 							.end().show();
+						$group.find('.select-arrayitem-control :checkbox.selectable').prop('checked', !!$group.attr('stmpl-id')).trigger('change');
 					}
 					var $titleCell = $('#tmpl-field-array-title', $page).tmpl(fieldData);
 					$titleCell.data('field-data', fieldData);
@@ -299,8 +300,11 @@ define(function(require, exports, module){
 				};
 				saveData.groups.push(group);
 				if(isArray){
+					var $selectable = $group.find('.selectable:checkbox');
+					if($selectable.prop('checked')){
+						group.selectionTemplateId = $group.attr('stmpl-id');
+					}
 					group.compositeId = $group.attr('composite-id');
-					group.selectionTemplateId = $group.attr('stmpl-id');
 					$arrayTable.find('.title-row>th[field-id]').each(function(){
 						var $th = $(this);
 						var field = $th.data('field-data');

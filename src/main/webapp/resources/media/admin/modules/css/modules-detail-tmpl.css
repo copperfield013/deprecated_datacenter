@@ -401,10 +401,15 @@ th.field-unavailable:before {
 .entity-detail-tmpl .dtmpl-field-validates{
     position: absolute;
     bottom: 0;
-    left: 0;
+    right: 0;
     display: block;
     height: 1em;
     line-height: 1em;
+}
+.entity-detail-tmpl .form-group.field-item  .dtmpl-field-validates{
+	right: 7%;
+	height: 2em;
+	line-height: 2em;
 }
 .entity-detail-tmpl .dtmpl-field-validates:before{
     content: "";
@@ -428,10 +433,12 @@ th.field-unavailable:before {
 .entity-detail-tmpl .dtmpl-field-validates>i[validate-name="required"]:before{
 	content: "*";
     color: #f00;
+    font-weight: bold;
 }
 
 
-.entity-detail-tmpl .form-group.field-item.field-validate-error .field-value {
+.entity-detail-tmpl .form-group.field-item.field-validate-error .field-value,
+.entity-detail-tmpl table .field-input.field-validate-error {
 	border: 1px solid #f00;
 }
 
@@ -447,4 +454,11 @@ th.field-unavailable:before {
 }
 .entity-detail-tmpl a.open-select-dialog:hover {
     background-color: #52adff;
+}
+
+
+td .field-value span.field-input {
+    display: inline-block;
+    width: 100%;
+    position: relative;
 }

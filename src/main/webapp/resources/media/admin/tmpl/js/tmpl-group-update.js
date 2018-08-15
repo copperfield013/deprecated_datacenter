@@ -18,6 +18,7 @@ define(function(require, exports, module){
 				textPicked			: true,
 				module				: moduleName,
 				showArrayComposite	: false,
+				fieldFilters		: ['file'],
 				afterChoose			: function(field){
 					showPremiseField(field);
 				}
@@ -39,7 +40,8 @@ define(function(require, exports, module){
 					if(field){
 						var input = new FieldInput({
 							type		: field.type,
-							optionsKey	: field.optGroupId
+							optionsKey	: field.optGroupId,
+							fieldKey	: field.composite.module + '@' + field.name
 						});
 						$field.find('.field-view').append(input.getDom());
 						if(f.value){

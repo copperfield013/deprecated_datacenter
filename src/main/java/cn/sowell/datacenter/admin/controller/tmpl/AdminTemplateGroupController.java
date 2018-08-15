@@ -26,7 +26,7 @@ import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_TMPL + "/group")
-@PreAuthorize("hasAuthority(@propConfig.getProperty('admin_config_authen'))")
+@PreAuthorize("hasAuthority(@confAuthenService.getAdminConfigAuthen())")
 public class AdminTemplateGroupController {
 	
 	@Resource

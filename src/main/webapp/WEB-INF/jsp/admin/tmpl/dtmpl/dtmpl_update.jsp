@@ -23,7 +23,7 @@
 						选择
 					</a>
           	         <label title="是否显示选择按钮">
-         	            <input type="checkbox" class="colored-blue" checked="checked">
+         	            <input type="checkbox" class="selectable colored-blue">
          	            <span class="text"></span>
          	         </label>
              	</div>

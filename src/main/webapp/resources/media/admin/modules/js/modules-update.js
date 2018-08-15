@@ -23,14 +23,28 @@ define(function(require, exports, module){
 		$('#save i', $page).click(function(){
 			var validateResult = true;
 			$('.dtmpl-field-validates>i', $page).each(function(){
-				var $item = $(this).closest('.field-item');
-				$item.removeClass('field-validate-error');
-				validateResult = validate({
-					$item 			: $item,
-					validateName	: $(this).attr('validate-name'),
-					title 			: $item.find('label.field-item').text(),
-					value 			: $item.find(':input').val()
-				}) && validateResult;
+				var $this = $(this);
+				var param = {};
+				if($this.is('table *')){
+					var $item = $this.closest('.field-input');
+					var $title = $this.closest('table').find('thead>tr>th').eq($this.closest('td').index());
+					param = {
+						$item 			: $item,
+						title 			: $title.text(),
+						value 			: $item.find(':input').val()
+					};
+					$item.removeClass('field-validate-error');
+				}else{
+					var $item = $this.closest('.field-item');
+					param = {
+						$item 			: $item,
+						title 			: $item.find('label.field-title').text(),
+						value 			: $item.find(':input').val()
+					};
+					$item.removeClass('field-validate-error');
+				}
+				param.validateName = $this.attr('validate-name');
+				validateResult = validate(param) && validateResult;
 			});
 			if(validateResult){
 				var msg = '是否保存？';
@@ -69,7 +83,7 @@ define(function(require, exports, module){
 			var $this = $(this);
 			var stmplId = $this.attr('stmpl-id');
 			var existCodes = []; 
-			$this.closest('table').find('value-row').each(function(){
+			$this.closest('table').find('.value-row').each(function(){
 				var entityCode = $(this).find(':hidden.entity-code').val();
 				if(entityCode){
 					existCodes.push(entityCode);
@@ -145,14 +159,18 @@ define(function(require, exports, module){
 					$td.addClass('field-unavailable');
 				}else{
 					var $fieldInput = $('<span class="field-input"></span></span>');
+					var $validates = $('<div class="dtmpl-field-validates">').appendTo($fieldInput);
 					$fieldInput
-					.attr('fInp-type', $title.attr('fInp-type'))
-					.attr('fInp-optkey', $title.attr('fInp-optkey'))
-					.attr('fInp-fieldkey', $title.attr('fInp-fieldkey'))
-					.attr('fname-full', $title.attr('fname-full'))
-					.appendTo($('<span class="field-value"></span>').appendTo($td));
+						.attr('fInp-type', $title.attr('fInp-type'))
+						.attr('fInp-optkey', $title.attr('fInp-optkey'))
+						.attr('fInp-fieldkey', $title.attr('fInp-fieldkey'))
+						.attr('fname-full', $title.attr('fname-full'))
+						.appendTo($('<span class="field-value"></span>').appendTo($td));
 					if($title.attr('fInp-optset')){
 						$fieldInput.attr('fInp-optset', $title.attr('fInp-optset'));
+					}
+					if($title.is('.relation-label')){
+						$validates.append('<i validate-name="required"></i>');
 					}
 				}
 				$dataRow.append($td);

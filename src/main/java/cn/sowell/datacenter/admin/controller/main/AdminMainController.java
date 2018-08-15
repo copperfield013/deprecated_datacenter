@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.UserUtils;
-import cn.sowell.copframe.spring.properties.PropertyPlaceholder;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel1Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
+import cn.sowell.datacenter.model.config.service.ConfigAuthencationService;
 import cn.sowell.datacenter.model.config.service.NonAuthorityException;
 import cn.sowell.datacenter.model.config.service.SideMenuService;
 
@@ -28,6 +28,9 @@ public class  AdminMainController {
 	
 	@Resource
 	AuthorityService authService;
+
+	@Resource
+	ConfigAuthencationService confAuthenService;
 	
 	@RequestMapping("/login")
 	public String login(@RequestParam(name="error",required=false) String error, Model model){
@@ -49,7 +52,7 @@ public class  AdminMainController {
 			return true;
 		}).collect(Collectors.toList());
 		model.addAttribute("menus", menus);
-		model.addAttribute("configAuth", PropertyPlaceholder.getProperty("admin_config_authen"));
+		model.addAttribute("configAuth", confAuthenService.getAdminConfigAuthen());
 		return "/admin/index.jsp";
 	}
 	

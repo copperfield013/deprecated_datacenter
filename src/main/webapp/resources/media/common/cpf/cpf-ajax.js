@@ -510,7 +510,43 @@ define(function(require, exports, module){
 		}
 	}
 	
-	function download(url, fileName){
+	function download(sUrl){
+		//iOS devices do not support downloading. We have to inform user about this.
+	    if (/(iP)/g.test(navigator.userAgent)) {
+	        alert('Your device does not support files downloading. Please try again in desktop browser.');
+	        return false;
+	    }
+
+	    //If in Chrome or Safari - download via virtual link click
+	    if (download.isChrome || download.isSafari) {
+	        //Creating new link node.
+	        var link = document.createElement('a');
+	        link.href = sUrl;
+
+	        if (link.download !== undefined) {
+	            //Set HTML5 download attribute. This will prevent file from opening if supported.
+	            var fileName = sUrl.substring(sUrl.lastIndexOf('/') + 1, sUrl.length);
+	            link.download = fileName;
+	        }
+
+	        //Dispatching click event.
+	        if (document.createEvent) {
+	            var e = document.createEvent('MouseEvents');
+	            e.initEvent('click', true, true);
+	            link.dispatchEvent(e);
+	            return true;
+	        }
+	    }
+
+	    // Force file download (whether supported by server).
+	    if (sUrl.indexOf('?') === -1) {
+	        sUrl += '?download';
+	    }
+
+	    window.open(sUrl, '_self');
+	    return true;
+		
+		/*
 		if(utils.isPhoto(url) || /.*\.pdf$/i.test(url)){
 			var a = document.createElement('a');
 			if(a.download !== undefined){
@@ -531,8 +567,12 @@ define(function(require, exports, module){
 			});
 		}else{
 			$downloadFrame[0].contentWindow.location.href = url;
-		}
+		}*/
 	}
+	
+
+	download.isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+	download.isSafari = navigator.userAgent.toLowerCase().indexOf('safari') > -1;
 	
 	exports.ajax = ajax;
 	exports.postJson = postJson;

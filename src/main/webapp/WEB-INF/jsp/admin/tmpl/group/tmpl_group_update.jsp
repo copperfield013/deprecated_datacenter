@@ -127,9 +127,9 @@
 	</div>
 </div>
 <script>
-	console.log(111);
 	seajs.use(['tmpl/js/tmpl-group-update'], function(TmplGroupUpdate){
 		var $page = $('#tmpl-group-update-${group.id }');
+		console.log($page);
 		var premisesJson = [];
 		try{
 			premisesJson = $.parseJSON('${premisesJson}');

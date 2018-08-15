@@ -62,6 +62,31 @@
 							</span>
 						</div>
 						<div class="widget-body field-container">
+							<%-- <div class="form-group field-item dbcol">
+								<div class="dtmpl-field-validates">
+									<i validate-name="required"></i>
+								</div>
+								<label class="control-label field-title">级联测试</label>
+								<div class="field-value"  value-field-name="${tmplField.fieldName }">
+									<span class="field-input" 
+										fInp-type="caselect"
+										fInp-name="行政区域"
+										fInp-value="浙江省->杭州市"
+										fInp-optkey="1"
+										fInp-fieldkey="${module.name }@${tmplField.fieldName }"
+									>
+										<span>
+											<select>
+											
+											</select>
+											<select>
+												
+											</select>
+										</span>
+									</span>
+								</div>
+							</div> --%>
+						
 							<c:choose>
 								<c:when test="${tmplGroup.isArray != 1 }">
 									<c:forEach var="tmplField" items="${tmplGroup.fields }">
@@ -98,7 +123,7 @@
 													>#</th>
 													<c:if test="${tmplGroup.relationSubdomain != null }">
 														<th
-															class="th-field-title"
+															class="th-field-title relation-label"
 															fname-format="${tmplGroup.composite.name }[ARRAY_INDEX_REPLACEMENT].$$label$$"
 															fInp-type="select"
 															fInp-optset="${tmplGroup.relationSubdomain }"
@@ -140,6 +165,9 @@
 																		fInp-value="${entityItem.smap[relationName] }"
 																		fInp-optset="${tmplGroup.relationSubdomain }"
 																	>
+																		<span class="dtmpl-field-validates">
+																			<i validate-name="required"></i>
+																		</span>
 																	</span>
 																</span>
 															</td>
@@ -155,6 +183,11 @@
 																		fInp-optkey="${tmplField.optionGroupId }"
 																		fInp-fieldkey="${module.name }@${tmplField.fieldName }"
 																	>
+																		<span class="dtmpl-field-validates">
+																			<c:if test="${fn:contains(tmplField.validators, 'required')}">
+																				<i validate-name="required"></i>
+																			</c:if>
+																		</span>
 																	</span>
 																</span>
 															</td>

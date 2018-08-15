@@ -1,6 +1,7 @@
 package cn.sowell.datacenter.model.config.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -14,12 +15,15 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.abc.auth.pojo.AuthorityVO;
+import com.abc.auth.service.ServiceFactory;
 import com.google.common.collect.Lists;
 
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.NormalOperateDao;
+import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.datacenter.model.admin.pojo.ABCUser;
 import cn.sowell.datacenter.model.config.dao.SideMenuDao;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel1Menu;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
@@ -170,6 +174,7 @@ public class SideMenuServiceImpl implements SideMenuService{
 	public Map<Long, String[]> getMenuAuthNameMap(Set<Long> level1MenuIds) {
 		Map<Long, String[]> map = new HashMap<>();
 		if(level1MenuIds != null) {
+			Collection<AuthorityVO> auths = ServiceFactory.getRoleAuthorityService().getFunctionAuth(((ABCUser) UserUtils.getCurrentUser()).getUserInfo());
 			level1MenuIds.forEach(menuId->{
 				SideMenuLevel1Menu menu = getLevel1Menu(menuId);
 				if(menu != null) {
@@ -177,7 +182,7 @@ public class SideMenuServiceImpl implements SideMenuService{
 					if(authorities != null) {
 						List<String> authNameList = Lists.newArrayList();
 						authorities.forEach(authCode->{
-							AuthorityVO auth = authService.getAuthority(authCode);
+							AuthorityVO auth = auths.stream().filter(au->authCode.equals(au.getCode())).findFirst().orElse(null);
 							if(auth != null) {
 								authNameList.add(auth.getName());
 							}

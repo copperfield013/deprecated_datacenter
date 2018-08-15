@@ -11,6 +11,7 @@ define(function(require, exports, module){
 			//textarea		： 长文本
 			//select		： 单选下拉框
 			//multiselect	: 多选下拉框
+			//caseelect		: 级联下拉框
 			//checkbox		: 多选
 			//radio			: 单选
 			//date			: 日期选择
@@ -229,7 +230,7 @@ define(function(require, exports, module){
 							
 						});
 					}
-					$div.val = function(value){
+					$div.val = function(value, trigger){
 						if(value === undefined){
 							var v = $select.val();
 							if(typeof v === 'string'){
@@ -238,14 +239,14 @@ define(function(require, exports, module){
 								return v.join();
 							}
 						}else if(typeof value === 'string'){
-							return $div.val(value.split(','));
+							return $div.val(value.split(','), trigger);
 						}else if($.isArray(value)){
 							$select.val(value).trigger('change');
 							return $div;
 						}
 					}
 					if(param.value){
-						$div.val(param.value);
+						$div.val(param.value, false);
 					}
 					return $div;
 				}
@@ -644,7 +645,9 @@ define(function(require, exports, module){
 		}
 		
 		this.__triggerValueChanged = function(){
-			this.getDom().trigger('field-input-changed', [this]);
+			if(param.$dom){
+				param.$dom.trigger('field-input-changed', [this]);
+			}
 		}
 		
 		/**

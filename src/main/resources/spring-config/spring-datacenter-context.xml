@@ -33,6 +33,9 @@
 	<!-- serivce自动扫描 -->
 	<context:component-scan base-package="cn.sowell.dataserver.model.*.service.impl" />
 
+	<!-- 默认访问权限的获取service -->
+	<bean id="confAuthenService" class="cn.sowell.datacenter.model.config.service.impl.ConfigAuthencationServiceImpl" />
+
 	<bean class="cn.sowell.dataserver.model.tmpl.strategy.TemplateUpdateStrategyFactory">
 		<constructor-arg>
 			<map>
@@ -51,7 +54,8 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 	
-
+	<!-- 查询条件转换器 -->
+	<bean class="cn.sowell.dataserver.model.modules.bean.criteriaConveter.CriteriaConverterFactoryImpl" />
 
 	<bean
 		class="cn.sowell.copframe.spring.propTranslator.PropertyValueTranslatorSet">

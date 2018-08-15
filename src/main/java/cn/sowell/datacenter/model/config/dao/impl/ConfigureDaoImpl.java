@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.datacenter.model.config.dao.ConfigureDao;
+import cn.sowell.datacenter.model.config.pojo.AuthencationConfig;
 import cn.sowell.datacenter.model.config.pojo.ConfigModule;
 
 @Repository
@@ -34,5 +35,11 @@ public class ConfigureDaoImpl implements ConfigureDao{
 			return new HashMap<>();
 		}
 	}
+
+	@Override
+	public AuthencationConfig getAdminDefaultAuthen(Long configId) {
+		return sFactory.getCurrentSession().get(AuthencationConfig.class, configId);
+	}
+
 
 }

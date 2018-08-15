@@ -182,8 +182,7 @@ define(function(require, exports, module){
 		
 		var currentCriteria = null;
 		
-		
-		
+		;
 		
 		/**
 		 * 显示条件详情
@@ -367,8 +366,11 @@ define(function(require, exports, module){
 								var $comparator = $('#criteria-detail-comparator', $page).empty();
 								for(var i in comparators){
 									var comparator = comparators[i];
-									if(comparator['class'] !== 'negative'){
-										$comparator.append('<option value="' + comparator.key + '">' + comparator.title + '</option>');
+									var classes = comparator['class']? comparator['class'].split(' '): [];
+									if(classes.indexOf('negative') < 0){
+										var $option = $('<option value="' + comparator.key + '">' + comparator.title + '</option>');
+										$option.addClass(comparator['class']);
+										$comparator.append($option);
 									}
 									if(comparatorName === comparator.key){
 										inComparators = true;
@@ -443,6 +445,7 @@ define(function(require, exports, module){
 			handleSelectedItem(function($item){
 				this.toggleQueryShow(toShow);
 			});
+			//$comparator.trigger('deal-comparator');
 		}).trigger('change');
 		$('.criteria-partition-add', $page).click(function(){
 			handleSelectedItem(function(){
