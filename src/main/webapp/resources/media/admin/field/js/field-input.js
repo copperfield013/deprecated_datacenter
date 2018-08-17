@@ -108,9 +108,6 @@ define(function(require, exports, module){
 			if(param.id){
 				$dom.attr('id', param.id);
 			}
-			if(param.readonly){
-				$dom.attr('readonly', 'readonly');
-			}
 			$dom.change(function(){
 				_this.__triggerValueChanged();
 			});
@@ -138,7 +135,8 @@ define(function(require, exports, module){
 			},
 			//下拉选择框
 			'select'		: function(){
-				var $select = $('<select>');
+				var $span = $('<span class="field-input-wrapper">');
+				var $select = $('<select>').appendTo($span);
 				setNormalAttrs($select);
 				var $defOption = $('<option value="">--请选择---</option>');
 				$select.append($defOption);
@@ -168,19 +166,43 @@ define(function(require, exports, module){
 						}
 					}
 				}
-				return $select;
+				$span.val = function(){
+					return $select.val.apply($select, arguments);
+				};
+				$span.funcMap = {
+					setReadonly	: function(toReadonly){
+						if(toReadonly == false){
+							$select.removeAttr('disabled');
+							var $hidden = $select.data('instead-input');
+							if($hidden){
+								$hidden.remove();
+							}
+						}else{
+							var val = $select.val();
+							$select.attr('disabled', 'disabled');
+							var formName = $select.attr('name');
+							if(formName){
+								var $hidden = $('<input type="hidden" />')
+									.attr('name', formName)
+									.val(val);
+								$select.after($hidden).data('instead-input', $hidden);
+							}
+						}
+					}
+				};
+				return $span;
 			},
 			'date'			: function(){
 				var $text = this['text']();
 				var value = param.value;
 				var Utils = require('utils');
 				if(typeof value === 'number'){
-					value = Utils.formatDate(value, 'yyyy-mm-dd');
+					value = Utils.formatDate(value, 'yyyy-MM-dd');
 				}
 				if(typeof value === 'string'){
 					$text.val(value);
 				}
-				$text.attr('readonly', 'readonly');
+				$text.addClass('field-input-readonly').attr('readonly', 'readonly');
 				var scrollEle = null;
 				if(param.$page){
 					var page = param.$page.getLocatePage();
@@ -189,6 +211,75 @@ define(function(require, exports, module){
 					}
 				}
 				Utils.datepicker($text, scrollEle);
+				$text.funcMap = {
+					setReadonly	: function(toReadonly){
+						if(toReadonly == false){
+							Utils.datepicker($text, scrollEle);
+						}else{
+							$text.datetimepicker('remove');
+						}
+					}
+				};
+				return $text;
+			},
+			'datetime'		: function(){
+				var $text = this['text']();
+				var value = param.value;
+				var Utils = require('utils');
+				if(typeof value === 'number'){
+					value = Utils.formatDate(value, 'yyyy-MM-dd hh:mm:ss');
+				}
+				if(typeof value === 'string'){
+					$text.val(value);
+				}
+				$text.addClass('field-input-readonly').attr('readonly', 'readonly');
+				var scrollEle = null;
+				if(param.$page){
+					var page = param.$page.getLocatePage();
+					if(page instanceof require('page')){
+						scrollEle = page.getContent();
+					}
+				}
+				Utils.datetimepicker($text, scrollEle, param.$page);
+				$text.funcMap = {
+					setReadonly	: function(toReadonly){
+						if(toReadonly == false){
+							Utils.datepicker($text, scrollEle, param.$page);
+						}else{
+							$text.datetimepicker('remove');
+						}
+					}
+				};
+				return $text;
+			},
+			'time'			: function(){
+				var $text = this['text']();
+				var value = param.value;
+				var Utils = require('utils');
+				if(typeof value === 'number'){
+					value = Utils.formatDate(value, 'hh:mm:ss');
+				}
+				if(typeof value === 'string'){
+					$text.val(value);
+				}
+				$text.addClass('field-input-readonly').attr('readonly', 'readonly');
+				var scrollEle = null;
+				if(param.$page){
+					var page = param.$page.getLocatePage();
+					if(page instanceof require('page')){
+						scrollEle = page.getContent();
+					}
+				}
+				Utils.timepicker($text, scrollEle, param.$page);
+				$text.funcMap = {
+					setReadonly	: function(toReadonly){
+						if(toReadonly == false){
+							Utils.timepicker($text, scrollEle, param.$page);
+						}else{
+							$text.datetimepicker('remove');
+						}
+					}
+				};
 				return $text;
 			},
 			'checkbox'		: function(){
@@ -245,6 +336,15 @@ define(function(require, exports, module){
 							return $div;
 						}
 					}
+					$div.funcMap = {
+						setReadonly	: function(toReadonly){
+							if(toReadonly == false){
+								$select.removeAttr('disabled');
+							}else{
+								$select.attr('disabled', 'disabled');
+							}
+						}
+					};
 					if(param.value){
 						$div.val(param.value, false);
 					}
@@ -454,12 +554,14 @@ define(function(require, exports, module){
 						}
 					},
 					setReadonly	: function(toReadonly){
-						if(toReadonly){
+						if(toReadonly != false){
+							$container.addClass('file-readonly');
 							$operates.find('.fa-times').hide();
 							if(inputFile == null && !originFileURL){
 								$thumb.text('无文件');
 							}
 						}else{
+							$container.removeClass('file-readonly');
 							$operates.find('.fa-times').show();
 							if(inputFile == null && !originFileURL){
 								$thumb.html('<i></i>');
@@ -484,7 +586,8 @@ define(function(require, exports, module){
 		
 		this.__buildDom = function(){
 			checkBuildParam();
-			return (param.type && domBuilder[param.type] || function(){return $('<input type="hidden" />')}).apply(domBuilder);
+			var $dom = (param.type && domBuilder[param.type] || function(){return $('<input type="hidden" />')}).apply(domBuilder);
+			return $dom;
 		};
 		
 		this.getName = function(){
@@ -501,7 +604,15 @@ define(function(require, exports, module){
 			if(param.$dom){
 				return param.$dom;
 			}else{
-				return param.$dom = this.__buildDom();
+				param.$dom = this.__buildDom();
+				if(param.$dom){
+					try{
+						if(param.readonly){
+							this.setReadonly();
+						}
+					}catch(e){}
+				}
+				return param.$dom;
 			}
 		};
 		/**
@@ -544,7 +655,7 @@ define(function(require, exports, module){
 		this.setDisabled = function(toDisabled){
 			var $dom = this.getDom();
 			if($dom.funcMap && typeof $dom.funcMap['setDisabled'] === 'function'){
-				$dom.func['setDisabled'](toDisabled);
+				$dom.funcMap['setDisabled'](toDisabled);
 			}else{
 				var $inputs = $dom.filter(':input').add($dom.find(':input'));
 				if(toDisabled != false){
@@ -572,7 +683,7 @@ define(function(require, exports, module){
 		this.setReadonly = function(toReadonly){
 			var $dom = this.getDom();
 			if($dom.funcMap && typeof $dom.funcMap['setReadonly'] === 'function'){
-				$dom.func['setReadonly'](toReadonly);
+				$dom.funcMap['setReadonly'](toReadonly);
 			}else{
 				var $inputs = $dom.filter(':input').add($dom.find(':input'));
 				if(toReadonly != false){

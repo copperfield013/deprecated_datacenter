@@ -143,9 +143,11 @@ public class AdminModulesController {
 				hidenCriteriaDesc.append(premise.getFieldTitle() + ":" + premise.getFieldValue() + "&#10;");
 			}
 		}
+		model.addAttribute("tmplGroup", tmplGroup);
 		model.addAttribute("hidenCriteriaDesc", hidenCriteriaDesc);
 		model.addAttribute("menu", menu);
 		model.addAttribute("criteria", criteria);
+		model.addAttribute("moduleWritable", mService.getModuleEntityWritable(moduleName));
 		
 		return AdminConstants.JSP_MODULES + "/modules_list_tmpl.jsp";
 	}

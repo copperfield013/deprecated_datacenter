@@ -107,7 +107,7 @@ define(function(require, exports, module){
 						console.log(entities);
 						function _(i){
 							if(entitiesLoader.codes.length > i){
-								addRow($this.closest('table')).done(function(initInput, refreshRowTable, $row, $doms){
+								addRow($this.closest('table'), true).done(function(initInput, refreshRowTable, $row, $doms){
 									setFieldValue(entities[entitiesLoader.codes[i]], $row, $doms);
 									initInput();
 									if(entitiesLoader.codes.length > i + 1){
@@ -148,7 +148,7 @@ define(function(require, exports, module){
 			});
 		});
 		
-		function addRow($table){
+		function addRow($table, withData){
 			var $tbody = $table.children('tbody');
 			var $titleRow = $table.find('.title-row');
 			var $dataRow = $('<tr>').append('<td><span></span></td>')
@@ -160,11 +160,17 @@ define(function(require, exports, module){
 				}else{
 					var $fieldInput = $('<span class="field-input"></span></span>');
 					var $validates = $('<div class="dtmpl-field-validates">').appendTo($fieldInput);
+					var access = $title.attr('fInp-access');
+					var readonly = false;
+					if(access == '读' || access == '补' && withData){
+						readonly = true;
+					}
 					$fieldInput
 						.attr('fInp-type', $title.attr('fInp-type'))
 						.attr('fInp-optkey', $title.attr('fInp-optkey'))
 						.attr('fInp-fieldkey', $title.attr('fInp-fieldkey'))
 						.attr('fname-full', $title.attr('fname-full'))
+						.attr('fInp-readonly', readonly)
 						.appendTo($('<span class="field-value"></span>').appendTo($td));
 					if($title.attr('fInp-optset')){
 						$fieldInput.attr('fInp-optset', $title.attr('fInp-optset'));
@@ -204,9 +210,10 @@ define(function(require, exports, module){
 				value		: attr('fInp-value'),
 				styleClass	: attr('fInp-class'),
 				optionsKey	: attr('fInp-optkey'),
-				readonly	: attr('fInp-readonly'),
+				readonly	: attr('fInp-readonly') == 'true',
 				optionsSet	: attr('fInp-optset'),
-				fieldKey	: attr('fInp-fieldkey')
+				fieldKey	: attr('fInp-fieldkey'),
+				$page		: $page
 			};
 		};
 		var $tables = [];

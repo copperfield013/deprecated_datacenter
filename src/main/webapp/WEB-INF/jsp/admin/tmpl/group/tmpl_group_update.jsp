@@ -95,6 +95,27 @@
 										</div>
 									</div>
 								</div>
+								<div class="row">
+									<div class="form-group"> 
+										<div class="col-lg-9">
+											<label class="col-lg-2 control-label" for="name">功能按钮</label>
+											<div class="col-lg-9">
+												<label class="col-lg-4 col-xs-3">
+													<input id="showCreateButton" type="checkbox" class="checkbox-slider colored-blue" ${group.hideCreateButton == 1? '': 'checked="checked"' }>
+													<span class="text">创建按钮</span>
+												</label>
+												<label class="col-lg-4 col-xs-3">
+													<input id="showImportButton" type="checkbox" class="checkbox-slider colored-success" ${group.hideImportButton == 1? '': 'checked="checked"' }>
+													<span class="text">导入按钮</span>
+												</label>
+												<label class="col-lg-4 col-xs-3">
+													<input id="showExportButton" type="checkbox" class="checkbox-slider colored-danger" ${group.hideExportButton == 1? '': 'checked="checked"' }>
+													<span class="text">导出按钮</span>
+												</label>
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 					

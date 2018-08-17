@@ -64,6 +64,9 @@ define(function(require, exports, module){
 		
 		$('form', $page).on('cpf-submit', function(e, formData){
 			var $form = $(this);
+			formData.append('hideCreateButton', $('#showCreateButton', $page).prop('checked')? '': 1);
+			formData.append('hideImportButton', $('#showImportButton', $page).prop('checked')? '': 1);
+			formData.append('hideExportButton', $('#showExportButton', $page).prop('checked')? '': 1);
 			$('.field-item', $page).each(function(index){
 				var $this = $(this);
 				var fieldData = $this.data('field-data');

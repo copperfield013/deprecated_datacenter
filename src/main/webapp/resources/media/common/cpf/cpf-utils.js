@@ -361,11 +361,6 @@ define(function(require, exports){
 		datepicker		: function($dom,scrollEle){
 			$dom = $($dom);
 			if($dom.is(':text')){
-				/*$dom.keydown(function(e){
-					if(e.keyCode == 8){
-						$dom.val('').trigger('changeDate');
-					}
-				});*/
 				return $dom.datetimepicker({
 					format		: 'yyyy-mm-dd',
 					language	: 'zh-CN',
@@ -381,6 +376,39 @@ define(function(require, exports){
 					monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月',  
 						'七月', '八月', '九月', '十月', '十一月', '十二月' ]
 				},scrollEle);*/
+			}
+		},
+		datetimepicker	: function($dom, scrollEle, $page){
+			$dom = $($dom);
+			if($dom.is(':text')){
+				return $dom.datetimepicker({
+					format		: 'yyyy-mm-dd hh:ii:ss',
+					language	: 'zh-CN',
+					weekStart	: 1,
+					autoclose	: true,
+					bootcssVer	: 3,
+					minView		: 0,
+					minuteStep	: 1,
+					pickerPosition: "bottom-right",
+					container	: $page
+				});
+			}
+		},
+		timepicker		: function($dom, scrollEle, $page){
+			$dom = $($dom);
+			if($dom.is(':text')){
+				return $dom.datetimepicker({
+					format		: 'hh:ii:ss',
+					language	: 'zh-CN',
+					startView	: 1,
+					autoclose	: true,
+					bootcssVer	: 3,
+					maxView		: 'hour',
+					minView		: 0,
+					minuteStep	: 1,
+					pickerPosition: "bottom-right",
+					container	: $page
+				});
 			}
 		},
 		/**

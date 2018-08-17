@@ -101,12 +101,18 @@
 											</div>
 											<label class="control-label field-title">${tmplField.title }</label>
 											<div class="field-value"  value-field-name="${tmplField.fieldName }">
+												<c:set var="fieldValue" value="${entity != null? entity.smap[tmplField.fieldName] : premise != null? premise.fieldValue: '' }" />
+												<c:set var="fieldReadonly" 
+														value="${tmplField.fieldAccess == '读'? 'true'
+																: tmplField.fieldAccess == '补'&& !empty fieldValue? 'true'
+																	: ''  }" />
 												<span class="field-input" 
 													fInp-type="${tmplField.type }"
 													fInp-name="${tmplField.fieldName }"
-													fInp-value="${entity != null? entity.smap[tmplField.fieldName] : premise != null? premise.fieldValue: '' }"
+													fInp-value="${fieldValue }"
 													fInp-optkey="${tmplField.optionGroupId }"
 													fInp-fieldkey="${module.name }@${tmplField.fieldName }"
+													fInp-readonly="${fieldReadonly}"
 												>
 												</span>
 											</div>
@@ -127,6 +133,7 @@
 															fname-format="${tmplGroup.composite.name }[ARRAY_INDEX_REPLACEMENT].$$label$$"
 															fInp-type="select"
 															fInp-optset="${tmplGroup.relationSubdomain }"
+															fInp-access="${tmplGroup.additionRelationLabelAccess }"
 															>关系</th>
 													</c:if>
 													<c:forEach var="field" items="${tmplGroup.fields }">
@@ -138,13 +145,16 @@
 															fInp-type="${field.type }"
 															fInp-optkey="${field.optionGroupId }"
 															fInp-fieldkey="${module.name }@${field.fieldName }"
+															fInp-access="${field.additionAccess}"
 															>${field.title }</th>
 													</c:forEach>
 													<th width="20px">
-														<c:if test="${tmplGroup.selectionTemplateId != null}">
-															<a title="选择" stmpl-id="${tmplGroup.selectionTemplateId }" href="javascript:;" class="open-select-dialog fa fa-link"></a>
+														<c:if test="${!(tmplGroup.composite.access == '读' || tmplGroup.composite.access == '补' && fn:length(entity.arrayMap[tmplGroup.composite.name]) > 0 ) }">
+															<c:if test="${tmplGroup.selectionTemplateId != null}">
+																<a title="选择" stmpl-id="${tmplGroup.selectionTemplateId }" href="javascript:;" class="open-select-dialog fa fa-link"></a>
+															</c:if>
+															<span class="array-item-add" title="添加一行">+</span>
 														</c:if>
-														<span class="array-item-add" title="添加一行">+</span>
 													</th>
 												</tr>
 											</thead>
@@ -164,6 +174,7 @@
 																		fInp-name="${relationName }"
 																		fInp-value="${entityItem.smap[relationName] }"
 																		fInp-optset="${tmplGroup.relationSubdomain }"
+																		fInp-readonly="${tmplGroup.relationLabelAccess == '读' }"
 																	>
 																		<span class="dtmpl-field-validates">
 																			<i validate-name="required"></i>
@@ -173,15 +184,21 @@
 															</td>
 														</c:if>
 														<c:forEach var="tmplField" items="${tmplGroup.fields }">
+															<c:set var="fieldValue" value="${entityItem.smap[tmplField.fieldName] }" />
+															<c:set var="fieldReadonly" 
+																	value="${tmplField.fieldAccess == '读'? 'true'
+																			: tmplField.fieldAccess == '补'&& !empty fieldValue? 'true'
+																				: ''  }" />
 															<td class="${tmplField.fieldAvailable? '': 'field-unavailable'}">
 																<span class="field-value">
 																	<span class="field-input" 
 																		fInp-type="${tmplField.type }"
 																		fname-full="${fieldDescMap[tmplField.fieldId].fullKey }"
 																		fInp-name="${fieldDescMap[tmplField.fieldId].arrayFieldNameMap[i.index] }"
-																		fInp-value="${entityItem.smap[tmplField.fieldName] }"
+																		fInp-value="${fieldValue }"
 																		fInp-optkey="${tmplField.optionGroupId }"
 																		fInp-fieldkey="${module.name }@${tmplField.fieldName }"
+																		fInp-readonly="${fieldReadonly }"
 																	>
 																		<span class="dtmpl-field-validates">
 																			<c:if test="${fn:contains(tmplField.validators, 'required')}">
@@ -192,7 +209,11 @@
 																</span>
 															</td>
 														</c:forEach>
-														<td><span class="array-item-remove" title="移除当前行">×</span></td>
+														<td>
+															<c:if test="${tmplGroup.composite.access == '写' }">
+																<span class="array-item-remove" title="移除当前行">×</span>
+															</c:if>
+														</td>
 													</tr>
 												</c:forEach>
 											</tbody>

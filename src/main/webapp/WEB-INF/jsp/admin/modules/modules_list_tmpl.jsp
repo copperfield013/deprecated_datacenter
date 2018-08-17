@@ -13,15 +13,23 @@
 			<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
 				<i class="glyphicon glyphicon-refresh"></i>
 			</a>
-			<a class="export btn-toggle" title="导出" id="btn-export " href="page:#export-window.toggle">
-				<i class="glyphicon glyphicon-export"></i>
-			</a>
-			<a class="import tab" href="admin/modules/import/go/${menu.id }" title="导入" target="module_${module.name }_import">
-				<i class="glyphicon glyphicon-import"></i>
-			</a>
-			<a class="tab" href="admin/modules/curd/add/${menu.id }" title="创建" target="module_${module.name }_add">
-				<i class="fa fa-plus"></i>
-			</a>
+			<c:if test="${tmplGroup.hideExportButton == null }">
+				<a class="export btn-toggle" title="导出" id="btn-export " href="page:#export-window.toggle">
+					<i class="glyphicon glyphicon-export"></i>
+				</a>
+			</c:if>
+			<c:if test="${moduleWritable }">
+				<c:if test="${tmplGroup.hideImportButton == null }">
+					<a class="import tab" href="admin/modules/import/go/${menu.id }" title="导入" target="module_${module.name }_import">
+						<i class="glyphicon glyphicon-import"></i>
+					</a>
+				</c:if>
+				<c:if test="${tmplGroup.hideCreateButton == null }">
+					<a class="tab" href="admin/modules/curd/add/${menu.id }" title="创建" target="module_${module.name }_add">
+						<i class="fa fa-plus"></i>
+					</a>
+				</c:if>
+			</c:if>
 		</div>
 	</div>
 	<div class="page-body">
@@ -114,20 +122,22 @@
 													<i class="fa fa-book"></i>详情
 												</a>
 											</c:if>
-											<c:if test="${fn:contains(column.specialField, '-u') }">
-												<a target="module_update_${parser.code }" 
-													title="修改-${parser.title }" 
-													href="admin/modules/curd/update/${menu.id }/${parser.code }" 
-													class="tab btn btn-info btn-xs edit">
-													<i class="fa fa-edit"></i>修改
-												</a>
-											</c:if>
-											<c:if test="${fn:contains(column.specialField, '-r') }">
-												<a confirm="确认删除？"
-													href="admin/modules/curd/delete/${menu.id }/${parser.code }" 
-													class="btn btn-danger btn-xs delete">
-													<i class="fa fa-trash-o"></i>删除
-												</a>
+											<c:if test="${moduleWritable }">
+												<c:if test="${fn:contains(column.specialField, '-u') }">
+													<a target="module_update_${parser.code }" 
+														title="修改-${parser.title }" 
+														href="admin/modules/curd/update/${menu.id }/${parser.code }" 
+														class="tab btn btn-info btn-xs edit">
+														<i class="fa fa-edit"></i>修改
+													</a>
+												</c:if>
+												<c:if test="${fn:contains(column.specialField, '-r') }">
+													<a confirm="确认删除？"
+														href="admin/modules/curd/delete/${menu.id }/${parser.code }" 
+														class="btn btn-danger btn-xs delete">
+														<i class="fa fa-trash-o"></i>删除
+													</a>
+												</c:if>
 											</c:if>
 										</c:when>
 										<c:otherwise>

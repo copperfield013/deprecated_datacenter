@@ -316,18 +316,22 @@ div#tmpl-list span.tmpl-date {
 
 .field-input>input, 
 .field-input>select,
-.field-input>textarea {
+.field-input>textarea,
+.field-input>.field-input-wrapper>select {
     height: 2.5em;
     line-height: 2.5em;
     padding: 10px 5px;
     width: 100%;
 }
-.entity-detail-tmpl .field-input>select {
+.entity-detail-tmpl .field-input>select,
+.entity-detail-tmpl .field-input>.field-input-wrapper>select {
     line-height: 3em;
     height: 3em;
 }
 
-.field-array-table .field-input select,.field-array-table .field-input input {
+.field-array-table .field-input select,
+.field-array-table .field-input>.field-input-wrapper>select,
+.field-array-table .field-input input {
     font-size: 1em;
     height: 2em;
     line-height: 2em;
@@ -457,8 +461,15 @@ th.field-unavailable:before {
 }
 
 
-td .field-value span.field-input {
+.entity-detail-tmpl td .field-value span.field-input {
     display: inline-block;
     width: 100%;
     position: relative;
+}
+
+.entity-detail-tmpl .field-input input[type="text"][readonly="readonly"]:not(.field-input-readonly),
+.entity-detail-tmpl .field-input select[disabled="disabled"],
+.entity-detail-tmpl .field-input .cpf-file-input-container.file-readonly {
+    cursor: not-allowed;
+    background-color: #eee;
 }

@@ -10,6 +10,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +36,7 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
 @Service
-public class SideMenuServiceImpl implements SideMenuService{
+public class SideMenuServiceImpl implements SideMenuService, InitializingBean{
 
 	@Resource
 	SideMenuDao sDao;
@@ -59,6 +60,18 @@ public class SideMenuServiceImpl implements SideMenuService{
 	synchronized void reloadMenuMap() {
 		l1MenuMap = null;
 		l2MenuMap = null;
+	}
+	
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		tService.bindTemplateGroupReloadEvent(tmplGroup->{
+			l2MenuMap.values().stream()
+				.filter(l2->tmplGroup.getId().equals(l2.getTemplateGroupId()))
+				.forEach(l2->{
+					l2.setTemplateGroupTitle(tmplGroup.getTitle());
+					l2.setTemplateGroupKey(tmplGroup.getKey());
+				});
+		});
 	}
 	
 	synchronized Map<Long, SideMenuLevel1Menu> getL1MenuMap(){
