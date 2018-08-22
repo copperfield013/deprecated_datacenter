@@ -8,223 +8,225 @@
 	</c:choose>
 </c:set>
 <title>${title }</title>
-<div class="detail entity-detail-tmpl" id="${module.name }-update-tmpl-${entity.code }-${RES_STAMP}">
-	<div class="page-header">
-		<div class="header-title">
-			<h1>${title }</h1>
-		</div>
-		<div class="template-container title-operate">
-			<label style="display: inline-flex" title="是否开启融合模式">
-				<input id="fuse-switch" class="checkbox-slider toggle" type="checkbox">
-				<span class="text"></span>
-			</label> 
-			<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
-				<i style="font-size: 20px" class="glyphicon glyphicon-refresh"></i>
-			</a>
-		</div>
+<div class="entity-detail-tmpl" id="${module.name }-update-tmpl-${entity.code }-${RES_STAMP}">
+	<div class="float-operate-area">
+		<div class="operate-area-cover"></div>
+		<a id="save" title="保存"><i class="fa fa-check-square"></i></a>
 	</div>
-	<div class="page-body">
-		<div class="float-operate-area">
-			<div class="operate-area-cover"></div>
-			<a id="save" title="保存"><i class="fa fa-check-square"></i></a>
+	<div class="detail">
+		<div class="page-header">
+			<div class="header-title">
+				<h1>${title }</h1>
+			</div>
+			<div class="template-container title-operate">
+				<label style="display: inline-flex" title="是否开启融合模式">
+					<input id="fuse-switch" class="checkbox-slider toggle" type="checkbox">
+					<span class="text"></span>
+				</label> 
+				<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
+					<i style="font-size: 20px" class="glyphicon glyphicon-refresh"></i>
+				</a>
+			</div>
 		</div>
-		<div class="col-lg-offset-1 col-lg-10">
-			<form class="form-horizontal group-container" action="admin/modules/curd/save/${menu.id }/${module.name }">
-				<input type="hidden" name="${config.codeAttributeName }" value="${entity.code }" />
-				<c:if test="${!empty groupPremises }">
-					<div class="widget field-group">
-						<div class="widget-header">
-							<span class="widget-caption">
-								<span class="group-title">默认字段（不可修改）</span>
-							</span>
-						</div>
-						<div class="widget-body field-container premises-container">
-							<c:forEach var="premise" items="${groupPremises }">
-								<c:if test="${premise.fieldName != null }">
-									<div class="form-group field-item">
-										<label class="control-label field-title">${premise.fieldTitle }</label>
-										<div class="field-value" value-field-name="${premise.fieldName }">
-											${entity== null? premise.fieldValue: entity.smap[premise.fieldName] }
-											<input type="hidden" name="${premise.fieldName }" value="${entity== null? premise.fieldValue: entity.smap[premise.fieldName] }" />
+		<div class="page-body">
+			<div class="col-lg-offset-1 col-lg-10">
+				<form class="form-horizontal group-container" action="admin/modules/curd/save/${menu.id }/${module.name }">
+					<input type="hidden" name="${config.codeAttributeName }" value="${entity.code }" />
+					<c:if test="${!empty groupPremises }">
+						<div class="widget field-group">
+							<div class="widget-header">
+								<span class="widget-caption">
+									<span class="group-title">默认字段（不可修改）</span>
+								</span>
+							</div>
+							<div class="widget-body field-container premises-container">
+								<c:forEach var="premise" items="${groupPremises }">
+									<c:if test="${premise.fieldName != null }">
+										<div class="form-group field-item">
+											<label class="control-label field-title">${premise.fieldTitle }</label>
+											<div class="field-value" value-field-name="${premise.fieldName }">
+												${entity== null? premise.fieldValue: entity.smap[premise.fieldName] }
+												<input type="hidden" name="${premise.fieldName }" value="${entity== null? premise.fieldValue: entity.smap[premise.fieldName] }" />
+											</div>
 										</div>
+									</c:if>
+								</c:forEach>
+							</div>
+						</div>
+					</c:if>
+					
+					<c:forEach var="tmplGroup" items="${dtmpl.groups }">
+						<div class="widget field-group">
+							<div class="widget-header">
+								<span class="widget-caption">
+									<span class="group-title">${tmplGroup.title }</span>
+								</span>
+							</div>
+							<div class="widget-body field-container">
+								<%-- <div class="form-group field-item dbcol">
+									<div class="dtmpl-field-validates">
+										<i validate-name="required"></i>
 									</div>
-								</c:if>
-							</c:forEach>
-						</div>
-					</div>
-				</c:if>
-				
-				<c:forEach var="tmplGroup" items="${dtmpl.groups }">
-					<div class="widget field-group">
-						<div class="widget-header">
-							<span class="widget-caption">
-								<span class="group-title">${tmplGroup.title }</span>
-							</span>
-						</div>
-						<div class="widget-body field-container">
-							<%-- <div class="form-group field-item dbcol">
-								<div class="dtmpl-field-validates">
-									<i validate-name="required"></i>
-								</div>
-								<label class="control-label field-title">级联测试</label>
-								<div class="field-value"  value-field-name="${tmplField.fieldName }">
-									<span class="field-input" 
-										fInp-type="caselect"
-										fInp-name="行政区域"
-										fInp-value="浙江省->杭州市"
-										fInp-optkey="1"
-										fInp-fieldkey="${module.name }@${tmplField.fieldName }"
-									>
-										<span>
-											<select>
-											
-											</select>
-											<select>
-												
-											</select>
-										</span>
-									</span>
-								</div>
-							</div> --%>
-						
-							<c:choose>
-								<c:when test="${tmplGroup.isArray != 1 }">
-									<c:forEach var="tmplField" items="${tmplGroup.fields }">
-										<c:set var="premise" value="${groupPremisesMap[tmplField.fieldName] }" />
-										<div class="form-group field-item ${tmplField.fieldAvailable? '': 'field-unavailable' } ${tmplField.colNum == 2? 'dbcol': '' }"
-											title="${tmplField.fieldAvailable? '': '无效字段' }"
+									<label class="control-label field-title">级联测试</label>
+									<div class="field-value"  value-field-name="${tmplField.fieldName }">
+										<span class="field-input" 
+											fInp-type="caselect"
+											fInp-name="行政区域"
+											fInp-value="浙江省->杭州市"
+											fInp-optkey="1"
+											fInp-fieldkey="${module.name }@${tmplField.fieldName }"
 										>
-											<div class="dtmpl-field-validates">
-												<c:if test="${fn:contains(tmplField.validators, 'required')}">
-													<i validate-name="required"></i>
-												</c:if>
-											</div>
-											<label class="control-label field-title">${tmplField.title }</label>
-											<div class="field-value"  value-field-name="${tmplField.fieldName }">
-												<c:set var="fieldValue" value="${entity != null? entity.smap[tmplField.fieldName] : premise != null? premise.fieldValue: '' }" />
-												<c:set var="fieldReadonly" 
-														value="${tmplField.fieldAccess == '读'? 'true'
-																: tmplField.fieldAccess == '补'&& !empty fieldValue? 'true'
-																	: ''  }" />
-												<span class="field-input" 
-													fInp-type="${tmplField.type }"
-													fInp-name="${tmplField.fieldName }"
-													fInp-value="${fieldValue }"
-													fInp-optkey="${tmplField.optionGroupId }"
-													fInp-fieldkey="${module.name }@${tmplField.fieldName }"
-													fInp-readonly="${fieldReadonly}"
-												>
-												</span>
-											</div>
-										</div>
-									</c:forEach>
-								</c:when>
-								<c:otherwise>
-									<div class="table-scrollable field-array-table">
-										<table class="table table-striped table-bordered table-hover">
-											<thead>
-												<tr class="title-row">
-													<th
-														fname-format="${tmplGroup.composite.name }[ARRAY_INDEX_REPLACEMENT].唯一编码"
-													>#</th>
-													<c:if test="${tmplGroup.relationSubdomain != null }">
-														<th
-															class="th-field-title relation-label"
-															fname-format="${tmplGroup.composite.name }[ARRAY_INDEX_REPLACEMENT].$$label$$"
-															fInp-type="select"
-															fInp-optset="${tmplGroup.relationSubdomain }"
-															fInp-access="${tmplGroup.additionRelationLabelAccess }"
-															>关系</th>
-													</c:if>
-													<c:forEach var="field" items="${tmplGroup.fields }">
-														<th 
-															class="th-field-title ${field.fieldAvailable? '': 'field-unavailable'}"
-															title="${field.fieldAvailable? '': '无效字段' }"
-															fname-format="${fieldDescMap[field.fieldId].arrayFieldNameFormat }"
-															fname-full="${fieldDescMap[field.fieldId].fullKey }"
-															fInp-type="${field.type }"
-															fInp-optkey="${field.optionGroupId }"
-															fInp-fieldkey="${module.name }@${field.fieldName }"
-															fInp-access="${field.additionAccess}"
-															>${field.title }</th>
-													</c:forEach>
-													<th width="20px">
-														<c:if test="${!(tmplGroup.composite.access == '读' || tmplGroup.composite.access == '补' && fn:length(entity.arrayMap[tmplGroup.composite.name]) > 0 ) }">
-															<c:if test="${tmplGroup.selectionTemplateId != null}">
-																<a title="选择" stmpl-id="${tmplGroup.selectionTemplateId }" href="javascript:;" class="open-select-dialog fa fa-link"></a>
-															</c:if>
-															<span class="array-item-add" title="添加一行">+</span>
-														</c:if>
-													</th>
-												</tr>
-											</thead>
-											<tbody>
-												<c:forEach var="entityItem" varStatus="i" items="${entity.arrayMap[tmplGroup.composite.name] }">
-													<tr class="value-row">
-														<td>
-															<span>${i.index + 1 }</span>
-															<input class="entity-code" type="hidden" name="${entityItem.codeName }" value="${entityItem.code }" />
-														</td>
-														<c:if test="${tmplGroup.relationSubdomain != null }">
-															<c:set var="relationName" value="${tmplGroup.composite.name }[${i.index }].$$label$$" />
-															<td>
-																<span class="field-value">
-																	<span class="field-input" 
-																		fInp-type="select"
-																		fInp-name="${relationName }"
-																		fInp-value="${entityItem.smap[relationName] }"
-																		fInp-optset="${tmplGroup.relationSubdomain }"
-																		fInp-readonly="${tmplGroup.relationLabelAccess == '读' }"
-																	>
-																		<span class="dtmpl-field-validates">
-																			<i validate-name="required"></i>
-																		</span>
-																	</span>
-																</span>
-															</td>
-														</c:if>
-														<c:forEach var="tmplField" items="${tmplGroup.fields }">
-															<c:set var="fieldValue" value="${entityItem.smap[tmplField.fieldName] }" />
-															<c:set var="fieldReadonly" 
-																	value="${tmplField.fieldAccess == '读'? 'true'
-																			: tmplField.fieldAccess == '补'&& !empty fieldValue? 'true'
-																				: ''  }" />
-															<td class="${tmplField.fieldAvailable? '': 'field-unavailable'}">
-																<span class="field-value">
-																	<span class="field-input" 
-																		fInp-type="${tmplField.type }"
-																		fname-full="${fieldDescMap[tmplField.fieldId].fullKey }"
-																		fInp-name="${fieldDescMap[tmplField.fieldId].arrayFieldNameMap[i.index] }"
-																		fInp-value="${fieldValue }"
-																		fInp-optkey="${tmplField.optionGroupId }"
-																		fInp-fieldkey="${module.name }@${tmplField.fieldName }"
-																		fInp-readonly="${fieldReadonly }"
-																	>
-																		<span class="dtmpl-field-validates">
-																			<c:if test="${fn:contains(tmplField.validators, 'required')}">
-																				<i validate-name="required"></i>
-																			</c:if>
-																		</span>
-																	</span>
-																</span>
-															</td>
-														</c:forEach>
-														<td>
-															<c:if test="${tmplGroup.composite.access == '写' }">
-																<span class="array-item-remove" title="移除当前行">×</span>
-															</c:if>
-														</td>
-													</tr>
-												</c:forEach>
-											</tbody>
-										</table>
+											<span>
+												<select>
+												
+												</select>
+												<select>
+													
+												</select>
+											</span>
+										</span>
 									</div>
-								</c:otherwise>
-							</c:choose>
+								</div> --%>
+							
+								<c:choose>
+									<c:when test="${tmplGroup.isArray != 1 }">
+										<c:forEach var="tmplField" items="${tmplGroup.fields }">
+											<c:set var="premise" value="${groupPremisesMap[tmplField.fieldName] }" />
+											<div class="form-group field-item ${tmplField.fieldAvailable? '': 'field-unavailable' } ${tmplField.colNum == 2? 'dbcol': '' }"
+												title="${tmplField.fieldAvailable? '': '无效字段' }"
+											>
+												<div class="dtmpl-field-validates">
+													<c:if test="${fn:contains(tmplField.validators, 'required')}">
+														<i validate-name="required"></i>
+													</c:if>
+												</div>
+												<label class="control-label field-title">${tmplField.title }</label>
+												<div class="field-value"  value-field-name="${tmplField.fieldName }">
+													<c:set var="fieldValue" value="${entity != null? entity.smap[tmplField.fieldName] : premise != null? premise.fieldValue: '' }" />
+													<c:set var="fieldReadonly" 
+															value="${tmplField.fieldAccess == '读'? 'true'
+																	: tmplField.fieldAccess == '补'&& !empty fieldValue? 'true'
+																		: ''  }" />
+													<span class="field-input" 
+														fInp-type="${tmplField.type }"
+														fInp-name="${tmplField.fieldName }"
+														fInp-value="${fieldValue }"
+														fInp-optkey="${tmplField.optionGroupKey }"
+														fInp-fieldkey="${module.name }@${tmplField.fieldName }"
+														fInp-readonly="${fieldReadonly}"
+													>
+													</span>
+												</div>
+											</div>
+										</c:forEach>
+									</c:when>
+									<c:otherwise>
+										<div class="table-scrollable field-array-table">
+											<table class="table table-striped table-bordered table-hover">
+												<thead>
+													<tr class="title-row">
+														<th
+															fname-format="${tmplGroup.composite.name }[ARRAY_INDEX_REPLACEMENT].唯一编码"
+														>#</th>
+														<c:if test="${tmplGroup.relationSubdomain != null }">
+															<th
+																class="th-field-title relation-label"
+																fname-format="${tmplGroup.composite.name }[ARRAY_INDEX_REPLACEMENT].$$label$$"
+																fInp-type="select"
+																fInp-optset="${tmplGroup.relationSubdomain }"
+																fInp-access="${tmplGroup.additionRelationLabelAccess }"
+																>关系</th>
+														</c:if>
+														<c:forEach var="field" items="${tmplGroup.fields }">
+															<th 
+																class="th-field-title ${field.fieldAvailable? '': 'field-unavailable'}"
+																title="${field.fieldAvailable? '': '无效字段' }"
+																fname-format="${fieldDescMap[field.fieldId].arrayFieldNameFormat }"
+																fname-full="${fieldDescMap[field.fieldId].fullKey }"
+																fInp-type="${field.type }"
+																fInp-optkey="${field.optionGroupKey }"
+																fInp-fieldkey="${module.name }@${field.fieldName }"
+																fInp-access="${field.additionAccess}"
+																>${field.title }</th>
+														</c:forEach>
+														<th width="20px">
+															<c:if test="${!(tmplGroup.composite.access == '读' || tmplGroup.composite.access == '补' && fn:length(entity.arrayMap[tmplGroup.composite.name]) > 0 ) }">
+																<c:if test="${tmplGroup.selectionTemplateId != null}">
+																	<a title="选择" stmpl-id="${tmplGroup.selectionTemplateId }" href="javascript:;" class="open-select-dialog fa fa-link"></a>
+																</c:if>
+																<span class="array-item-add" title="添加一行">+</span>
+															</c:if>
+														</th>
+													</tr>
+												</thead>
+												<tbody>
+													<c:forEach var="entityItem" varStatus="i" items="${entity.arrayMap[tmplGroup.composite.name] }">
+														<tr class="value-row">
+															<td>
+																<span>${i.index + 1 }</span>
+																<input class="entity-code" type="hidden" name="${entityItem.codeName }" value="${entityItem.code }" />
+															</td>
+															<c:if test="${tmplGroup.relationSubdomain != null }">
+																<c:set var="relationName" value="${tmplGroup.composite.name }[${i.index }].$$label$$" />
+																<td>
+																	<span class="field-value">
+																		<span class="field-input" 
+																			fInp-type="select"
+																			fInp-name="${relationName }"
+																			fInp-value="${entityItem.smap[relationName] }"
+																			fInp-optset="${tmplGroup.relationSubdomain }"
+																			fInp-readonly="${tmplGroup.relationLabelAccess == '读' }"
+																		>
+																			<span class="dtmpl-field-validates">
+																				<i validate-name="required"></i>
+																			</span>
+																		</span>
+																	</span>
+																</td>
+															</c:if>
+															<c:forEach var="tmplField" items="${tmplGroup.fields }">
+																<c:set var="fieldValue" value="${entityItem.smap[tmplField.fieldName] }" />
+																<c:set var="fieldReadonly" 
+																		value="${tmplField.fieldAccess == '读'? 'true'
+																				: tmplField.fieldAccess == '补'&& !empty fieldValue? 'true'
+																					: ''  }" />
+																<td class="${tmplField.fieldAvailable? '': 'field-unavailable'}">
+																	<span class="field-value">
+																		<span class="field-input" 
+																			fInp-type="${tmplField.type }"
+																			fname-full="${fieldDescMap[tmplField.fieldId].fullKey }"
+																			fInp-name="${fieldDescMap[tmplField.fieldId].arrayFieldNameMap[i.index] }"
+																			fInp-value="${fieldValue }"
+																			fInp-optkey="${tmplField.optionGroupKey }"
+																			fInp-fieldkey="${module.name }@${tmplField.fieldName }"
+																			fInp-readonly="${fieldReadonly }"
+																		>
+																			<span class="dtmpl-field-validates">
+																				<c:if test="${fn:contains(tmplField.validators, 'required')}">
+																					<i validate-name="required"></i>
+																				</c:if>
+																			</span>
+																		</span>
+																	</span>
+																</td>
+															</c:forEach>
+															<td>
+																<c:if test="${tmplGroup.composite.access == '写' }">
+																	<span class="array-item-remove" title="移除当前行">×</span>
+																</c:if>
+															</td>
+														</tr>
+													</c:forEach>
+												</tbody>
+											</table>
+										</div>
+									</c:otherwise>
+								</c:choose>
+							</div>
 						</div>
-					</div>
-				</c:forEach>
-			</form>
+					</c:forEach>
+				</form>
+			</div>
 		</div>
 	</div>
 </div>

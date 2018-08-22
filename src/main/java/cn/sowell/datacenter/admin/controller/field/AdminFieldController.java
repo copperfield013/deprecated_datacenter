@@ -81,5 +81,17 @@ public class AdminFieldController {
 		jRes.put("LABELS_MAP", labelsMap);
 		return jRes;
 	}
+	
+	
+	@ResponseBody
+	@RequestMapping("/cas_ops/{optGroupId}")
+	public ResponseJSON casOptions(@PathVariable Long optGroupId) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		List<DictionaryOption> options = dService.queryOptions(optGroupId);
+		jRes.put("options", options);
+		jRes.setStatus("suc");
+		return jRes;
+	}
+	
 
 }

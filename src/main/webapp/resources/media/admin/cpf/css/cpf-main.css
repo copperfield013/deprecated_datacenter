@@ -752,6 +752,24 @@ span.cpf-select2-sign.cpf-select2-sign-or:after {
 	display: none;
 }
 
+
+.cpf-field-input-caselectt-sels{
+	display: none;
+	position: absolute;
+    padding: 10px 10px;
+    background-color: #fcfc;
+    border: 3px solid #ccc;
+}
+.cpf-field-input-caselect span.cpf-field-input-caselect-input {
+    border: 1px solid #ccc;
+    width: 100%;
+    cursor: text;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1em;
+}
+
+
 /* .cpf-file-input-container .cpf-file-input-item,
 .cpf-file-input-container .cpf-file-input-add {
     width: 40px;

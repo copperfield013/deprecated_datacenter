@@ -317,7 +317,8 @@ div#tmpl-list span.tmpl-date {
 .field-input>input, 
 .field-input>select,
 .field-input>textarea,
-.field-input>.field-input-wrapper>select {
+.field-input>.field-input-wrapper>select,
+.field-input .cpf-field-input-caselect-input  {
     height: 2.5em;
     line-height: 2.5em;
     padding: 10px 5px;

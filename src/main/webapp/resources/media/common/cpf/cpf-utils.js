@@ -358,7 +358,7 @@ define(function(require, exports){
 			SEQUENCE_MAP[key] = currentSeq + 1;
 			return currentSeq;
 		},
-		datepicker		: function($dom,scrollEle){
+		datepicker		: function($dom,scrollEle, $page){
 			$dom = $($dom);
 			if($dom.is(':text')){
 				return $dom.datetimepicker({
@@ -367,7 +367,8 @@ define(function(require, exports){
 					weekStart	: 1,
 					autoclose	: true,
 					minView		: 'month',
-					bootcssVer	: 3
+					bootcssVer	: 3,
+					container	: $page
 				});
 				/*return $dom.datepicker({
 					format		: 'yyyy-mm-dd',
@@ -706,6 +707,36 @@ define(function(require, exports){
 					}
 				}
 			}
+		},
+		instead			: function($ori, $target, $container){
+			var offset, top, left, containerOffset;
+			if ($container) {
+				containerOffset = $($container).offset();
+			} else {
+				containerOffset = $(document.body).offset();
+		    }
+			$ori = $($ori);
+			$target = $($target);
+			
+			offset = $ori.offset();
+	        left = offset.left;
+			
+	        var bodyWidth = document.body.clientWidth || window.innerWidth;
+	        if (left + 220 > bodyWidth) {
+	          left = bodyWidth - 220;
+	        }
+	        
+	        top = offset.top;
+	        
+	        top = top - containerOffset.top;
+	        left = left - containerOffset.left;
+
+	        $ori.hide();
+	        $target.css({
+	          top:    top,
+	          left:   left
+	        }).show();
+	        
 		}
 	});
 	

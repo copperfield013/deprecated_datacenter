@@ -210,7 +210,7 @@ define(function(require, exports, module){
 						scrollEle = page.getContent();
 					}
 				}
-				Utils.datepicker($text, scrollEle);
+				Utils.datepicker($text, scrollEle, param.$page);
 				$text.funcMap = {
 					setReadonly	: function(toReadonly){
 						if(toReadonly == false){
@@ -349,6 +349,121 @@ define(function(require, exports, module){
 						$div.val(param.value, false);
 					}
 					return $div;
+				}
+			},
+			'caselect'		: function(){
+				var CAS_SPLITER = '->';
+				var disabled = false;
+				var $span = $('<span class="cpf-field-input-caselect">');
+				var $input = $('<span class="cpf-field-input-caselect-input">');
+				$span.append($input);
+				var $selSpan = $('<span class="cpf-field-input-caselectt-sels">').appendTo(param.$page);
+				
+				$input.click(function(e){
+					e.stopImmediatePropagation();
+					if(!disabled){
+						require('utils').instead($input, $selSpan, param.$page);
+						function blur(e1){
+							if($(e1.target).closest($selSpan).length == 0){
+								$selSpan.hide();
+								$input.text($span.val()).show();
+								param.$page.off('click', blur);
+							}
+						}
+						param.$page.on('click', blur);
+					}
+					return false;
+				});
+				
+				var atIndex = param.optionsKey.indexOf('@');
+				if(param.optionsKey && atIndex > 0){
+					var fieldGroupId = param.optionsKey.substring(0, atIndex),
+						fieldLevel = parseInt(param.optionsKey.substring(atIndex + 1, param.optionsKey.length));
+					for(var i = 1; i <= fieldLevel; i++){
+						var $select = $('<select><option value="">--请选择--</option></select>');
+						$select.change(function(){
+							var $this = $(this);
+							var groupId = $this.val();
+							var level = $this.index($selSpan.children('select')) + 1;
+							if(groupId){
+								appendOption($this.next('select'), groupId);
+							}
+						});
+						$selSpan.append($select);
+					}
+					function appendOption($select, groupId, val){
+						var def = $.Deferred();
+						if($select && $select.length > 0){
+							var $next = $select;
+							while($next.length > 0){
+								$next.children('option:gt(0)').remove();
+								$next = $next.next('select');
+							}
+							if(groupId){
+								require('ajax').ajax('admin/field/cas_ops/' + groupId, {}, function(data){
+									if(data.status === 'suc'){
+										for(var i in data.options){
+											var option = data.options[i];
+											$select.append('<option value="' + option.id + '">' + option.title + '</option>');
+										}
+										if(typeof val === 'string' && val){
+											var spliterIndex = val.indexOf(CAS_SPLITER);
+											if(spliterIndex >= 0){
+												var thisVal = val.substring(0, spliterIndex);
+											}
+											groupId = $select
+												.children('option')
+												.filter(function(){return this.text === thisVal})
+												.attr('value');
+											$select.val(groupId);
+											val = val.substring(spliterIndex + 2, val.length);
+											appendOption($select.next('select'), groupId, val).done(function(){
+												def.promise();
+											});
+										}
+									}
+								}, {
+									method	: 'GET',
+									cache	: true
+								});
+							}
+						}
+						return def.promise();
+					}
+					appendOption($selSpan.children('select').eq(0), fieldGroupId);
+					$span.val = function(val){
+						if(val === undefined){
+							val = '';
+							$selSpan.children('select').each(function(){
+								var $select = $(this);
+								if($select.val() !== ''){
+									val += require('utils').getCheckedOption($select).text() + CAS_SPLITER;
+								}else{
+									return false;
+								}
+							});
+							if(val != ''){
+								val = val.substring(0, val.length - CAS_SPLITER.length);
+							}
+							return val;
+						}else if(typeof val === 'string'){
+							appendOption($selSpan.children('select').eq(0), fieldGroupId, val);
+						}
+					};
+					$span.funcMap = {
+						setDisabled	: function(toDisabled){
+							disabled = toDisabled != false;
+						},
+						setReadonly	: function(toReadonly){
+							disabled = toReadonly != false;
+						},
+						getSubmitData	: function(){
+							return $span.val();
+						}
+					};
+					$span.data('fieldInputObject', _this);
+					
+					return $span;
 				}
 			},
 			'daterange'		: function(){
