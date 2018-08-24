@@ -543,7 +543,20 @@ define(function(require, exports, module){
 	        sUrl += '?download';
 	    }
 
-	    window.open(sUrl, '_self');
+	    if(!sUrl.match(/^[(http\:)(https\:)]/)){
+	    	var base = $('base').attr('href');
+	    	if(base){
+	    		sUrl = base + sUrl;
+	    	}
+	    }
+	    
+	    var oPop = window.open(sUrl, '_blank');
+        for(; oPop.document.readyState != "complete"; )
+        {
+            if (oPop.document.readyState == "complete")break;
+        }
+        oPop.document.execCommand("SaveAs");
+        oPop.close();
 	    return true;
 		
 		/*

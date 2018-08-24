@@ -1,5 +1,6 @@
 package cn.sowell.datacenter.test.abc;
 
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -17,17 +18,20 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.abc.auth.pojo.UserInfo;
 import com.abc.mapping.conf.MappingContainer;
 import com.abc.mapping.entity.Entity;
 import com.abc.mapping.node.ABCNode;
 import com.abc.mapping.node.AttributeNode;
 
+import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigResolver;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.impl.EntityComponent;
+import cn.sowell.datacenter.model.admin.pojo.ABCUser;
 import cn.sowell.dataserver.model.abc.service.ABCExecuteService;
 import cn.sowell.dataserver.model.dict.service.DictionaryService;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
@@ -48,9 +52,32 @@ public class TestEntityBinder {
 	@Resource
 	SessionFactory sFactory;
 	
+	@Resource
+	ModulesService mService;
+	
+	
+	
+	UserIdentifier getUser(){
+		UserInfo u = new UserInfo();
+		u.setCode("u6");
+		ABCUser user = new ABCUser(u);
+		return user;
+	}
+	
 	@Test
 	public void 残疾人() {
-		abcService.delete("65c64ee142784e818dc636a23667149c");
+		String module = "Dvat2g4Gn9";
+		UserIdentifier user = getUser();
+		Map<String, Object> map = new HashMap<>();
+		map.put("姓名", "puuuu");
+		map.put("街道/镇", "");
+		map.put("唯一编码", "18008ab6ac044212878b58f7675cd035");
+		String code = mService.mergeEntity(module, map, user);
+		
+		System.out.println(code);
+		ModuleEntityPropertyParser entity = mService.getEntity(module, code, null, user);
+		String p = entity.getFormatedProperty("图骗");
+		System.out.println(p);
 	}
 	
 	
@@ -110,7 +137,7 @@ public class TestEntityBinder {
 		Map<String, Object> map = getDataMap();
 		FusionContextConfigResolver resolver = config.getConfigResolver();
 		EntityComponent entity = resolver.createEntity(map);
-		ModuleEntityPropertyParser parser = resolver.createParser(entity.getEntity(), UserUtils.getCurrentUser());
+		ModuleEntityPropertyParser parser = resolver.createParser(entity.getEntity(), UserUtils.getCurrentUser(), null);
 		System.out.println(parser.getProperty("name"));
 		System.out.println(parser.getProperty("code"));
 		System.out.println(parser.getProperty("lowIncomeInsureType"));
@@ -211,8 +238,6 @@ public class TestEntityBinder {
 		return map;
 	}
 	
-	@Resource
-	ModulesService mService;
 	
 	@Test
 	public void testCreate() {

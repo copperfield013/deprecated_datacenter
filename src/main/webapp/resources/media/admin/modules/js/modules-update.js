@@ -21,11 +21,11 @@ define(function(require, exports, module){
 		
 		var fuseMode = false;
 		$('#save i', $page).click(function(){
-			var validateResult = true;
+			var validateResult = FieldInput.validateForm($('form', $page));
 			$('.dtmpl-field-validates>i', $page).each(function(){
 				var $this = $(this);
 				var param = {};
-				if($this.is('table *')){
+				if($this.closest('table').length > 0){
 					var $item = $this.closest('.field-input');
 					var $title = $this.closest('table').find('thead>tr>th').eq($this.closest('td').index());
 					param = {

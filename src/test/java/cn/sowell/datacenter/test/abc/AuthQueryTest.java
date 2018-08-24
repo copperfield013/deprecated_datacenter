@@ -51,7 +51,7 @@ public class AuthQueryTest {
 		List<Criteria> criterias = new ArrayList<Criteria>();
 		CriteriaFactory criteriaFactory = new CriteriaFactory(context);
 
-		QueryCriteria common = criteriaFactory.createLikeQueryCriteria("名称","测试");
+		Criteria common = criteriaFactory.createLikeQueryCriteria("名称","测试");
 		criterias.add(common);
 		
 		select(criterias, "名称",context);

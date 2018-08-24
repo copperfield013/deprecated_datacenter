@@ -20,7 +20,6 @@ import com.abc.panel.PanelFactory;
 import com.abc.query.criteria.Criteria;
 import com.abc.query.criteria.CriteriaFactory;
 import com.abc.query.criteria.IncludeQueryCriteria;
-import com.abc.query.criteria.QueryCriteria;
 import com.abc.query.entity.impl.EntitySortedPagedQuery;
 
 @ContextConfiguration(locations = "classpath*:spring-config/spring-datacenter-context.xml")
@@ -51,7 +50,7 @@ public class CrossRecordQueryTest {
 		
 //		QueryCriteria common = criteriaFactory.createLikeQueryCriteria("居住地址","居住地址","全名","杭州");
 //		criterias.add(common);
-		QueryCriteria common = criteriaFactory.createLikeQueryCriteria("name","施连");
+		Criteria common = criteriaFactory.createLikeQueryCriteria("name","施连");
 		criterias.add(common);
 		common = criteriaFactory.createQueryCriteria("性别","女");
 		criterias.add(common);

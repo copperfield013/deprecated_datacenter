@@ -21,6 +21,29 @@ define(function(require, exports){
 			}
 			return str;
 		},
+		startsWith	: function(source, snippit){
+			if (snippit == null || snippit == "" || source.length == 0
+					|| snippit.length > source.length)
+				return false;
+			if (source.substring(0, snippit.length) == snippit)
+				return true;
+			else
+				return false;
+			return true;
+		},
+		endWith		: function(source, snippit){
+			if (snippit == null || snippit == "" || source.length == 0
+					|| snippit.length > source.length)
+				return false;
+			if (source.substring(source.length - snippit.length, source.length) == snippit)
+				return true;
+			else
+				return false;
+			return true;
+		},
+		indexOf		: function(){
+			
+		},
 		isPhoto		: function(fileName){
 			if(typeof fileName === 'string'){
 				var reg = /.*\.(gif|jpg|jpeg|png|bmp|ico)$/i;
@@ -708,35 +731,43 @@ define(function(require, exports){
 				}
 			}
 		},
-		instead			: function($ori, $target, $container){
+		place			: function($dom, $site, direction, $container){
 			var offset, top, left, containerOffset;
 			if ($container) {
 				containerOffset = $($container).offset();
 			} else {
 				containerOffset = $(document.body).offset();
 		    }
-			$ori = $($ori);
-			$target = $($target);
+			$site = $($site);
+			$dom = $($dom);
+			$dom.appendTo($container);
 			
-			offset = $ori.offset();
+			offset = $site.offset();
 	        left = offset.left;
 			
 	        var bodyWidth = document.body.clientWidth || window.innerWidth;
-	        if (left + 220 > bodyWidth) {
-	          left = bodyWidth - 220;
+	        if (left + $dom.width() > bodyWidth) {
+	          left = bodyWidth - $dom.width();
 	        }
 	        
 	        top = offset.top;
 	        
+	        
 	        top = top - containerOffset.top;
 	        left = left - containerOffset.left;
 
-	        $ori.hide();
-	        $target.css({
+	        if(direction === 'top'){
+	        	top -= $dom.height();
+	        }
+	        $dom.css({
 	          top:    top,
 	          left:   left
-	        }).show();
-	        
+	        });
+		},
+		instead			: function($ori, $target, $container){
+			exports.place($target, $ori, '', $container);
+			$ori.hide();
+			$target.show();
 		}
 	});
 	

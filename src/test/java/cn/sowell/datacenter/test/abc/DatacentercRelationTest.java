@@ -59,11 +59,9 @@ public class DatacentercRelationTest {
 	private Entity createEntity(String mappingName) {
 		
 		Entity entity = new Entity(mappingName);
-		entity.putValue("唯一编码", "5d914e41b5a64a90b17e0ac8de92146x");
-		entity.putValue("姓名", "关于9");
-		entity.putValue("性别", "女");
-		entity.putValue("街道/镇", "浙江省->杭州->西湖区->西溪街道");
-		entity.putValue("图骗",readPhotoFile());
+		//entity.putValue("唯一编码", "3a3b391b7ec74d778cff915fef59399c");
+		entity.putValue("姓名", "uuuuu");
+		entity.putValue("街道/镇", "");
 //		entity.putValue("人口类型", "失业人员");
 		
 //		Entity entity = new Entity(mappingName);

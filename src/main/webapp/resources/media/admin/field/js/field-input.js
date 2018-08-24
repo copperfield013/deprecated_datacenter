@@ -47,7 +47,8 @@ define(function(require, exports, module){
 			$dom		: null,
 			//检测表单的函数，如果错误，返回错误信息(string)，否则检测成功
 			validator	: $.noop,
-			$page		: null
+			$page		: null,
+			$container	: null
 		};
 		
 		var param = $.extend({}, defaultParam, _param);
@@ -58,6 +59,16 @@ define(function(require, exports, module){
 			}else{
 				if(param.optionsSet){
 					param.options = resolveOptionsSet(param.optionsSet);
+				}
+			}
+		}
+		if(!param.$container || param.$container.length == 0){
+			if(!param.$page || param.$page.length == 0){
+				param.$container = $(document.body);
+			}else{
+				param.$container = param.$page.find('.field-input-container');
+				if(param.$container.length == 0){
+					param.$container = param.$page;
 				}
 			}
 		}
@@ -203,18 +214,11 @@ define(function(require, exports, module){
 					$text.val(value);
 				}
 				$text.addClass('field-input-readonly').attr('readonly', 'readonly');
-				var scrollEle = null;
-				if(param.$page){
-					var page = param.$page.getLocatePage();
-					if(page instanceof require('page')){
-						scrollEle = page.getContent();
-					}
-				}
-				Utils.datepicker($text, scrollEle, param.$page);
+				Utils.datepicker($text, param.$container, param.$container);
 				$text.funcMap = {
 					setReadonly	: function(toReadonly){
 						if(toReadonly == false){
-							Utils.datepicker($text, scrollEle);
+							Utils.datepicker($text, scrollEle, param.$container);
 						}else{
 							$text.datetimepicker('remove');
 						}
@@ -233,18 +237,11 @@ define(function(require, exports, module){
 					$text.val(value);
 				}
 				$text.addClass('field-input-readonly').attr('readonly', 'readonly');
-				var scrollEle = null;
-				if(param.$page){
-					var page = param.$page.getLocatePage();
-					if(page instanceof require('page')){
-						scrollEle = page.getContent();
-					}
-				}
-				Utils.datetimepicker($text, scrollEle, param.$page);
+				Utils.datetimepicker($text, param.$container, param.$container);
 				$text.funcMap = {
 					setReadonly	: function(toReadonly){
 						if(toReadonly == false){
-							Utils.datepicker($text, scrollEle, param.$page);
+							Utils.datepicker($text, scrollEle, param.$container);
 						}else{
 							$text.datetimepicker('remove');
 						}
@@ -263,18 +260,11 @@ define(function(require, exports, module){
 					$text.val(value);
 				}
 				$text.addClass('field-input-readonly').attr('readonly', 'readonly');
-				var scrollEle = null;
-				if(param.$page){
-					var page = param.$page.getLocatePage();
-					if(page instanceof require('page')){
-						scrollEle = page.getContent();
-					}
-				}
-				Utils.timepicker($text, scrollEle, param.$page);
+				Utils.timepicker($text, param.$container, param.$container);
 				$text.funcMap = {
 					setReadonly	: function(toReadonly){
 						if(toReadonly == false){
-							Utils.timepicker($text, scrollEle, param.$page);
+							Utils.timepicker($text, scrollEle, param.$container);
 						}else{
 							$text.datetimepicker('remove');
 						}
@@ -354,23 +344,25 @@ define(function(require, exports, module){
 			'caselect'		: function(){
 				var CAS_SPLITER = '->';
 				var disabled = false;
+				var valueChanged = true;
 				var $span = $('<span class="cpf-field-input-caselect">');
 				var $input = $('<span class="cpf-field-input-caselect-input">');
+				var $selSpan = $('<span class="cpf-field-input-caselectt-sels">');
 				$span.append($input);
-				var $selSpan = $('<span class="cpf-field-input-caselectt-sels">').appendTo(param.$page);
 				
 				$input.click(function(e){
 					e.stopImmediatePropagation();
 					if(!disabled){
-						require('utils').instead($input, $selSpan, param.$page);
-						function blur(e1){
+						require('utils').instead($input, $selSpan, param.$container);
+						var blur = function(e1){
 							if($(e1.target).closest($selSpan).length == 0){
 								$selSpan.hide();
 								$input.text($span.val()).show();
-								param.$page.off('click', blur);
+								_this.validate();
+								$(document.body).off('click', blur);
 							}
 						}
-						param.$page.on('click', blur);
+						$(document.body).on('click', blur);
 					}
 					return false;
 				});
@@ -391,7 +383,7 @@ define(function(require, exports, module){
 						});
 						$selSpan.append($select);
 					}
-					function appendOption($select, groupId, val){
+					var appendOption = function($select, groupId, val){
 						var def = $.Deferred();
 						if($select && $select.length > 0){
 							var $next = $select;
@@ -407,30 +399,35 @@ define(function(require, exports, module){
 											$select.append('<option value="' + option.id + '">' + option.title + '</option>');
 										}
 										if(typeof val === 'string' && val){
+											var thisVal = val;
 											var spliterIndex = val.indexOf(CAS_SPLITER);
 											if(spliterIndex >= 0){
-												var thisVal = val.substring(0, spliterIndex);
+												thisVal = val.substring(0, spliterIndex);
 											}
 											groupId = $select
 												.children('option')
 												.filter(function(){return this.text === thisVal})
 												.attr('value');
-											$select.val(groupId);
-											val = val.substring(spliterIndex + 2, val.length);
-											appendOption($select.next('select'), groupId, val).done(function(){
-												def.promise();
-											});
+											if(groupId){
+												$select.val(groupId);
+												val = val.substring(spliterIndex + 2, val.length);
+												return appendOption($select.next('select'), groupId, val).done(function(valArr){
+													def.resolve($.merge([thisVal], valArr));
+												});
+											}
 										}
+										def.resolve(['']);
 									}
 								}, {
 									method	: 'GET',
 									cache	: true
 								});
 							}
+						}else{
+							def.resolve([]);
 						}
 						return def.promise();
 					}
-					appendOption($selSpan.children('select').eq(0), fieldGroupId);
 					$span.val = function(val){
 						if(val === undefined){
 							val = '';
@@ -447,7 +444,18 @@ define(function(require, exports, module){
 							}
 							return val;
 						}else if(typeof val === 'string'){
-							appendOption($selSpan.children('select').eq(0), fieldGroupId, val);
+							appendOption($selSpan.children('select').eq(0), fieldGroupId, val).done(function(valArr){
+								var valStr = '';
+								for(var i in valArr){
+									if(valArr[i]){
+										valStr += valArr[i] + CAS_SPLITER;
+									}
+								}
+								if(valStr != ''){
+									valStr = valStr.substring(0, valStr.length - CAS_SPLITER.length);
+								}
+								$input.text(valStr);
+							});
 						}
 					};
 					$span.funcMap = {
@@ -459,10 +467,30 @@ define(function(require, exports, module){
 						},
 						getSubmitData	: function(){
 							return $span.val();
+						},
+						isValueChanged	: function(){
+							return valueChanged;
+						},
+						validate		: function(ui){
+							var completed = true;
+							if($span.val()){
+								$selSpan.children('select').each(function(){
+									if(!$(this).val()){
+										completed = false;
+										return false;
+									}
+								});
+							}
+							if(!completed){
+								ui.tipError($input, '级联属性不完整');
+								return false;
+							}else{
+								ui.removeError($input);
+							}
 						}
 					};
-					$span.data('fieldInputObject', _this);
-					
+					$span.addClass('cpf-field-input').data('fieldInputObject', _this);
+					$span.val(param.value || '');
 					return $span;
 				}
 			},
@@ -876,11 +904,32 @@ define(function(require, exports, module){
 			}
 		}
 		
+		var ui = {
+			tipError	: function($dom, message){
+				var $dom = $($dom);
+				$dom.tooltip({
+					title		: message,
+					trigger		: 'manual',
+					container	: param.$container,
+					template	: '<div class="tooltip field-input-error-tip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
+				}).tooltip('show');
+				$dom.addClass('field-input-error');
+			},
+			removeError	: function($dom){
+				$dom.removeClass('field-input-error');
+				$dom.tooltip('destroy');
+			}
+		}
+		
 		/**
 		 * 检测当前表单的合法性
 		 */
 		this.validate = function(){
-			param.validator.apply(this, [this.getValue()]);
+			if(doDomFuncMap('validate', [ui]) !== false){
+				param.validator.apply(this, [this.getValue()]);
+			}else{
+				return false;
+			}
 		}
 		
 		/**
@@ -970,6 +1019,18 @@ define(function(require, exports, module){
 			}else{
 				_callback();
 			}
+		},
+		validateForm			: function(form){
+			var validateResult = true;
+			$(form).find('.cpf-field-input').each(function(){
+				var fieldInputObject = $(this).data('fieldInputObject');
+				if(fieldInputObject instanceof FieldInput){
+					if(fieldInputObject.validate() === false){
+						validateResult = false;
+					}
+				}
+			});
+			return validateResult;
 		},
 		bindSubmitData			: function(form, formData){
 			$(form).find('.cpf-field-input').each(function(){

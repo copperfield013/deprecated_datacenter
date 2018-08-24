@@ -437,7 +437,7 @@ define(function(require, exports, module){
 				$('li.active', li.closest('.sidebar-menu')).removeClass('active');
 				li.addClass('active');
 			}
-			if(uri.startsWith($CPF.getParam('tabLinkPrefix'))){
+			if(utils.startsWith(uri, $CPF.getParam('tabLinkPrefix'))){
 				try{
 					Tab.openInTab(uri, tabId, title);
 				}catch(e){
@@ -445,7 +445,7 @@ define(function(require, exports, module){
 				}finally{
 					return false;
 				}
-			}else if(uri.startsWith('#')){
+			}else if(utils.startsWith(uri, '#')){
 				return false;
 			}
 		});

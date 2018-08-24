@@ -21,6 +21,13 @@
 <!-- cover beyond styles -->
 <link href="media/admin/main/css/datacenter-cover.css" rel="stylesheet" type="text/css" />
 <link href="media/admin/field/css/field-search.css" rel="stylesheet" type="text/css" />
+
+<link type="text/css" rel="stylesheet" href="media/admin/modules/css/modules-detail-tmpl.css" />
+
+<script src="${basePath }media/common/compat/weakmap-polyfill.min.js"></script>
+<script src="${basePath }media/common/compat/formdata.min.js"></script>
+<script src="${basePath }media/common/compat/compat.js"></script>
+
 <!-- jQuery -->
 <script src="${basePath }media/jquery-1.11.3.js"></script>
 <script src="${basePath }media/jquery.fix.clone.js"></script>

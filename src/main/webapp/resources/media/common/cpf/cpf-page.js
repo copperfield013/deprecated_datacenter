@@ -166,7 +166,7 @@ define(function(require, exports, module){
 			title = $(dom).attr('title'),
 			pageType = $(dom).attr('page-type') || 'dialog'
 			;
-		if(target && target.startsWith('@')){
+		if(target && require('utils').startsWith(target, '@')){
 			var pageId = target.substr(1);
 			//根据id获得获得对应的Page对象
 			targetPage = Page.getPage(pageId);
