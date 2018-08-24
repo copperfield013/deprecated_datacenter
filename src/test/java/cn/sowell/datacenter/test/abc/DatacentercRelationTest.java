@@ -1,5 +1,10 @@
 package cn.sowell.datacenter.test.abc;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import javax.annotation.Resource;
 
 import org.apache.log4j.Logger;
@@ -22,7 +27,7 @@ public class DatacentercRelationTest {
 
 	private static Logger logger = Logger
 			.getLogger(DatacentercRelationTest.class);
-	protected String mapperName = "新的测试";
+	protected String mapperName = "八二四";
 	// protected String dictionaryMappingName="default_dm";
 
 	@Resource
@@ -52,28 +57,78 @@ public class DatacentercRelationTest {
 	}
 
 	private Entity createEntity(String mappingName) {
+		
 		Entity entity = new Entity(mappingName);
-		entity.putValue("唯一编码", "5d914e41b5a64a90b17e0ac8de92147l");
-		entity.putValue("姓名", "关于8");
+		entity.putValue("唯一编码", "5d914e41b5a64a90b17e0ac8de92146x");
+		entity.putValue("姓名", "关于9");
 		entity.putValue("性别", "女");
-		entity.putValue("行政区域", "浙江省->杭州->西湖区->西溪街道");
-		Entity relationentity = new Entity("新测试关系");
-		relationentity.putValue("名字", "刘志华5");
-		entity.putRelationEntity("t关系", "新测试关系", relationentity);
-
-		relationentity = new Entity("新测试关系");
-		relationentity.putValue("名字", "刘志华6");
-		entity.putRelationEntity("t关系", "新测试关系", relationentity);
-
-		relationentity = new Entity("新测试关系");
-		relationentity.putValue("名字", "刘志华4");
-		entity.putRelationEntity("t关系", "旧测试关系", relationentity);
-
+		entity.putValue("街道/镇", "浙江省->杭州->西湖区->西溪街道");
+		entity.putValue("图骗",readPhotoFile());
+//		entity.putValue("人口类型", "失业人员");
+		
+//		Entity entity = new Entity(mappingName);
+//		entity.putValue("唯一编码", "5d914e41b5a64a90b17e0ac8de92147l");
+//		entity.putValue("姓名", "关于9");
+//		entity.putValue("性别", "女");
+//		entity.putValue("行政区域", "浙江省->杭州->西湖区->西溪街道");
+//		entity.putValue("照骗",readPhotoFile());
+//		entity.putValue("人口类型", "失业人员");
+//		
+//		Entity relationentity = new Entity("新测试关系");
+//		relationentity.putValue("名字", "刘志华5");
+//		entity.putRelationEntity("t关系", "新测试关系", relationentity);
+//
+//		relationentity = new Entity("新测试关系");
+//		relationentity.putValue("名字", "刘志华6");
+//		entity.putRelationEntity("t关系", "新测试关系", relationentity);
+//
+//		relationentity = new Entity("新测试关系");
+//		relationentity.putValue("名字", "刘志华4");
+//		entity.putRelationEntity("t关系", "旧测试关系", relationentity);
+//
 		return entity;
 	}
 
 	@Test
 	public void test() {
+	}
+	
+	private byte[] readPhotoFile() {
+		String filePath = "E:\\Work\\zhsq\\2018\\个人照片.jpg";
+		InputStream in=null;
+		ByteArrayOutputStream out=null;
+		try {
+			in = new FileInputStream(filePath);
+			out = new ByteArrayOutputStream();
+			byte[] buffer = new byte[1024 * 4];
+			int n = 0;
+			while ((n = in.read(buffer)) != -1) {
+				out.write(buffer, 0, n);
+			}
+			return out.toByteArray();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally{
+			if(in!=null){
+				try {
+					in.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			if(out!=null){
+				try {
+					out.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return null;
 	}
 
 }
