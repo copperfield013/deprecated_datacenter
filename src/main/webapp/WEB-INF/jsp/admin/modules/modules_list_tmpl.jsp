@@ -204,10 +204,10 @@
 			pageNo	: '${criteria.pageInfo.pageNo}',
 			pageSize: '${criteria.pageInfo.pageSize}'
 		},{
-			uuid		: '${exportProgress.uuid}',
-			scope		: '${exportProgress.dataMap["exportPageInfo"].scope}',
-			rangeStart	: '${exportProgress.dataMap["exportPageInfo"].rangeStart}',
-			rangeEnd	: '${exportProgress.dataMap["exportPageInfo"].rangeEnd}'
+			uuid		: '${exportStatus.uuid}',
+			scope		: '${exportStatus.dataMap["exportPageInfo"].scope}',
+			rangeStart	: '${exportStatus.dataMap["exportPageInfo"].rangeStart}',
+			rangeEnd	: '${exportStatus.dataMap["exportPageInfo"].rangeEnd}'
 		});
 	});
 </script>

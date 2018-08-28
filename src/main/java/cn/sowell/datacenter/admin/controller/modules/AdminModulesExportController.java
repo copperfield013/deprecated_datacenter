@@ -109,6 +109,7 @@ public class AdminModulesExportController {
 				Map<Long, NormalCriteria> vCriteriaMap = mService.getCriteriasFromRequest(pvs, CollectionUtils.toMap(ltmpl.getCriterias(), c->c.getId()));
 				progress.getDataMap().put("exportPageInfo", ePageInfo);
 				eService.startExport(progress, ltmpl, new HashSet<NormalCriteria>(vCriteriaMap.values()), ePageInfo, UserUtils.getCurrentUser());
+				session.setAttribute(AdminConstants.EXPORT_PEOPLE_STATUS_UUID, progress.getUUID());
 			}
 		}
 		jRes.put("uuid", progress.getUUID());

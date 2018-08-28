@@ -1,6 +1,5 @@
 package cn.sowell.datacenter.admin.controller.modules;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,8 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -103,7 +102,7 @@ public class AdminModulesController {
 	public String list(
 			@PathVariable Long menuId,
 			PageInfo pageInfo,
-			HttpServletRequest request, Model model, ServletRequest session) {
+			HttpServletRequest request, Model model, HttpSession session) {
 		
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		String moduleName = menu.getTemplateModule();

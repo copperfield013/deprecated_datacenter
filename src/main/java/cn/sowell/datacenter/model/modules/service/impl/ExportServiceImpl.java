@@ -88,6 +88,7 @@ public class ExportServiceImpl implements ExportService {
 		progress.setTotal(100);
 		progress.setCurrent(0);
 		XSSFWorkbook workbook = new XSSFWorkbook();
+		progress.veni();
 		pFactory.createThread(progress, p->{
 			progress.setCurrent(1);
 			XSSFSheet sheet = workbook.createSheet();
@@ -180,7 +181,6 @@ public class ExportServiceImpl implements ExportService {
 		if(progress.isBreaked()){
 			throw new ExportBreakException();
 		}
-		progress.veni();
 	}
 	
 	@Override

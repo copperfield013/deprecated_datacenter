@@ -176,38 +176,43 @@ define(function(require, exports, module){
 								console.log(ui);
 							}
 						});
-						$group.find('.select-arrayitem-control')
-							.find(':checkbox').change(function(){
-								//勾选是否显示选择按钮
-								var $checkbox = $(this);
-								var $a = $checkbox.closest('label').prev('a');
-								$a.toggle($checkbox.prop('checked'));
-							})
-							.end().find('a.btn-select').click(function(){
-								var reqParam = {};
-								var stmplId = $group.attr('stmpl-id'); 
-								if(!stmplId){
-									reqParam.moduleName = param.module;
-									reqParam.compositeId = field.c_id;
-								}
-								require('dialog').openDialog(
-										'admin/tmpl/stmpl/' + (stmplId? ('update/' + stmplId) : 'create')
-										, '编辑选择模板' + field.c_title, undefined, {
-									reqParam	: reqParam,
-									width		: 1000,
-									height		: 500,
-									events		: {
-										afterSave	: function(stmplId){
-											if(stmplId){
-												console.log(stmplId);
-												$group.attr('stmpl-id', stmplId);
-											}
-										}
+						var $arrayitemControl = $group.find('.select-arrayitem-control');
+						if(field.composite.addType == 5){
+							$arrayitemControl
+								.find(':checkbox').change(function(){
+									//勾选是否显示选择按钮
+									var $checkbox = $(this);
+									var $a = $checkbox.closest('label').prev('a');
+									$a.toggle($checkbox.prop('checked'));
+								})
+								.end().find('a.btn-select').click(function(){
+									var reqParam = {};
+									var stmplId = $group.attr('stmpl-id'); 
+									if(!stmplId){
+										reqParam.moduleName = param.module;
+										reqParam.compositeId = field.c_id;
 									}
-								});
-							})
-							.end().show();
-						$group.find('.select-arrayitem-control :checkbox.selectable').prop('checked', !!$group.attr('stmpl-id')).trigger('change');
+									require('dialog').openDialog(
+											'admin/tmpl/stmpl/' + (stmplId? ('update/' + stmplId) : 'create')
+											, '编辑选择模板' + field.c_title, undefined, {
+												reqParam	: reqParam,
+												width		: 1000,
+												height		: 500,
+												events		: {
+													afterSave	: function(stmplId){
+														if(stmplId){
+															console.log(stmplId);
+															$group.attr('stmpl-id', stmplId);
+														}
+													}
+												}
+											});
+								})
+								.end().show();
+							$arrayitemControl.find(':checkbox.selectable').prop('checked', !!$group.attr('stmpl-id')).trigger('change');
+						}else{
+							$arrayitemControl.remove();
+						}
 					}
 					var $titleCell = $('#tmpl-field-array-title', $page).tmpl(fieldData);
 					$titleCell.data('field-data', fieldData);

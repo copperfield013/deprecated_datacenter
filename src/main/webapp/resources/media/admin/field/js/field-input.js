@@ -354,10 +354,11 @@ define(function(require, exports, module){
 					e.stopImmediatePropagation();
 					if(!disabled){
 						require('utils').instead($input, $selSpan, param.$container);
+						$input.show().css('visibility', 'hidden');
 						var blur = function(e1){
 							if($(e1.target).closest($selSpan).length == 0){
 								$selSpan.hide();
-								$input.text($span.val()).show();
+								$input.text($span.val()).css('visibility', 'visible');
 								_this.validate();
 								$(document.body).off('click', blur);
 							}
@@ -376,10 +377,7 @@ define(function(require, exports, module){
 						$select.change(function(){
 							var $this = $(this);
 							var groupId = $this.val();
-							var level = $this.index($selSpan.children('select')) + 1;
-							if(groupId){
-								appendOption($this.next('select'), groupId);
-							}
+							appendOption($this.next('select'), groupId);
 						});
 						$selSpan.append($select);
 					}

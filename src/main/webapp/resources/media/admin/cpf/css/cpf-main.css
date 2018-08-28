@@ -760,6 +760,7 @@ span.cpf-select2-sign.cpf-select2-sign-or:after {
     padding: 10px 10px;
     background-color: #fcfc;
     border: 3px solid #ccc;
+    white-space: nowrap;
 }
 .cpf-field-input-caselect span.cpf-field-input-caselect-input {
     border: 1px solid #ccc;
