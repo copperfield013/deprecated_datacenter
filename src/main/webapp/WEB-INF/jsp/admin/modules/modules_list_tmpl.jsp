@@ -157,6 +157,10 @@
 		<div class="detail-toggle-sublist-wrapper">
 			<div class="export-window-title">
 				<h3>导出</h3>
+				<label>
+					<input id="with-detail" type="checkbox" class="colored-blue">
+					<span class="text">详情</span>
+				</label>
 			</div>
 			<div class="row range-toggle">
 				<label class="col-lg-6">
@@ -167,6 +171,9 @@
 					<input id="export-all" type="radio" class="colored-blue">
 					<span class="text">导出所有</span>
 				</label>
+			</div>
+			<div class="row">
+				
 			</div>
 			<div class="row data-range" style="display: none;">
 				<label class="col-lg-4">数据范围：</label>
@@ -205,6 +212,7 @@
 			pageSize: '${criteria.pageInfo.pageSize}'
 		},{
 			uuid		: '${exportStatus.uuid}',
+			withDetail	: '${exportStatus.dataMap["withDetail"]}',
 			scope		: '${exportStatus.dataMap["exportPageInfo"].scope}',
 			rangeStart	: '${exportStatus.dataMap["exportPageInfo"].rangeStart}',
 			rangeEnd	: '${exportStatus.dataMap["exportPageInfo"].rangeEnd}'

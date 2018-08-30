@@ -157,6 +157,27 @@ define(function(require, exports, module){
 			}
 		});
 		
+		$('#btn-export', $page).click(function(){
+			Dialog.confirm('确认导出当前详情页？', function(yes){
+				if(yes){
+					$CPF.showLoading();
+					Ajax.ajax('admin/modules/export/export_detail/' + menuId + '/' + entityCode, {
+						
+					}, function(data){
+						if(data.status === 'suc'){
+							if(data.uuid){
+								Ajax.download('admin/modules/export/download/' + data.uuid);
+							}
+						}
+					}, {
+						afterLoad	: function(){
+							$CPF.closeLoading();
+						}
+					});
+				}
+			})
+		});
+		
 		setTimeout(function(){
 			$CPF.showLoading();
 			$('.field-title', $page).each(function(){DtmplUpdate.adjustFieldTitle($(this))});

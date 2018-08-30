@@ -9,8 +9,16 @@
 			    <h1 id="showErrors" class="fa fa-info-circle" style="cursor: pointer;color: #CD5C5C;"></h1>
 			</c:if>
 		</div>
-		<div class="history-container title-operate">
-			<a href="page:#timeline-area.toggle" title="查看历史" class="toggle-timeline btn-toggle"><i class="iconfont icon-historyrecord"></i></a>
+		<div class="header-buttons">
+			<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
+				<i class="glyphicon glyphicon-refresh"></i>
+			</a>
+			<a href="page:#timeline-area.toggle" title="查看历史" class="toggle-timeline btn-toggle">
+				<i class="iconfont icon-historyrecord"></i>
+			</a>
+			<a class="export" title="导出" id="btn-export" href="javascript:;">
+				<i class="glyphicon glyphicon-export"></i>
+			</a>
 		</div>
 	</div>
 	<div class="page-body">

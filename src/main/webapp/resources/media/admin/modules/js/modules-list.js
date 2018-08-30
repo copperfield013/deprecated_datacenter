@@ -10,6 +10,7 @@ define(function(require, exports, module){
 		var $exportAll = $('#export-all', $page),
 			$exportCur = $('#export-current-page', $page),
 			$exportMsg = $('#export-msg', $page),
+			$withDetail = $('#with-detail', $page),
 			$msg = $('p', $exportMsg);
 			
 		$exportAll.change(function(e, flag){
@@ -92,6 +93,7 @@ define(function(require, exports, module){
 				$('#export-range-end', $page).val(sessionExportStatus.rangeEnd);
 				$exportAll.prop('checked', true).trigger('change');
 			}
+			$withDetail.prop('checked', sessionExportStatus.withDetail === 'true').trigger('change');
 			handler.pollWith(sessionExportStatus.uuid);
 			startPolling();
 		}
@@ -99,11 +101,13 @@ define(function(require, exports, module){
 			var scope = $exportAll.prop('checked')? 'all': $exportCur.prop('checked')? 'current': null;
 			if(scope){
 				var rangeStart = scope == 'all' && $('#export-range-start', $page).val() || undefined,
-					rangeEnd = scope == 'all' && $('#export-range-end', $page).val() || undefined;
+					rangeEnd = scope == 'all' && $('#export-range-end', $page).val() || undefined,
+					withDetail = $withDetail.prop('checked');
 				handler.start({
 					scope		: scope,
 					rangeStart	: rangeStart,
 					rangeEnd	: rangeEnd,
+					withDetail	: withDetail,
 					parameters	: initParam
 				});
 				startPolling();
@@ -116,6 +120,7 @@ define(function(require, exports, module){
 			$exportMsg.show();
 			$exportAll.attr('disabled', 'disabled');
 			$exportCur.attr('disabled', 'disabled');
+			$withDetail.attr('disabled', 'disabled');
 			$exportProgress.find('.progress-text').text('0%').css('left', 0);
 			$exportProgress.find('.progress-bar').attr('aria-valuenow', 0).css('width', 0);
 			$exportProgress.show();
@@ -138,6 +143,7 @@ define(function(require, exports, module){
 			$btnDownload.hide();
 			$exportAll.removeAttr('disabled');
 			$exportCur.removeAttr('disabled');
+			$withDetail.removeAttr('disabled');
 			$('.data-range :input', $page).removeAttr('disabled');
 		}
 	}

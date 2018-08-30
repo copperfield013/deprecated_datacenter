@@ -6,8 +6,10 @@ import org.springframework.core.io.AbstractResource;
 
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.web.poll.WorkProgress;
+import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.dataserver.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.dataserver.model.modules.pojo.criteria.NormalCriteria;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
 
 public interface ExportService {
@@ -19,5 +21,9 @@ public interface ExportService {
 	WorkProgress getExportProgress(String uuid);
 	void stopExport(String uuid);
 	void removeExport(String uuid);
+	
+	void startWholeExport(WorkProgress progress, TemplateListTemplate ltmpl, TemplateDetailTemplate dtmpl,
+			Set<NormalCriteria> criteria, ExportDataPageInfo ePageInfo, UserIdentifier user);
+	String exportDetailExcel(ModuleEntityPropertyParser parser, TemplateDetailTemplate dtmpl) throws Exception;
 	
 }

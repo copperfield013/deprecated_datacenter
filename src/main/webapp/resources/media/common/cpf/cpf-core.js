@@ -8,6 +8,7 @@ define(function(require, exports, module){
 		pageInitSequeue = [],
 		defaultParamSequeue = [],
 		$loading = undefined,
+		loadingTimer = null,
 		_data = {}
 	;
 	var $CPF = {
@@ -94,7 +95,7 @@ define(function(require, exports, module){
 		/**
 		 * 显示加载层，并阻止用户点击
 		 */
-		showLoading			: function(){
+		showLoading			: function(whenShutdown){
 			if($loading){
 				$loading.appendTo(document.body).modal('show');
 			}else{
@@ -107,6 +108,19 @@ define(function(require, exports, module){
 					keyboard	: false
 				});
 			}
+			if(loadingTimer){
+				clearTimeout(loadingTimer);
+			}
+			loadingTimer = setTimeout(function(){
+				var $btnCloseLoading = $('<i title="关闭遮罩" class="btn-close-loading">').click(function(){
+					$CPF.closeLoading();
+					(whenShutdown || $.noop).apply();
+				}).appendTo(document.body);
+				if($loading.data('btnCloseLoading')){
+					$loading.data('btnCloseLoading').remove();
+				}
+				$loading.data('btnCloseLoading', $btnCloseLoading);
+			}, $CPF.getParam('loadingTimeout') || 7000);
 		},
 		/**
 		 * 显示加载层，并阻止用户点击
@@ -114,6 +128,12 @@ define(function(require, exports, module){
 		closeLoading		: function(){
 			if($loading){
 				$loading.modal('hide');
+				if($loading.data('btnCloseLoading')){
+					$loading.data('btnCloseLoading').remove();
+				}
+				if(loadingTimer){
+					clearTimeout(loadingTimer);
+				}
 			}
 		},
 		data				: function(key, value){

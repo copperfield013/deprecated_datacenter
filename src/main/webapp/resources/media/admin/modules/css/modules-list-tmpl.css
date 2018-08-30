@@ -1,17 +1,26 @@
 @CHARSET "UTF-8";
 
+.module-list-tmpl div#export-window {
+	height: auto;
+	padding-bottom: 10px;
+}
+
 .module-list-tmpl #export-window .export-window-title h3 {
     margin: 5px 10px;
     font-size: 18px;
+    float: left;
+}
+.module-list-tmpl #export-window .export-window-title label {
+    float: right;
+    margin-right: 20px;
 }
 
 .module-list-tmpl .export-window-title {
     border-bottom: 1px solid #f0f0f0;
-}
-
-.module-list-tmpl div#export-window {
-	height: auto;
-	padding-bottom: 10px;
+    display: block;
+    width: 100%;
+    clear: right;
+    height: 30px;
 }
 
 .module-list-tmpl #export-window>div>.row {

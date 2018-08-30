@@ -123,7 +123,7 @@ public class AdminModulesController {
 		String uuid = (String) session.getAttribute(AdminConstants.EXPORT_PEOPLE_STATUS_UUID);
 		if(uuid != null){
 			WorkProgress progress = eService.getExportProgress(uuid);
-			if(progress != null && !progress.isBreaked() && !progress.isCompleted()){
+			if(progress != null && !progress.isBreaked()){
 				model.addAttribute("exportStatus", progress);
 			}
 		}

@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
@@ -35,12 +36,14 @@ import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.copframe.web.poll.WorkProgress;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.modules.service.ExportService;
 import cn.sowell.dataserver.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.dataserver.model.modules.pojo.criteria.NormalCriteria;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
 import cn.sowell.dataserver.model.tmpl.service.TemplateService;
@@ -74,11 +77,11 @@ public class AdminModulesExportController {
 		TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
 		TemplateListTemplate ltmpl = tService.getListTemplate(tmplGroup.getListTemplateId());
 		
-		
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		JSONObject json = jReq.getJsonObject();
 		WorkProgress progress = new WorkProgress();
 		String scope = json.getString("scope");
+		Boolean withDetail = json.getBoolean("withDetail");
 		boolean isCurrentScope = "current".equals(scope),
 				isAllScope = "all".equals(scope);
 		if(isCurrentScope || isAllScope){
@@ -108,7 +111,9 @@ public class AdminModulesExportController {
 				pageInfo.setPageSize(parameters.getInteger("pageSize"));
 				Map<Long, NormalCriteria> vCriteriaMap = mService.getCriteriasFromRequest(pvs, CollectionUtils.toMap(ltmpl.getCriterias(), c->c.getId()));
 				progress.getDataMap().put("exportPageInfo", ePageInfo);
-				eService.startExport(progress, ltmpl, new HashSet<NormalCriteria>(vCriteriaMap.values()), ePageInfo, UserUtils.getCurrentUser());
+				progress.getDataMap().put("withDetail", withDetail);
+				TemplateDetailTemplate dtmpl = Boolean.TRUE.equals(withDetail)? tService.getDetailTemplate(tmplGroup.getDetailTemplateId()): null;
+				eService.startWholeExport(progress, ltmpl, dtmpl, new HashSet<NormalCriteria>(vCriteriaMap.values()), ePageInfo, UserUtils.getCurrentUser());
 				session.setAttribute(AdminConstants.EXPORT_PEOPLE_STATUS_UUID, progress.getUUID());
 			}
 		}
@@ -166,4 +171,28 @@ public class AdminModulesExportController {
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
+	
+	
+	@ResponseBody
+	@RequestMapping("/export_detail/{menuId}/{code}")
+	public ResponseJSON exportDetail(@PathVariable Long menuId, @PathVariable String code) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
+		TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
+		UserIdentifier user = UserUtils.getCurrentUser();
+		ModuleEntityPropertyParser parser = mService.getEntity(menu.getTemplateModule(), code, null, user);
+		try {
+			String uuid = eService.exportDetailExcel(parser, dtmpl);
+			if(uuid != null) {
+				jRes.put("uuid", uuid);
+				jRes.setStatus("suc");
+			}
+		} catch (Exception e) {
+			logger.error("导出时发生错误", e);
+			jRes.setStatus("error");
+		}
+		return jRes;
+	}
+	
 }

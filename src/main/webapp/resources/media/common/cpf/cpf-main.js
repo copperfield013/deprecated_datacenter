@@ -42,7 +42,9 @@ define(function(require){
 		innerPageLoadingImg	: 'media/admin/cpf/image/innerpage-loading.gif',
 		maxPageCount		: 8,
 		sessionInvalidURL	: 'admin/login',
-		tabLinkPrefix		: 'admin/'
+		tabLinkPrefix		: 'admin/',
+		//加载层最多持续多久后出现关闭加载按钮
+		loadingTimeout		: 7000
 	});
 	$CPF.showLoading();
 	//初始化当前页面

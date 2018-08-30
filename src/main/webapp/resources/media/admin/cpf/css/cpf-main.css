@@ -88,9 +88,37 @@ div.tab-content>.tab-pane>h1{
 	text-align: center;
     vertical-align: middle;
 }
+
 .modal-backdrop {
     background-color: #333;
 }
+
+i.btn-close-loading {
+    font-size: 40px;
+    position: absolute;
+    right: -50px;
+    top: -50px;
+    background-color: #fff;
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    line-height: 130px;
+    z-index: 99999;
+    border-radius: 50px;
+    text-align: left;
+    vertical-align: bottom;
+    padding-left: 20px;
+    cursor: pointer;
+}
+i.btn-close-loading:hover {
+    background-color: #8470FF;
+    color: #666;
+}
+
+i.btn-close-loading:before {
+    content: "×";
+}
+
 /* 分页模块 */
 .cpf-paginator{
 	text-align: right;
