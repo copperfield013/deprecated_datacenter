@@ -286,9 +286,7 @@ define(function(require, exports, module){
 				var nextTab = this.getNextTab();
 				if(nextTab){
 					nextTab.activate();
-					console.log("next");
 				}else{
-					console.log("prev")
 					var prevTab = this.getPrevTab();
 					if(!(prevTab instanceof Tab)){
 						$CPF.getParam('defaultTab').activate();

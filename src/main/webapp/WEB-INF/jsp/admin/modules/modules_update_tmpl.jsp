@@ -127,7 +127,10 @@
 													<tr class="title-row">
 														<th
 															fname-format="${tmplGroup.composite.name }[ARRAY_INDEX_REPLACEMENT].唯一编码"
-														>#</th>
+														>
+															#
+															<input type="hidden" name="${tmplGroup.composite.name }.$$flag$$" value="true" />
+														</th>
 														<c:if test="${tmplGroup.relationSubdomain != null }">
 															<th
 																class="th-field-title relation-label"

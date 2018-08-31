@@ -41,9 +41,6 @@ define(function(require, exports){
 				return false;
 			return true;
 		},
-		indexOf		: function(){
-			
-		},
 		isPhoto		: function(fileName){
 			if(typeof fileName === 'string'){
 				var reg = /.*\.(gif|jpg|jpeg|png|bmp|ico)$/i;
@@ -877,6 +874,29 @@ define(function(require, exports){
 		}
 	};
 	
+	/**
+	 * 集合栈
+	 */
+	function SetStack(){
+		this.array = [];
+	}
+	
+	SetStack.prototype.get = function(){
+		return this.array[this.array.length - 1];
+	}
+	
+	SetStack.prototype.push = function(ele){
+		var array = this.array;
+		var index = $.inArray(ele, array);
+		if(index >= 0){
+			array.splice(index, 1);
+		}
+		array.push(ele);
+	}
+	SetStack.prototype.pop = function(){
+		return this.array.pop();
+	}
+	exports.SetStack = SetStack;
 	
 	function returnTrue(){return true;}
 	function returnFalse(){return false;}
