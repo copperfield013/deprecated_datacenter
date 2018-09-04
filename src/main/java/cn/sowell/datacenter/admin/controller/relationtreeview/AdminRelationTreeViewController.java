@@ -475,41 +475,5 @@ public class AdminRelationTreeViewController {
 		return null;
 		
 	}
-	
-	
-	/**
-	 * 删除实体与实体之间的关系
-	 * @param paramJson
-	 * @return
-	 *//*
-	@ResponseBody
-	@RequestMapping("/removeRelation")
-	public String removeRelation(String parentMappingName, 
-			String parentId, 
-			String chileMappingName,
-			String chileId, 
-			String relationName, 
-			String lableRelatioin) {
-		JSONObject json = new JSONObject();
-		try {
-			String addRelation = relationTreeViewService.removeRelation(parentMappingName.trim(), 
-					parentId.trim(), 
-					chileMappingName.trim(),
-					chileId.trim(), 
-					relationName.trim(), 
-					lableRelatioin.trim());
-			json.put("code", 200);
-			json.put("msg", "操作成功！");
-			return json.toJSONString();
-		} catch (Exception e) {
-			json.put("code", 400);
-			json.put("msg", "操作失败！");
-			e.printStackTrace();
-		}
-		
-		return null;
-		
-	}*/
-	
 
 }
