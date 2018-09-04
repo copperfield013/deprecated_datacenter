@@ -327,6 +327,13 @@ public class AdminRelationTreeViewController {
 		return "true";
 	}
 	
+	/**
+	 * 选择实体列表页面
+	 * @param mappingName
+	 * @param relationName
+	 * @param pageInfo
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping("/openSelection")
 	public ModelAndView openSelection(String mappingName,String relationName, PageInfo pageInfo) {
@@ -335,17 +342,15 @@ public class AdminRelationTreeViewController {
 		Set<String> attrNameSet = null;
 		 
 		List<AttributeNode> attrList = getAbcNodeList(3, mapperName);
-		
-		BizFusionContext context = new BizFusionContext();
-		context.setMappingName(mapperName);
-		context.setUserCode(String.valueOf(UserUtils.getCurrentUser().getId()));
-		context.setSource(FusionContext.SOURCE_COMMON);
+		BizFusionContext context = relationTreeViewService.getBizFusionContext(mapperName);
 		context.setToEntityRange(FusionContext.ENTITY_CONTENT_RANGE_INTERSECTION);
-		
 		Discoverer discoverer = PanelFactory.getDiscoverer(context);
 		EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(null, null);
 		
 		Integer pageNo = pageInfo.getPageNo();
+		sortedPagedQuery.setPageSize(pageInfo.getPageSize());
+		pageInfo.setCount(sortedPagedQuery.getAllCount());
+		
 		for (Entity entity : sortedPagedQuery.visit(pageNo)) {
 			String json = entity.toJson();
 			JSONObject parse = (JSONObject)JSONObject.parse(json);

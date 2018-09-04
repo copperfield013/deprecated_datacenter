@@ -2,7 +2,9 @@
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <div id="entity-selection">
 	<nav>
-		<form class="form-inline" action="admin/cascadedict/cascadedictBasicItem/list">
+		<form class="form-inline" action="admin/relationtreeview/openSelection">
+			<input type="hidden" name="mappingName" value="${mappingName }">
+			<input type="hidden" name="relationName" value="${relationName }">
 			<div class="form-group">
 				<label for="name">名称</label>
 				<input type="text" class="form-control" name="name" value="" />
@@ -67,7 +69,14 @@
 			var mappingName = $("#entity-selection .list-area").find("#mappingName").val();
 			var relationName = $("#entity-selection .list-area").find("#relationName").val();
 			
+			if ($("#entity-selection .list-area tbody>tr.selected").length == 0) {
+				Dialog.notice("请选择一个！", "warning");
+				return;
+			}
+			
 			var code = $("#entity-selection .list-area tbody>tr.selected").attr("data-id");
+			
+			
 			$pag.data("selectEntity")(code+ " " + mappingName + " " +relationName);
 		});
 		

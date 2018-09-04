@@ -162,8 +162,8 @@ public class RelationTreeViewServiceImpl implements RelationTreeViewService {
 		return entityRelation;
 	}
 	
-	
-	private BizFusionContext getBizFusionContext(String mappingName){
+	@Override
+	public BizFusionContext getBizFusionContext(String mappingName){
 		BizFusionContext context = new BizFusionContext();
 		context.setMappingName(mappingName);
 		context.setSource(FusionContext.SOURCE_COMMON);

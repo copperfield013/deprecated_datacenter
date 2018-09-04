@@ -335,11 +335,11 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
 						 nodeHtml += "<li class='attr-relative'>" + 
 						"<div class='attr-relative-title attr-relative collapse-header' data-mappingName='" + mappingNameMap[ss[2]] + "'  data-relationName='"+ss[2]+"' data-id='" + key + "' labelSetMap='"+labelSetMap[ss[2]]+"' labelSetValue=''>" + 
 							"<div class='icon-label attr-relative'>" + 
-								"<i class='icon icon-attr-relative'></i><span class='text'>" + ss[2]+ "</span>" +
+								"<i class='icon icon-attr-relative'></i><span title='"+ss[2]+"' class='text'>" + ss[2].substring(0, 5)+ "</span>" +
 							"</div>" + 
 							"<div class='label-bar attr-relative al-save edit'>";
 						 
-							nodeHtml+= "<i class='icon icon-add-tag-relative'></i>";
+							nodeHtml+= "<i title='具体关系' class='icon icon-add-tag-relative'></i>";
 								var i = 0;
 								for (var p in abcAttrNodeList) {
 									var title = abcAttrNodeList[p].title;
