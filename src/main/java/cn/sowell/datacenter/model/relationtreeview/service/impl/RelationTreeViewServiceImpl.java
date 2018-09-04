@@ -170,17 +170,4 @@ public class RelationTreeViewServiceImpl implements RelationTreeViewService {
 		context.setUserCode(String.valueOf(UserUtils.getCurrentUser().getId()));
 		return context;
 	}
-
-/*	@Override
-	public String removeRelation(String parentMappingName, String parentId, String chileMappingName, String chileId,
-			String relationName, String lableRelatioin) {
-		Integration integration = PanelFactory.getIntegration();
-		
-		BizFusionContext context = getBizFusionContext(parentMappingName);
-		EntityRelation entityRelation = new EntityRelation(parentId, context);
-		entityRelation.removeRelation(relationName, lableRelatioin, chileId);
-		String code = integration.integrateRelation(entityRelation, context);
-		return code;
-	}
-*/
 }
