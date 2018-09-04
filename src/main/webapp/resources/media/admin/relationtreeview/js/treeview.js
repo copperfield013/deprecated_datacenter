@@ -364,7 +364,10 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
 					
 					var $html = $(nodeHtml).prependTo($contant);
 					Dialog.closeDialog("add-tree-relation-node");	//关闭节点添加窗口
-					$iconarr.trigger("click");   
+					if ($iconarr.hasClass("active")) {
+						$iconarr.trigger("click");   
+					}
+					
 					$CPF.closeLoading();
 				}else{
 					Dialog.notice(dao.msg, "error");
