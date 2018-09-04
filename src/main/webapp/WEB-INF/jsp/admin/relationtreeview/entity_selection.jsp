@@ -5,10 +5,13 @@
 		<form class="form-inline" action="admin/relationtreeview/openSelection">
 			<input type="hidden" name="mappingName" value="${mappingName }">
 			<input type="hidden" name="relationName" value="${relationName }">
-			<div class="form-group">
-				<label for="name">名称</label>
-				<input type="text" class="form-control" name="name" value="" />
-			</div>
+			<c:forEach items="${attrMap }" var="map">
+				<div class="form-group">
+					<label for="name">${map.key }</label>
+					<input type="text" class="form-control" name="${map.key }" value="${map.value }" />
+				</div>
+			</c:forEach>
+			
 			<button type="submit" class="btn btn-default">查询</button>
 		</form>
 	</nav>
@@ -73,10 +76,7 @@
 				Dialog.notice("请选择一个！", "warning");
 				return;
 			}
-			
 			var code = $("#entity-selection .list-area tbody>tr.selected").attr("data-id");
-			
-			
 			$pag.data("selectEntity")(code+ " " + mappingName + " " +relationName);
 		});
 		
