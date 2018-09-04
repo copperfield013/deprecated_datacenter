@@ -30,18 +30,4 @@ public interface RelationTreeViewService {
 			String relationName, String labelsetmap,
 			String labelsetvalue);
 	
-	
-	/**
-	 * 删除实体与实体之间的关系
-	 * @param parentMappingName   父实体mappingname
-	 * @param parentId            父实体id
-	 * @param chileMappingName    孩子的mappingname
-	 * @param chileId			  孩子的id
-	 * @param relationName			关系名称
-	 * @param lableRelatioin		关系的标签
-	 * @return
-	 *//*
-	String removeRelation(String parentMappingName, String parentId, String chileMappingName, String chileId,
-			String relationName, String lableRelatioin);
-	*/
 }
