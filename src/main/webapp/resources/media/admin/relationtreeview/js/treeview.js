@@ -12,6 +12,17 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
 	    $CPF.closeLoading();
     })
     
+     $page.on('click', '#attr-count-determine-btn', function(e){
+    	attrCount = $("#attr-count", $page).val();
+    	var attrMaxSize = $("#attr-max-size", $page).val();
+    	console.log(attrCount  + "-----" + attrMaxSize);
+    	if(attrCount > attrMaxSize){
+    		Dialog.notice("请输入合理的数字！", "warning");
+    		return;
+    	}
+    	 getChildrenNode(rootNodeId, rootMappingName, attrCount);
+    });
+    
 	function addUnfold(el) {	
 		if($(el).hasClass("icon-add") && $(el).siblings(".icon-arrow").hasClass("active")) {
 			alert("111111111");
@@ -292,10 +303,10 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
      * 弹出选择实体页面
      */
     $page.on("click", ".card>li.card-list", function(e) {
-    	
+    	var attrCount = $("#attr-count", $page).val();
     	var relationName = $(this).children(".text").html();
     	var mappingName = $(this).parent().attr("mappingName");
-    	Dialog.openDialog("admin/relationtreeview/openSelection?mappingName=" + mappingName + "&relationName=" + relationName,"选择实体", "add-tree-relation-node",{
+    	Dialog.openDialog("admin/relationtreeview/openSelection?mappingName=" + mappingName + "&relationName=" + relationName + "&attrCount=" + attrCount,"选择实体", "add-tree-relation-node",{
 			width	: $(window).width()/2 + 100,
 			height	: $(window).height()/2 + 100
     	});
@@ -483,48 +494,6 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
 		});
     	
     };
-    
-    /*//关系删除方法 ...  暂时没用
-    function relativeDelete(el) {
-    	var $relativeBar = $(el).closest(".label-bar");
-    	
-    	var $header = $this = $(el).closest(".collapse-header");
-     	var $parentheader = $header.closest(".collapse-content").siblings(".collapse-header");
-     	
-     	var parentMappingName = $parentheader.attr("data-mappingname");
-     	var parentId = $parentheader.attr("data-id");
-     	
-     	var chileMappingName = $header.attr("data-mappingname");
-     	var chileId = $header.attr("data-id");
-     	var relationName = $header.attr("data-relationName");
-     	var lableRelatioin = $header.find("#lableRelatioin option:selected").text();
-    	
-    	var callback = function() {
-    		$relativeBar.closest("li.attr-relative").remove();    		
-    	};
-    	
-    	if($relativeBar.hasClass("al-save")){
-    		$CPF.showLoading();
-    		Ajax.ajax("admin/relationtreeview/removeRelation", {
-          		 parentMappingName:parentMappingName,
-      			 parentId:parentId,
-      			 chileMappingName:chileMappingName,
-      			 chileId:chileId,
-      			 relationName:relationName,
-      			 lableRelatioin:lableRelatioin
-      		}, function(data){
-    			if(data.code==200) {
-    				callback();
-    	    		removePop();
-    	    		Dialog.notice(data.msg, "success");
-    			}  else {
-    				removePop();
-    				Dialog.notice(data.msg, "error");
-    			}
-    		});
-        	$CPF.closeLoading();
-    	} 
-    };   */
     
     //tag删除
     $page.on("click", function () {  

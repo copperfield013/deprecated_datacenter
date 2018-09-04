@@ -5,7 +5,7 @@
 		<form class="form-inline" action="admin/relationtreeview/openSelection">
 			<input type="hidden" name="mappingName" value="${mappingName }">
 			<input type="hidden" name="relationName" value="${relationName }">
-			<c:forEach items="${attrMap }" var="map">
+			<c:forEach items="${attrMap }" var="map" begin="0" end="2">
 				<div class="form-group">
 					<label for="name">${map.key }</label>
 					<input type="text" class="form-control" name="${map.key }" value="${map.value }" />
@@ -22,7 +22,7 @@
 			<thead>
 				<tr>
 					<th>#</th>
-					<c:forEach items="${attrNameList }" var="attr">
+					<c:forEach items="${attrNameList }" var="attr"  begin="0" end="4">
 						<th>${attr.title }</th>
 					</c:forEach>
 				</tr>
@@ -31,7 +31,7 @@
 				<c:forEach items="${reulstMap }" var="entityMap" varStatus="i">
 					<tr data-id="${entityMap.key }">
 						<td>${i.index + 1 }</td>
-						<c:forEach items="${entityMap.value }" var="map">
+						<c:forEach items="${entityMap.value }" var="map"  begin="0" end="4">
                                 <td>${map.value}</td>
 						</c:forEach>
 					</tr>

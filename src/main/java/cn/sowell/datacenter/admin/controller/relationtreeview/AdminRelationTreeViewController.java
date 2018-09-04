@@ -339,7 +339,7 @@ public class AdminRelationTreeViewController {
 	 */
 	@ResponseBody
 	@RequestMapping("/openSelection")
-	public ModelAndView openSelection(String mappingName,String relationName, PageInfo pageInfo, HttpServletRequest request) {
+	public ModelAndView openSelection(String mappingName,String relationName, PageInfo pageInfo,@RequestParam(defaultValue="1") Integer attrCount, HttpServletRequest request) {
 		String mapperName = mappingName+"."+relationName;
 		BizFusionContext context = relationTreeViewService.getBizFusionContext(mapperName);
 		context.setToEntityRange(FusionContext.ENTITY_CONTENT_RANGE_INTERSECTION);
@@ -348,7 +348,7 @@ public class AdminRelationTreeViewController {
 		Set<String> attrNameSet = null;
 		
 		//属性列表
-		List<AttributeNode> attrList = getAbcNodeList(3, mapperName);
+		List<AttributeNode> attrList = getAbcNodeList(attrCount, mapperName);
 		Map<String, Object> attrMap = new TreeMap<String, Object>();
 		
 		//设置查询条件start
