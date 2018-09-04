@@ -84,11 +84,11 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
 				"<li class='attr-relative'>" + 
 					"<div class='attr-relative-title attr-relative collapse-header' data-mappingName='"+ mappingNameMap[array[0]]+"'  data-relationName='"+array[0]+"' data-id='"+key+"' labelSetMap='"+labelSetMap[array[0]]+"' labelSetValue='"+labelSetValue[array[0]]+"'>" + 
 						"<div class='icon-label attr-relative'>" + 
-							"<i class='icon icon-attr-relative'></i><span class='text'>" + array[0] + "</span>" +
+							"<i class='icon icon-attr-relative'></i><span title='"+array[0]+"' class='text'>" + array[0].substring(0, 5) + "</span>" +
 						"</div>" + 
 						"<div class='label-bar attr-relative al-save'>";
 				 
-				 			nodeHtml+= "<i class='icon icon-add-tag-relative'></i>";
+				 			nodeHtml+= "<i title='具体关系' class='icon icon-add-tag-relative'></i>";
 							for(var i=0; i<relationNameAttrMap[array[0]].length; i++){
 								nodeHtml = nodeHtml + 
 								"<input id='abc_node_attr_" + i + "' type='text' disabled class='edit-input text order' title='" + relationNameAttrMap[array[0]][i].abcattrName  + "' value='" + array[i + 1] + "'>";
