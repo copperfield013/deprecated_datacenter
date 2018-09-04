@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,6 +29,8 @@ import com.abc.mapping.node.ABCNode;
 import com.abc.mapping.node.AttributeNode;
 import com.abc.panel.Discoverer;
 import com.abc.panel.PanelFactory;
+import com.abc.query.criteria.Criteria;
+import com.abc.query.criteria.CriteriaFactory;
 import com.abc.query.entity.impl.EntitySortedPagedQuery;
 import com.abc.service.RelationTreeServiceFactory;
 import com.abc.vo.RelationVO;
@@ -336,16 +339,33 @@ public class AdminRelationTreeViewController {
 	 */
 	@ResponseBody
 	@RequestMapping("/openSelection")
-	public ModelAndView openSelection(String mappingName,String relationName, PageInfo pageInfo) {
+	public ModelAndView openSelection(String mappingName,String relationName, PageInfo pageInfo, HttpServletRequest request) {
 		String mapperName = mappingName+"."+relationName;
-		Map<String, Map<String, Object>> reulstMap = new HashMap<String, Map<String, Object>>();
-		Set<String> attrNameSet = null;
-		 
-		List<AttributeNode> attrList = getAbcNodeList(3, mapperName);
 		BizFusionContext context = relationTreeViewService.getBizFusionContext(mapperName);
 		context.setToEntityRange(FusionContext.ENTITY_CONTENT_RANGE_INTERSECTION);
+		
+		Map<String, Map<String, Object>> reulstMap = new HashMap<String, Map<String, Object>>();
+		Set<String> attrNameSet = null;
+		
+		//属性列表
+		List<AttributeNode> attrList = getAbcNodeList(3, mapperName);
+		Map<String, Object> attrMap = new TreeMap<String, Object>();
+		
+		//设置查询条件start
+		CriteriaFactory criteriaFactory = new CriteriaFactory(context);
+		List<Criteria> criterias = new ArrayList<Criteria>();
+		for (AttributeNode attr : attrList) {
+			String param = request.getParameter(attr.getTitle());
+			attrMap.put(attr.getTitle(), param);
+			if (param !=null && param.trim() !="") {
+				Criteria common = criteriaFactory.createLikeQueryCriteria(attr.getTitle(),param);
+				criterias.add(common);
+			}
+		}
+		//end
+		
 		Discoverer discoverer = PanelFactory.getDiscoverer(context);
-		EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(null, null);
+		EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(criterias, null);
 		
 		Integer pageNo = pageInfo.getPageNo();
 		sortedPagedQuery.setPageSize(pageInfo.getPageSize());
@@ -366,6 +386,7 @@ public class AdminRelationTreeViewController {
 		mv.addObject("reulstMap", reulstMap);
 		mv.addObject("pageInfo", pageInfo);
 		mv.addObject("attrNameList", attrList);
+		mv.addObject("attrMap", attrMap);
 		mv.addObject("mappingName", mappingName);
 		mv.addObject("relationName", relationName);
 		mv.setViewName("/admin/relationtreeview/entity_selection.jsp");
