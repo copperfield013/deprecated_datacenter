@@ -472,7 +472,6 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
     	
     	var labelsetmap = $header.attr("labelsetmap");
     	var labelsetvalue = $header.attr("labelsetvalue");
-    	
     	$CPF.showLoading();
     	Ajax.ajax("admin/relationtreeview/addRelation", {
     		 parentMappingName:parentMappingName,
@@ -484,6 +483,10 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
 			 labelsetvalue:labelsetvalue
 		}, function(data){
 			if (data.code == 200) {
+				
+				if (labelsetvalue.length == 0) {
+					$("#attr-count-determine-btn").trigger("click");   
+				}
 				saveSuccess(el)
 				Dialog.notice(data.msg, "success");
 			} else {
