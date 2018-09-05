@@ -472,29 +472,39 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
     	
     	var labelsetmap = $header.attr("labelsetmap");
     	var labelsetvalue = $header.attr("labelsetvalue");
-    	$CPF.showLoading();
-    	Ajax.ajax("admin/relationtreeview/addRelation", {
-    		 parentMappingName:parentMappingName,
-			 parentId:parentId,
-			 chileMappingName:chileMappingName,
-			 chileId:chileId,
-			 relationName:relationName,
-			 labelsetmap:labelsetmap,
-			 labelsetvalue:labelsetvalue
-		}, function(data){
-			if (data.code == 200) {
-				
-				if (labelsetvalue.length == 0) {
-					$("#attr-count-determine-btn").trigger("click");   
-				}
-				saveSuccess(el)
-				Dialog.notice(data.msg, "success");
-			} else {
-				Dialog.notice(data.msg, "error");
-			}
-			
-			$CPF.closeLoading();
-		});
+    	
+    	var msg = "确认保存节点？";
+    	if (labelsetvalue.length == 0) {
+    		msg="【节点没有具体关系】是否确认保存？";
+		}
+    	
+    	Dialog.confirm(msg, function(yes){
+        	if(yes){
+            	$CPF.showLoading();
+            	Ajax.ajax("admin/relationtreeview/addRelation", {
+            		 parentMappingName:parentMappingName,
+        			 parentId:parentId,
+        			 chileMappingName:chileMappingName,
+        			 chileId:chileId,
+        			 relationName:relationName,
+        			 labelsetmap:labelsetmap,
+        			 labelsetvalue:labelsetvalue
+        		}, function(data){
+        			if (data.code == 200) {
+        				
+        				if (labelsetvalue.length == 0) {
+        					$("#attr-count-determine-btn").trigger("click");   
+        				}
+        				saveSuccess(el)
+        				Dialog.notice(data.msg, "success");
+        			} else {
+        				Dialog.notice(data.msg, "error");
+        			}
+        			
+        			$CPF.closeLoading();
+        		});
+        	}
+        });
     	
     };
     
