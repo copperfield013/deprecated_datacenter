@@ -28,7 +28,7 @@
 					seajs.use(['ajax'], function(Ajax){
 						$("#close-and-submit-btn").on('click', function(){
 							//var $page = $("#tree_view_${rootId}");
-							var $page = $("#tree_view_panel");
+							var $page = $("#relation_tree_view_panel");
 							alert($("#edit-node-form").serializeJson());
 							console.log($("#edit-node-form").serializeJson());
 							$page.data("editSubmit")($("#edit-node-form").serializeJson());

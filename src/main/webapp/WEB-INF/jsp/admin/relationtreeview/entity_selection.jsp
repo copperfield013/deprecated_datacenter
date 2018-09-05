@@ -68,7 +68,7 @@
 		});
 		
 		$("#btn-conf").on('click', function(){
-			var $pag = $("#tree_view_panel");
+			var $pag = $("#relation_tree_view_panel");
 			var mappingName = $("#entity-selection .list-area").find("#mappingName").val();
 			var relationName = $("#entity-selection .list-area").find("#relationName").val();
 			

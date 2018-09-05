@@ -1,6 +1,6 @@
 
 seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF){
-	var $page = $("#tree_view_panel");
+	var $page = $("#relation_tree_view_panel");
 	var rootNodeId = $(".entity-title", $page).attr("data-id");	
 	var rootMappingName = $(".entity-title", $page).attr("data-mappingName");	
 	var entityId = $(".entity-title", $page).attr("data-abcattrCode");	//根节点对应的实体code: abcattrCode
@@ -172,7 +172,7 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
 			}				
 		};
 		html += "</ul>";
-			var wrap = $("#tree_view_panel");
+			var wrap = $("#relation_tree_view_panel");
 	   var offsetx = $(this).offset().left;
 	   var offsety = $(this).offset().top;
 	   var wrapOffsetx = wrap.offset().left;
@@ -219,7 +219,7 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
 				}
 				html +="</ul>";
 				
-				var wrap = $("#tree_view_panel");
+				var wrap = $("#relation_tree_view_panel");
 				var offsetx = $(e).offset().left;
 		        var offsety = $(e).offset().top;
 		        var wrapOffsetx = wrap.offset().left;
@@ -393,9 +393,9 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
      */
 	function getEntity(entity) {		
 		var cnName = $(entity).attr("data-cnname");		
-		$("#tree_view_panel .entity-title>.edit-input").val(cnName);
-		$("#tree_view_panel .entity-title>.entity-only-title").html(cnName);
-		$("#tree_view_panel .entity-edit-wrap").addClass("active");
+		$("#relation_tree_view_panel .entity-title>.edit-input").val(cnName);
+		$("#relation_tree_view_panel .entity-title>.entity-only-title").html(cnName);
+		$("#relation_tree_view_panel .entity-edit-wrap").addClass("active");
 	}
     
     /**
@@ -412,7 +412,7 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
             "</div>" +
             "</div>"
 
-        var wrap = $("#tree_view_panel");
+        var wrap = $("#relation_tree_view_panel");
         var offsetx = $(el).offset().left;
         var offsety = $(el).offset().top;
         var wrapOffsetx = wrap.offset().left;
@@ -448,8 +448,8 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
 
     //提醒有未保存的节点
     function judgeSave() {    	
-        var editBar = $("#tree_view_panel").find(".label-bar.edit");
-        var editEntity = $("#tree_view_panel").find(".entity-edit-wrap.edit");
+        var editBar = $("#relation_tree_view_panel").find(".label-bar.edit");
+        var editEntity = $("#relation_tree_view_panel").find(".entity-edit-wrap.edit");
         if(editBar.length > 0 || editEntity.length > 0) {
             Dialog.notice("请先保存正在编辑的节点！", "warning");
             return true;
@@ -502,7 +502,7 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
       
 
     //收缩事件绑定
-    $("#tree_view_panel").on("click", ".icon-arrow, .icon-arrow-sm", function (e) {
+    $("#relation_tree_view_panel").on("click", ".icon-arrow, .icon-arrow-sm", function (e) {
     	var attr_relative = $(this).closest(".collapse-header").hasClass("attr-relative");
     	e.stopPropagation();
     	var bar = $(this).closest(".label-bar")[0];
@@ -533,7 +533,7 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
     })
 
     //跟实体添加事件绑定
-    $("#tree_view_panel").on("click", ".icon-add, .icon-add-abc", function (e) {
+    $("#relation_tree_view_panel").on("click", ".icon-add, .icon-add-abc", function (e) {
         e.stopPropagation();
         var hasSave = judgeSave();
         if(hasSave){
@@ -547,7 +547,7 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
     //关系下标签添加
 
     //删除属性事件绑定
-    $("#tree_view_panel").on("click", ".icon-trash, .icon-trash-sm", function (e) {
+    $("#relation_tree_view_panel").on("click", ".icon-trash, .icon-trash-sm", function (e) {
         e.stopPropagation();
         removePop();
         var $header = $(this).closest(".label-bar").hasClass("attr-group");
@@ -561,14 +561,14 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
     })
 
     //添加页中的事件绑定
-    $("#tree_view_panel").on("click", ".card>li.card-list", function (e) {
+    $("#relation_tree_view_panel").on("click", ".card>li.card-list", function (e) {
         e.stopPropagation();
-        if ($("#tree_view_panel").find(".icon-add.active").length > 0) {
-            var el = $("#tree_view_panel").find(".icon-add.active")[0];
-        } else if ($("#tree_view_panel").find(".icon-add-sm.active").length > 0) {
-            var el = $("#tree_view_panel").find(".icon-add-sm.active")[0];
-        } else if ($("#tree_view_panel").find(".icon-add-abc.active").length > 0) {
-            var el = $("#tree_view_panel").find(".icon-add-abc.active")[0];
+        if ($("#relation_tree_view_panel").find(".icon-add.active").length > 0) {
+            var el = $("#relation_tree_view_panel").find(".icon-add.active")[0];
+        } else if ($("#relation_tree_view_panel").find(".icon-add-sm.active").length > 0) {
+            var el = $("#relation_tree_view_panel").find(".icon-add-sm.active")[0];
+        } else if ($("#relation_tree_view_panel").find(".icon-add-abc.active").length > 0) {
+            var el = $("#relation_tree_view_panel").find(".icon-add-abc.active")[0];
         }
         if ($(this).hasClass("add-relative")) {
             addRelative(el);
@@ -579,21 +579,21 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
 
 
     //双击编辑
-    $("#tree_view_panel").on("dblclick", ".label-bar", function(){
+    $("#relation_tree_view_panel").on("dblclick", ".label-bar", function(){
 		$(this).find(".edit-input").removeAttr("disabled");
     	$(this).find("select").removeAttr("disabled");
         $(this).addClass("edit");
     })
     
     //双击编辑
-    $("#tree_view_panel").on("dblclick", ".entity-title", function(){   
+    $("#relation_tree_view_panel").on("dblclick", ".entity-title", function(){   
     	$(this).find(".edit-input").removeAttr("disabled");
     	$(this).find("select").removeAttr("disabled");
         $(this).addClass("edit");
     })
     
     //保存
-    $("#tree_view_panel").on("click", ".icon-save", function() {        
+    $("#relation_tree_view_panel").on("click", ".icon-save", function() {        
         var entityTitle = $(this).closest(".entity-title");
         var labelBar = $(this).closest(".label-bar");
         if(entityTitle.length > 0) {
@@ -617,7 +617,7 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
     });
     
     //删除-全部
-    $("#tree_view_panel").on("click", ".opera.confirm", function(e) {  
+    $("#relation_tree_view_panel").on("click", ".opera.confirm", function(e) {  
     	e.stopPropagation();    
         var entityTitle = $(".icon-trash.active").closest(".entity-title");
         var labelBar = $(".icon-trash-sm.active").closest(".label-bar");

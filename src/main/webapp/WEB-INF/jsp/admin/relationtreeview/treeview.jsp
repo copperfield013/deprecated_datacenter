@@ -5,7 +5,7 @@
 <script src="media/admin/plugins/sortable/Sortable.js"></script>
 <script src="media/admin/relationtreeview/js/treeview.js"></script>
 
-<div id="tree_view_panel">
+<div id="relation_tree_view_panel">
 		<input type="hidden" id="rootId" value="${id }">
 		<input type="hidden" id="rootMappingName" value="${mappingName }">
 		<div class="page-header">
