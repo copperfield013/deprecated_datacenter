@@ -101,6 +101,7 @@
 					'form'		: 'COMMON/cpf/cpf-form.js?v=${cpfVersion}',
 					'tab' 		: 'COMMON/cpf/cpf-tab.js?v=${cpfVersion}',
 					'ajax'		: 'COMMON/cpf/cpf-ajax.js?v=${cpfVersion}',
+					'poll'		: 'COMMON/cpf/cpf-poll.js?v=${cpfVersion}',
 					'css'		: 'COMMON/cpf/cpf-css.js?v=${cpfVersion}',
 					'timer'		: 'COMMON/cpf/cpf-timer.js?v=${cpfVersion}',
 					'console'	: 'COMMON/cpf/cpf-console.js?v=${cpfVersion}',

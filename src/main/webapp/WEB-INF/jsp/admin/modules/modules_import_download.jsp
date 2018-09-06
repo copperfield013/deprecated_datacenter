@@ -45,13 +45,20 @@
 				</div>
 				<div class="fields-r col-lg-4">
 					<h4>可选字段</h4>
-					<ul class="list-group">
+					<div class="input-icon field-search" style="width: 100%">
+						<span class="search-input-wrapper">
+							<input type="text" class="search-text-input form-control input-xs glyphicon-search-input" autocomplete="off" placeholder="输入添加的字段名">
+						</span>
+						<i class="glyphicon glyphicon-search blue"></i>
+						<i title="选择字段" class="glyphicon glyphicon-th blue field-picker-button"></i>
+					</div>
+					<%-- <ul class="list-group">
 						<c:forEach var="field" items="${fields }">
 							<li class="list-group-item ${field.isMultipleField? 'multiple-field' : '' }" 
 								relation-key="${field.relationKey }"
 								pattern="${field.fieldNamePattern }">${field.fieldName }</li>
 						</c:forEach>
-					</ul>
+					</ul> --%>
 				</div>
 			</div>	
 		</form>
@@ -70,7 +77,10 @@
 		</div>
 	</div>
 	<script type="jquery/tmpl" id="tmpl-col-row-tmpl">
-		<tr field-index="\${fieldIndex}", data-id="\${fieldId}">
+		<tr field-index="\${fieldIndex}" 
+			data-id="\${tmplFieldId}" 
+			field-id="\${fieldId}"
+			composite-id="\${compositeId}">
 			<td>
 				<span class="field-title">\${title}</span>
 			</td>
@@ -86,200 +96,19 @@
 	</script>
 </div>
 <script>
-	seajs.use(['utils', 'ajax', '$CPF', 'dialog'], function(Utils, Ajax, $CPF, Dialog){
+	seajs.use(['modules/js/modules-import-download.js'], function(ModulesImportDownload){
 		var $page = $('#module-import-tmpl-dialog-${RES_STAMP }');
-		var $colTmpl = $('#tmpl-col-row-tmpl', $page);
-		var $tbody = $('.fields-l tbody', $page);
-		$tbody.sortable({
-			helper 		: "clone",
-			cursor 		: "move",// 移动时候鼠标样式
-			opacity		: 0.5, // 拖拽过程中透明度
-			tolerance 	: 'pointer'
-		});
-		$('.fields-r', $page).on('dblclick', 'ul li', function(e, field){
-			console.log(arguments);
-			var $field = $(this);
-			var fieldName = $field.text();
-			var pattern = $field.attr('pattern');
-			var $row = null;
-			var fieldId = undefined;
-			if(field){
-				fieldId = field.id;
-			}
-			if($field.is('.multiple-field')){
-				var $rows = $field.data('fieldRows');
-				if(!$rows){
-					$field.data('fieldRows', $rows = []);
-				}
-				var fieldIndex = $rows.length;
-				var relationKey = $field.attr('relation-key');
-				if(relationKey){
-					//添加的字段是关系字段，必须自动添加关系label字段
-					var hasLabelRow = false;
-					relationKey += '[' + fieldIndex + '].${relationLabelKey}';
-					$tbody.children('tr').each(function(){
-						var fieldName = $('.field-name', this).text();
-						if(fieldName === relationKey){
-							hasLabelRow = true;
-							return false;
-						}
-					});
-					if(!hasLabelRow){
-						$colTmpl.tmpl({
-							title		: relationKey,
-							fieldName	: relationKey,
-							fieldIndex	: fieldIndex,
-							removable	: false
-						}).addClass('relation-label').appendTo($tbody)
-					}
-				}
-				fieldName = pattern.replace('%INDEX%' , fieldIndex);
-				$row = $colTmpl.tmpl({
-					title		: fieldName,
-					fieldName	: fieldName,
-					fieldIndex	: fieldIndex,
-					fieldId		: fieldId,
-					removable	: true
-				}).appendTo($tbody);
-				$rows.push($row);
-			}else{
-				$row = $colTmpl.tmpl({
-					title		: fieldName,
-					fieldName	: fieldName,
-					fieldId		: fieldId,
-					removable	: true
-				}).appendTo($tbody);
-				$field.hide();
-			}
-			$row.data('originLi', $field);
-		});
+		var tmplFieldsJson = {};
+		try{
+			tmplFieldsJson = $.parseJSON('${tmplFieldsJson}');
+		}catch(e){}
 		
-		//初始化模板数据
-		+function(){
-			try{
-				var tmplFieldsJson = $.parseJSON('${tmplFieldsJson}');
-				console.log(tmplFieldsJson);
-				var $lis = $('.fields-r ul li', $page);
-				for(var i in tmplFieldsJson){
-					var field = tmplFieldsJson[i];
-					var $li = $lis.filter('li[pattern="' + field.fieldPattern + '"]');
-					if($li.length == 1){
-						$li.trigger('dblclick', [field]);
-					}
-				}
-			}catch(e){}
-		}();
-		
-		console.log('111');
-		$('.fields-l', $page).on('click', '.remove-col', function(){
-			var $row = $(this).closest('tr');
-			var $originLi = $row.data('originLi');
-			if($originLi){
-				var $rows = $originLi.data('fieldRows');
-				if($rows && $.isArray($rows)){
-					var pattern = $originLi.attr('pattern');
-					var index = 0;
-					while(!$row.is($rows[index])) index++;
-					if(index < $rows.length){
-						$rows.splice(index, 1);
-						for(var i = index; i < $rows.length; i++){
-							$rows[i]
-								.attr('field-index', i)
-								.find('.field-name').text(pattern.replace('%INDEX%', i));
-						}
-					}
-				}
-				$originLi.show();
-			}
-			$row.remove();
-			$('tr.relation-label[field-index]', $tbody).each(function(){
-				var relationLabelKey = $(this).find('.field-name').text();
-				var fieldIndex = $(this).attr('field-index');
-				var hasRelationField = false;
-				$('tr[field-index]', $tbody).not('.relation-label').each(function(){
-					var $originLi = $(this).data('originLi');
-					var relationKey = $originLi.attr('relation-key');
-					if(relationKey){
-						var thisFieldIndex = $(this).attr('field-index');
-						if(relationKey + '[' + thisFieldIndex + '].${relationLabelKey}' == relationLabelKey){
-							hasRelationField = true;
-							return false;
-						}
-					}
-				});
-				if(!hasRelationField){
-					$(this).remove();
-				}
-			});
-		});
-		
-		function checkSubmitData(operate){
-			var def = $.Deferred();
-			var title = $('#tmpl-title', $page).val();
-			if(!title){
-				Dialog.notice('请填写模板名称后保存', 'error');
-			}else{
-				var $rows = $tbody.children('tr');
-				if($rows.length == 0){
-					Dialog.notice('模板内没有选择字段', 'error');
-				}else{
-					Dialog.confirm('确认' + operate + '当前模板[' + title + ']，模板内共有' + $rows.length + '个字段', function(yes){
-						if(yes){
-							var fields = [];
-							$rows.each(function(){
-								var $row = $(this);
-								var $field = $row.data('originLi');
-								fields.push({
-									id			: $row.attr('data-id'),
-									title		: $row.find('.field-title').text(),
-									fieldName	: $row.find('.field-name').text(),
-									fieldPattern: !$field? null: $field.attr('pattern'),
-									fieldIndex	: $row.attr('field-index')
-								});
-							});
-							def.resolve({
-								tmplId		: '${tmpl.id}',
-								fields		: fields,
-								title		: title,
-								module		: '${module.name}'
-							});
-						}
-					});
-				}
-			}
-			return def.promise();
-		}
-		
-		$('#btn-download', $page).click(function(){
-			checkSubmitData('下载').done(function(sData){
-				$CPF.showLoading();
-				Ajax.postJson('admin/modules/import/submit_field_names/${menu.id}', sData, function(data){
-					if(data.uuid){
-						Ajax.download('admin/modules/import/download_tmpl/' + data.uuid);
-					}
-					$CPF.closeLoading();
-				});
-			});
-		});
-		
-		$('#btn-save', $page).click(function(){
-			checkSubmitData('保存').done(function(sData){
-				Ajax.postJson('admin/modules/import/save_tmpl/${menu.id}', sData, function(data){
-					if(data.status === 'suc'){
-						Dialog.notice('保存成功', 'success');
-						$page.getLocatePage().loadContent('admin/modules/import/tmpl/show/${menu.id}/' + data.tmplId);
-					}else{
-						Dialog.notice('保存失败', 'error');
-					}
-				});
-			})
-		});
-		$('#btn-new', $page).click(function(){
-			Dialog.confirm('是否创建新的模板？当前模板若已修改，将不会被保存。', function(yes){
-				if(yes){
-					$page.getLocatePage().loadContent('admin/modules/import/tmpl/${menu.id}');
-				}
-			});
+		ModulesImportDownload.initPage($page, {
+			relationLabelKey	: '${relationLabelKey}',
+			tmplFieldsJson		: tmplFieldsJson,
+			tmplId				: '${tmpl.id}',
+			moduleName			: '${module.name}',
+			menuId				: '${menu.id}'
 		});
 	});
 </script>

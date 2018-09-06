@@ -118,3 +118,7 @@
     top:0;
     color: #FFff00;
 }
+
+.module-list-tmpl .row.external-export-message>p {
+    text-align: center;
+}

@@ -67,21 +67,25 @@ define(function(require, exports, module){
 									title		: thisField.cname,
 									c_title		: thisComposite.cname,
 									optGroupId	: thisField.optionGroupId,
-									composite	: thisComposite
+									fieldPattern: thisField.fieldPattern,
+									composite	: $.extend({}, thisComposite, {
+											data	: {}
+									}),
+									data		: {}
 							});
 				}
 			}
 			return fieldData;
 		}
 		
-		function whenPickField(fieldId){
+		function whenPickField(fieldId, args){
 			_this.enableField(fieldId, param.disablePicked == false).done(function(field){
 				if(param.textPicked){
 					try{
 						setTextsValue(field.cname);
 					}catch(e){}
 				}
-				param.afterPicked.apply(_this, [field]);
+				param.afterPicked.apply(_this, $.merge([field], args || []));
 			});
 		}
 		
@@ -328,11 +332,11 @@ define(function(require, exports, module){
 		 * 选择某个字段
 		 * @param fieldId 字段的id
 		 */
-		this.select = function(fieldId){
+		this.select = function(fieldId, args){
 			this.getFieldData(fieldId).done(function(field){
 				if(field){
 					setTextsValue(field.cname);
-					whenPickField(fieldId);
+					whenPickField(fieldId, $.isArray(args)? args: [args]);
 				}
 			});
 		};

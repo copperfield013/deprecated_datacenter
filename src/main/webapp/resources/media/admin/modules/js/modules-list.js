@@ -2,9 +2,18 @@ define(function(require, exports, module){
 	"use strict";
 	var Form = require('form'),
 		Ajax = require('ajax'),
-		Utils = require('utils')
+		Utils = require('utils'),
+		Poll = require('poll');
 	
+	
+	//导出的全局句柄
+	var exportHandler = Poll.global('modules-list');
+	
+	
+	
+		
 	exports.init = function($page, moduleName, menuId, 
+			menuTitle, 
 			pageInfo, 
 			sessionExportStatus){
 		var $exportAll = $('#export-all', $page),
@@ -47,55 +56,92 @@ define(function(require, exports, module){
 		});
 		
 		var $exportProgress = $('#export-progress', $page);
-		//轮询处理对象
-		var handler = Ajax.poll({
+		
+		//先将当前页面添加到订阅者中
+		var subscriber = exportHandler.addSubscriber({
+			key					: menuId,
 			startupURL			: 'admin/modules/export/start/' + menuId,
 			progressURL			: 'admin/modules/export/status',
 			whenStartupResponse	: function(data, uuid){
 				$msg.text('开始导出');
 			},
-			progressHandler	: function(progress, res){
-				var progressText = parseFloat(progress * 100).toFixed(0);
-				var percent = progressText + '%';
-				$msg.text(res.statusMsg || '');
-				$exportProgress.find('.progress-text').text(percent).css('left', (parseFloat(progressText) - 3) + '%');
-				$exportProgress.find('.progress-bar').attr('aria-valuenow', percent).css('width', percent);
+			data				: {
+				menuTitle	: menuTitle,
+				menuId		: menuId
 			},
-			whenComplete		: function(res){
+			progressHandler		: progressHandler,
+			whenCompleted		: function(res){
 				if(res.uuid){
 					$msg.text('导出完成');
 					$btnDownload.removeAttr('disabled').off('click').click(function(){
 						Ajax.download('admin/modules/export/download/' + res.uuid);
 					}).show();
 					$btnBreak.off('click').click(function(){
-						resetExport(res.uuid);
+						resetExport();
 					});
 				}
 			},
 			whenBreaked			: function(){
-				
+				resetExport();
 			},
-			whenUnsuccess		: function(res){
-				
+			subscribeFunctions	: {
+				progressHandler		: progressHandler,
+				whenCompleted		: function(res){
+					resetExport();
+				},
+				whenSubscribed		: function(e){
+					var working = this.getGlobalPoll().getWorkingSubscriber();
+					if(working){
+						toggleWait(working);
+					}
+				},
+				whenBreaked			: function(){
+					resetExport();
+				}
 			}
 		});
-		$page.getLocatePage().getEventCallbacks(['afterClose', 'beforeReload'], null, function(callbacks){
-			callbacks.add(function(){
-				handler.disconnect();
-			});
-		});
+		function progressHandler(progress, res){
+			var progressText = parseFloat(progress * 100).toFixed(0);
+			var percent = progressText + '%';
+			$msg.text(res.statusMsg || '');
+			$exportProgress.find('.progress-text').text(percent).css('left', (parseFloat(progressText) - 3) + '%');
+			$exportProgress.find('.progress-bar').attr('aria-valuenow', percent).css('width', percent);
+		}
+		
+		//如果全局句柄当前没有在执行导出，那么根据从后台获得的参数来构造一次导入事件
 		//判断当前session是否有导出工作正在处理
-		if(sessionExportStatus.uuid && sessionExportStatus.scope){
-			if(sessionExportStatus.scope === 'current'){
-				$exportCur.prop('checked', true).trigger('change');
-			}else if(sessionExportStatus.scope === 'all'){
-				$('#export-range-start', $page).val(sessionExportStatus.rangeStart);
-				$('#export-range-end', $page).val(sessionExportStatus.rangeEnd);
-				$exportAll.prop('checked', true).trigger('change');
+		if(sessionExportStatus.uuid ){
+			if(exportHandler.getStatus() != 'working'){
+				//当前没有正在轮询的订阅者
+				Ajax.ajax('admin/modules/export/work/' + sessionExportStatus.uuid).done(function(work){
+					if(work.menuId == menuId){
+						if(work.scope === 'current'){
+							$exportCur.prop('checked', true).trigger('change');
+						}else if(work.scope === 'all'){
+							$('#export-range-start', $page).val(work.rangeStart);
+							$('#export-range-end', $page).val(work.rangeEnd);
+							$exportAll.prop('checked', true).trigger('change');
+						}
+						$withDetail.prop('checked', work.withDetail == 'true').trigger('change');
+						//menu对应
+						subscriber.pollWith(work.uuid);
+					}else{
+						//menu不对应
+						//创建空回调的订阅者
+						var workingSubscriber = exportHandler.addSubscriber({
+							startupURL			: 'admin/modules/export/start/' + work.menuId,
+							progressURL			: 'admin/modules/export/status',
+							data				: {
+								menuTitle	: work.menuTitle,
+								menuId		: work.menuId
+							},
+						});
+						//启动空回调的轮询
+						workingSubscriber.pollWith(work.uuid);
+					}
+					startPolling();
+				});
 			}
-			$withDetail.prop('checked', sessionExportStatus.withDetail === 'true').trigger('change');
-			handler.pollWith(sessionExportStatus.uuid);
-			startPolling();
 		}
 		$btnExport.click(function(){
 			var scope = $exportAll.prop('checked')? 'all': $exportCur.prop('checked')? 'current': null;
@@ -103,7 +149,7 @@ define(function(require, exports, module){
 				var rangeStart = scope == 'all' && $('#export-range-start', $page).val() || undefined,
 					rangeEnd = scope == 'all' && $('#export-range-end', $page).val() || undefined,
 					withDetail = $withDetail.prop('checked');
-				handler.start({
+				subscriber.starts({
 					scope		: scope,
 					rangeStart	: rangeStart,
 					rangeEnd	: rangeEnd,
@@ -116,6 +162,21 @@ define(function(require, exports, module){
 			}
 			
 		});
+		//轮询处理对象
+		$page.getLocatePage().getEventCallbacks(['beforeClose', 'beforeLoad'], 'unique', function(callbacks){
+			callbacks.add(function(e){
+				if(exportHandler && exportHandler.getWorkingSubscriber() == subscriber){
+					if(e.eventName === 'beforeClose'){
+						require('dialog').notice('当前页面正在执行导出，需要等待导出结束后，才允许关闭', 'error');
+					}else if(e.eventName === 'beforeLoad'){
+						require('dialog').notice('当前页面正在执行导出，需要等待导出结束后，才允许刷新', 'error');
+					}
+					e.stopDefault();
+				}else{
+					exportHandler.removeSubscriber(subscriber);
+				}
+			});
+		});
 		function startPolling(){
 			$exportMsg.show();
 			$exportAll.attr('disabled', 'disabled');
@@ -126,13 +187,11 @@ define(function(require, exports, module){
 			$exportProgress.show();
 			$btnExport.hide();
 			$btnDownload.show().attr('disabled', 'disabled');
+			$('.external-export-message', $page).hide();
 			$('.data-range :input', $page).attr('disabled', 'disabled');
 			$btnBreak.show().off('click').click(function(){
 				$btnBreak.attr('disabled', 'disabled');
-				handler.breaks().done(function(){
-					$btnBreak.removeAttr('disabled');
-					resetExport();
-				});
+				exportHandler.breaks();
 			});
 		}
 		function resetExport(){
@@ -141,10 +200,24 @@ define(function(require, exports, module){
 			$btnExport.show();
 			$btnBreak.removeAttr('disabled').hide();
 			$btnDownload.hide();
-			$exportAll.removeAttr('disabled');
-			$exportCur.removeAttr('disabled');
+			$('.range-toggle', $page).show();
+			$exportAll.removeAttr('disabled').trigger('change');
+			$exportCur.removeAttr('disabled').trigger('change');
 			$withDetail.removeAttr('disabled');
+			$('.external-export-message', $page).hide();
 			$('.data-range :input', $page).removeAttr('disabled');
+		}
+		function toggleWait(working){
+			startPolling();
+			var $menuLink = $('#export-menu-link', $page);
+			var menuId = working.getData('menuId');
+			$menuLink.text(working.getData('menuTitle'))
+				.attr('href', 'admin/modules/curd/list/' + menuId)
+				.attr('target', 'entity_list_' + menuId)
+				.addClass('tab');
+			$('.range-toggle', $page).hide();
+			$('.data-range', $page).hide();
+			$('.external-export-message', $page).show();
 		}
 	}
 });

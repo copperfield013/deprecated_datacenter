@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
@@ -19,14 +20,14 @@ public class ModuleImportTemplateField {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(name="c_title")
+	@Transient
 	private String title;
 	
-	@Column(name="c_field_name")
-	private String fieldName;
+	@Column(name="field_id")
+	private Long fieldId;
 	
-	@Column(name="c_field_pattern")
-	private String fieldPattern;
+	@Column(name="composite_id")
+	private Long compositeId;
 	
 	@Column(name="c_field_index")
 	private Integer fieldIndex;
@@ -53,12 +54,6 @@ public class ModuleImportTemplateField {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	public String getFieldName() {
-		return fieldName;
-	}
-	public void setFieldName(String fieldName) {
-		this.fieldName = fieldName;
-	}
 	public Integer getOrder() {
 		return order;
 	}
@@ -77,16 +72,22 @@ public class ModuleImportTemplateField {
 	public void setTemplateId(Long templateId) {
 		this.templateId = templateId;
 	}
-	public String getFieldPattern() {
-		return fieldPattern;
-	}
-	public void setFieldPattern(String fieldPattern) {
-		this.fieldPattern = fieldPattern;
-	}
 	public Integer getFieldIndex() {
 		return fieldIndex;
 	}
 	public void setFieldIndex(Integer fieldIndex) {
 		this.fieldIndex = fieldIndex;
+	}
+	public Long getFieldId() {
+		return fieldId;
+	}
+	public void setFieldId(Long fieldId) {
+		this.fieldId = fieldId;
+	}
+	public Long getCompositeId() {
+		return compositeId;
+	}
+	public void setCompositeId(Long compositeId) {
+		this.compositeId = compositeId;
 	}
 }

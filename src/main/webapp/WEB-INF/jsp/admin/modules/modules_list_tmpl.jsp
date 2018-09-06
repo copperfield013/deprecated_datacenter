@@ -162,6 +162,9 @@
 					<span class="text">详情</span>
 				</label>
 			</div>
+			<div class="row external-export-message" style="display: none">
+				<p>检测到功能模块（<a class="without-refresh" id="export-menu-link"></a>）正在执行导出工作</p>
+			</div>
 			<div class="row range-toggle">
 				<label class="col-lg-6">
 					<input id="export-current-page" type="radio" class="colored-blue" checked="checked">
@@ -171,9 +174,6 @@
 					<input id="export-all" type="radio" class="colored-blue">
 					<span class="text">导出所有</span>
 				</label>
-			</div>
-			<div class="row">
-				
 			</div>
 			<div class="row data-range" style="display: none;">
 				<label class="col-lg-4">数据范围：</label>
@@ -207,7 +207,7 @@
 <script>
 	seajs.use(['modules/js/modules-list.js'], function(ModulesList){
 		var $page = $('#${module.name }-list-tmpl-${RES_STAMP}');
-		ModulesList.init($page, '${module.name}', '${menu.id}', {
+		ModulesList.init($page, '${module.name}', '${menu.id}', '${menu.title}',{
 			pageNo	: '${criteria.pageInfo.pageNo}',
 			pageSize: '${criteria.pageInfo.pageSize}'
 		},{

@@ -32,11 +32,8 @@ public class ModuleImportTemplateStrategy implements TemplateUpdateStrategy<Modu
 					ModuleImportTemplateField.class, nDao,
 					field->field.getId(),
 					(oField, field)->{
-						oField.setTitle(field.getTitle());
 						oField.setFieldIndex(field.getFieldIndex());
 						oField.setOrder(field.getOrder());
-						oField.setFieldName(field.getFieldName());
-						oField.setFieldPattern(field.getFieldPattern());
 						oField.setUpdateTime(now);
 					},field->{
 						field.setUpdateTime(now);

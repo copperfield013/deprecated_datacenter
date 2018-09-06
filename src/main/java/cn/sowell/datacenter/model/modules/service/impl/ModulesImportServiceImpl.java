@@ -7,7 +7,8 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -52,12 +53,16 @@ import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.ImportCompositeField;
 import cn.sowell.datacenter.entityResolver.impl.EntityComponent;
+import cn.sowell.datacenter.entityResolver.impl.RelationEntityProxy;
 import cn.sowell.datacenter.model.modules.dao.ModulesImportDao;
 import cn.sowell.datacenter.model.modules.exception.ImportBreakException;
 import cn.sowell.datacenter.model.modules.pojo.ImportTemplateCriteria;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplate;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplateField;
 import cn.sowell.datacenter.model.modules.service.ModulesImportService;
+import cn.sowell.dataserver.model.dict.pojo.DictionaryComposite;
+import cn.sowell.dataserver.model.dict.pojo.DictionaryField;
+import cn.sowell.dataserver.model.dict.service.DictionaryService;
 import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
 @Service
@@ -74,6 +79,9 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 	
 	@Resource
 	TemplateService tService;
+	
+	@Resource
+	DictionaryService dService;
 	
 	Logger logger = Logger.getLogger(ModulesImportServiceImpl.class);
 	
@@ -194,7 +202,7 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 	}
 	
 	private Map<String, Object> createImportData(Row headerRow, Row row){
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new LinkedHashMap<String, Object>();
 		int length = headerRow.getPhysicalNumberOfCells();
 		for (int i = 0; i < length; i++) {
 			Cell cell = row.getCell(i);
@@ -229,7 +237,7 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 				for (ModuleImportTemplateField field : fields) {
 					sheet.setDefaultColumnStyle(columnIndex, dataStyle);
 					XSSFCell titleCell = headerRow.createCell(columnIndex);
-					titleCell.setCellValue(field.getFieldName());
+					titleCell.setCellValue(field.getTitle());
 					titleCell.setCellStyle(titleStyle);
 					XSSFCell dataCell = firstDataRow.createCell(columnIndex);
 					dataCell.setCellType(CellType.STRING);
@@ -305,6 +313,28 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 	public ModuleImportTemplate getImportTempalte(Long tmplId) {
 		ModuleImportTemplate tmpl = nDao.get(ModuleImportTemplate.class, tmplId);
 		Set<ModuleImportTemplateField> fields = new LinkedHashSet<>(impDao.getTemplateFields(tmpl.getId()));
+		Iterator<ModuleImportTemplateField> itr = fields.iterator();
+		while(itr.hasNext()) {
+			ModuleImportTemplateField tmplField = itr.next();
+			if(tmplField.getFieldId() != null) {
+				DictionaryField field = dService.getField(tmpl.getModule(), tmplField.getFieldId());
+				if(field != null) {
+					String fieldTitle = field.getFieldPattern();
+					if(tmplField.getFieldIndex() != null) {
+						fieldTitle = fieldTitle.replaceFirst(ImportCompositeField.REPLACE_INDEX, tmplField.getFieldIndex().toString());
+					}
+					tmplField.setTitle(fieldTitle);
+					continue;
+				}
+			}else if(tmplField.getCompositeId() != null && tmplField.getFieldIndex() != null){
+				DictionaryComposite composite = dService.getComposite(tmpl.getModule(), tmplField.getCompositeId());
+				if(composite != null) {
+					tmplField.setTitle(composite.getName() + "[" + tmplField.getFieldIndex() + "]." + RelationEntityProxy.LABEL_KEY);
+					continue;
+				}
+			}
+			itr.remove();
+		}
 		tmpl.setFields(fields);
 		return tmpl;
 	}

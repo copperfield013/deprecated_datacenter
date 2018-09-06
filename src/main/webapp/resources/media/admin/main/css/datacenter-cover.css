@@ -587,8 +587,7 @@ input.search-input:hover {
 	font-size: 0;
 }
 
-.module-import-tmpl-dialog .fields-l,
-.module-import-tmpl-dialog .fields-r{
+.module-import-tmpl-dialog .fields-l{
 	max-height: 300px;
 	overflow-y: auto;
 }

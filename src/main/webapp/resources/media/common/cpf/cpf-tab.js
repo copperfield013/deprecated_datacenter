@@ -137,6 +137,17 @@ define(function(require, exports, module){
 		 */
 		this.loadContent = function(content, _title, _formData){
 			var free = this.isFree();
+			var stop = false;
+			var e = {
+				stopDefault 	: function(){
+					stop = true;
+				},
+				eventName		: 'beforeLoad'
+			}
+			this.getEventCallbacks(e.eventName).fireWith(this, [e]);
+			if(stop){
+				return;
+			}
 			if(typeof content === 'string'){
 				var dUrl = content;
 				var dFormData = _formData;
@@ -264,6 +275,17 @@ define(function(require, exports, module){
 		 * 关闭标签
 		 */
 		this.close = function(activateTabId){
+			var stop = false;
+			var e = {
+				stopDefault 	: function(){
+					stop = true;
+				},
+				eventName		: 'beforeClose'
+			}
+			this.getEventCallbacks(e.eventName).fireWith(this, [e]);
+			if(stop){
+				return;
+			}
 			var ulDom = $("#main-tab-title-container")
 			var warpWidth = parseFloat(ulDom.closest(".tab-warp").css("width"));
 			var result = param.onClose(this);
@@ -436,6 +458,13 @@ define(function(require, exports, module){
 				li.addClass('active');
 			}
 			if(utils.startsWith(uri, $CPF.getParam('tabLinkPrefix'))){
+				if(_this.is('.without-refresh')){
+					var tab = Tab.getTab(tabId);
+					if(tab){
+						tab.activate();
+						return false;
+					}
+				}
 				try{
 					Tab.openInTab(uri, tabId, title);
 				}catch(e){

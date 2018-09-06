@@ -765,6 +765,15 @@ define(function(require, exports){
 			exports.place($target, $ori, '', $container);
 			$ori.hide();
 			$target.show();
+		},
+		inherit			: function(SubType, SuperType){
+			var s = SubType;
+			// 创建一个没有实例方法的类
+			var Super = function(){};
+			Super.prototype = SuperType.prototype;
+			//将实例作为子类的原型
+			SubType.prototype = new Super();
+			SubType.prototype.constructor = s;
 		}
 	});
 	
@@ -830,7 +839,7 @@ define(function(require, exports){
 		this.replace = function(eventName, callback){
 			if(eventName || eventName === 0){
 				if(typeof callback === 'function' || callback === null){
-					var callbacks = map[eventName.toString()] = $.Callbacks();
+					var callbacks = map[eventName.toString()] = $.Callbacks('stopOnFalse');
 					callbacks.add(callback);
 				}
 			}
@@ -897,6 +906,77 @@ define(function(require, exports){
 		return this.array.pop();
 	}
 	exports.SetStack = SetStack;
+	
+	
+	function Subscriber(param){
+		var funcMap = {};
+		
+		this.invoke = function(funcName, invoker, args){
+			if(typeof funcMap[funcName] === 'function'){
+				funcMap[funcName].apply(invoker || this, args);
+			}
+		}
+		
+		this.bind = function(funcName, func){
+			if(typeof funcName === 'string' && typeof func === 'function'){
+				funcMap[funcName] = func;
+			}
+		}
+	}
+	
+	function Subscribers(){
+		Array.call(this);
+	}
+	
+	exports.inherit(Subscribers, Array);
+	$.extend(Subscribers.prototype, {
+		add 	: function(subscriber){
+			if(subscriber instanceof Subscriber){
+				this.push(subscriber);
+				return subscriber;
+			}
+		},
+		
+		remove	: function(ele){
+			if(typeof ele === 'number'){
+				return this.splice(ele, 1);
+			}else{
+				var index = $.inArray(ele, this);
+				if(index >= 0){
+					return this.remove(index);
+				}
+			}
+		},
+		forEach	: function(itr){
+			for(var i = 0; i < this.length; i++){
+				itr.apply(this[i], [i, this[i]]);
+			}
+		},
+		invoke	: function(funcName, invoker, args, excepts, calledSubscriber){
+			excepts = excepts || [];
+			if(funcName){
+				this.forEach(function(i, subscriber){
+					if($.inArray(subscriber, excepts) < 0){
+						try{
+							subscriber.invoke(funcName, invoker, args);
+						}catch(e){
+							console.error(e);
+						}
+					}
+				});
+				/*for(var i in this){
+					var subscriber = this[i];
+					
+				}*/
+			}
+		}
+	});
+	
+	
+	
+	
+	exports.Subscriber = Subscriber;
+	exports.Subscribers = Subscribers;
 	
 	function returnTrue(){return true;}
 	function returnFalse(){return false;}

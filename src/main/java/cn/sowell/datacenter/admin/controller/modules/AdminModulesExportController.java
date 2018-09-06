@@ -80,6 +80,8 @@ public class AdminModulesExportController {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		JSONObject json = jReq.getJsonObject();
 		WorkProgress progress = new WorkProgress();
+		progress.getDataMap().put("menuId", menuId);
+		progress.getDataMap().put("menuTitle", menu.getTitle());
 		String scope = json.getString("scope");
 		Boolean withDetail = json.getBoolean("withDetail");
 		boolean isCurrentScope = "current".equals(scope),
@@ -191,6 +193,25 @@ public class AdminModulesExportController {
 		} catch (Exception e) {
 			logger.error("导出时发生错误", e);
 			jRes.setStatus("error");
+		}
+		return jRes;
+	}
+	
+	
+	@ResponseBody
+	@RequestMapping("/work/{uuid}")
+	public ResponseJSON loadWork(@PathVariable String uuid) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		WorkProgress progress = eService.getExportProgress(uuid);
+		if(progress != null) {
+			jRes.put("menuId", progress.getDataMap().get("menuId"));
+			jRes.put("menuTitle", progress.getDataMap().get("menuTitle"));
+			jRes.put("uuid", uuid);
+			ExportDataPageInfo ePageInfo = (ExportDataPageInfo) progress.getDataMap().get("exportPageInfo");
+			jRes.put("scope", ePageInfo.getScope());
+			jRes.put("rangeStart", ePageInfo.getRangeStart());
+			jRes.put("rangeEnd", ePageInfo.getRangeEnd());
+			jRes.put("withDetail", progress.getDataMap().get("withDetail"));
 		}
 		return jRes;
 	}

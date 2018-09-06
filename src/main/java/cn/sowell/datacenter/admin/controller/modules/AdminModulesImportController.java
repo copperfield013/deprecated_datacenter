@@ -282,8 +282,9 @@ public class AdminModulesImportController {
 		JSONObject reqJson = jReq.getJsonObject();
 		ModuleImportTemplate tmpl = toImportTemplate(reqJson);
 		if(tmpl != null) {
+			Long tmplId = impService.saveTemplate(tmpl);
 			String uuid = TextUtils.uuid();
-			session.setAttribute(SESSION_KEY_FIELD_NAMES + uuid, tmpl);
+			session.setAttribute(SESSION_KEY_FIELD_NAMES + uuid, tmplId);
 			jRes.put("uuid", uuid);
 		}
 		return jRes;
@@ -291,7 +292,8 @@ public class AdminModulesImportController {
 	
 	@RequestMapping("/download_tmpl/{uuid}")
 	public ResponseEntity<byte[]> download(@PathVariable String uuid, HttpSession session){
-		ModuleImportTemplate tmpl = (ModuleImportTemplate) session.getAttribute(SESSION_KEY_FIELD_NAMES + uuid);
+		Long tmplId = (Long) session.getAttribute(SESSION_KEY_FIELD_NAMES + uuid);
+		ModuleImportTemplate tmpl = impService.getImportTempalte(tmplId);
 		if(tmpl != null) {
 			try {
 				byte[] tmplInputStream = impService.createImportTempalteBytes(tmpl);
@@ -341,9 +343,8 @@ public class AdminModulesImportController {
 				JSONObject fieldItem = (JSONObject) item; 
 				ModuleImportTemplateField field = new ModuleImportTemplateField();
 				field.setId(fieldItem.getLong("id"));
-				field.setFieldName(fieldItem.getString("fieldName"));
-				field.setTitle(fieldItem.getString("title"));
-				field.setFieldPattern(fieldItem.getString("fieldPattern"));
+				field.setFieldId(fieldItem.getLong("fieldId"));
+				field.setCompositeId(fieldItem.getLong("compositeId"));
 				field.setFieldIndex(fieldItem.getInteger("fieldIndex"));
 				return field;
 			});
