@@ -227,6 +227,7 @@ define(function(require, exports, module){
 					if(field){
 						if(field.composite.isArray){
 							$group.attr('composite-id', field.composite.c_id);
+							fieldSearch.lockTabByCompositeId(field.composite.c_id);
 						}else{
 							fieldSearch.hideArrayComposites();
 						}
