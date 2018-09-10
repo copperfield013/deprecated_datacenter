@@ -5,6 +5,8 @@
 		<form class="form-inline" action="admin/relationtreeview/openSelection">
 			<input type="hidden" name="mappingName" value="${mappingName }">
 			<input type="hidden" name="relationName" value="${relationName }">
+			<input type="hidden" name="attrCount" value="${attrCount }">
+			
 			<c:forEach items="${attrMap }" var="map" begin="0" end="2">
 				<div class="form-group">
 					<label for="name">${map.key }</label>
