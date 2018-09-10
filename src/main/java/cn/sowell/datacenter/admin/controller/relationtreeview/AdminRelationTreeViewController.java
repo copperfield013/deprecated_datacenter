@@ -383,6 +383,7 @@ public class AdminRelationTreeViewController {
 		}
 		ModelAndView mv = new ModelAndView();
 		
+		mv.addObject("attrCount", attrCount);
 		mv.addObject("reulstMap", reulstMap);
 		mv.addObject("pageInfo", pageInfo);
 		mv.addObject("attrNameList", attrList);
