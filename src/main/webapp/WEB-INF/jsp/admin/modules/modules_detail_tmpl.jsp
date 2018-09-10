@@ -131,7 +131,7 @@
 				'${module.name}',
 				'${entity.code}',
 				'${menu.id}',
-				'${date.time}');
+				'${historyId}');
 		
 	});
 </script>

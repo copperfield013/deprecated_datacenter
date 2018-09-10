@@ -1,6 +1,5 @@
 package cn.sowell.datacenter.admin.controller.modules;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -167,29 +166,21 @@ public class AdminModulesController {
 	@RequestMapping("/detail/{menuId}/{code}")
 	public String detail(@PathVariable String code, 
 			@PathVariable Long menuId,
-			String datetime, 
-    		Long timestamp,
+    		Long historyId,
     		Model model) {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		String moduleName = menu.getTemplateModule();
 		
 		Object moduleMeta = mService.getModule(moduleName);
-		Date date = null;
-        date = dateFormat.parse(datetime);
-        if(timestamp != null){
-        	date = new Date(timestamp);
-        }
-        model.addAttribute("date", date == null? new Date(): date);
         TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
         TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
         
-        ModuleEntityPropertyParser entity = mService.getEntity(moduleName, code, date, UserUtils.getCurrentUser());
+        ModuleEntityPropertyParser entity = mService.getHistoryEntityParser(moduleName, code, historyId, UserUtils.getCurrentUser());
         model.addAttribute("menu", menu);
+        model.addAttribute("historyId", historyId);
         model.addAttribute("entity", entity);
-        model.addAttribute("datetime", datetime);
         model.addAttribute("dtmpl", dtmpl);
         model.addAttribute("groupPremises", tmplGroup.getPremises());
-        model.addAttribute("timestamp", timestamp);
 		model.addAttribute("module", moduleMeta);
 		return AdminConstants.JSP_MODULES + "/modules_detail_tmpl.jsp";
 		

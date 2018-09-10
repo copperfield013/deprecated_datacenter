@@ -74,7 +74,8 @@ define(function(require, exports, module){
 				//调用该事件需要修改bootstrap的源码中的Tab.prototype.activate#next方法
 				//为$active触发一个事件.trigger('inactivate')
 				afterInactivate	: null
-			}
+			},
+			openedStack		: null
 		};
 		var param = $.extend({}, defaultParam, _param);
 		var id = param.id,
@@ -263,6 +264,9 @@ define(function(require, exports, module){
 			}
 			var $title = this.getTitleDom();
 			$('a', $title).trigger('click');
+			if(param.openedStack){
+				param.openedStack.push(this);
+			}
 			return this;
 		};
 		/**
@@ -296,26 +300,39 @@ define(function(require, exports, module){
 			if(result === false){
 				return this;
 			}
-			var activateTab;
-			if(activateTabId){
-				activateTab = tabMap[activateTabId];
+			
+			if(param.openedStack){
+				param.openedStack.remove(this);
 			}
-			if(activateTab){
-				//存在关闭后要激活的标签
-				activateTab.activate();
-			}else{
-				//不存在关闭后要激活的标签，那么根据策略来激活前后的标签
-				var nextTab = this.getNextTab();
-				if(nextTab){
-					nextTab.activate();
-				}else{
-					var prevTab = this.getPrevTab();
-					if(!(prevTab instanceof Tab)){
-						$CPF.getParam('defaultTab').activate();
-					}else{
-						prevTab.activate();
+			
+			if(this.isActive()){
+				var activateTab;
+				if(activateTabId){
+					activateTab = tabMap[activateTabId];
+				}
+				if(!activateTab){
+					if(param.openedStack && !param.openedStack.isEmpty()){
+						var top = param.openedStack.getTop();
+						if(top){
+							activateTab = top;
+						}
+					}
+					if(!activateTab){
+						//不存在关闭后要激活的标签，那么根据策略来激活前后的标签
+						var nextTab = this.getNextTab();
+						if(nextTab){
+							activateTab = nextTab;
+						}else{
+							var prevTab = this.getPrevTab();
+							if(!(prevTab instanceof Tab)){
+								activateTab = $CPF.getParam('defaultTab');
+							}else{
+								activateTab = prevTab;
+							}
+						}
 					}
 				}
+				activateTab.activate();
 			}
 			
 			//关闭并且移除当前标签对象
@@ -479,14 +496,15 @@ define(function(require, exports, module){
 		
 	};
 	
-	
+	var openedStack = new utils.SetStack();
 	$.extend(Tab, {
 		openInTab	: function(url, tabId, title){
 			var tab = Tab.getTab(tabId);
 			if(!tab){
 				tab = new Tab({
-					id		: tabId,
-					title	: title
+					id			: tabId,
+					title		: title,
+					openedStack	: openedStack
 				});
 				tab.insert();
 			}

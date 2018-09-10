@@ -6,7 +6,7 @@ define(function(require, exports, module){
 		DtmplUpdate = require('tmpl/js/dtmpl-update.js'),
 		Utils = require('utils')
 	
-	exports.init = function($page, moduleName, entityCode, menuId, theTime){
+	exports.init = function($page, moduleName, entityCode, menuId, historyId){
 		if(entityCode === ''){
 			Dialog.notice('数据不存在', 'warning');
 			$('.header-title h1').text('数据不存在');
@@ -32,6 +32,9 @@ define(function(require, exports, module){
 						appendHistory(data.history);
 						curPageNo ++;
 						timelineInited = true;
+						if(!historyId && $('.VivaTimeline>dl>dd.current', $page).length == 0){
+							$('.VivaTimeline>dl>dd', $page).first().addClass('current');
+						}
 					}
 					if(data.isLast){
 						$this.text('没有更多了');					
@@ -42,12 +45,11 @@ define(function(require, exports, module){
 			}
 		});
 		$('.VivaTimeline', $page).on('click', '.circ', function(){
-			var time = parseInt($(this).closest('dd').attr('data-time'));
-			$page.getLocatePage().loadContent('admin/modules/curd/detail/' + menuId + '/' + entityCode, null, {timestamp:time});
+			var hid = parseInt($(this).closest('dd').attr('data-id'));
+			$page.getLocatePage().loadContent('admin/modules/curd/detail/' + menuId + '/' + entityCode, null, {historyId:hid});
 			
 		});
 		
-		theTime = parseInt(theTime);
 		function appendHistory(history){
 			if(history.length > 0){
 				var $dl = $('dl', $page);
@@ -111,8 +113,8 @@ define(function(require, exports, module){
 				$dd.each(function(i){
 					var $this = $(this);
 					if(!checked){
-						var thisTime = parseInt($this.attr('data-time'));
-						if(theTime >= thisTime){
+						var hid = $this.attr('data-id');
+						if(historyId == hid){
 							$this.addClass('current');
 							checked = true;
 						}
@@ -162,7 +164,7 @@ define(function(require, exports, module){
 				if(yes){
 					$CPF.showLoading();
 					Ajax.ajax('admin/modules/export/export_detail/' + menuId + '/' + entityCode, {
-						
+						historyId	: historyId
 					}, function(data){
 						if(data.status === 'suc'){
 							if(data.uuid){

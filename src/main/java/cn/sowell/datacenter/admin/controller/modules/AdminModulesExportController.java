@@ -177,13 +177,16 @@ public class AdminModulesExportController {
 	
 	@ResponseBody
 	@RequestMapping("/export_detail/{menuId}/{code}")
-	public ResponseJSON exportDetail(@PathVariable Long menuId, @PathVariable String code) {
+	public ResponseJSON exportDetail(
+			@PathVariable Long menuId, 
+			@PathVariable String code,
+			Long historyId) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
 		TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
 		UserIdentifier user = UserUtils.getCurrentUser();
-		ModuleEntityPropertyParser parser = mService.getEntity(menu.getTemplateModule(), code, null, user);
+		ModuleEntityPropertyParser parser = mService.getHistoryEntityParser(menu.getTemplateModule(), code, historyId, user);
 		try {
 			String uuid = eService.exportDetailExcel(parser, dtmpl);
 			if(uuid != null) {

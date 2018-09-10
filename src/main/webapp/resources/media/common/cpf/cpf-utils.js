@@ -890,20 +890,26 @@ define(function(require, exports){
 		this.array = [];
 	}
 	
-	SetStack.prototype.get = function(){
+	SetStack.prototype.getTop = function(){
 		return this.array[this.array.length - 1];
 	}
 	
 	SetStack.prototype.push = function(ele){
-		var array = this.array;
-		var index = $.inArray(ele, array);
-		if(index >= 0){
-			array.splice(index, 1);
-		}
-		array.push(ele);
+		this.remove(ele);
+		this.array.push(ele);
 	}
 	SetStack.prototype.pop = function(){
 		return this.array.pop();
+	}
+	
+	SetStack.prototype.remove = function(ele){
+		var index = $.inArray(ele, this.array);
+		if(index >= 0){
+			this.array.splice(index, 1);
+		}
+	}
+	SetStack.prototype.isEmpty = function(){
+		return this.array.length == 0;
 	}
 	exports.SetStack = SetStack;
 	
