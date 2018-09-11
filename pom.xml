@@ -9,13 +9,14 @@
 	<url>http://maven.apache.org</url>
 	
 	<properties>
-		<version.kie>6.5.0.Final</version.kie>
+		<version.kie>7.10.0.Final</version.kie>
 		<version.abcitem>3.5.62.alphal</version.abcitem>
 		<version.dataserver>0.21</version.dataserver>
 		<version.cpfweb>0.2.12</version.cpfweb>
 		<version.abcbizz>2.1.15</version.abcbizz>
 		<version.authbiz>0.0.16</version.authbiz>
-		<version.jgdj>0.0.17</version.jgdj>
+		<version.jgdj>0.0.18</version.jgdj>
+		<version.xfjd>0.1.1</version.xfjd>
 		<cxf.version>3.2.2</cxf.version>
 	</properties>
 	
@@ -70,13 +71,18 @@
 			<artifactId>jgdj</artifactId>
 			<version>${version.jgdj}</version>
 		</dependency>
-		 <dependency>
+		<dependency>
+			<groupId>com.zhsq.biz</groupId>
+			<artifactId>xfjd</artifactId>
+			<version>${version.xfjd}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.abc.biz</groupId>
 			<artifactId>authbiz</artifactId>
 			<version>${version.authbiz}</version>
 		</dependency>
 
-		 <!--<dependency>
+		<!--  <dependency>
 			<groupId>com.abc</groupId>
 			<artifactId>bizz</artifactId>
 			<version>${version.abcbizz}</version>
@@ -167,12 +173,6 @@
 		<dependency>
 			<groupId>org.drools</groupId>
 			<artifactId>drools-decisiontables</artifactId>
-			<version>${version.kie}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.drools</groupId>
-			<artifactId>drools-examples-api</artifactId>
-			<type>pom</type>
 			<version>${version.kie}</version>
 		</dependency>
 		<dependency>
