@@ -294,7 +294,17 @@ define(function(require, exports, module){
 					options = FieldInput.GLOBAL_LABELS[param.fieldKey];
 				}
 				
-				if(options){
+				if($.isArray(options)){
+					var strOptions = [];
+					if(options.length > 0){
+						if(typeof options[0] === 'object'){
+							for(var i in options){
+								strOptions[i] = options[i].value;
+							}
+						}else if(typeof options[0] === 'string'){
+							$.merge(strOptions, options);
+						}
+					}
 					var $div = $('<div>');
 					$div.append('<span class="cpf-select-sign cpf-select-sign-and"></span>')
 					var $select = $('<select multiple="multiple" >').appendTo($div);
@@ -307,7 +317,7 @@ define(function(require, exports, module){
 						$select.select2({
 							theme	: "bootstrap",
 							width	: null,
-							data	: options
+							data	: strOptions
 							
 						});
 					}

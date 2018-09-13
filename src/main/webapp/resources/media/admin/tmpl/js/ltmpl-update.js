@@ -241,6 +241,7 @@ define(function(require, exports, module){
 			$('#criteria-detail-cover', $page).removeClass('cover-active')
 			var field = criteria.getField();
 			if(field){
+				//criteriaSearcher.changeFieldMode('field');
 				$fieldSearchInput.typeahead('val', field.cname);
 				criteriaSearcher.enableField(field.id, false);
 				$('.hide-when-no-field', $page).show();
@@ -250,28 +251,20 @@ define(function(require, exports, module){
 			}
 			var queryShow = criteria.isQueryShow();
 			$('#toggle-show-criteria', $page).prop('checked', queryShow).trigger('change');
-			//if(queryShow){
-				var $defVal = $('#criteria-default-value-container', $page).children();
-				$defVal.detach();
-				criteria.detailHandler(function($$){
-					var defValInput = criteria.getDefaultValueInput();
-					filterFieldInputSelectable($$('#field-input-type'), field).done(function(){
-						$$('#field-input-type').val(defValInput.getType());
-						criteria.setDefaultInputType(criteria.getDefaultValueInput());
-						$$('#criteria-detail-comparator').val(criteria.getComparatorName());
-						$$('#criteria-default-value-container').append(defValInput.getInput());
-						$$('#criteria-detail-placeholder').val(criteria.getPlaceholder());
-						toggleRelationLabelInput($$('#relation-label-row'), criteria.getRelationLabelInput())
-					})
-				});
-			//}
+			var $defVal = $('#criteria-default-value-container', $page).children();
+			$defVal.detach();
+			criteria.detailHandler(function($$){
+				var defValInput = criteria.getDefaultValueInput();
+				filterFieldInputSelectable($$('#field-input-type'), field).done(function(){
+					$$('#field-input-type').val(defValInput.getType());
+					criteria.setDefaultInputType(criteria.getDefaultValueInput());
+					$$('#criteria-detail-comparator').val(criteria.getComparatorName());
+					$$('#criteria-default-value-container').append(defValInput.getInput());
+					$$('#criteria-detail-placeholder').val(criteria.getPlaceholder());
+					toggleRelationLabelInput($$('#relation-label-row'), criteria.getRelationLabelInput())
+				})
+			});
 			
-			/*var $partitionsContainer = $('.criteria-detail-partitions-container', $page)
-					.find('.criteria-detail-partition').remove().end(); 
-			var partitions = criteria.getPartitions();
-			for(var i in partitions){
-				apppendPartitionDom(partitions[i]);
-			}*/
 			cField = field;
 		}
 		function apppendPartitionDom(partition){
@@ -471,8 +464,9 @@ define(function(require, exports, module){
 			handleSelectedItem(function(){
 				try{
 					if(inputType === 'select' 
+						|| inputType === 'multiselect'
 						|| inputType === 'label'){
-						this.setDefaultInputType($.extend({type	: inputType}, this.getField()));
+						this.setDefaultInputType($.extend({}, this.getField(), {type : inputType}));
 					}else{
 						this.setDefaultInputType(inputType);
 					}

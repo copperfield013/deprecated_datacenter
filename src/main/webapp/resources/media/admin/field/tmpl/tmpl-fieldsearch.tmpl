@@ -1,4 +1,12 @@
 <div class="fieldpicker-container">
+	<span class="fieldpicker-mode">
+		<i>F</i>
+		<ol style="display:none">
+			<li class="selected" fieldpicker-mode="field">字段</li>
+			<li fieldpicker-mode="relation">关系</li>
+			<li fieldpicker-mode="multiattr">多值属性</li>
+		</ol>
+	</span>
 	<ul class="nav nav-tabs nav-justified">
 		{{if composites.length > 0}}
 			<li data-id="${composites[0].c_id}" class="active ${composites[0].isArray == 1 ?'array-field':''}"><a data-toggle="tab" href="#ctab_${pickerKey }_0">${composites[0].cname }</a></li>
@@ -34,5 +42,12 @@
 				</div>
 			</div>
 		{{/each}}
+		<div id="ctab_${pickerKey }_composites" class="tab-pane composites-tab">
+			<div class="fieldpicker-field-container">
+				{{each(i, composite) composites}}
+					<a href="#" data-id="${composite.c_id}" class="fieldpicker-composite-item">${composite.cname }</a>
+				{{/each}}
+			</div>
+		</div>
 	</div>
 </div>

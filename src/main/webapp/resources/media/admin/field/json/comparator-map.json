@@ -58,13 +58,12 @@
 	"multiselect": {
 		"comparators"		: [
 			{
-				"title"	: "包括",
+				"title"	: "包括于",
 				"key"	: "ms1"
 			},
 			{
-				"title"	: "不包括",
-				"key"	: "ms1n",
-				"class"	: "negative"
+				"title"	: "不包括于",
+				"key"	: "ms1n"
 			}
 		]
 	},

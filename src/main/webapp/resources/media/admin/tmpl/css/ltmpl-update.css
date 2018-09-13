@@ -374,8 +374,9 @@
     display: inline-block;
 }
 .ltmpl-update .criteria-detail-show-config-container>div>div{
-    width: 69%;
+    width: 65%;
     display: inline-block;
+    vertical-align: middle;
 }
 
 .ltmpl-update .criteria-detail-show-config-container{
