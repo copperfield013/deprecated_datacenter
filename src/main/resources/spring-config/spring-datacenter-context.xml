@@ -55,8 +55,14 @@
 	</bean>
 	
 	<!-- 查询条件转换器 -->
-	<bean class="cn.sowell.dataserver.model.modules.bean.criteriaConveter.CriteriaConverterFactoryImpl" />
-
+	<bean class="cn.sowell.dataserver.model.modules.bean.criteriaConveter.CriteriaConverterFactoryImpl" >
+		<property name="extendConverters">
+			<list>
+				<bean class="cn.sowell.dataserver.model.modules.bean.criteriaConveter.UserRelationExistCriteriaConverter"></bean>
+			</list>
+		</property>
+	</bean>
+		
 	<bean
 		class="cn.sowell.copframe.spring.propTranslator.PropertyValueTranslatorSet">
 		<property name="translatorSet">

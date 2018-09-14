@@ -280,6 +280,7 @@ public class AdminListTemplateController {
 					criteria.setOrder(order++);
 					if(item.getBooleanValue("fieldAvailable")) {
 						criteria.setFieldId(item.getLong("fieldId"));
+						criteria.setCompositeId(item.getLong("compositeId"));
 						criteria.setRelationLabel(item.getString("relationLabel"));
 						//条件需要显示
 						criteria.setComparator(item.getString("comparator"));

@@ -57,9 +57,9 @@ public class TestEntityBinder {
 	
 	
 	
-	UserIdentifier getUser(){
+	static UserIdentifier getUser(){
 		UserInfo u = new UserInfo();
-		u.setCode("u6");
+		u.setCode("u5");
 		ABCUser user = new ABCUser(u);
 		return user;
 	}

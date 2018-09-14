@@ -176,6 +176,10 @@ public class AdminModulesController {
         TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
         
         ModuleEntityPropertyParser entity = mService.getHistoryEntityParser(moduleName, code, historyId, UserUtils.getCurrentUser());
+        if(entity == null) {
+        	entity = mService.getEntity(moduleName, code, null, UserUtils.getCurrentUser());
+        	model.addAttribute("fromHistory", false);
+        }
         model.addAttribute("menu", menu);
         model.addAttribute("historyId", historyId);
         model.addAttribute("entity", entity);

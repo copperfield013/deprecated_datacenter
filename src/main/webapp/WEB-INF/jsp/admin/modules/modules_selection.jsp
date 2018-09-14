@@ -27,6 +27,13 @@
 											</c:forEach>								
 										</select>
 									</c:when>
+									<c:when test="${criteriaItem.inputType == 'multiselect' }">
+										<select class="form-control cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${criteria.selectionTemplateCriteria[criteriaItem.id]}">
+											<c:forEach var="option" items="${view.criteriaOptionMap[criteriaItem.fieldId]}">
+												<option value="${option.value }">${option.title}</option>
+											</c:forEach>								
+										</select>
+									</c:when>
 									<c:when test="${criteriaItem.inputType == 'date' }">
 										<input class="form-control datepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.selectionTemplateCriteria[criteriaItem.id]}"  />
 									</c:when>

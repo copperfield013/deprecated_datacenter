@@ -73,10 +73,13 @@ public class AdminSelectionTemplateController {
 		JSONArray columnDataJSON = toColumnData(stmpl.getColumns());
 		JSONObject tmplDataJSON = toLtmplData(stmpl);
 		JSONArray criteriaDataJSON = toCriteriaData(stmpl.getCriterias());
+		model.addAttribute("stmpl", stmpl);
 		model.addAttribute("tmplDataJSON", tmplDataJSON);
 		model.addAttribute("columnDataJSON", columnDataJSON);
 		model.addAttribute("criteriaDataJSON", criteriaDataJSON);
 		model.addAttribute("module", mService.getModule(stmpl.getModule()));
+		DictionaryComposite composite = dService.getComposite(stmpl.getModule(), stmpl.getCompositeId());
+		model.addAttribute("composite", composite);
 		return AdminConstants.JSP_TMPL_SELECTION + "/stmpl_update.jsp";
 	}
 	

@@ -9,24 +9,27 @@ import org.springframework.stereotype.Service;
 import com.abc.auth.pojo.UserInfo;
 import com.abc.auth.service.ServiceFactory;
 
+import cn.sowell.copframe.common.UserIdentifier;
+import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.datacenter.entityResolver.UserCodeService;
 import cn.sowell.datacenter.model.admin.dao.AdminUserDao;
 import cn.sowell.datacenter.model.admin.pojo.ABCUser;
 import cn.sowell.datacenter.model.admin.service.AdminUserService;
+import cn.sowell.dataserver.model.modules.bean.criteriaConveter.UserRelationExistCriteriaConverter.UserCodeSupplier;
 
 @Service("adminUserService")
-public class AdminUserServiceImpl implements AdminUserService, UserCodeService{
+public class AdminUserServiceImpl implements AdminUserService, UserCodeService, UserCodeSupplier{
 
 	@Resource
 	AdminUserDao userDao;
 	
+	private ThreadLocal<String> threadUserCode = new ThreadLocal<>();
 	
 	@Override
 	public UserDetails loadUserByUsername(String username)
 			throws UsernameNotFoundException {
 		UserInfo u = ServiceFactory.getUserInfoService().getUserInfoByUserName(username);
 		if(u != null) {
-			u.setPassword("e10adc3949ba59abbe56e057f20f883e");
 			return new ABCUser(u);
 		}else {
 			return null;
@@ -40,6 +43,21 @@ public class AdminUserServiceImpl implements AdminUserService, UserCodeService{
 	public String getUserCode(Object userPrinciple) {
 		ABCUser user = (ABCUser) userPrinciple;
 		return user.getCode();
+	}
+
+	@Override
+	public void setUserCode(String userCode) {
+		threadUserCode.set(userCode);
+	}
+	
+	@Override
+	public String getUserCode() {
+		UserIdentifier user = UserUtils.getCurrentUser();
+		if(user != null) {
+			return (String) user.getId();
+		}else {
+			return threadUserCode.get();
+		}
 	}
 
 }

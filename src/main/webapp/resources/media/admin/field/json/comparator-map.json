@@ -168,6 +168,23 @@
 			}
 		]
 	},
+	"relation_existion"	: {
+		"comparators"		: [
+			{
+				"title"	: "包含关系",
+				"key"	: "re1"
+			},
+			{
+				"title"	: "不包含关系",
+				"key"	: "re1n"
+			},
+			{
+				"title"	: "与当前用户关系",
+				"key"	: "re2",
+				"premise-classes-e"	: ["user"]
+			}
+		]
+	},
 	"none"			: {
 		"class"		: "hidden-only",
 		"comparators"		: [

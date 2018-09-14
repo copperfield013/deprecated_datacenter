@@ -256,28 +256,19 @@ define(function(require, exports, module){
 			}
 			var queryShow = criteria.isQueryShow();
 			$('#toggle-show-criteria', $page).prop('checked', queryShow).trigger('change');
-			//if(queryShow){
-				var $defVal = $('#criteria-default-value-container', $page).children();
-				$defVal.detach();
-				criteria.detailHandler(function($$){
-					var defValInput = criteria.getDefaultValueInput();
-					filterFieldInputSelectable($$('#field-input-type'), field).done(function(){
-						$$('#field-input-type').val(defValInput.getType());
-						criteria.setDefaultInputType(criteria.getDefaultValueInput());
-						$$('#criteria-detail-comparator').val(criteria.getComparatorName());
-						$$('#criteria-default-value-container').append(defValInput.getInput());
-						$$('#criteria-detail-placeholder').val(criteria.getPlaceholder());
-						toggleRelationLabelInput($$('#relation-label-row'), criteria.getRelationLabelInput())
-					})
-				});
-			//}
-			
-			/*var $partitionsContainer = $('.criteria-detail-partitions-container', $page)
-					.find('.criteria-detail-partition').remove().end(); 
-			var partitions = criteria.getPartitions();
-			for(var i in partitions){
-				apppendPartitionDom(partitions[i]);
-			}*/
+			var $defVal = $('#criteria-default-value-container', $page).children();
+			$defVal.detach();
+			criteria.detailHandler(function($$){
+				var defValInput = criteria.getDefaultValueInput();
+				filterFieldInputSelectable($$('#field-input-type'), field).done(function(){
+					$$('#field-input-type').val(defValInput.getType());
+					criteria.setDefaultInputType(criteria.getDefaultValueInput());
+					$$('#criteria-detail-comparator').val(criteria.getComparatorName());
+					$$('#criteria-default-value-container').append(defValInput.getInput());
+					$$('#criteria-detail-placeholder').val(criteria.getPlaceholder());
+					toggleRelationLabelInput($$('#relation-label-row'), criteria.getRelationLabelInput())
+				})
+			});
 			cField = field;
 		}
 		function apppendPartitionDom(partition){
@@ -387,7 +378,8 @@ define(function(require, exports, module){
 							}
 						});
 						$('#criteria-default-value-container', $page).empty().append(valueInput.getInput());
-						$('#criteria-placeholder-row', $page).toggle(criteria.isQueryShow() && valueInput.getType() === 'text');
+						var shown = valueInput.getType() === 'text';
+						$('#criteria-placeholder-row', $page).data('shown', shown).toggle(criteria.isQueryShow() && shown);
 					}
 				}
 			});
@@ -437,7 +429,9 @@ define(function(require, exports, module){
 			var toShow = $(this).prop('checked');
 			var $defaultValueLabel = $('#default-value-label', $page);
 			var $placeholderRow = $('#criteria-placeholder-row', $page);
-			$placeholderRow.toggle(toShow);
+			if($placeholderRow.data('shown')){
+				$placeholderRow.toggle(toShow);
+			}
 			if(toShow){
 				$defaultValueLabel.text('默认值');
 			}else{
@@ -473,8 +467,9 @@ define(function(require, exports, module){
 			handleSelectedItem(function(){
 				try{
 					if(inputType === 'select' 
-						|| inputType === 'label'){
-						this.setDefaultInputType($.extend({type	: inputType}, this.getField()));
+						|| inputType === 'multiselect'
+							|| inputType === 'label'){
+							this.setDefaultInputType($.extend({}, this.getField(), {type : inputType}));
 					}else{
 						this.setDefaultInputType(inputType);
 					}

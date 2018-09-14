@@ -42,7 +42,9 @@ public class AdminFieldController {
 		List<DictionaryComposite> infoList = dService.getAllComposites(module);
 		JsonArrayResponse jRes = new JsonArrayResponse();
 		for (DictionaryComposite info : infoList) {
-			jRes.add(JSON.toJSON(info));
+			JSONObject jComposite = (JSONObject) JSON.toJSON(info);
+			jComposite.put("dataClasses", dService.getCompositeClasses(module, info.getId()));
+			jRes.add(jComposite);
 		}
 		return jRes;
 	}

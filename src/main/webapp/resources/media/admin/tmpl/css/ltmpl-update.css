@@ -478,7 +478,7 @@
 }
 
 .ltmpl-update div#relation-label-row {
-    min-height: 60px;
+    /* min-height: 60px; */
 }
 .ltmpl-update div#relation-label-row>label {
     height: 100%;

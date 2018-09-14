@@ -13,9 +13,11 @@
 			<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
 				<i class="glyphicon glyphicon-refresh"></i>
 			</a>
-			<a href="page:#timeline-area.toggle" title="查看历史" class="toggle-timeline btn-toggle">
-				<i class="iconfont icon-historyrecord"></i>
-			</a>
+			<c:if test="${fromHistory != false }">
+				<a href="page:#timeline-area.toggle" title="查看历史" class="toggle-timeline btn-toggle">
+					<i class="iconfont icon-historyrecord"></i>
+				</a>
+			</c:if>
 			<a class="export" title="导出" id="btn-export" href="javascript:;">
 				<i class="glyphicon glyphicon-export"></i>
 			</a>

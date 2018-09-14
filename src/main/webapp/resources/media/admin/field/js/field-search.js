@@ -20,7 +20,10 @@ define(function(require, exports, module){
 			hideCompositeFields	: false,
 			//字段过滤器
 			fieldFilters	: [],
-			compositeId		: undefined
+			compositeId		: undefined,
+			fieldModes		: ['field'],
+			fieldMode		: 'field',
+			afterPickedComposite	: $.noop
 		};
 		
 		var param = $.extend({}, defaultParam, _param);
@@ -28,6 +31,7 @@ define(function(require, exports, module){
 		var _this = this;
 
 		var disabledFieldSet = new Set();
+		var bindedSearchTexts = new Set();
 		
 		param.afterPicked = function(){
 			param.afterChoose.apply(_this, arguments);
@@ -53,6 +57,11 @@ define(function(require, exports, module){
 			var fieldData = [];
 			for(var i in compositeData){
 				var thisComposite = compositeData[i];
+				if(thisComposite.addType == 5){
+					thisComposite.__type__ = 'relation';
+				}else if(thisComposite.addType == 4){
+					thisComposite.__type__ = 'multiattr';
+				}
 				for(var j in thisComposite.fields){
 					var thisField = thisComposite.fields[j];
 					fieldData.push(
@@ -71,6 +80,7 @@ define(function(require, exports, module){
 									composite	: $.extend({}, thisComposite, {
 											data	: {}
 									}),
+									__type__	: 'field',
 									data		: {}
 							});
 				}
@@ -86,6 +96,16 @@ define(function(require, exports, module){
 					}catch(e){}
 				}
 				param.afterPicked.apply(_this, $.merge([field], args || []));
+			});
+		}
+		function whenPickComposite(compositeId, args){
+			_this.enableComposite(compositeId, param.disablePicked == false).done(function(composite){
+				if(param.textPicked){
+					try{
+						setTextsValue(composite.cname);
+					}catch(e){}
+				}
+				param.afterPicked.apply(_this, $.merge([composite], args || []));
 			});
 		}
 		
@@ -139,6 +159,9 @@ define(function(require, exports, module){
 						var _compositeData = filterTmplData(compositeData);
 						__$fieldPicker = tmpl.tmpl({
 							composites	: _compositeData,
+							hasFieldMode: function(modeName){
+								return $.inArray(modeName, param.fieldModes) >= 0;
+							},
 							pickerKey	: require('utils').uuid(5, 62)
 						});
 						$('.fieldpicker-field-item', __$fieldPicker).click(function(){
@@ -150,10 +173,35 @@ define(function(require, exports, module){
 								}
 							}
 						});
+						$('.fieldpicker-composite-item', __$fieldPicker).click(function(){
+							var $this = $(this);
+							if(!$this.is('.disabled')){
+								var compositeId = $this.attr('data-id');
+								if(compositeId){
+									whenPickComposite(compositeId);
+								}
+							}
+						});
 						$('ul.dropdown-menu>li>a', __$fieldPicker).click(function(){
 							var $this = $(this);
 							var $li = $this.closest('li.dropdown');
 							$li.find('a.dropdown-toggle span').text($this.text());
+						});
+						var $pickerMode = $('.fieldpicker-mode', __$fieldPicker);
+						var $modeOl = $('>ol', $pickerMode);
+						$('>i', $pickerMode).click(function(e){
+							$modeOl.toggle();
+							e.preventDefault();
+							return false;
+						});
+						$(document.body).click(function(){
+							$modeOl.hide();
+						});
+						//选择模式
+						$('>li', $modeOl).click(function(){
+							var $this = $(this);
+							var mode = $this.attr('fieldpicker-mode');
+							_this.changeFieldMode(mode);
 						});
 						(callback || $.noop)(__$fieldPicker, true);
 						__fieldPickerDeferred.resolve();
@@ -165,12 +213,81 @@ define(function(require, exports, module){
 				}
 			});
 		}
-		var bindedSearchTexts = new Set();
 		function setTextsValue(fieldTitle){
 			bindedSearchTexts.forEach(function(t){
 				$(t).typeahead('val', fieldTitle);
 			})
 		}
+		this.getFieldMode = function(){
+			return param.fieldMode;
+		}
+		this.changeFieldMode = function(mode){
+			if(mode && mode != this.getFieldMode()){
+				fieldpickerHandler(function($fieldPicker){
+					var $pickerMode = $('.fieldpicker-mode', $fieldPicker);
+					var $mode = $('>ol>li[fieldpicker-mode="' + mode + '"]', $pickerMode);
+					if($mode.length > 0){
+						changeToFieldMode(mode);
+						$('>i', $pickerMode).text(mode.charAt(0).toUpperCase());
+						$mode.siblings().removeClass('selected');
+						$mode.filter('[fieldpicker-mode="' + mode + '"]').addClass('selected');
+						param.fieldMode = mode;
+					}
+				});
+			}
+		}
+		function changeToFieldMode(mode){
+			fieldpickerHandler(function($fieldPicker){
+				var $nav = $fieldPicker.children('ul.nav');
+				switch(mode){
+					case 'field':
+						bindedSearchTexts.forEach(function(t){
+							$(t).prop('disabled', false);
+						})
+						require('utils').removeStyle($nav, 'display');
+						$('>.tab-content>.tab-pane', $fieldPicker).each(function(){
+							var $pane = $(this);
+							if($pane.is('.composites-tab')){
+								$pane.hide();
+							}else{
+								require('utils').removeStyle($pane, 'display');
+							}
+						});
+						break;
+					case 'relation':
+						bindedSearchTexts.forEach(function(t){
+							$(t).prop('disabled', true);
+						})
+						$nav.css('display', 'none');
+						$('>.tab-content>.tab-pane', $fieldPicker).each(function(){
+							var $pane = $(this);
+							if($pane.is('.relations-tab')){
+								$pane.show();
+							}else{
+								$pane.css('display', 'none');
+							}
+						});
+						break;
+					case 'multiattr':
+						bindedSearchTexts.forEach(function(t){
+							$(t).prop('disabled', true);
+						})
+						$nav.css('display', 'none');
+						$('>.tab-content>.tab-pane', $fieldPicker).each(function(){
+							var $pane = $(this);
+							if($pane.is('.multiattrs-tab')){
+								$pane.show();
+							}else{
+								$pane.css('display', 'none');
+							}
+						});
+						break;
+					default:
+				}
+			});
+		}
+		
+		
 		/**
 		 * 绑定自动完成的功能到某个文本输入框
 		 */
@@ -261,7 +378,21 @@ define(function(require, exports, module){
 			});
 			return def.promise();
 		};
-		
+		this.getCompositeData = function(compositeId, callback){
+			var def = $.Deferred();
+			afterLoadFieldData(function(fData, cData, fieldKeyData){
+				var composite = null;
+				for(var i in cData){
+					if(cData[i].c_id == compositeId){
+						composite = cData[i];
+						break;
+					}
+				}
+				(callback || $.noop)(composite);
+				def.resolve(composite);
+			});
+			return def.promise();
+		}
 		/**
 		 * 获得绑定的页面元素
 		 */
@@ -309,6 +440,19 @@ define(function(require, exports, module){
 			});
 			return def.promise();
 		}
+		this.enableComposite = function(compositeId, toEnable){
+			var def = $.Deferred();
+			fieldpickerHandler(function($fieldpicker){
+				var $toDisable = $('a.fieldpicker-composite-item[data-id="' + compositeId + '"]', $fieldpicker);
+				$toDisable.toggleClass('disabled', toEnable === false);
+				_this.getCompositeData(compositeId).done(function(composite){
+					def.resolve(composite);
+				});
+			});
+			return def.promise();
+		}
+		
+		
 		/**
 		 * 判断字段是否被禁用
 		 */

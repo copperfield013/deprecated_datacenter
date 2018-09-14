@@ -7,7 +7,6 @@
 	</c:choose>
 </c:set>
 <title>${title }</title>
-<link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/ltmpl-update.css" />
 <div class="ltmpl-update" id="ltmpl-update-${RES_STAMP }">
 	<script type="jquery/tmpl" id="col-row-tmpl">
 		<div class="row \${fieldAvailable? '': 'col-field-unavailable'}" column-id="\${columnId}" field-id="\${id}" field-key="\${name}">
@@ -133,7 +132,7 @@
 															<div id="relation-label-value-wrap">
 															</div>
 														</div>
-														<div>
+														<div id="criteria-detail-field-input-type-row">
 															<label>控件</label>
 															<div>
 																<select id="field-input-type">

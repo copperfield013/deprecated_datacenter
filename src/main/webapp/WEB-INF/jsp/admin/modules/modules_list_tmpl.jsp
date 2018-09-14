@@ -82,6 +82,15 @@
 											<span class="cpf-select2-sign ${labelSelectClass }"></span>
 										</span>
 									</c:when>
+									<c:when test="${criteriaItem.inputType == 'relation_existion' && criteriaItem.composite != null }">
+										<span class="cpf-select2-container">
+											<select class="cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
+												<c:forEach var="label" items="${criteriaItem.composite.relationSubdomain}">
+													<option value="${label }">${label}</option>
+												</c:forEach>								
+											</select>
+										</span>
+									</c:when>
 									<c:when test="${criteriaItem.inputType == 'daterange' }">
 										<span class="cpf-daterangepicker format-submit-value" 
 											data-name="criteria_${criteriaItem.id }" 

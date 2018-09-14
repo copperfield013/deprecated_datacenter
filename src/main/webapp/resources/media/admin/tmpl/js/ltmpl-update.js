@@ -101,15 +101,22 @@ define(function(require, exports, module){
 					fieldAvailable	: false
 				};
 				if(criteria.isFieldAvailable()){
-					var field = criteria.getField();
-					if(!field){
-						require('dialog').notice('条件必须选择一个字段', 'error');
-						$.error();
+					var composite = criteria.getComposite();
+					if(composite != null){
+						itemData.compositeId = composite.c_id;
+					}else{
+						var field = criteria.getField();
+						if(!field){
+							require('dialog').notice('条件必须选择一个字段', 'error');
+							$.error();
+						}else{
+							itemData.fieldId = field.id;
+							itemData.fieldKey = field.name;
+						}
 					}
+					
 					var relationLabelInput = criteria.getRelationLabelInput();
 					$.extend(itemData, {
-						fieldId			: field.id,
-						fieldKey		: field.name,
 						relation		: 'and',
 						comparator		: criteria.getComparatorName(),
 						inputType		: criteria.getDefaultValueInput().getType(),
@@ -145,7 +152,8 @@ define(function(require, exports, module){
 	
 	function initCriteria($page, criteriaData, module){
 		
-		var cField = null
+		var cField = null,
+			cComposite = null;
 		var $fieldSearch = $('.criteria-field-search-row .field-search', $page);
 		var $fieldSearchInput = $fieldSearch.find(':text');
 		
@@ -163,17 +171,35 @@ define(function(require, exports, module){
 			textPicked		: true,
 			module			: module,
 			fieldFilters	: ['file'], 
+			fieldModes		: ['field', 'relation'],
 			afterChoose		: function(field){
-				if(cField){
-					criteriaSearcher.enableField(cField.id);
+				enableCurrent();
+				if(field.__type__ == 'field'){
+					cField = field;
+					cComposite = null;
+					handleSelectedItem(function($item){
+						this.setField(field);
+						$('.hide-when-no-field', $page).show();
+					});
+				}else if(field.__type__ == 'relation'){
+					cField = null;
+					cComposite = field;
+					handleSelectedItem(function($item){
+						this.setComposite(field);
+						$('.hide-when-no-field', $page).show();
+					});
 				}
-				cField = field;
-				handleSelectedItem(function($item){
-					this.setField(field);
-					$('.hide-when-no-field', $page).show();
-				});
 			}
 		});
+		
+		function enableCurrent(){
+			if(cField != null){
+				criteriaSearcher.enableField(cField.id);
+			}else if(cComposite != null){
+				criteriaSearcher.enableComposite(cComposite.c_id);
+			}
+		}
+		
 		
 		var $criteriaContainer = $('.criterias-container', $page);
 		
@@ -233,39 +259,66 @@ define(function(require, exports, module){
 		}
 		
 		function showCriteria(criteria){
+			enableCurrent();
 			if(!criteria.isFieldAvailable()){
 				//条件详情遮罩
 				$('#criteria-detail-cover', $page).addClass('cover-active');
 				return ;
 			}
-			$('#criteria-detail-cover', $page).removeClass('cover-active')
-			var field = criteria.getField();
-			if(field){
-				//criteriaSearcher.changeFieldMode('field');
-				$fieldSearchInput.typeahead('val', field.cname);
-				criteriaSearcher.enableField(field.id, false);
-				$('.hide-when-no-field', $page).show();
-			}else{
-				$fieldSearchInput.typeahead('val', '');
-				$('.hide-when-no-field', $page).hide();
-			}
-			var queryShow = criteria.isQueryShow();
-			$('#toggle-show-criteria', $page).prop('checked', queryShow).trigger('change');
-			var $defVal = $('#criteria-default-value-container', $page).children();
-			$defVal.detach();
-			criteria.detailHandler(function($$){
-				var defValInput = criteria.getDefaultValueInput();
-				filterFieldInputSelectable($$('#field-input-type'), field).done(function(){
-					$$('#field-input-type').val(defValInput.getType());
-					criteria.setDefaultInputType(criteria.getDefaultValueInput());
-					$$('#criteria-detail-comparator').val(criteria.getComparatorName());
-					$$('#criteria-default-value-container').append(defValInput.getInput());
-					$$('#criteria-detail-placeholder').val(criteria.getPlaceholder());
-					toggleRelationLabelInput($$('#relation-label-row'), criteria.getRelationLabelInput())
+			$('#criteria-detail-cover', $page).removeClass('cover-active');
+			var composite = criteria.getComposite();
+			if(composite && composite.__type__ == 'relation'){
+				criteriaSearcher.changeFieldMode('relation');
+				$fieldSearchInput.val(composite.cname);
+				criteriaSearcher.enableComposite(composite.c_id, false).done(function(){
+					$('#criteria-detail-field-input-type-row', $page).hide();
+					$('.hide-when-no-field', $page).show();
+					var queryShow = criteria.isQueryShow();
+					$('#toggle-show-criteria', $page).prop('checked', queryShow).trigger('change');
+					var $defVal = $('#criteria-default-value-container', $page).children();
+					$defVal.detach();
+					criteria.detailHandler(function($$){
+						var defValInput = criteria.getDefaultValueInput();
+						criteria.setDefaultInputType(criteria.getDefaultValueInput());
+						$$('#criteria-detail-comparator').val(criteria.getComparatorName());
+						$$('#criteria-default-value-container').append(defValInput.getInput());
+						$$('#criteria-detail-placeholder').hide();
+						$$('#relation-label-row').hide();
+					});
+					cField = null;
+					cComposite = composite;
 				})
-			});
-			
-			cField = field;
+			}else{
+				var field = criteria.getField();
+				$('#criteria-detail-field-input-type-row', $page).show();
+				if(field){
+					//criteriaSearcher.changeFieldMode('field');
+					$fieldSearchInput.typeahead('val', field.cname);
+					criteriaSearcher.enableField(field.id, false);
+					$('.hide-when-no-field', $page).show();
+				}else{
+					$fieldSearchInput.typeahead('val', '');
+					$('.hide-when-no-field', $page).hide();
+				}
+				criteriaSearcher.changeFieldMode('field');
+				var queryShow = criteria.isQueryShow();
+				$('#toggle-show-criteria', $page).prop('checked', queryShow).trigger('change');
+				var $defVal = $('#criteria-default-value-container', $page).children();
+				$defVal.detach();
+				criteria.detailHandler(function($$){
+					var defValInput = criteria.getDefaultValueInput();
+					filterFieldInputSelectable($$('#field-input-type'), field).done(function(){
+						$$('#field-input-type').val(defValInput.getType());
+						criteria.setDefaultInputType(criteria.getDefaultValueInput());
+						$$('#criteria-detail-comparator').val(criteria.getComparatorName());
+						$$('#criteria-default-value-container').append(defValInput.getInput());
+						$$('#criteria-detail-placeholder').val(criteria.getPlaceholder());
+						toggleRelationLabelInput($$('#relation-label-row'), criteria.getRelationLabelInput())
+					})
+				});
+				cComposite = null;
+				cField = field;
+			}
 		}
 		function apppendPartitionDom(partition){
 			if(partition){
@@ -308,10 +361,22 @@ define(function(require, exports, module){
 				afterSetField		: function(field){
 					$criteria.find('.criteria-property-name span').text(field.cname);
 					criteria.detailHandler(function($$){
+						$$('#criteria-detail-field-input-type-row').show();
 						filterFieldInputSelectable($$('#field-input-type'), field).done(function(){
 							criteria.setDefaultInputType($$('#field-input-type').val());
 							toggleRelationLabelInput($$('#relation-label-row'), criteria.getRelationLabelInput());
 						})
+					});
+				},
+				afterSetComposite	: function(composite){
+					$criteria.find('.criteria-property-name span').text(composite.cname);
+					criteria.detailHandler(function($$){
+						if(composite.__type__ == 'relation'){
+							$$('#criteria-detail-field-input-type-row').hide();
+							$$('#criteria-placeholder-row').hide();
+							$$('#relation-label-row').hide();
+							criteria.setDefaultInputType(criteria.getRelationLabelInput());
+						}
 					});
 				},
 				afterSetPlaceholder	: function(placeholder){
@@ -361,6 +426,22 @@ define(function(require, exports, module){
 									var comparator = comparators[i];
 									var classes = comparator['class']? comparator['class'].split(' '): [];
 									if(classes.indexOf('negative') < 0){
+										var premiseClasses = comparator['premise-classes-e'];
+										if(premiseClasses){
+											var foc = criteria.getField() || criteria.getComposite();
+											if(foc && foc.dataClasses){
+												var exist = false;
+												for(var i in premiseClasses){
+													if($.inArray(premiseClasses[i], foc.dataClasses) >= 0){
+														exist = true;
+														break;
+													}
+												}
+												if(!exist){
+													continue;
+												}
+											}
+										}
 										var $option = $('<option value="' + comparator.key + '">' + comparator.title + '</option>');
 										$option.addClass(comparator['class']);
 										$comparator.append($option);
@@ -377,7 +458,8 @@ define(function(require, exports, module){
 							}
 						});
 						$('#criteria-default-value-container', $page).empty().append(valueInput.getInput());
-						$('#criteria-placeholder-row', $page).toggle(criteria.isQueryShow() && valueInput.getType() === 'text');
+						var shown = valueInput.getType() === 'text';
+						$('#criteria-placeholder-row', $page).data('shown', shown).toggle(criteria.isQueryShow() && shown);
 					}
 				}
 			});
@@ -427,7 +509,9 @@ define(function(require, exports, module){
 			var toShow = $(this).prop('checked');
 			var $defaultValueLabel = $('#default-value-label', $page);
 			var $placeholderRow = $('#criteria-placeholder-row', $page);
-			$placeholderRow.toggle(toShow);
+			if($placeholderRow.data('shown')){
+				$placeholderRow.toggle(toShow);
+			}
 			if(toShow){
 				$defaultValueLabel.text('默认值');
 			}else{
@@ -488,16 +572,25 @@ define(function(require, exports, module){
 				+function addCriteriaItem(index){
 					var item = criteriaData[index];
 					if(item){
-						if(item.fieldAvailable){
-							criteriaSearcher.getFieldData(item.fieldId, function(field){
+						if(item.fieldId){
+							if(item.fieldAvailable){
+								criteriaSearcher.getFieldData(item.fieldId, function(field){
+									addCriteria($.extend({
+										fieldData	: field
+									}, item), true);
+									addCriteriaItem(index + 1);
+								});
+							}else{
+								addCriteria(item, true);
+								addCriteriaItem(index + 1);
+							}
+						}else if(item.compositeId){
+							criteriaSearcher.getCompositeData(item.compositeId, function(composite){
 								addCriteria($.extend({
-									fieldData	: field
+									compositeData	: composite
 								}, item), true);
 								addCriteriaItem(index + 1);
 							});
-						}else{
-							addCriteria(item, true);
-							addCriteriaItem(index + 1);
 						}
 					}
 					$CPF.closeLoading();
@@ -522,6 +615,7 @@ define(function(require, exports, module){
 	function Criteria(_param, $page){
 		var defaultParam = {
 			field			: null,
+			composite		: null,
 			queryShow		: true,
 			title			: '',
 			field			: null,
@@ -541,17 +635,25 @@ define(function(require, exports, module){
 			if(data){
 				param.fieldAvailable = data.fieldAvailable != false;
 				param.id = data.id;
-				this.setField(data.fieldData);
+				if(data.fieldData){
+					this.setField(data.fieldData);
+				}else if(data.compositeData){
+					this.setComposite(data.compositeData);
+				}
 				this.toggleQueryShow(data.queryShow == 1);
 				this.setTitle(data.title);
 				//this.setRelation(data.relation);
 				this.setComparatorName(data.comparator);
-				this.setPlaceholder(data.placeholder);
-				this.setRelationLabelValue(data.relationLabel);
-				if(param.fieldAvailable){
-					defaultValueInput = new ValueInput($.extend({}, data.fieldData, {type:data.inputType}), $page);
-				}else{
-					defaultValueInput = new ValueInput(data.inputType, $page);
+				if(data.fieldData){
+					this.setPlaceholder(data.placeholder);
+					this.setRelationLabelValue(data.relationLabel);
+					if(param.fieldAvailable){
+						defaultValueInput = new ValueInput($.extend({}, data.fieldData, {type:data.inputType}), $page);
+					}else{
+						defaultValueInput = new ValueInput(data.inputType, $page);
+					}
+				}else if(data.compositeData){
+					this.setDefaultInputType(this.getRelationLabelInput());
 				}
 				defaultValueInput.setValue(data.defaultValue);
 			}else{
@@ -584,6 +686,8 @@ define(function(require, exports, module){
 		this.setField = function(field){
 			if(typeof field === 'object'){
 				param.field = field;
+				param.composite = null;
+				relationLabelFieldInput = null;
 				param.title = field.cname;
 				//this.setDefaultInputType(field);
 				callbackMap.fire('afterSetField', [field]);
@@ -591,6 +695,22 @@ define(function(require, exports, module){
 				$.error('setField方法只能从传入field数据对象');
 			}
 		};
+		
+		this.setComposite = function(composite){
+			if(typeof composite === 'object'){
+				param.composite = composite;
+				param.field = null;
+				relationLabelFieldInput = null;
+				param.title = composite.cname;
+				callbackMap.fire('afterSetComposite', [composite]);
+			}else if(field !== undefined){
+				$.error('setComposite方法只能从传入Composite数据对象');
+			}
+		}
+		
+		this.getComposite = function(){
+			return param.composite;
+		}
 		
 		/**
 		 * 获得条件字段的标题（可以自定义）
@@ -692,11 +812,17 @@ define(function(require, exports, module){
 		
 		this.getRelationLabelInput = function(){
 			var field = this.getField();
-			if(field && field.composite && field.composite.relationSubdomain){
+			var relationComposite = null;
+			if(field && field.composite && field.composite.__type__ == 'relation'){
+				relationComposite = field.composite;
+			}else{
+				relationComposite = this.getComposite();
+			}
+			if(relationComposite && relationComposite.__type__ == 'relation'){
 				if(!relationLabelFieldInput){
 					relationLabelFieldInput = new FieldInput({
-						type	: 'multiselect',
-						fieldKey: param.module + '@' + field.composite.name,
+						type	: 'relation_existion',
+						fieldKey: param.module + '@' + relationComposite.name,
 						value	: param.data && param.data.relationLabel
 					});
 				}
@@ -894,13 +1020,16 @@ define(function(require, exports, module){
 				$page	: $page
 			});
 		}else if(typeof field === 'object'){
-			var fParam = {
-				optionsKey	: field.optGroupId,
-				fieldKey	: field.composite.module + '@' + field.name,
-				$page		: $page
-			};
-			
-			fieldInput = new FieldInput($.extend({}, field, fParam));
+			if(field.__type__ == 'field'){
+				var fParam = {
+						optionsKey	: field.optGroupId,
+						fieldKey	: field.composite.module + '@' + field.name,
+						$page		: $page
+				};
+				fieldInput = new FieldInput($.extend({}, field, fParam));
+			}else if(field instanceof FieldInput){
+				fieldInput = field;
+			}
 		}else{
 			fieldInput = new FieldInput({
 				type	: 'text'

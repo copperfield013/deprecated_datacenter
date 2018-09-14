@@ -23,6 +23,7 @@
 <link href="media/admin/field/css/field-search.css" rel="stylesheet" type="text/css" />
 
 <link type="text/css" rel="stylesheet" href="media/admin/modules/css/modules-detail-tmpl.css" />
+<link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/ltmpl-update.css" />
 
 <script src="${basePath }media/common/compat/weakmap-polyfill.min.js"></script>
 <script src="${basePath }media/common/compat/formdata.min.js"></script>

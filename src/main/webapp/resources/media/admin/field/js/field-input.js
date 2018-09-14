@@ -278,6 +278,9 @@ define(function(require, exports, module){
 			'label'			: function(){
 				return this['multiselect']('labels');
 			},
+			'relation_existion'	: function(){
+				return this['multiselect']('labels');
+			},
 			'multiselect'	: function(source){
 				var options = null;
 				if(!source){

@@ -37,6 +37,7 @@ import cn.sowell.copframe.web.poll.ConsumerThrowException;
 import cn.sowell.copframe.web.poll.ProgressPollableThreadFactory;
 import cn.sowell.copframe.web.poll.WorkProgress;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
+import cn.sowell.datacenter.entityResolver.UserCodeService;
 import cn.sowell.datacenter.model.modules.bean.EntityExportWriter;
 import cn.sowell.datacenter.model.modules.exception.ExportBreakException;
 import cn.sowell.datacenter.model.modules.service.ExportService;
@@ -64,6 +65,9 @@ public class ExportServiceImpl implements ExportService {
 	
 	@Resource
 	ModulesService mService;
+	
+	@Resource
+	UserCodeService userCodeService;
 	
 	private Long exportCacheTimeout = null;
 	
@@ -160,6 +164,7 @@ public class ExportServiceImpl implements ExportService {
 		XSSFWorkbook workbook = new XSSFWorkbook();
 		progress.veni();
 		pFactory.createThread(progress, p->{
+			userCodeService.setUserCode((String) user.getId());
 			progress.setCurrent(1);
 			XSSFSheet sheet = workbook.createSheet();
 			XSSFRow headerRow = sheet.createRow(1);
@@ -184,7 +189,7 @@ public class ExportServiceImpl implements ExportService {
 			progress.setResponseData("totalData", itr.getDataCount());
 			CellStyle linkStyle = entityExportWriter.createLinkStyle(workbook);
 			linkStyle.setAlignment(HorizontalAlignment.CENTER);
-			int lastColnum = 0;
+			int lastColnum = 1;
 			while(itr.hasNext()){
 				checkBreaked(progress);
 				ModuleEntityPropertyParser parser = itr.next();
