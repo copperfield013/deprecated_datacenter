@@ -16,7 +16,7 @@
 		<version.abcbizz>2.1.15</version.abcbizz>
 		<version.authbiz>0.0.16</version.authbiz>
 		<version.jgdj>0.0.18</version.jgdj>
-		<version.xfjd>0.1.3</version.xfjd>
+		<version.xfjd>0.1.6</version.xfjd>
 		<cxf.version>3.2.2</cxf.version>
 	</properties>
 	
