@@ -59,11 +59,17 @@ public class FusionWriteTest {
 //		entity.putValue("所在支部", "第二党支部");
 //		entity.putValue("志愿时数", 50);
 		
-		SimpleEntity sentity = new SimpleEntity("享受资助");
-		sentity.putValue("资助类别", "1");
-		sentity.putValue("资助标准", "22");
-		sentity.putValue("开始时间", "2015-04-01");
-		sentity.putValue("结束时间", "2015-05-01");
+		SimpleEntity sentity = new SimpleEntity("证件信息");
+		sentity.putValue("证件类型", "1");
+		sentity.putValue("证件号码", "223");
+		entity.putMultiAttrEntity(sentity);
+		sentity = new SimpleEntity("证件信息");
+		sentity.putValue("证件类型", "2");
+		sentity.putValue("证件号码", "223");
+		entity.putMultiAttrEntity(sentity);
+		sentity = new SimpleEntity("证件信息");
+		sentity.putValue("证件类型", "3");
+		sentity.putValue("证件号码", "223");
 		entity.putMultiAttrEntity(sentity);
 //		
 //		entity.putValue("类别", "入党申请人");
