@@ -10,13 +10,13 @@
 	
 	<properties>
 		<version.kie>7.10.0.Final</version.kie>
-		<version.abcitem>3.5.73.alphal</version.abcitem>
+		<version.abcitem>3.5.77.alphal</version.abcitem>
 		<version.dataserver>0.24</version.dataserver>
 		<version.cpfweb>0.2.12</version.cpfweb>
 		<version.abcbizz>2.1.15</version.abcbizz>
 		<version.authbiz>0.0.16</version.authbiz>
 		<version.jgdj>0.0.18</version.jgdj>
-		<version.xfjd>0.1.6</version.xfjd>
+		<version.xfjd>0.1.11</version.xfjd>
 		<cxf.version>3.2.2</cxf.version>
 	</properties>
 	
