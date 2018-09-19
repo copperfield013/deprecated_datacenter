@@ -75,6 +75,8 @@ define(function(require, exports, module){
 			return $('.field-container', $group);
 		}
 		
+		var choosedArrayCompositeIdSet = new Set();
+		
 		/**
 		 * 初始化某个字段组的自动完成功能
 		 */
@@ -84,10 +86,12 @@ define(function(require, exports, module){
 				single			: true,
 				textPicked		: true,
 				module			: param.module,
+				exceptComposites: choosedArrayCompositeIdSet,
 				afterChoose		: function(field){
 					if(field.composite.isArray){
 						//选择的字段是一个数组字段，锁定当前选择器的标签页
 						fieldSearch.lockTab();
+						choosedArrayCompositeIdSet.add(field.composite.c_id.toString());
 						//TODO: 将字段添加到数组当中
 					}else{
 						fieldSearch.hideArrayComposites();
@@ -172,8 +176,6 @@ define(function(require, exports, module){
 										}
 									});
 								});
-								console.log(this);
-								console.log(ui);
 							}
 						});
 						var $arrayitemControl = $group.find('.select-arrayitem-control');
@@ -227,6 +229,7 @@ define(function(require, exports, module){
 					if(field){
 						if(field.composite.isArray){
 							$group.attr('composite-id', field.composite.c_id);
+							choosedArrayCompositeIdSet.add(field.composite.c_id.toString());
 							fieldSearch.lockTabByCompositeId(field.composite.c_id);
 						}else{
 							fieldSearch.hideArrayComposites();
@@ -515,6 +518,7 @@ define(function(require, exports, module){
 		bindPageEvent('click', '.remove-group i', function(e){
 			var $group = getLocateGroup(e.target);
 			var groupTitle = $group.find('.group-title').text();
+			var compositeId = $group.attr('composite-id');
 			require('dialog').confirm('是否删除字段组[' + groupTitle + ']', function(yes){
 				if(yes){
 					//移除
@@ -524,6 +528,7 @@ define(function(require, exports, module){
 					if(fieldSearch){
 						fieldSearch.release();
 					}
+					choosedArrayCompositeIdSet['delete'](compositeId);
 				}
 			});
 		});

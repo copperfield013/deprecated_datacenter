@@ -23,7 +23,8 @@ define(function(require, exports, module){
 			compositeId		: undefined,
 			fieldModes		: ['field'],
 			fieldMode		: 'field',
-			afterPickedComposite	: $.noop
+			afterPickedComposite	: $.noop,
+			exceptComposites: []
 		};
 		
 		var param = $.extend({}, defaultParam, _param);
@@ -123,6 +124,12 @@ define(function(require, exports, module){
 					}
 					if(!param.showArrayComposite && composite.isArray == 1){
 						continue;
+					}
+					if(param.exceptComposites){
+						if(param.exceptComposites instanceof Set && param.exceptComposites.has(composite.c_id.toString())
+							|| $.inArray(composite.c_id, param.exceptComposites) >= 0){
+							continue;
+						}
 					}
 					if(composite.fields){
 						for(var j in composite.fields){
