@@ -35,6 +35,7 @@ import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.common.choose.ChooseTablePage;
+import cn.sowell.datacenter.model.config.service.ConfigureService;
 import cn.sowell.dataserver.model.dict.service.DictionaryService;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
@@ -63,13 +64,16 @@ public class AdminListTemplateController {
 	@Resource
 	private ModulesService mService;
 	
+	@Resource
+	ConfigureService configService;
 	
-	@RequestMapping("/list/{module}")
-	public String list(Model model, @PathVariable String module){
+	@RequestMapping("/list/{moduleName}")
+	public String list(Model model, @PathVariable String moduleName){
 		UserIdentifier user = UserUtils.getCurrentUser();
-		ModuleMeta moduleMeta = mService.getModule(module);
-		List<TemplateListTemplate> ltmplList = tService.queryListTemplateList(module, user);
+		ModuleMeta moduleMeta = mService.getModule(moduleName);
+		List<TemplateListTemplate> ltmplList = tService.queryListTemplateList(moduleName, user);
 		Map<Long, Set<TemplateGroup>> relatedGroupsMap = tService.getListTemplateRelatedGroupsMap(CollectionUtils.toSet(ltmplList, ltmpl->ltmpl.getId()));
+		model.addAttribute("modulesJson", configService.getSiblingModulesJson(moduleName));
 		model.addAttribute("ltmplList", ltmplList);
 		model.addAttribute("module", moduleMeta);
 		model.addAttribute("relatedGroupsMap", relatedGroupsMap);
@@ -303,7 +307,21 @@ public class AdminListTemplateController {
 		return tmpl;
 	}
 	
-	
+	@ResponseBody
+	@RequestMapping("/copy/{ltmplId}/{targetModuleName}")
+	public ResponseJSON copy(@PathVariable Long ltmplId, @PathVariable String targetModuleName) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		try {
+			Long newTmplId = tService.copyListTemplate(ltmplId, targetModuleName);
+			if(newTmplId != null) {
+				jRes.setStatus("suc");
+				jRes.put("newTmplId", newTmplId);
+			}
+		} catch (Exception e) {
+			logger.error("复制列表模板时发生错误", e);
+		}
+		return jRes;
+	}
 	
 	
 	

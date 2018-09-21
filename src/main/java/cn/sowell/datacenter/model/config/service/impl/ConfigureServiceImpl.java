@@ -2,16 +2,20 @@ package cn.sowell.datacenter.model.config.service.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.abc.mapping.conf.MappingContainer;
+import com.abc.mapping.node.ABCNode;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import cn.sowell.copframe.dao.utils.NormalOperateDao;
 import cn.sowell.copframe.utils.CollectionUtils;
+import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.config.ModuleConfigureMediator;
 import cn.sowell.datacenter.entityResolver.config.abst.Module;
 import cn.sowell.datacenter.entityResolver.config.param.QueryModuleCriteria;
@@ -35,12 +39,41 @@ public class ConfigureServiceImpl implements ConfigureService{
 	@Resource
 	TemplateService tService;
 	
+	@Resource
+	FusionContextConfigFactory fFactory;
+	
 	@Override
 	public List<Module> getEnabledModules(){
 		QueryModuleCriteria criteria = new QueryModuleCriteria();
 		criteria.setFilterDisabled(true);
 		List<Module> modules = moduleConfigMediator.queryModules(criteria);
 		return modules;
+	}
+	
+	@Override
+	public List<Module> getSiblingModules(String moduleName) {
+		Module sourceModule = fFactory.getModule(moduleName);
+		ABCNode node = MappingContainer.getABCNode(sourceModule.getMappingName());
+		String abcattr = node.getAbcattr();
+		return getEnabledModules().stream().filter(module->{
+			if(module.getMappingName() != null) {
+				ABCNode abcNode = MappingContainer.getABCNode(module.getMappingName());
+				return abcattr.equals(abcNode.getAbcattr());
+			}
+			return false;
+		}).collect(Collectors.toList());
+	}
+	
+	@Override
+	public JSONArray getSiblingModulesJson(String moduleName) {
+		JSONArray modulesJson = new JSONArray();
+		getSiblingModules(moduleName).forEach(module->{
+			JSONObject jModule = new JSONObject();
+			jModule.put("title", module.getTitle());
+			jModule.put("moduleName", module.getName());
+			modulesJson.add(jModule);
+		});
+		return modulesJson;
 	}
 	
 	

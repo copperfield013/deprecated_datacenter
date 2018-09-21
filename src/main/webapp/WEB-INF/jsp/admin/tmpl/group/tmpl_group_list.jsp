@@ -52,6 +52,10 @@
 									<i class="fa fa-trash-o"></i>
 									删除
 								</a>
+								<a tmpl-id="${group.id }" tmpl-title="${group.title }" class="btn btn-magenta btn-xs btn-copy-tmplgroup">
+									<i class="fa fa-copy"></i>
+									复制到模块
+								</a>
 							</td>
 						</tr>
 					</c:forEach>
@@ -60,3 +64,41 @@
 		</div>
 	</div>
 </div>
+<script>
+	seajs.use(['utils', 'ajax', 'dialog', 'tab'], function(Utils, Ajax, Dialog, Tab){
+		var $page = $('#tmplgroup-${module.name }');
+		var modules = [];
+		try{
+			modules = $.parseJSON('${modulesJson}');
+		}catch(e){}
+		$('.btn-copy-tmplgroup[tmpl-id]', $page).click(function(){
+			var $btn = $(this);
+			Dialog.promptSelect({
+				data		: modules,
+				target		: $btn,
+				container	: $page
+			}).done(function(selected){
+				if(selected.title && selected.moduleName){
+					var tmplTitle = $btn.attr('tmpl-title'),
+						tmplId = $btn.attr('tmpl-id');
+					Dialog.confirm('确认复制模板组合[' + tmplTitle + ']到模块[' + selected.title + ']？（注意：复制模板组合将会同时复制该模板组合下的列表模板和详情模板）', function(yes){
+						if(yes){
+							Ajax.ajax('admin/tmpl/group/copy/' + tmplId + '/' + selected.moduleName, function(res){
+								if(res.status === 'suc' && res.newTmplId){
+									Dialog.confirm('复制成功，是否打开复制成功的模板组合编辑页？', function(yes){
+										if(yes){
+											Tab.openInTab('admin/tmpl/group/update/' + res.newTmplId, 'tmpl_group_update_' + res.newTmplId);
+										}
+									})
+								}else{
+									Dialog.notice('复制失败', 'error');
+								}
+							});
+						}
+					});
+				}
+			});
+			return false;
+		});
+	});
+</script>

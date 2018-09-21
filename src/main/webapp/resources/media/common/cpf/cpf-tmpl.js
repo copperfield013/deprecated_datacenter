@@ -24,17 +24,22 @@ define(function(require, exports, module){
 		
 	}
 	
-	
+	var tmplMap = {};
 	Template.load = function(url, reqParam, tmplParam){
 		var deferred = $.Deferred();
-		require('ajax').loadResource(url).done(function(data){
-			var $script = $('<script>');
-			$script.html(data);
-			var tmpl = new Template($.extend({}, {
-				$script	: $script
-			}, tmplParam));
-			deferred.resolve(tmpl);
-		});
+		if(tmplMap[url]){
+			deferred.resolve(tmplMap[url]);
+		}else{
+			require('ajax').loadResource(url).done(function(data){
+				var $script = $('<script>');
+				$script.html(data);
+				var tmpl = new Template($.extend({}, {
+					$script	: $script
+				}, tmplParam));
+				tmplMap[url] = tmpl;
+				deferred.resolve(tmpl);
+			});
+		}
 		return deferred.promise();
 	};
 	

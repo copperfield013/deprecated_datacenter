@@ -814,6 +814,56 @@ span.cpf-select2-sign.cpf-select2-sign-or:after {
 }
 
 
+.prompt-menu{
+	width: 180px;
+	/* max-height: 200px; */
+	position: absolute;
+	background-color: #fff;
+	z-index: 1000;
+	border: 1px solid #ccc;
+	font-size: 15px;
+}
+.prompt-menu>ul{
+	list-style-type: none;
+	-webkit-margin-before: 0;
+	-webkit-margin-after: 0;
+	-webkit-margin-start: 0;
+	-webkit-margin-end: 0;
+	-webkit-padding-start: 0;
+}
+
+.prompt-menu>ul>li{
+	padding: 5px 10px 5px 20px;
+	cursor: pointer;
+	min-height: 25px;
+	line-height: 25px;
+	text-align: left;
+}
+
+.prompt-menu>ul>li:not(:first-child){
+	border-top: 1px solid #ddd;
+}
+.prompt-menu>ul>li:hover{
+	background-color: #5db2ff;
+	color: #eee;
+}
+.prompt-menu>ul>li.selected{
+	padding-left: 0;
+}
+
+.prompt-menu>ul>li.selected:before{
+	display: inline-block;
+	width: 20px;
+	text-align: center;
+	content: "\f00c";
+	font-family: FontAwesome;
+	font-style: normal;
+	font-weight: normal;
+	line-height: 1;
+	font-size: 14px;
+	-webkit-font-smoothing: antialiased;
+}
+
 /* .cpf-file-input-container .cpf-file-input-item,
 .cpf-file-input-container .cpf-file-input-add {
     width: 40px;
@@ -879,3 +929,4 @@ span.cpf-select2-sign.cpf-select2-sign-or:after {
 .cpf-file-input-container .cpf-file-input-add:before {
     content: "+";
 } */
+

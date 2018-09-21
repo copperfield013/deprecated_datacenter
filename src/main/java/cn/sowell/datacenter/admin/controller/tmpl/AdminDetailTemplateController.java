@@ -31,6 +31,7 @@ import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.common.choose.ChooseTablePage;
+import cn.sowell.datacenter.model.config.service.ConfigureService;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailField;
@@ -56,6 +57,9 @@ public class AdminDetailTemplateController {
 	@Resource
 	ModulesService mService;
 	
+	@Resource
+	ConfigureService configService;
+	
 	@RequestMapping("/to_create/{module}")
 	public String toCreate(@PathVariable String module, Model model){
 		ModuleMeta moduleMeta = mService.getModule(module);
@@ -63,11 +67,12 @@ public class AdminDetailTemplateController {
 		return AdminConstants.JSP_TMPL_DETAIL + "/dtmpl_update.jsp";
 	}
 	
-	@RequestMapping("/list/{module}")
-	public String tmplList(Model model, @PathVariable String module){
-		ModuleMeta moduleMeta = mService.getModule(module);
-		List<TemplateDetailTemplate> tmplList = tService.queryDetailTemplates(module);
+	@RequestMapping("/list/{moduleName}")
+	public String list(Model model, @PathVariable String moduleName){
+		ModuleMeta moduleMeta = mService.getModule(moduleName);
+		List<TemplateDetailTemplate> tmplList = tService.queryDetailTemplates(moduleName);
 		Map<Long, Set<TemplateGroup>> relatedGroupsMap = tService.getDetailTemplateRelatedGroupsMap(CollectionUtils.toSet(tmplList, dtmpl->dtmpl.getId()));
+		model.addAttribute("modulesJson", configService.getSiblingModulesJson(moduleName));
 		model.addAttribute("tmplList", tmplList);
 		model.addAttribute("module", moduleMeta);
 		model.addAttribute("relatedGroupsMap", relatedGroupsMap);
@@ -222,5 +227,20 @@ public class AdminDetailTemplateController {
 		return null;
 	}
 	
+	@ResponseBody
+	@RequestMapping("/copy/{dtmplId}/{targetModuleName}")
+	public ResponseJSON copy(@PathVariable Long dtmplId, @PathVariable String targetModuleName) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		try {
+			Long newTmplId = tService.copyDetailTemplate(dtmplId, targetModuleName);
+			if(newTmplId != null) {
+				jRes.setStatus("suc");
+				jRes.put("newTmplId", newTmplId);
+			}
+		} catch (Exception e) {
+			logger.error("复制详情模板时发生错误", e);
+		}
+		return jRes;
+	}
 	
 }

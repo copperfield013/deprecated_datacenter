@@ -64,7 +64,10 @@
 										</a>
 									</c:otherwise>
 								</c:choose>
-								
+								<a ltmpl-id="${ltmpl.id }" ltmpl-title="${ltmpl.title }" class="btn btn-magenta btn-xs btn-copy-ltmpl">
+									<i class="fa fa-copy"></i>
+									复制到模块
+								</a>
 								
 							</td>
 						</tr>
@@ -74,3 +77,41 @@
 		</div>
 	</div>
 </div>
+<script>
+	seajs.use(['utils', 'ajax', 'dialog', 'tab'], function(Utils, Ajax, Dialog, Tab){
+		var $page = $('#tmpl-ltmpl-list-${module.name }');
+		var modules = [];
+		try{
+			modules = $.parseJSON('${modulesJson}');
+		}catch(e){}
+		$('.btn-copy-ltmpl[ltmpl-id]', $page).click(function(){
+			var $btn = $(this);
+			Dialog.promptSelect({
+				data		: modules,
+				target		: $btn,
+				container	: $page
+			}).done(function(selected){
+				if(selected.title && selected.moduleName){
+					var tmplTitle = $btn.attr('ltmpl-title'),
+						tmplId = $btn.attr('ltmpl-id');
+					Dialog.confirm('确认复制列表模板[' + tmplTitle + ']到模块[' + selected.title + ']？', function(yes){
+						if(yes){
+							Ajax.ajax('admin/tmpl/ltmpl/copy/' + tmplId + '/' + selected.moduleName, function(res){
+								if(res.status === 'suc' && res.newTmplId){
+									Dialog.confirm('复制成功，是否打开复制成功的列表模板编辑页？', function(yes){
+										if(yes){
+											Tab.openInTab('admin/tmpl/ltmpl/update/' + res.newTmplId, 'viewtmpl_update_' + res.newTmplId);
+										}
+									})
+								}else{
+									Dialog.notice('复制失败', 'error');
+								}
+							});
+						}
+					});
+				}
+			});
+			return false;
+		});
+	});
+</script>

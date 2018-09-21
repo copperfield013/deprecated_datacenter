@@ -755,6 +755,8 @@ define(function(require, exports){
 
 	        if(direction === 'top'){
 	        	top -= $dom.height();
+	        }else if(direction === 'bottom'){
+	        	top += $site.height();
 	        }
 	        $dom.css({
 	          top:    top,

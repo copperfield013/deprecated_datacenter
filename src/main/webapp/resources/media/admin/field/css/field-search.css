@@ -271,10 +271,12 @@ span.fieldpicker-mode>ol{
 	display: none;
 }
 
-span.fieldpicker-mode>ol>li:not(first-child){
-	border-top: 1px solid #ddd;
+span.fieldpicker-mode>ol>li{
 	padding-left: 20px;
 	cursor: pointer;
+}
+span.fieldpicker-mode>ol>li:not(:first-child){
+	border-top: 1px solid #ddd;
 }
 span.fieldpicker-mode>ol>li:hover{
 	background-color: #5db2ff;

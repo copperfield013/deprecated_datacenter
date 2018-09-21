@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <title>详情模板（${module.title }）</title>
-<div id="dtmpl-list" class="detail">
+<div id="tmpl-dtmpl-list-${module.name }" class="detail">
 	<div>
 		<form action="admin/tmpl/dtmpl/list">
 			
@@ -64,7 +64,10 @@
 										</a>
 									</c:otherwise>
 								</c:choose>
-								
+								<a dtmpl-id="${tmpl.id }" dtmpl-title="${tmpl.title }" class="btn btn-magenta btn-xs btn-copy-dtmpl">
+									<i class="fa fa-copy"></i>
+									复制到模块
+								</a>
 							</td>
 						</tr>
 					</c:forEach>
@@ -74,11 +77,40 @@
 	</div>
 </div>
 <script>
-	window.TMPL = {
-		switchTemplateGroup		: function(){
-			seajs.use(['dialog'], function(){
-				
+	seajs.use(['utils', 'ajax', 'dialog', 'tab'], function(Utils, Ajax, Dialog, Tab){
+		var $page = $('#tmpl-dtmpl-list-${module.name }');
+		var modules = [];
+		try{
+			modules = $.parseJSON('${modulesJson}');
+		}catch(e){}
+		$('.btn-copy-dtmpl[dtmpl-id]', $page).click(function(){
+			var $btn = $(this);
+			Dialog.promptSelect({
+				data		: modules,
+				target		: $btn,
+				container	: $page
+			}).done(function(selected){
+				if(selected.title && selected.moduleName){
+					var tmplTitle = $btn.attr('dtmpl-title'),
+						tmplId = $btn.attr('dtmpl-id');
+					Dialog.confirm('确认复制详情模板[' + tmplTitle + ']到模块[' + selected.title + ']？', function(yes){
+						if(yes){
+							Ajax.ajax('admin/tmpl/dtmpl/copy/' + tmplId + '/' + selected.moduleName, function(res){
+								if(res.status === 'suc' && res.newTmplId){
+									Dialog.confirm('复制成功，是否打开复制成功的详情模板编辑页？', function(yes){
+										if(yes){
+											Tab.openInTab('admin/tmpl/dtmpl/update/' + res.newTmplId, 'dtmpl_update_' + res.newTmplId);
+										}
+									})
+								}else{
+									Dialog.notice('复制失败', 'error');
+								}
+							});
+						}
+					});
+				}
 			});
-		}
-	}
+			return false;
+		});
+	});
 </script>

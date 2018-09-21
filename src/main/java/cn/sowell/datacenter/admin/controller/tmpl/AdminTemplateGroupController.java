@@ -18,7 +18,10 @@ import com.alibaba.fastjson.JSON;
 
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
+import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
+import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.model.config.service.ConfigureService;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
@@ -35,6 +38,9 @@ public class AdminTemplateGroupController {
 	@Resource
 	ModulesService  mService;
 	
+	@Resource
+	ConfigureService configService;
+	
 	Logger logger = Logger.getLogger(AdminTemplateGroupController.class);
 	
 	@RequestMapping("/list/{module}")
@@ -44,6 +50,7 @@ public class AdminTemplateGroupController {
 			List<TemplateGroup> tmplGroups = tService.queryTemplateGroups(module);
 			model.addAttribute("module", moduleMeta);
 			model.addAttribute("tmplGroups", tmplGroups);
+			model.addAttribute("modulesJson", configService.getSiblingModulesJson(module));
 			return AdminConstants.JSP_TMPL_GROUP + "/tmpl_group_list.jsp";
 		}
 		return null;
@@ -103,6 +110,22 @@ public class AdminTemplateGroupController {
 		}
 	}
 	
+	
+	@ResponseBody
+	@RequestMapping("/copy/{tmplGroupId}/{targetModuleName}")
+	public ResponseJSON copy(@PathVariable Long tmplGroupId, @PathVariable String targetModuleName) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		try {
+			Long newTmplId = tService.copyTemplateGroup(tmplGroupId, targetModuleName, UserUtils.getCurrentUser());
+			if(newTmplId != null) {
+				jRes.setStatus("suc");
+				jRes.put("newTmplId", newTmplId);
+			}
+		} catch (Exception e) {
+			logger.error("复制模板组合时发生错误", e);
+		}
+		return jRes;
+	}
 	
 	
 	

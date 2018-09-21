@@ -451,6 +451,53 @@ define(function(require, exports, module){
 				}
 			});
 		},
+		/**
+		 * 在指定位置弹出下拉菜单展示，并提供点选项后的回调
+		 */
+		promptSelect	: function(_param){
+			var defaultParam = {
+				//展示选项数组，可以是字符串数组，也可以是对象数组，但是元素对象必须提供title属性
+				data		: [],
+				//菜单显示的位置
+				target		: null,
+				container	: document.body
+			};
+			var param = $.extend({}, defaultParam, _param);
+			var def = $.Deferred();
+			require('tmpl').load('media/admin/tmpl/tmpl/tmpl-modules.tmpl').done(function(tmpl){
+				var data = [];
+				for(var i in param.data){
+					var ele = param.data[i];
+					if(typeof ele === 'string'){
+						data.push({
+							title	: ele
+						})
+					}else if(typeof ele === 'object'){
+						data.push(ele);
+					}else{
+						$.error('展示的菜单的元素必须是字符串或者是包含title属性的object')
+					}
+				}
+				
+				var $dom = tmpl.tmpl({
+					array	: data
+				});
+				utils.place($dom, param.target, 'bottom', param.container);
+				$dom.find('li').click(function(){
+					var index = $(this).attr('data-index');
+					if(index){
+						def.resolve(data[index]);
+					}
+					$dom.remove();
+					return false;
+				});
+				$(document).one('click', function(){
+					$dom.remove();
+				});
+			});
+			return def.promise();
+			
+		},
 		prompt	: function(msg, defaultMsg, callback, _param){
 			var defaultParam = {
 				domHandler	: $.noop,
