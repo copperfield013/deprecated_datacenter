@@ -329,6 +329,8 @@ define(function(require, exports, module){
 							var v = $select.val();
 							if(typeof v === 'string'){
 								return v;
+							}else if(!v){
+								return '';
 							}else if($.isArray(v)){
 								return v.join();
 							}
