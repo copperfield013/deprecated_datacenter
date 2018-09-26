@@ -175,10 +175,19 @@ public class AdminModulesController {
         TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
         TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
         
-        ModuleEntityPropertyParser entity = mService.getHistoryEntityParser(moduleName, code, historyId, UserUtils.getCurrentUser());
+        ModuleEntityPropertyParser entity = null;
+        UserIdentifier user = UserUtils.getCurrentUser();
+        EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, code, user);
+		if(historyId != null) {
+			if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
+				entity = mService.getHistoryEntityParser(moduleName, code, historyId, user);
+			}
+        }
         if(entity == null) {
-        	entity = mService.getEntity(moduleName, code, null, UserUtils.getCurrentUser());
-        	model.addAttribute("fromHistory", false);
+        	entity = mService.getEntity(moduleName, code, null, user);
+        }
+        if(lastHistory != null) {
+        	model.addAttribute("hasHistory", true);
         }
         model.addAttribute("menu", menu);
         model.addAttribute("historyId", historyId);

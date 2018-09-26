@@ -13,7 +13,7 @@
 			<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
 				<i class="glyphicon glyphicon-refresh"></i>
 			</a>
-			<c:if test="${fromHistory != false }">
+			<c:if test="${hasHistory == true }">
 				<a href="page:#timeline-area.toggle" title="查看历史" class="toggle-timeline btn-toggle">
 					<i class="iconfont icon-historyrecord"></i>
 				</a>
