@@ -1058,6 +1058,12 @@ define(function(require, exports, module){
 					}
 				}
 			});
+		},
+		compare					: function(x, y, fieldType){
+			switch(fieldType){
+			default:
+				return x > y? 1: x < y? -1: 0;
+			}
 		}
 	});
 	

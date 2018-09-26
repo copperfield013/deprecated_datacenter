@@ -76,17 +76,18 @@
 												<tr class="title-row">
 													<th>#</th>
 													<c:if test="${tmplGroup.relationSubdomain != null }">
-														<th>关系</th>
+														<th class="sorting">关系</th>
 													</c:if>
 													<c:forEach var="field" items="${tmplGroup.fields }">
-														<th class="${field.fieldAvailable? '': 'field-unavailable'}" 
-															title="${field.fieldAvailable? '': '无效字段' }">${field.title }</th>
+														<th class="${field.fieldAvailable? 'sorting': 'field-unavailable'}" 
+															title="${field.fieldAvailable? '': '无效字段' }"
+															field-type="${field.type }">${field.title }</th>
 													</c:forEach>
 												</tr>
 											</thead>
 											<tbody>
 												<c:forEach var="entityItem" varStatus="i" items="${entity.arrayMap[tmplGroup.composite.name] }">
-													<tr class="value-row">
+													<tr class="value-row" origin-order="${i.index }">
 														<td>${i.index + 1 }</td>
 														<c:if test="${tmplGroup.relationSubdomain != null }">
 															<c:set var="relationName" value="${tmplGroup.composite.name }.$$label$$" />

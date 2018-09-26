@@ -10,6 +10,7 @@
 <!-- <link href="media/admin/plugins/typeahead/dist/examples.css" rel="stylesheet" /> -->
 <link href="media/admin/plugins/beyond/css/bootstrap.min.css" rel="stylesheet" />
 <link href="media/admin/plugins/beyond/css/font-awesome.min.css" rel="stylesheet" />
+<link href="media/admin/plugins/beyond/css/dataTables.bootstrap.css" rel="stylesheet" type="text/css" />
 
 <!--Beyond styles-->
 <link id="beyond-link" href="media/admin/plugins/beyond/css/beyond.min.css" rel="stylesheet" type="text/css" />

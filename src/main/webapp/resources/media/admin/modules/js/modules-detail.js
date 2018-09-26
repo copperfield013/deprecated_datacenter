@@ -180,6 +180,31 @@ define(function(require, exports, module){
 			})
 		});
 		
+		/**
+		 * 排序
+		 */
+		$('.field-array-table table', $page).each(function(){
+			var $table = $(this);
+			var $orderHeads = $('>thead>tr>th.sorting', $table);
+			var $tbody = $('>tbody', $table);
+			$orderHeads.click(function(){
+				var $thisHead = $(this);
+				var colIndex = $('>thead>tr>th', $table).index($thisHead);
+				var fieldType = $thisHead.attr('field-type');
+				$orderHeads.not(this).filter('.sorting_desc,.sorting_asc').removeClass('sorting_desc sorting_asc');
+				if($thisHead.is('.sorting_asc')){
+					$thisHead.removeClass('sorting_asc').addClass('sorting_desc');
+					sortTable($tbody, colIndex, 'desc', fieldType);
+				}else if($thisHead.is('.sorting_desc')){
+					$thisHead.removeClass('sorting_desc sorting_asc');
+					sortTable($tbody);
+				}else{
+					$thisHead.removeClass('sorting_desc').addClass('sorting_asc');
+					sortTable($tbody, colIndex, 'asc', fieldType);
+				}
+			});
+		});
+		
 		setTimeout(function(){
 			$CPF.showLoading();
 			$('.field-title', $page).each(function(){DtmplUpdate.adjustFieldTitle($(this))});
@@ -187,7 +212,45 @@ define(function(require, exports, module){
 		}, 100);
 	}
 	
+	function sortTable($tbody, colIndex, orderDir, fieldType){
+		var datas = [];
+		var $rows = $tbody.children('tr').each(function(i){
+			var $row = $(this);
+			var $orderCol = $row.children('td').eq(colIndex);
+			datas.push({
+				data	: $orderCol.text(),
+				index	: i,
+				order	: $row.attr('origin-order')
+			});
+		});
+		
+		for(var i = 0; i < datas.length; i++){
+			for(var j = i + 1; j < datas.length; j++){
+				if(orderDir && shouldSwap(datas[i].data, datas[j].data, orderDir, fieldType)
+					|| !orderDir && shouldSwap(datas[i].order, datas[j].order, 'asc')){
+					var t = datas[i];
+					datas[i] = datas[j];
+					datas[j] = t;
+				}
+			}
+		}
+		
+		for(var i = 0; i < datas.length; i++){
+			var $row = $rows.eq(datas[i].index);
+			$row.children('td').eq(0).text(i + 1);
+			$tbody.append($row);
+		}
+		
+	}
 	
+	function shouldSwap(x, y, orderDir, fieldType){
+		var FieldInput = require('field/js/field-input.js');
+		if(orderDir === 'asc'){
+			return FieldInput.compare(x, y, fieldType) > 0;
+		}else if(orderDir === 'desc'){
+			return FieldInput.compare(x, y, fieldType) < 0;
+		}
+	}
 	
 	
 	
