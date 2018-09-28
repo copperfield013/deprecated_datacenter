@@ -44,6 +44,13 @@ public class DatacenterReloadServiceImpl implements DatacenterReloadService, Ini
 	public void syncField() {
 		fService.refreshFields();
 	}
+	
+	@Override
+	public String syncCache() {
+		syncModule();
+		tService.loadCache();
+		return "同步成功";
+	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {

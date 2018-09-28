@@ -7,4 +7,6 @@ public interface DatacenterReloadService {
 	String syncModule();
 
 	void syncField();
+
+	String syncCache();
 }
