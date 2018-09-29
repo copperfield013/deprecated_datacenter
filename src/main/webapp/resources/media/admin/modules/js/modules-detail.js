@@ -205,6 +205,168 @@ define(function(require, exports, module){
 			});
 		});
 		
+		//筛选
+		$('.field-group .keyword-search-container :text', $page).on('input propertychang', function(){
+			var $text = $(this);
+			var keyword = $text.val();
+			var $tbody = $text.closest('.field-group').find('.field-container .field-array-table tbody');
+			$tbody.children('tr').each(function(i){
+				var $row = $(this);
+				var flag = keyword == '';
+				$row.children('td').slice(1).each(function(){
+					var $cell = $(this);
+					if(!isExceptFilterCell($cell)){
+						var cellText = $cell.data('origin-text');
+						if(cellText == undefined){
+							cellText = $cell.text();
+						}
+						if(keyword){
+							if(cellText.indexOf(keyword) >= 0){
+								var html = cellText.replace(keyword, '<k>' + keyword + '</k>');
+								$cell.html(html);
+								flag = true;
+								$cell.data('origin-text', cellText);
+							}
+						}else{
+							if($cell.data('origin-text')){
+								$cell.html(cellText);
+							}
+						}
+					}
+				});
+				$row.toggleClass('hidden-row', !flag);
+			});
+			refreshPagination($tbody);
+			return false;
+		});
+		
+		function isExceptFilterCell($cell){
+			return $cell.is('[field-type="file"]');
+		}
+		
+		var pageSize = 5;
+		function refreshPagination($tbody){
+			var $rows = $tbody.children('tr');
+			var count = $rows.not('.hidden-row').each(function(i){
+				var $indexCell = $(this).children('td').eq(0);
+				$indexCell.text(i + 1);
+			}).length;
+			
+			var $widgetHeader = $tbody.closest('.field-group').find('>div.widget-header');
+			var $paginationContainer = $widgetHeader.find('>div.pagination-container');
+			
+			if(count <= pageSize){
+				//不需要分页
+				$paginationContainer.remove();
+				$tbody.children('tr').addClass('show-page-row');
+			}else{
+				if($paginationContainer.length == 0){
+					$paginationContainer = buildPaginationContainer();
+					$widgetHeader.append($paginationContainer);
+				}
+				var $paginationList = $paginationContainer.children('ul');
+				var $firstLi = $paginationList.children('li.page-first');
+				$firstLi.nextUntil('li.page-last').remove();
+				//刷新后的页号
+				
+				var pageCount = Math.ceil(count / pageSize);
+				
+				for(var i = pageCount; i >= 1; i--){
+					var $pageLi = $('<li><a href="#">' + i + '</a></li>');
+					$pageLi.children('a').click(function(){
+						goPage(parseInt($(this).text()), $paginationList, $tbody);
+						return false;
+					});
+					$firstLi.after($pageLi);
+				}
+				
+				goPage(1, $paginationList, $tbody);
+			}
+			
+			
+		}
+		
+		function goPage(pageNo, $paginationList, $tbody){
+			//显示的最多页码个数
+			var maxPaginator = 3;
+			var $pageNos = $paginationList.children('li').removeClass('hidden-paginator').not('.page-first,.page-last');
+			$pageNos.removeClass('active');
+			if($pageNos.length > maxPaginator){
+				var half = Math.ceil(maxPaginator / 2);
+				if(pageNo >= half){
+					$pageNos.slice(0, pageNo - half).addClass('hidden-paginator');
+				}
+				$pageNos.slice(pageNo + half - 1).addClass('hiden-paginator');
+			}
+			$pageNos.eq(pageNo - 1).addClass('active');
+			$tbody.children('tr').removeClass('show-page-row');
+			var start = (pageNo - 1) * pageSize;
+			$tbody.children('tr').not('.hidden-row').slice(start, start + pageSize).addClass('show-page-row');
+			var $goFirst = $paginationList.children('.page-first').removeClass('disabled').off('click'),
+				$goLast = $paginationList.children('.page-last').removeClass('disabled').off('click');
+			if(pageNo == 1){
+				$goFirst.addClass('disabled');
+			}else{
+				$goFirst.click(function(){goPage(1, $paginationList, $tbody)})
+			}
+			if(pageNo == $pageNos.length){
+				$goLast.addClass('disabled');
+			}else{
+				$goLast.click(function(){goPage($pageNos.length, $paginationList, $tbody)})
+			}
+		}
+		
+		function buildPaginationContainer(){
+			var $container = $('<div class="widget-buttons pagination-container">'
+					+ '<ul class="pagination pagination-sm">'
+					+ '<li class="page-first disabled"><a href="#">«</a></li>'
+					+ '<li class="page-last"><a href="#">»</a></li>'
+					+ '</ul></div>');
+			return $container;
+			
+		}
+		
+		
+		function sortTable($tbody, colIndex, orderDir, fieldType){
+			var datas = [];
+			var $rows = $tbody.children('tr').not('.hidden-row').each(function(i){
+				var $row = $(this);
+				var $orderCol = $row.children('td').eq(colIndex);
+				datas.push({
+					data	: $orderCol.text(),
+					index	: i,
+					order	: $row.attr('origin-order')
+				});
+			});
+			
+			for(var i = 0; i < datas.length; i++){
+				for(var j = i + 1; j < datas.length; j++){
+					if(orderDir && shouldSwap(datas[i].data, datas[j].data, orderDir, fieldType)
+						|| !orderDir && shouldSwap(datas[i].order, datas[j].order, 'asc')){
+						var t = datas[i];
+						datas[i] = datas[j];
+						datas[j] = t;
+					}
+				}
+			}
+			
+			for(var i = 0; i < datas.length; i++){
+				var $row = $rows.eq(datas[i].index);
+				$row.children('td').eq(0).text(i + 1);
+				$tbody.append($row);
+			}
+			
+			refreshPagination($tbody);
+			
+		}
+		
+		/**
+		 * 分页
+		 */
+		$('.field-array-table>table', $page).each(function(){
+			refreshPagination($('>tbody', this))
+		});
+		
 		setTimeout(function(){
 			$CPF.showLoading();
 			$('.field-title', $page).each(function(){DtmplUpdate.adjustFieldTitle($(this))});
@@ -212,36 +374,6 @@ define(function(require, exports, module){
 		}, 100);
 	}
 	
-	function sortTable($tbody, colIndex, orderDir, fieldType){
-		var datas = [];
-		var $rows = $tbody.children('tr').each(function(i){
-			var $row = $(this);
-			var $orderCol = $row.children('td').eq(colIndex);
-			datas.push({
-				data	: $orderCol.text(),
-				index	: i,
-				order	: $row.attr('origin-order')
-			});
-		});
-		
-		for(var i = 0; i < datas.length; i++){
-			for(var j = i + 1; j < datas.length; j++){
-				if(orderDir && shouldSwap(datas[i].data, datas[j].data, orderDir, fieldType)
-					|| !orderDir && shouldSwap(datas[i].order, datas[j].order, 'asc')){
-					var t = datas[i];
-					datas[i] = datas[j];
-					datas[j] = t;
-				}
-			}
-		}
-		
-		for(var i = 0; i < datas.length; i++){
-			var $row = $rows.eq(datas[i].index);
-			$row.children('td').eq(0).text(i + 1);
-			$tbody.append($row);
-		}
-		
-	}
 	
 	function shouldSwap(x, y, orderDir, fieldType){
 		var FieldInput = require('field/js/field-input.js');
@@ -251,7 +383,6 @@ define(function(require, exports, module){
 			return FieldInput.compare(x, y, fieldType) < 0;
 		}
 	}
-	
 	
 	
 	

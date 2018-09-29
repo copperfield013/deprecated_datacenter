@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <link type="text/css" rel="stylesheet" href="media/admin/modules/css/modules-detail-tmpl.css" />
-<div class="detail entity-detail-tmpl" id="${moduke.key }-detail-tmpl-${entity.code }-${RES_STAMP}">
+<div class="detail entity-detail-tmpl entity-detail-page" id="${moduke.key }-detail-tmpl-${entity.code }-${RES_STAMP}">
 	<div class="page-header">
 		<div class="header-title">
 			<h1>${module.title}-${entity.title }-详情</h1>
@@ -55,6 +55,14 @@
 							<span class="widget-caption">
 								<span class="group-title">${tmplGroup.title }</span>
 							</span>
+							<c:if test="${tmplGroup.isArray == 1 && !empty entity.arrayMap[tmplGroup.composite.name]}">
+								<div class="widget-buttons keyword-search-container">
+									<span class="input-icon">
+										<input type="text" class="form-control input-xs" placeholder="关键字">
+										<i class="glyphicon glyphicon-search blue"></i>
+									</span>
+								</div>
+							</c:if>
 						</div>
 						<div class="widget-body field-container">
 							<c:choose>
@@ -79,7 +87,7 @@
 														<th class="sorting">关系</th>
 													</c:if>
 													<c:forEach var="field" items="${tmplGroup.fields }">
-														<th class="${field.fieldAvailable? 'sorting': 'field-unavailable'}" 
+														<th class="${field.fieldAvailable? field.type == 'file'? '': 'sorting': 'field-unavailable'}" 
 															title="${field.fieldAvailable? '': '无效字段' }"
 															field-type="${field.type }">${field.title }</th>
 													</c:forEach>

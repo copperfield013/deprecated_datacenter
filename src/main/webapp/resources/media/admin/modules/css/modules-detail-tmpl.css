@@ -474,3 +474,42 @@ th.field-unavailable:before {
     cursor: not-allowed;
     background-color: #eee;
 }
+
+.entity-detail-tmpl.entity-detail-page .widget.field-group .widget-buttons.keyword-search-container {
+    position: absolute;
+    right: 120px;
+    top: 0;
+}
+
+.entity-detail-tmpl.entity-detail-page .widget.field-group .widget-buttons.pagination-container {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 120px;
+    vertical-align: middle;
+}
+
+.entity-detail-tmpl.entity-detail-page .widget.field-group .pagination-container>ul.pagination {
+    line-height: 30px;
+    margin: 0;
+}
+
+.entity-detail-tmpl.entity-detail-page .widget.field-group .pagination li a {
+    padding: 2px 5px;
+}
+
+.entity-detail-tmpl.entity-detail-page tr.value-row.hidden-row {
+    display: none !important;
+}
+
+.entity-detail-tmpl.entity-detail-page .field-array-table>table>tbody>tr>td k {
+    background-color: #FFD700;
+    font-weight: bold;
+    color: #555;
+}
+.entity-detail-tmpl.entity-detail-page .field-array-table>table>tbody>tr {
+    display: none;
+}
+.entity-detail-tmpl.entity-detail-page .field-array-table>table>tbody>tr.show-page-row {
+    display: table-row;
+}
