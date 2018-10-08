@@ -104,10 +104,64 @@
 		]
 	},
 	"time"		: {
-		"ref_comparators"	: "comparators.*"
+		"comparators"		: [
+			{
+				"title"	: "在",
+				"key"	: "d1"
+			},
+			{
+				"title"	: "早于",
+				"key"	: "d2"
+			},
+			{
+				"title"	: "晚于",
+				"key"	: "d3"
+			},
+			{
+				"title"	: "不在",
+				"key"	: "d1n"
+			},
+			{
+				"title"	: "不早于",
+				"key"	: "d2n",
+				"class"	: "negative"
+			},
+			{
+				"title"	: "不晚于",
+				"key"	: "d3n",
+				"class"	: "negative"
+			}
+		]
 	},
 	"datetime"	: {
-		"ref_comparators"	: "#comparators.*"
+		"comparators"		: [
+			{
+				"title"	: "在",
+				"key"	: "d1"
+			},
+			{
+				"title"	: "早于",
+				"key"	: "d2"
+			},
+			{
+				"title"	: "晚于",
+				"key"	: "d3"
+			},
+			{
+				"title"	: "不在",
+				"key"	: "d1n"
+			},
+			{
+				"title"	: "不早于",
+				"key"	: "d2n",
+				"class"	: "negative"
+			},
+			{
+				"title"	: "不晚于",
+				"key"	: "d3n",
+				"class"	: "negative"
+			}
+		]
 	},
 	"daterange"	: {
 		"comparators"		: [

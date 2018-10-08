@@ -627,7 +627,7 @@ define(function(require, exports, module){
 		
 		var callbackMap = require('utils').CallbacksMap(this);
 		
-		var defaultValueInput = new ValueInput();
+		var defaultValueInput = new ValueInput(undefined, $page);
 		
 		var relationLabelFieldInput = null;
 		
@@ -1014,17 +1014,20 @@ define(function(require, exports, module){
 		var fieldInput = null;
 		var defaultValue = null,
 			placeholder = null;
+		var $detail = $page.find('div.detail').eq(0);
 		if(typeof field === 'string'){
 			fieldInput = new FieldInput({
-				type	: field,
-				$page	: $page
+				type		: field,
+				$page		: $page,
+				$container	: $detail
 			});
 		}else if(typeof field === 'object'){
 			if(field.__type__ == 'field'){
 				var fParam = {
 						optionsKey	: field.optGroupId,
 						fieldKey	: field.composite.module + '@' + field.name,
-						$page		: $page
+						$page		: $page,
+						$container	: $detail
 				};
 				fieldInput = new FieldInput($.extend({}, field, fParam));
 			}else if(field instanceof FieldInput){
@@ -1032,7 +1035,8 @@ define(function(require, exports, module){
 			}
 		}else{
 			fieldInput = new FieldInput({
-				type	: 'text'
+				type	: 'text',
+				$container	: $detail
 			});
 		}
 		function viewTransfer(val, fieldInput){

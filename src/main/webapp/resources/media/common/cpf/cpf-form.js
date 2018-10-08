@@ -134,6 +134,12 @@ define(function(require, exports, module){
 		$('form :text.datepicker', $page).each(function(){
 			require('utils').datepicker(this);
 		});
+		$('form :text.datetimepicker', $page).each(function(){
+			require('utils').datetimepicker(this);
+		});
+		$('form :text.timepicker', $page).each(function(){
+			require('utils').timepicker(this);
+		});
 		$('form div.cpf-daterangepicker,form span.cpf-daterangepicker', $page).each(function(){
 			var $div = $(this);
 			var name = $div.is('.format-submit-value')? null: $div.attr('data-name'),
