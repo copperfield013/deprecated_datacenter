@@ -97,6 +97,12 @@
 											data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
 										</span>
 									</c:when>
+									<c:when test="${criteriaItem.inputType == 'datetime' }">
+										<input class="form-control datetimepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}"  />
+									</c:when>
+									<c:when test="${criteriaItem.inputType == 'time' }">
+										<input class="form-control timepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}"  />
+									</c:when>
 									<c:otherwise>
 										<input type="text" disabled="disabled" placeholder="没有配置对应的控件${criteriaItem.inputType }" />
 									</c:otherwise>

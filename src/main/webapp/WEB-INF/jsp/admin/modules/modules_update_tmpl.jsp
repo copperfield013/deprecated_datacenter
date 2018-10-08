@@ -8,7 +8,7 @@
 	</c:choose>
 </c:set>
 <title>${title }</title>
-<div class="entity-detail-tmpl" id="${module.name }-update-tmpl-${entity.code }-${RES_STAMP}">
+<div class="entity-detail-tmpl entity-update-page" id="${module.name }-update-tmpl-${entity.code }-${RES_STAMP}">
 	<div class="float-operate-area">
 		<div class="operate-area-cover"></div>
 		<a id="save" title="保存"><i class="fa fa-check-square"></i></a>
