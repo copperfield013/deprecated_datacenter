@@ -73,6 +73,7 @@
     height: 2.8em;
     line-height: 2.8em;
     margin-right: 0.7em;
+    white-space: nowrap;
 }
 .module-list-tmpl form.form-inline>.form-group label.control-label:after{
 	content: "：";
@@ -121,4 +122,9 @@
 
 .module-list-tmpl .row.external-export-message>p {
     text-align: center;
+}
+
+.module-list-tmpl .form-group span.cpf-daterangepicker {
+    width: 20em;
+    display: inline-block;
 }

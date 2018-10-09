@@ -513,3 +513,9 @@ th.field-unavailable:before {
 .entity-detail-tmpl.entity-detail-page .field-array-table>table>tbody>tr.show-page-row {
     display: table-row;
 }
+
+
+.entity-detail-tmpl.entity-update-page .field-array-table.table-scrollable>table.table {
+    min-width: 100%;
+    width: auto !important;
+}
