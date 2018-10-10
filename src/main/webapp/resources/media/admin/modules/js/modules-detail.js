@@ -80,12 +80,12 @@ define(function(require, exports, module){
 								'<div class="time"></div>' +
 								'<div class="events">' + 
 			 						'<div class="events-header"></div>' + 
-									'<div class="events-body"></div>' + 
+									//'<div class="events-body"></div>' + 
 								'</div>' +
 							'</dd>');
 					$item.find('.time').text(Utils.formatDate(new Date(item.timeKey), 'yyyy-MM-dd hh:mm:ss'));
 					$item.find('.events-header').text('操作人：' + item.userName);
-					$item.find('.events-body').text('详情');
+					//$item.find('.events-body').text('详情');
 					$item.attr('data-id', item.id).attr('data-time', item.timeKey);
 					var inserted = false;
 					var $dds = $month.nextUntil('dt');

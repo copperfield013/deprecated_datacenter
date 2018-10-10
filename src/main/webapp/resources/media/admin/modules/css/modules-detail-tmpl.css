@@ -69,6 +69,9 @@ div#timeline-area .show-more-history{
 	color: #fff;
 }
 
+.VivaTimeline dl dd .events{
+	background-color: #fff !important;
+}
 
 .entity-detail-tmpl .widget-caption{
 	font-size: 1.3em;
