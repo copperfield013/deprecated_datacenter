@@ -51,6 +51,7 @@ public class  AdminMainController {
 			}
 			return true;
 		}).collect(Collectors.toList());
+		model.addAttribute("user", user);
 		model.addAttribute("menus", menus);
 		model.addAttribute("configAuth", confAuthenService.getAdminConfigAuthen());
 		return "/admin/index.jsp";

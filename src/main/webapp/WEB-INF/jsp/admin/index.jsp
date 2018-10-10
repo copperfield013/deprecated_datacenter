@@ -36,7 +36,8 @@
 	                    <i class="collapse-icon fa fa-bars"></i>
 	             </div>
 	             <div class="cmd-right">
-	                	<a class="jump" href="admin/logout">退出登录</a>
+	             	<span class="user-name">${user.nickname }</span>
+	                <a class="jump" href="admin/logout">退出登录</a>
 	             </div>
 
 			</div>

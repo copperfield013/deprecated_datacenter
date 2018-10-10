@@ -327,8 +327,18 @@ label.form-control-title {
     line-height: 50px;
     font-size: 1.1em;
 }
+span.user-name {
+    color: #fff  !important;
+    margin-right: 1em;
+}
+span.user-name:before {
+    content: "当前用户：";
+}
 .cmd-right a{
     color: #fff !important;
+}
+.cmd-right a:hover{
+    text-decoration: underline;
 }
 nav{
 	padding: 1em 0;
