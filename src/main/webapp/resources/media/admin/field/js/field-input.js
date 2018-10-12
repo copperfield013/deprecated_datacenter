@@ -145,13 +145,15 @@ define(function(require, exports, module){
 				return $ta;
 			},
 			//下拉选择框
-			'select'		: function(){
+			'select'		: function(withoutEmpty){
 				var $span = $('<span class="field-input-wrapper">');
 				var $select = $('<select>').appendTo($span);
 				setNormalAttrs($select);
-				var $defOption = $('<option value="">--请选择---</option>');
-				$select.append($defOption);
-				$select.val('');
+				if(withoutEmpty != true){
+					var $defOption = $('<option value="">--请选择---</option>');
+					$select.append($defOption);
+					$select.val('');
+				}
 				if($.isArray(param.options)){
 					for(var i in param.options){
 						var option = param.options[i];
@@ -202,6 +204,9 @@ define(function(require, exports, module){
 					}
 				};
 				return $span;
+			},
+			'select-without-empty'	: function(){
+				return this['select'](true);
 			},
 			'date'			: function(){
 				var $text = this['text']();

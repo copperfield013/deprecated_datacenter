@@ -178,8 +178,11 @@ define(function(require, exports, module){
 								});
 							}
 						});
+						var $createArrayControl = $group.find('.create-arrayitem-control');
+						
 						var $arrayitemControl = $group.find('.select-arrayitem-control');
 						if(field.composite.addType == 5){
+							$createArrayControl.show();
 							$arrayitemControl
 								.find(':checkbox').change(function(){
 									//勾选是否显示选择按钮
@@ -213,6 +216,7 @@ define(function(require, exports, module){
 								.end().show();
 							$arrayitemControl.find(':checkbox.selectable').prop('checked', !!$group.attr('stmpl-id')).trigger('change');
 						}else{
+							$createArrayControl.remove();
 							$arrayitemControl.remove();
 						}
 					}
@@ -314,6 +318,7 @@ define(function(require, exports, module){
 						group.selectionTemplateId = $group.attr('stmpl-id');
 					}
 					group.compositeId = $group.attr('composite-id');
+					group.unallowedCreate = $group.find('.create-arrayitem-control :checkbox').prop('checked')? 1 : 0;
 					$arrayTable.find('.title-row>th[field-id]').each(function(){
 						var $th = $(this);
 						var field = $th.data('field-data');
@@ -378,7 +383,8 @@ define(function(require, exports, module){
 		//绑定点击添加字段组按钮的事件
 		$('#add-group', $page).click(function(){
 			var $group = $tmplFieldGroup.tmpl({
-				title	: '新字段组'
+				title			: '新字段组',
+				unallowedCreate	: null
 			}).appendTo($groupContainer);
 			//绑定字段组内字段的拖动动作
 			bindGroupFieldsDraggable(getFieldContainer($group));
@@ -543,7 +549,10 @@ define(function(require, exports, module){
 		if(tmplData && tmplData.groups){
 			for(var i in tmplData.groups){
 				var group = tmplData.groups[i];
-				var $group = $tmplFieldGroup.tmpl(group).appendTo($groupContainer);
+				var $group = 
+						$tmplFieldGroup
+							.tmpl($.extend({}, {unallowedCreate	: null}, group))
+							.appendTo($groupContainer);
 				if(!group.isArray){
 					//绑定字段组内字段的拖动动作
 					bindGroupFieldsDraggable(getFieldContainer($group));

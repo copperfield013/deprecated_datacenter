@@ -353,3 +353,12 @@ th.field-unavailable:before {
     font-size: 12px;
     line-height: 20px;
 }
+
+.create-arrayitem-control>label{
+    border-right: 2px solid #ddd;
+    padding-right: 10px;
+}
+
+.create-arrayitem-control>label>input[type=checkbox]+span.text {
+    z-index: inherit;
+}

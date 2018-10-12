@@ -196,6 +196,7 @@ public class AdminDetailTemplateController {
 						group.setIsArray(jGroup.getBoolean("isArray")?1:null);
 						group.setCompositeId(jGroup.getLong("compositeId"));
 						group.setSelectionTemplateId(jGroup.getLong("selectionTemplateId"));
+						group.setUnallowedCreate(Integer.valueOf(1).equals(jGroup.getInteger("unallowedCreate"))? 1: null);
 						group.setOrder(i++);
 						data.getGroups().add(group);
 						JSONArray jFields = jGroup.getJSONArray("fields");

@@ -226,10 +226,13 @@
 		</div>
 	</div>
 </div>
+<c:set var="menuTitleInScript">
+	${fn:replace(menu.title, '\\', '\\\\')}
+</c:set>
 <script>
 	seajs.use(['modules/js/modules-list.js'], function(ModulesList){
 		var $page = $('#${module.name }-list-tmpl-${RES_STAMP}');
-		ModulesList.init($page, '${module.name}', '${menu.id}', '${menu.title}',{
+		ModulesList.init($page, '${module.name}', '${menu.id}', '${menuTitleInScript}',{
 			pageNo	: '${criteria.pageInfo.pageNo}',
 			pageSize: '${criteria.pageInfo.pageSize}'
 		},{

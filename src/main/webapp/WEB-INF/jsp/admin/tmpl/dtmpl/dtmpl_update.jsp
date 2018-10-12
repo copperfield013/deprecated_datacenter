@@ -17,6 +17,12 @@
 				<span class="widget-caption">
 					<span class="group-title">\${title}</span>
 				</span>
+				<div class="widget-buttons create-arrayitem-control" style="display:none">
+					<label>
+						<input type="checkbox" class="colored-blue" \${unallowedCreate==1?'checked="checked"': ''}>
+						<span class="text">禁止创建</span>
+					</label>
+             	</div>
 				<div class="widget-buttons select-arrayitem-control" style="display:none">
 					<a class="btn btn-info btn-xs btn-select">
 						<i class="fa fa-link"></i>
