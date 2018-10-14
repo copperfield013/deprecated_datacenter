@@ -23,6 +23,7 @@ define(function(require, exports, module){
 			//label			: 多选标签
 			//image			: 图片文件
 			//file			: 文件
+			//range			: 文本范围
 			type		: 0,
 			//表单的name（提交的字段名）
 			name		: null,
@@ -228,6 +229,29 @@ define(function(require, exports, module){
 							$text.datetimepicker('remove');
 						}
 					}
+				};
+				return $text;
+			},
+			'yearmonth'			: function(){
+				var $text = this['text']();
+				var value = param.value;
+				var Utils = require('utils');
+				if(typeof value === 'number'){
+					value = Utils.formatDate(value, 'yyyy-MM');
+				}
+				if(typeof value === 'string'){
+					$text.val(value);
+				}
+				$text.addClass('field-input-readonly').attr('readonly', 'readonly');
+				Utils.yearMonthPicker($text, param.$container, param.$container);
+				$text.funcMap = {
+						setReadonly	: function(toReadonly){
+							if(toReadonly == false){
+								Utils.yearMonthPicker($text, scrollEle, param.$container);
+							}else{
+								$text.datetimepicker('remove');
+							}
+						}
 				};
 				return $text;
 			},
@@ -511,6 +535,31 @@ define(function(require, exports, module){
 					$span.val(param.value || '');
 					return $span;
 				}
+			},
+			'range'			: function(){
+				var $start = $('<input type="text" />'),
+					$end = $('<input type="text" />'),
+					$div = $('<span class="field-input-range">');
+				$div.append($start);
+				$div.append('~');
+				$div.append($end);
+				$div.val = function(value){
+					if(!value){
+						var start = $start.val(),
+							end = $end.val();
+						return start + '~' + end;
+					}else{
+						if(typeof value === 'string'){
+							var split = value.split('~');
+							$start.val(split[0]);
+							$end.val(split[1]);
+						}
+					}
+				};
+				if(param.value){
+					$div.val(param.value);
+				}
+				return $div;
 			},
 			'daterange'		: function(){
 				var $start = $('<input type="text" />'),

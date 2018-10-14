@@ -390,13 +390,22 @@ define(function(require, exports){
 					bootcssVer	: 3,
 					container	: $page
 				});
-				/*return $dom.datepicker({
-					format		: 'yyyy-mm-dd',
-					weekStart	: 1,
-					daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],  
-					monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月',  
-						'七月', '八月', '九月', '十月', '十一月', '十二月' ]
-				},scrollEle);*/
+			}
+		},
+		yearMonthPicker	: function($dom, scrollEle, $page){
+			$dom = $($dom);
+			if($dom.is(':text')){
+				return $dom.datetimepicker({
+					format		: 'yyyy-mm',
+					language	: 'zh-CN',
+					autoclose	: true,
+					bootcssVer	: 3,
+					startView	: 3,
+					minView		: 3,
+					maxView 	: 3,
+					pickerPosition: "bottom-right",
+					container	: $page
+				});
 			}
 		},
 		datetimepicker	: function($dom, scrollEle, $page){
@@ -443,6 +452,26 @@ define(function(require, exports){
 		daterangepicker: function($dom, _param){
 			var defaultParam = {
 					format 				: 'YYYY-MM-DD HH:mm:ss',
+					timePicker			: true,
+					timePicker12Hour	: false,
+					timePickerIncrement : 5,
+					separator			: '~',
+					locale				: {
+						applyLabel	: '确定',
+		                cancelLabel: '取消',
+		                fromLabel: '从',
+		                toLabel: '到',
+						daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],  
+		                monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月',  
+	                        '七月', '八月', '九月', '十月', '十一月', '十二月' ]
+				}
+			};
+			var param = $.extend({}, defaultParam, _param);
+			return $($dom).daterangepicker(param);
+		},
+		ymrangepicker: function($dom, _param){
+			var defaultParam = {
+					format 				: 'YYYY-MM',
 					timePicker			: true,
 					timePicker12Hour	: false,
 					timePickerIncrement : 5,

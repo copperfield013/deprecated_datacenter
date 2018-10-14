@@ -35,7 +35,7 @@ define(function(require, exports, module){
 			});
 		}();
 		+function(){
-			var $daterangepicker = $form.find('.cpf-daterangepicker.format-submit-value').filter('span,div');
+			var $daterangepicker = $form.find('.cpf-daterangepicker.format-submit-value,.cpf-textrange.format-submit-value').filter('span,div');
 			$daterangepicker.each(function(){
 				var $this = $(this),
 					name = $this.attr('data-name');
@@ -140,15 +140,16 @@ define(function(require, exports, module){
 		$('form :text.timepicker', $page).each(function(){
 			require('utils').timepicker(this);
 		});
-		$('form div.cpf-daterangepicker,form span.cpf-daterangepicker', $page).each(function(){
+		$('form div.cpf-daterangepicker,form span.cpf-daterangepicker,form span.cpf-textrange', $page).each(function(){
 			var $div = $(this);
 			var name = $div.is('.format-submit-value')? null: $div.attr('data-name'),
 				value = $div.attr('data-value');
 			if($div.children().length === 0){
 				var FieldInput = require('field/js/field-input.js');
 				if(FieldInput){
+					var fieldType = $div.is('.cpf-textrange')? 'range': 'daterange';
 					var range = new FieldInput({
-						type	: 'daterange',
+						type	: fieldType,
 						name	: name,
 						value	: value
 					});

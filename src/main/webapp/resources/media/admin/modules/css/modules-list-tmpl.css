@@ -124,7 +124,8 @@
     text-align: center;
 }
 
-.module-list-tmpl .form-group span.cpf-daterangepicker {
+.module-list-tmpl .form-group span.cpf-daterangepicker,
+.module-list-tmpl .form-group span.cpf-textrange {
     width: 20em;
     display: inline-block;
 }

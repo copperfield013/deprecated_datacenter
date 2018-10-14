@@ -657,7 +657,8 @@ span.ccheckbox.checked:after {
     display: none;
 }
 
-.field-input-date-range input[type="text"] {
+.field-input-date-range input[type="text"],
+.field-input-range input[type="text"] {
     display: inline-block;
     width: 40%;
     font-size: 13px;

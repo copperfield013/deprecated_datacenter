@@ -163,6 +163,36 @@
 			}
 		]
 	},
+	"yearmonth"	: {
+		"comparators"		: [
+			{
+				"title"	: "在",
+				"key"	: "d1"
+			},
+			{
+				"title"	: "早于",
+				"key"	: "d2"
+			},
+			{
+				"title"	: "晚于",
+				"key"	: "d3"
+			},
+			{
+				"title"	: "不在",
+				"key"	: "d1n"
+			},
+			{
+				"title"	: "不早于",
+				"key"	: "d2n",
+				"class"	: "negative"
+			},
+			{
+				"title"	: "不晚于",
+				"key"	: "d3n",
+				"class"	: "negative"
+			}
+		]
+	},
 	"daterange"	: {
 		"comparators"		: [
 			{
@@ -190,7 +220,30 @@
 		]
 	},
 	"datetimerange"	: {
-		"ref_comparators"	: "comparators.*"
+		"comparators"		: [
+			{
+				"title"	: "在",
+				"key"	: "dr1"
+			},
+			{
+				"title"	: "不在",
+				"key"	: "dr1n",
+				"class"	: "negative"
+			}
+		]
+	},
+	"ymrange"		: {
+		"comparators"		: [
+			{
+				"title"	: "在",
+				"key"	: "dr1"
+			},
+			{
+				"title"	: "不在",
+				"key"	: "dr1n",
+				"class"	: "negative"
+			}
+		]
 	},
 	"autocomplete"	: {
 		"comparators"		: [
@@ -236,6 +289,19 @@
 				"title"	: "与当前用户关系",
 				"key"	: "re2",
 				"premise-classes-e"	: ["user"]
+			}
+		]
+	},
+	"range"	: {
+		"comparators"		: [
+			{
+				"title"	: "在",
+				"key"	: "rg1"
+			},
+			{
+				"title"	: "不在",
+				"key"	: "rg1n",
+				"class"	: "negative"
 			}
 		]
 	},
