@@ -219,7 +219,12 @@ define(function(require, exports, module){
 				if(typeof value === 'string'){
 					$text.val(value);
 				}
-				$text.addClass('field-input-readonly').attr('readonly', 'readonly');
+				$text.addClass('field-input-readonly').attr('readonly', 'readonly').keydown(function(e){
+					if(e.keyCode == 8){
+						$text.val('');
+						return false;
+					}
+				});
 				Utils.datepicker($text, param.$container, param.$container);
 				$text.funcMap = {
 					setReadonly	: function(toReadonly){
@@ -242,7 +247,12 @@ define(function(require, exports, module){
 				if(typeof value === 'string'){
 					$text.val(value);
 				}
-				$text.addClass('field-input-readonly').attr('readonly', 'readonly');
+				$text.addClass('field-input-readonly').attr('readonly', 'readonly').keydown(function(e){
+					if(e.keyCode == 8){
+						$text.val('');
+						return false;
+					}
+				});
 				Utils.yearMonthPicker($text, param.$container, param.$container);
 				$text.funcMap = {
 						setReadonly	: function(toReadonly){
@@ -265,7 +275,12 @@ define(function(require, exports, module){
 				if(typeof value === 'string'){
 					$text.val(value);
 				}
-				$text.addClass('field-input-readonly').attr('readonly', 'readonly');
+				$text.addClass('field-input-readonly').attr('readonly', 'readonly').keydown(function(e){
+					if(e.keyCode == 8){
+						$text.val('');
+						return false;
+					}
+				});
 				Utils.datetimepicker($text, param.$container, param.$container);
 				$text.funcMap = {
 					setReadonly	: function(toReadonly){
@@ -288,7 +303,12 @@ define(function(require, exports, module){
 				if(typeof value === 'string'){
 					$text.val(value);
 				}
-				$text.addClass('field-input-readonly').attr('readonly', 'readonly');
+				$text.addClass('field-input-readonly').attr('readonly', 'readonly').keydown(function(e){
+					if(e.keyCode == 8){
+						$text.val('');
+						return false;
+					}
+				});
 				Utils.timepicker($text, param.$container, param.$container);
 				$text.funcMap = {
 					setReadonly	: function(toReadonly){
