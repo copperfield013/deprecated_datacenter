@@ -32,11 +32,21 @@ public class AuthorityServiceImpl implements AuthorityService{
 	
 	@Override
 	public SideMenuLevel2Menu vaidateL2MenuAccessable(Long level2MenuId) throws NonAuthorityException{
+		return this.vaidateUserL2MenuAccessable((UserDetails) UserUtils.getCurrentUser(), level2MenuId);
+	}
+	
+	@Override
+	public SideMenuLevel1Menu vaidateL1MenuAccessable(Long level1MenuId) throws NonAuthorityException{
+		return this.vaidateUserL1MenuAccessable((UserDetails) UserUtils.getCurrentUser(), level1MenuId);
+	}
+
+	@Override
+	public SideMenuLevel2Menu vaidateUserL2MenuAccessable(UserDetails user, Long level2MenuId) throws NonAuthorityException{
 		Assert.notNull(level2MenuId, "二级菜单的id不能为空");
 		
 		SideMenuLevel2Menu l2 = menuService.getLevel2Menu(level2MenuId);
 		if(l2 != null) {
-			vaidateL1MenuAccessable(l2.getSideMenuLevel1Id());
+			vaidateUserL1MenuAccessable(user, l2.getSideMenuLevel1Id());
 			return l2;
 		}else {
 			throw new NonAuthorityException("根据id[" + level2MenuId + "]获得不到对应二级菜单");
@@ -44,12 +54,11 @@ public class AuthorityServiceImpl implements AuthorityService{
 	}
 	
 	@Override
-	public SideMenuLevel1Menu vaidateL1MenuAccessable(Long level1MenuId) throws NonAuthorityException{
+	public SideMenuLevel1Menu vaidateUserL1MenuAccessable(UserDetails user, Long level1MenuId) throws NonAuthorityException{
 		Assert.notNull(level1MenuId, "一级菜单的id不能为空");
 		
 		SideMenuLevel1Menu l1 = menuService.getLevel1Menu(level1MenuId);
 		if(l1 != null) {
-			UserDetails user = (UserDetails) UserUtils.getCurrentUser();
 			Set<String> userAuthorities = CollectionUtils.toSet(user.getAuthorities(), GrantedAuthority::getAuthority);
 			
 			//只有当用户至少包含菜单的其中一个权限时，才能验证成功
@@ -63,7 +72,7 @@ public class AuthorityServiceImpl implements AuthorityService{
 			throw new NonAuthorityException("根据id[" + level1MenuId + "]获得不到对应一级菜单");
 		}
 	}
-
+	
 	
 	public AuthorityVO getAuthority(String authCode) {
 		ABCUser user = (ABCUser) UserUtils.getCurrentUser();

@@ -12,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 @Entity
 @Table(name="t_sa_config_sidemenu_level1")
 public class SideMenuLevel1Menu {
@@ -28,6 +30,7 @@ public class SideMenuLevel1Menu {
 	@Column(name="c_authorities")
 	private String authorities;
 	
+	@JSONField(serialize=false)
 	@Transient
 	private Set<String> authoritySet = new LinkedHashSet<>();
 	

@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 @Entity
 @Table(name="t_sa_config_sidemenu_level2")
 public class SideMenuLevel2Menu {
@@ -49,6 +51,7 @@ public class SideMenuLevel2Menu {
 	@Column(name="tmpl_module_title")
 	private String templateModuleTitle;
 	
+	@JSONField(serialize=false)
 	@Transient
 	private SideMenuLevel1Menu level1Menu;
 
