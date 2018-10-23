@@ -3,7 +3,7 @@
 
 <c:set var="title">
 	<c:choose>
-		<c:when test="${entity != null }">修改-${entity.title }</c:when>
+		<c:when test="${entity != null }">${menu.title}-修改-${entity.title }</c:when>
 		<c:otherwise>${menu.title }-创建</c:otherwise>
 	</c:choose>
 </c:set>

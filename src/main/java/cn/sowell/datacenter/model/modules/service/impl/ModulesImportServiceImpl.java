@@ -206,7 +206,7 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 		int length = headerRow.getPhysicalNumberOfCells();
 		for (int i = 0; i < length; i++) {
 			Cell cell = row.getCell(i);
-			map.put(getStringWithBlank(headerRow.getCell(i)), getStringWithBlank(cell));
+			map.put(getStringWithBlank(headerRow.getCell(i)), FormatUtils.coalesceWhole(getStringWithBlank(cell), ""));
 		}
 		return map;
 	}
