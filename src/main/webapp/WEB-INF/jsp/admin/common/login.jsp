@@ -5,7 +5,7 @@
 	<head>
 		<base href="${basePath }" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<title>登录易+数据融合工具</title>
+		<title>登录<fmt:message key="theme.logo" bundle="${logo}"/>数据融合工具</title>
 		<meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
 		<script type="text/javascript">
 			if(window.ADMIN_LOADED === true){
@@ -125,7 +125,7 @@
     			<div class="Z-loginbox">
     	    		
         			<div class="loginbox-logo">
-            			<img src="media/admin/main/image/datacenter-login.png"/>
+            			<img src="<fmt:message key='theme.logoPhoto' bundle='${logo}'/>"/>
         			</div>
         			<div class="warn-warp">
 	        			<c:if test="${error != null }">

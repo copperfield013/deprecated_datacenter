@@ -35,7 +35,7 @@
 		</ul>
 	</li>
 </c:forEach>
-<li>
+<!-- <li>
 	<a href="#" class="menu-dropdown">
 		<i class="menu-icon fa fa-bookmark"></i>
 		<span class="menu-text">demo</span>
@@ -59,3 +59,4 @@
 	   	</li>
 	</ul>
 </li>
+ -->

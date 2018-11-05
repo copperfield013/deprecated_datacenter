@@ -4,3 +4,5 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <c:set var="cpfVersion" value="1.2" />
+
+<fmt:setBundle basename="jspPage" var="logo"/>
