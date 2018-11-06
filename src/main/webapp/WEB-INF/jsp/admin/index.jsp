@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title><fmt:message key="theme.logo" bundle="${logo}"/>数据融合工具</title>
+		<title><fmt:message key="theme.logo" bundle="${logo}"/></title>
 		<link rel="icon" href="favicon.ico" type="image/x-icon" />
 		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
 		<jsp:include page="/WEB-INF/jsp/admin/common/admin-include.jsp"></jsp:include>
@@ -29,7 +29,7 @@
 	        <div class="navbar-inner">
 	             <div class="navbar-header pull-left">
 	                 <a href="admin/logout" class="datacenter-logo">	                   
-	                  <fmt:message key="theme.logo" bundle="${logo}"/>数据融合中心
+	                  <fmt:message key="theme.logo" bundle="${logo}"/>
 	                 </a>
 	             </div>
 	             <div class="sidebar-collapse" id="sidebar-collapse">

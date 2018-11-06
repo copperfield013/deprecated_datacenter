@@ -125,7 +125,8 @@
     			<div class="Z-loginbox">
     	    		
         			<div class="loginbox-logo">
-            			<img src="<fmt:message key='theme.logoPhoto' bundle='${logo}'/>"/>
+            			<%-- <img src="<fmt:message key='theme.logoPhoto' bundle='${logo}'/>"/> --%>
+            			<h1><fmt:message key='theme.logo' bundle='${logo}'/></h1>
         			</div>
         			<div class="warn-warp">
 	        			<c:if test="${error != null }">
