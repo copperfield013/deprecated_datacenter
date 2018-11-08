@@ -5,16 +5,15 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
 
-import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
+import cn.sowell.datacenter.common.ApiUser;
 import cn.sowell.datacenter.model.admin.service.AdminUserService;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel1Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
@@ -36,10 +35,9 @@ public class ApiMenuController {
 	
 	@ResponseBody
 	@RequestMapping("/getMenu")
-	public ResponseJSON getMenu() {
+	public ResponseJSON getMenu(ApiUser user) {
 		JSONObjectResponse res = new JSONObjectResponse();
-		UserDetails user = userService.loadUserByUsername("admin");
-		List<SideMenuLevel1Menu> menus = menuService.getSideMenuLevelMenus((UserIdentifier) user);
+		List<SideMenuLevel1Menu> menus = menuService.getSideMenuLevelMenus(user);
 		menus = menus.stream().filter(menu->{
 			try {
 				authService.vaidateUserL1MenuAccessable(user, menu.getId());

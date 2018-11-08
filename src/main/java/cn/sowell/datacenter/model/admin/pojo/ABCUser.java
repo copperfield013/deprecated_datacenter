@@ -5,14 +5,13 @@ import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import com.abc.auth.pojo.UserInfo;
 
-import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.utils.CollectionUtils;
+import cn.sowell.datacenter.common.ApiUser;
 
-public class ABCUser implements UserDetails, UserIdentifier{
+public class ABCUser implements ApiUser{
 
 	/**
 	 * 

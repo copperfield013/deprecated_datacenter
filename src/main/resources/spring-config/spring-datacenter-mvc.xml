@@ -27,6 +27,8 @@
         		<bean class="cn.sowell.copframe.dto.page.PageInfoArgumentResolver" />
         		<!-- 构造参数map的解析器 -->
         		<bean class="cn.sowell.datacenter.common.RequestParameterMapCompositeResolver" />
+        		<!-- 获得api请求的用户 -->
+        		<bean class="cn.sowell.datacenter.common.ApiUserResolver" />
       		</list>
     	</property>
     	<!-- Controller的消息转换器 -->
