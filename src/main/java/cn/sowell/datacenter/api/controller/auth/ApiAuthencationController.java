@@ -1,4 +1,4 @@
-package cn.sowell.datacenter.api.controller.menu;
+package cn.sowell.datacenter.api.controller.auth;
 
 import javax.annotation.Resource;
 

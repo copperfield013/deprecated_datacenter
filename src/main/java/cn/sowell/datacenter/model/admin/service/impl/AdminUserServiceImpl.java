@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import javax.annotation.Resource;
 
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;

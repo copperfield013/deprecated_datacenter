@@ -1,4 +1,4 @@
-package cn.sowell.datacenter.api.controller.menu;
+package cn.sowell.datacenter.api.controller.entity;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +26,7 @@ import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.datacenter.api.controller.APiDataNotFoundException;
 import cn.sowell.datacenter.common.ApiUser;
 import cn.sowell.datacenter.common.RequestParameterMapComposite;
 import cn.sowell.datacenter.entityResolver.CEntityPropertyParser;
@@ -56,6 +57,7 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionTemplate;
 import cn.sowell.dataserver.model.tmpl.service.TemplateService;
+import javassist.NotFoundException;
 
 @Controller
 @RequestMapping("/api/entity")
@@ -222,6 +224,8 @@ public class ApiEntityController {
         	res.put("entity", jEntity);
         	JSONArray aHistoryItems = toHistoryItems(historyItems, historyId);
         	res.put("history", aHistoryItems);
+        }else {
+        	throw new APiDataNotFoundException();
         }
     	return res;
 	}

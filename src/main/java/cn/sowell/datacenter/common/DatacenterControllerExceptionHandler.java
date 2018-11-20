@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import cn.sowell.datacenter.api.controller.APiDataNotFoundException;
 import cn.sowell.datacenter.model.config.service.NonAuthorityException;
 
 @ControllerAdvice
@@ -31,6 +32,17 @@ public class DatacenterControllerExceptionHandler {
 		logger.error("访问权限不足", ex);
 		return "AccessDenied";
 	}
+	
+	
+	@ResponseBody
+	@ExceptionHandler(APiDataNotFoundException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public String handleAPiNotFoundException(APiDataNotFoundException ex) {
+		logger.error("接口请求数据不存在", ex);
+		return "APiNotFound";
+	}
+	
+	
 	
 	
 	

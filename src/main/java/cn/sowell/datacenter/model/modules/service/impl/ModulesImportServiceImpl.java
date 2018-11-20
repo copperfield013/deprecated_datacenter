@@ -41,6 +41,7 @@ import org.springframework.util.Assert;
 import com.abc.application.BizFusionContext;
 import com.abc.application.FusionContext;
 import com.abc.panel.Integration;
+import com.abc.panel.IntegrationMsg;
 import com.abc.panel.PanelFactory;
 
 import cn.sowell.copframe.common.UserIdentifier;
@@ -128,9 +129,13 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 				progress.appendMessage("解析数据：\r\n" + displayRow(map));
 				EntityComponent entityC = config.getConfigResolver().createEntityIgnoreUnsupportedElement(map);
 				Assert.isTrue(entityC != null && entityC.getEntity() != null, "创建的实体为null");
-				String code = integration.integrate(entityC.getEntity(), context);
-				logger.debug("修改记录" + code);
-				progress.endItemTimer().getLogger().success("第" + progress.getCurrent() + "条数据导入完成，用时" + numberFormat.format(progress.getLastItemInterval() / 1000f) + "秒");
+				IntegrationMsg msg = integration.integrate(context, entityC.getEntity());
+				logger.debug("修改记录" + msg.getCode());
+				if(msg.success()) {
+					progress.endItemTimer().getLogger().success("第" + progress.getCurrent() + "条数据导入完成，用时" + numberFormat.format(progress.getLastItemInterval() / 1000f) + "秒");
+				}else {
+					logger.debug("导入记录时出错");
+				}
 			} catch (Exception e) {
 				failed++;
 				logger.error("导入第" + rownum + "行时发生异常", e);
