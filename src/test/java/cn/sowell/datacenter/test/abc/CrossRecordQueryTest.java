@@ -1,9 +1,7 @@
 package cn.sowell.datacenter.test.abc;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -17,12 +15,11 @@ import com.abc.mapping.entity.Entity;
 import com.abc.mapping.entity.RelationEntity;
 import com.abc.panel.Discoverer;
 import com.abc.panel.PanelFactory;
-import com.abc.query.criteria.Criteria;
-import com.abc.query.criteria.CriteriaFactory;
-import com.abc.query.criteria.IncludeQueryCriteria;
-import com.abc.query.entity.impl.EntitySortedPagedQuery;
+import com.abc.rrc.query.criteria.EntityCriteriaFactory;
+import com.abc.rrc.query.entity.impl.EntitySortedPagedQuery;
+import com.abc.rrc.query.queryrecord.criteria.Criteria;
 
-@ContextConfiguration(locations = "classpath*:spring-config/spring-datacenter-context.xml")
+@ContextConfiguration(locations = "classpath*:spring-core.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
 public class CrossRecordQueryTest {
 	private static Logger logger = Logger
@@ -36,41 +33,31 @@ public class CrossRecordQueryTest {
 	public void select() {
 		BizFusionContext context = new BizFusionContext();
 		context.setMappingName(mapperName);
-		context.setUserCode("u1");
 		context.setSource(FusionContext.SOURCE_COMMON);
 //		context.setDictionaryMappingName("SWZHSQ");
 		context.setToEntityRange(FusionContext.ENTITY_CONTENT_RANGE_INTERSECTION);
-		List<Criteria> criterias = new ArrayList<Criteria>();
-		CriteriaFactory criteriaFactory = new CriteriaFactory(context);
-//		QueryCriteria common = criteriaFactory.createQueryCriteria("性别","男");
-//		criterias.add(common);
-//		InequalQueryCriteria inequal = criteriaFactory
-//				.createInequalQueryCriteria("身份证号码","");
-//		criterias.add(inequal);
 		
-//		QueryCriteria common = criteriaFactory.createLikeQueryCriteria("居住地址","居住地址","全名","杭州");
-//		criterias.add(common);
-		Criteria common = criteriaFactory.createLikeQueryCriteria("name","施连");
-		criterias.add(common);
-		common = criteriaFactory.createQueryCriteria("性别","女");
-		criterias.add(common);
-		
-		Set<String> set=new HashSet<String>();
-		set.add("流动人口");
-		
-		IncludeQueryCriteria icommon = criteriaFactory.createIncludeQueryCriteria("人口类型",set);
-		criterias.add(icommon);
-//		BetweenQueryCriteria bcommon = criteriaFactory.createBetweenQueryCriteria("现状表现.内容","left","right");
-//		criterias.add(bcommon);
-		common = criteriaFactory.createLikeQueryCriteria("现状表现.内容","2");
-		criterias.add(common);
-//		common = criteriaFactory.createLikeQueryCriteria("培养联系人","入党联系人","人力资源证书.名称","资源人口");
-//		criterias.add(common);
-//		common = criteriaFactory.createLikeQueryCriteria("培养联系人","入党联系人,子女","姓名","刘");
-//		criterias.add(common);
-		select(criterias, "name",context);
+		EntityCriteriaFactory criteriaFactory = new EntityCriteriaFactory(context);
+		criteriaFactory.addCriteria("name","施",EntityCriteriaFactory.CommonSymbol.LIKE);
+		criteriaFactory.addCriteria("身份证","330105196906281912",EntityCriteriaFactory.CommonSymbol.EQUAL);
+		criteriaFactory.addRelationCriteria("关系人口", "介绍的入党人,入党联系人",  createSubCriteria(context,"关系人口"));
+		List<Criteria> criterias=criteriaFactory.getCriterias();
+		select(criterias, "编辑时间",context);
 
 	}
+	
+	public Collection<Criteria> createSubCriteria(BizFusionContext pcontext,String relatioName){
+		String mapperName=pcontext.getABCNode().getRelation(relatioName).getFullTitle();
+		BizFusionContext context = new BizFusionContext();
+		context.setMappingName(mapperName);
+		context.setSource(FusionContext.SOURCE_COMMON);
+		context.setToEntityRange(FusionContext.ENTITY_CONTENT_RANGE_INTERSECTION);
+		EntityCriteriaFactory criteriaFactory = new EntityCriteriaFactory(context);
+		criteriaFactory.addCriteria("低保信息.申请人","你好",EntityCriteriaFactory.CommonSymbol.LIKE);
+		criteriaFactory.addCriteria("姓名","刘",EntityCriteriaFactory.CommonSymbol.LIKE);
+		List<Criteria> criterias=criteriaFactory.getCriterias();
+		return criterias; 
+	} 
 
 	public void select(List<Criteria> criterias, String colName,BizFusionContext context) {
 		long startTime = System.currentTimeMillis();
@@ -80,9 +67,9 @@ public class CrossRecordQueryTest {
 
 			EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(
 					criterias, colName);
-			sortedPagedQuery.setPageSize(30);
+			sortedPagedQuery.setPageSize(5);
 
-			for (int i = 1; i < 2; i++) {
+			for (int i = 1; i < 3; i++) {
 				logger.debug("第" + i + "页,共" + sortedPagedQuery.getAllCount()
 						+ "条数据,每页" + sortedPagedQuery.getPageSize() + "条");
 				// abcNode.selectAliasAsTitle();
@@ -97,6 +84,7 @@ public class CrossRecordQueryTest {
 						
 					}
 					logger.debug(entity.toJson());
+					
 				}
 			}
 			long endTime = System.currentTimeMillis();// 记录结束时间
@@ -108,4 +96,6 @@ public class CrossRecordQueryTest {
 		}
 
 	}
+	
+	
 }
