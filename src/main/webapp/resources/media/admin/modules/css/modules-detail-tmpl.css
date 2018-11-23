@@ -522,3 +522,19 @@ th.field-unavailable:before {
     min-width: 100%;
     width: auto !important;
 }
+
+
+
+.entity-detail-tmpl.entity-update-page .field-input-wrapper>.select2 {
+    height: 2.5em;
+    line-height: 2.5em;
+    font-size: 16px;
+    display: inline-block;
+    width: 100%;
+}
+.entity-detail-tmpl.entity-update-page .field-input-wrapper>.select2>span.selection>span.select2-selection--single {
+    height: 100%;
+    line-height: 2em;
+    border-radius: 0;
+    margin-top: -2px;
+}

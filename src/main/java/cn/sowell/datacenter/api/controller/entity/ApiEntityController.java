@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.copframe.dto.page.PageInfo;
@@ -57,7 +56,6 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionTemplate;
 import cn.sowell.dataserver.model.tmpl.service.TemplateService;
-import javassist.NotFoundException;
 
 @Controller
 @RequestMapping("/api/entity")
@@ -346,6 +344,9 @@ public class ApiEntityController {
 		jField.put("available", field.getFieldAvailable());
 		jField.put("optionKey", field.getOptionGroupKey());
 		jField.put("fieldId", field.getFieldId());
+		jField.put("access", field.getFieldAccess());
+		jField.put("validators", field.getValidators());
+		jField.put("additionAccess", field.getAdditionAccess());
 	}
 	
 	final static String KEY_FUSE_MODE = "%fuseMode%";

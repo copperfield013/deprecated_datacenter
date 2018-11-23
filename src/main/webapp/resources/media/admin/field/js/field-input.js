@@ -174,9 +174,15 @@ define(function(require, exports, module){
 							$select.append($option);
 						}
 					}
+					if($.fn.select2){
+						$select.select2({
+							theme	: "bootstrap",
+							width	: null
+						});
+					}
 					if(param.value !== undefined && param.value !== ''){
 						if($select.find('option[value="' + param.value + '"]').length > 0){
-							$select.val(param.value);
+							$select.val(param.value).trigger('change');
 						}
 					}
 				}

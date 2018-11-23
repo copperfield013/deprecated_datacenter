@@ -47,7 +47,7 @@
 										<input class="form-control" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}" placeholder="${criteriaItem.placeholder }" />
 									</c:when>
 									<c:when test="${criteriaItem.inputType == 'select' }">
-										<select class="form-control" name="criteria_${criteriaItem.id }" data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
+										<select class="form-control cpf-select2" name="criteria_${criteriaItem.id }" data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
 											<option value="">--请选择--</option>
 											<c:forEach var="option" items="${view.criteriaOptionMap[criteriaItem.fieldId]}">
 												<option value="${option.value }">${option.title}</option>

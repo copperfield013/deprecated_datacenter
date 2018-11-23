@@ -180,7 +180,7 @@ define(function(require, exports, module){
 					$select.val(val.split(',')).trigger('change');
 					return;
 				}
-				$(this).val(val);
+				$(this).val(val).trigger('change');
 			}
 		});
 		/**

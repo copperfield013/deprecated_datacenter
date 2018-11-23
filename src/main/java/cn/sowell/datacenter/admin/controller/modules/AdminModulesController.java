@@ -102,7 +102,6 @@ public class AdminModulesController {
 			@PathVariable Long menuId,
 			PageInfo pageInfo,
 			HttpServletRequest request, Model model, HttpSession session) {
-		
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		String moduleName = menu.getTemplateModule();
 		//创建条件对象
