@@ -187,7 +187,9 @@ define(function(require, exports, module){
 					}
 				}
 				$span.val = function(){
-					return $select.val.apply($select, arguments);
+					var result = $select.val.apply($select, arguments);
+					$select.trigger('change');
+					return result;
 				};
 				$span.funcMap = {
 					setReadonly	: function(toReadonly){
