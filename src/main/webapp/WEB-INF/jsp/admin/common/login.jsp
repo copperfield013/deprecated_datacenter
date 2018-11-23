@@ -5,7 +5,7 @@
 	<head>
 		<base href="${basePath }" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<title>登录<fmt:message key="theme.logo" bundle="${logo}"/>数据融合工具</title>
+		<title>登录<fmt:message key="theme.logo" bundle="${logo}"/></title>
 		<meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
 		<script type="text/javascript">
 			if(window.ADMIN_LOADED === true){
