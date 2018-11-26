@@ -2,9 +2,11 @@ package cn.sowell.datacenter.api.controller.entity;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -52,6 +54,7 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailField;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateListColumn;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionTemplate;
@@ -99,6 +102,7 @@ public class ApiEntityController {
 		//执行查询
 		ListTemplateEntityView view = (ListTemplateEntityView) vService.query(criteria);
 		
+		
 		res.put("module", toModule(module));
 		res.put("ltmpl", toListTemplate(view.getListTemplate()));
 		res.put("entities", toEntities(view));
@@ -114,13 +118,48 @@ public class ApiEntityController {
 		jModule.put("title", module.getTitle());
 		return jModule;
 	}
+	
+	static Pattern operatePattern = Pattern.compile("^operate[(-d)*(-u)*(-r)*]$"); 
 	private JSONObject toListTemplate(TemplateListTemplate listTemplate) {
 		JSONObject jDtmpl = new JSONObject();
 		jDtmpl.put("id", listTemplate.getId());
 		jDtmpl.put("title", listTemplate.getTitle());
 		jDtmpl.put("module", listTemplate.getModule());
+		jDtmpl.put("columns", toColumns(listTemplate.getColumns()));
+		Set<String> operates = null;
+		List<TemplateListColumn> columns = listTemplate.getColumns();
+		for (TemplateListColumn column : columns) {
+			if(column.getSpecialField() != null && operates == null && column.getSpecialField().startsWith("operate")) {
+				operates = new LinkedHashSet<>();
+				String specialField = column.getSpecialField();
+				if(specialField.contains("-d")) {
+					operates.add("detail");
+				}
+				if(specialField.contains("-u")) {
+					operates.add("update");
+				}
+				if(specialField.contains("-r")) {
+					operates.add("remove");
+				}
+			}
+		}
+		if(operates != null) {
+			jDtmpl.put("operates", operates);
+		}
 		return jDtmpl;
 	}
+	
+	private JSONArray toColumns(List<TemplateListColumn> columns) {
+		JSONArray aColumns = new JSONArray();
+		if(columns != null) {
+			columns.forEach(column->{
+				aColumns.add(column);
+			});
+		}
+		return aColumns;
+	}
+
+
 	private JSONArray toCriterias(ListTemplateEntityView view, ListTemplateEntityViewCriteria lcriteria) {
 		JSONArray aCriterias = new JSONArray();
 		TemplateListTemplate ltmpl = view.getListTemplate();

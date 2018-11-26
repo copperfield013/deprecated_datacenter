@@ -230,7 +230,7 @@
 															<label class="text">显示序号列</label>
 				    									</span>
 														<span class="col-lg-6 col-md-6 col-xs-6">
-															<input id="toggle-operate-col" class="checkbox-slider slider-icon colored-blue" type="checkbox">
+															<input id="toggle-operate-col" class="checkbox-slider slider-icon colored-blue" checked="checked" type="checkbox">
 															<label class="text">显示操作列</label>
 														</span>
 			   										</div>

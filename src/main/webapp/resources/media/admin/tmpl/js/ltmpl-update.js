@@ -1325,14 +1325,17 @@ define(function(require, exports, module){
 				$('#isAscending :checkbox', $page).prop('checked', tmplData.defaultOrderDirection === 'desc');
 				$('#pageSize', $page).val(tmplData.defaultPageSize);
 			}
-			
 			if($.isArray(columnData)){
+				var checkedNumberCol = false,
+				checkedOperateCol = false;
 				var operateReg = /^operate(\-d)?(\-u)?(\-r)?$/;
 				for(var i in columnData){
 					var column = columnData[i];
 					if(column.specialField === 'number'){
+						checkedNumberCol = true;
 						$('#toggle-number-col', $page).prop('checked', true).trigger('change');
 					}else if(operateReg.test(column.specialField)){
+						checkedOperateCol = true;
 						$('#toggle-operate-col', $page).prop('checked', true).trigger('change');
 						var res = operateReg.exec(column.specialField);
 						$('#show-operate-detail', $page).prop('checked', !!res[1]).trigger('change');
@@ -1352,6 +1355,15 @@ define(function(require, exports, module){
 					}
 				}
 				colTable.syncByColumns();
+				if(!checkedNumberCol){
+					$('#toggle-number-col', $page).prop('checked', false).trigger('change');
+				}
+				if(!checkedOperateCol){
+					$('#toggle-operate-col', $page).prop('checked', false).trigger('change');
+				}
+			}else{
+				$('#toggle-number-col', $page).trigger('change');
+				$('#toggle-operate-col', $page).trigger('change');
 			}
 		};
 		initByData(tmplData, columnData)
