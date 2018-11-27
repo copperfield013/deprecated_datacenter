@@ -49,7 +49,7 @@ import cn.sowell.dataserver.model.modules.service.impl.EntityViewCriteria;
 @Controller
 @RequestMapping("/admin/relationtreeview")
 public class AdminRelationTreeViewController {
-	@Resource
+	/*@Resource
 	ViewDataService vService;
 	
 	@Resource
@@ -242,11 +242,11 @@ public class AdminRelationTreeViewController {
 		return result.toString();
 	}
 	
-	/**
+	*//**
 	 * get某个mappingName对应的基本属性列表
 	 * @param mappingName
 	 * @return
-	 */
+	 *//*
 	private List<AttributeNode> getAbcNodeList(Integer nodeAttrCount, String mappingName) {
 		ABCNode abcNode = relationTreeViewService.getABCNode(mappingName);
 		List<AttributeNode> attributesNameCollection = abcNode.getOrderAttributes();
@@ -339,13 +339,13 @@ public class AdminRelationTreeViewController {
 		return "true";
 	}
 	
-	/**
+	*//**
 	 * 选择实体列表页面
 	 * @param mappingName
 	 * @param relationName
 	 * @param pageInfo
 	 * @return
-	 */
+	 *//*
 	@ResponseBody
 	@RequestMapping("/openSelection")
 	public ModelAndView openSelection(String mappingName,String relationName, PageInfo pageInfo,@RequestParam(defaultValue="1") Integer attrCount, HttpServletRequest request) {
@@ -407,10 +407,10 @@ public class AdminRelationTreeViewController {
 		return mv;
 	}
 	
-	/**
+	*//**
 	 * 获取指定实体的所有关系
 	 * @param mappingName
-	 */
+	 *//*
 	@ResponseBody
 	@RequestMapping("/getRelationAll")
 	public String getRelationAll(String mappingName) {
@@ -479,11 +479,11 @@ public class AdminRelationTreeViewController {
 		return "";
 	}
 	
-	/**
+	*//**
 	 * 保存实体与实体之间的关系
 	 * @param paramJson
 	 * @return
-	 */
+	 *//*
 	@ResponseBody
 	@RequestMapping("/addRelation")
 	public String addRelation(String parentMappingName, 
@@ -515,5 +515,5 @@ public class AdminRelationTreeViewController {
 		return null;
 		
 	}
-
+*/
 }

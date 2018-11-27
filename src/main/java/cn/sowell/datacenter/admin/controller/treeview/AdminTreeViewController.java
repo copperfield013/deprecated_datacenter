@@ -30,7 +30,7 @@ import cn.sowell.datacenter.model.treeview.service.TreeViewService;
 @Controller
 @RequestMapping("/admin/treeview")
 public class AdminTreeViewController {
-	
+	/*
 	@Resource
 	TreeViewService treeService;
 	
@@ -203,11 +203,11 @@ public class AdminTreeViewController {
 		return result.toString();
 	}
 	
-	/**
+	*//**
 	 * get某个mappingName对应的基本属性列表
 	 * @param mappingName
 	 * @return
-	 */
+	 *//*
 	private List<AttributeNode> getAbcNodeList(Integer nodeAttrCount, String mappingName) {
 		ABCNode abcNode = treeService.getABCNode(mappingName);
 		List<AttributeNode> attributesNameCollection = abcNode.getOrderAttributes();
@@ -292,5 +292,5 @@ public class AdminTreeViewController {
 		return "true";
 	}
 	
-
+*/
 }
