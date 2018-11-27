@@ -47,7 +47,7 @@ public class AuthorityServiceImpl implements AuthorityService{
 		SideMenuLevel2Menu l2 = menuService.getLevel2Menu(level2MenuId);
 		if(l2 != null) {
 			Set<String> userAuthorities = CollectionUtils.toSet(user.getAuthorities(), GrantedAuthority::getAuthority);
-			if(!l2.getAuthorities().isEmpty()) {
+			if(!l2.getAuthoritySet().isEmpty()) {
 				//只有当用户至少包含菜单的其中一个权限时，才能验证成功
 				if(!userAuthorities.stream()
 						.filter(auth->l2.getAuthoritySet().contains(auth))
