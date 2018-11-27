@@ -36,10 +36,11 @@
 								<ol class="dd-list">
 									<c:if test="${!empty menu.level2s }">
 										<c:forEach items="${menu.level2s }" var="level2">
-											<li class="dd-item" data-id="${level2.id }" group-id="${level2.isDefault == 1? 0: level2.templateGroupId }">
+											<li class="dd-item" data-id="${level2.id }" group-id="${level2.isDefault == 1? 0: level2.templateGroupId }" data-auths="${level2.authorities }">
 												<div class="dd-handle">
 													<span class="level2-title">${level2.title }</span>
 													<span class="level-operate">
+														<a href="#" title="权限：(${fn:join(level2AuthorityDescriptionMap[level2.id], ';') })"><i class="authority-config icon iconfont icon-authority"></i></a>
 														<a href="#"><i class="del-level fa fa-trash-o"></i></a>
 													</span>
 													<span class="tip-level-title">${level2.templateModuleTitle}-${level2.isDefault == 1? '默认': level2.templateGroupTitle }</span>
@@ -102,8 +103,9 @@
 	<script type="jquery/tmpl" id="level2-item-tmpl">
 		<li class="dd-item">
 			<div class="dd-handle">
-				<span class="level2-title"><input type="text" value="\${level2Title}" /></span>
+				<span class="level2-title"><input type="text" value="\${level2Title}" data-auths="" /></span>
 				<span class="level-operate">
+					<a href="#" title="权限：()"><i class="authority-config icon iconfont icon-authority"></i></a>
 					<a href="#"><i class="del-level fa fa-trash-o"></i></a>
 				</span>	
 				<span class="tip-level-title">\${moduleTitle}-\${tmplGroupTitle}</span>

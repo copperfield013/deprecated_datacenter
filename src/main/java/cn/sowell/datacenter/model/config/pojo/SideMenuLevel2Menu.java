@@ -1,5 +1,8 @@
 package cn.sowell.datacenter.model.config.pojo;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -51,9 +54,16 @@ public class SideMenuLevel2Menu {
 	@Column(name="tmpl_module_title")
 	private String templateModuleTitle;
 	
+	@Column(name="c_authorities")
+	private String authorities;
+	
 	@JSONField(serialize=false)
 	@Transient
 	private SideMenuLevel1Menu level1Menu;
+
+	@JSONField(serialize=false)
+	@Transient
+	private Set<String> authoritySet = new LinkedHashSet<>();
 
 	public Long getId() {
 		return id;
@@ -141,6 +151,22 @@ public class SideMenuLevel2Menu {
 
 	public void setLevel1Menu(SideMenuLevel1Menu level1Menu) {
 		this.level1Menu = level1Menu;
+	}
+
+	public String getAuthorities() {
+		return authorities;
+	}
+
+	public void setAuthorities(String authorities) {
+		this.authorities = authorities;
+	}
+
+	public Set<String> getAuthoritySet() {
+		return authoritySet;
+	}
+
+	public void setAuthoritySet(Set<String> authoritySet) {
+		this.authoritySet = authoritySet;
 	}
 
 

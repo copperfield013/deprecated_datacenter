@@ -17,5 +17,7 @@ public interface SideMenuService {
 
 	SideMenuLevel1Menu getLevel1Menu(Long menuId);
 
-	Map<Long, String[]> getMenuAuthNameMap(Set<Long> level1MenuId);
+	Map<Long, String[]> getMenu1AuthNameMap(Set<Long> level1MenuId);
+
+	Map<Long, String[]> getMenu2AuthNameMap(Set<Long> level2MenuId);
 }

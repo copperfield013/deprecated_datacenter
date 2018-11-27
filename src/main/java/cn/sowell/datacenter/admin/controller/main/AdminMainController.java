@@ -1,7 +1,11 @@
 package cn.sowell.datacenter.admin.controller.main;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -14,6 +18,7 @@ import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel1Menu;
+import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.config.service.ConfigAuthencationService;
 import cn.sowell.datacenter.model.config.service.NonAuthorityException;
@@ -42,17 +47,30 @@ public class  AdminMainController {
 	@RequestMapping({"/", ""})
 	public String index(Model model){
 		UserIdentifier user = UserUtils.getCurrentUser();
+		Map<Long, Boolean> l1disables = new HashMap<Long, Boolean>(),
+					l2disables = new HashMap<Long, Boolean>();
 		List<SideMenuLevel1Menu> menus = menuService.getSideMenuLevelMenus(user);
-		menus = menus.stream().filter(menu->{
+		menus.forEach(l1->{
 			try {
-				authService.vaidateL1MenuAccessable(menu.getId());
+				authService.vaidateL1MenuAccessable(l1.getId());
+				Iterator<SideMenuLevel2Menu> itrl2 = l1.getLevel2s().iterator();
+				while(itrl2.hasNext()) {
+					SideMenuLevel2Menu l2 = itrl2.next();
+					try {
+						authService.vaidateL2MenuAccessable(l2.getId());
+					} catch (Exception e) {
+						l2disables.put(l2.getId(), true);
+					}
+				}
+				
 			} catch (NonAuthorityException e) {
-				return false;
+				l1disables.put(l1.getId(), true);
 			}
-			return true;
-		}).collect(Collectors.toList());
+		});
 		model.addAttribute("user", user);
 		model.addAttribute("menus", menus);
+		model.addAttribute("l1disables", l1disables);
+		model.addAttribute("l2disables", l2disables);
 		model.addAttribute("configAuth", confAuthenService.getAdminConfigAuthen());
 		return "/admin/index.jsp";
 	}

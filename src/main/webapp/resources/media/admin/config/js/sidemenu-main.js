@@ -124,6 +124,7 @@ define(function(require, exports, module){
 							id			: $level2Li.attr('data-id'),
 							title		: $level2Li.find('.level2-title').text(),
 							order		: j,
+							authorities	: $level2Li.attr('data-auths'),
 							tmplGroupId	: $level2Li.attr('group-id')
 					}
 					module.groups.push(group);

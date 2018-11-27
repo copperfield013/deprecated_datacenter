@@ -73,13 +73,25 @@ public class AdminConfigSidemenuController {
 		List<SideMenuLevel1Menu> menus = menuService.getSideMenuLevelMenus(user);
 		List<Module> modules = configService.getEnabledModules();
 		Map<String, List<TemplateGroup>> tmplGroupsMap = tService.queryTemplateGroups(CollectionUtils.toSet(modules, module->module.getName()));
-		Map<Long, String[]> level1AuthorityDescriptionMap = menuService.getMenuAuthNameMap(CollectionUtils.toSet(menus, menu->menu.getId()));
+		Map<Long, String[]> level1AuthorityDescriptionMap = menuService.getMenu1AuthNameMap(CollectionUtils.toSet(menus, menu->menu.getId()));
+		
+		Set<SideMenuLevel2Menu> l2MenuSet = new HashSet<SideMenuLevel2Menu>();
+		if(menus != null) {
+			menus.forEach(menu->{
+				List<SideMenuLevel2Menu> l2menus = menu.getLevel2s();
+				if(l2menus != null) {
+					l2MenuSet.addAll(l2menus);
+				}
+			});
+		}
+		Map<Long, String[]> level2AuthorityDescriptionMap = menuService.getMenu2AuthNameMap(CollectionUtils.toSet(l2MenuSet, l2menu->l2menu.getId()));
 		JSONObject config = configService.getModuleConfigJson();
 		model.addAttribute("config", config);
 		model.addAttribute("modules", modules);
 		model.addAttribute("menus", menus);
 		model.addAttribute("tmplGroupsMap", tmplGroupsMap);
 		model.addAttribute("level1AuthorityDescriptionMap", level1AuthorityDescriptionMap);
+		model.addAttribute("level2AuthorityDescriptionMap", level2AuthorityDescriptionMap);
 		return AdminConstants.JSP_CONFIG_SIDEMENU + "/sidemenu_main.jsp";
 	}
 	
@@ -103,28 +115,29 @@ public class AdminConfigSidemenuController {
 		JSONArray jModules = req.getJSONArray("modules");
 		List<SideMenuLevel1Menu> modules = new ArrayList<>();
 		for (Object x : jModules) {
-			JSONObject jModule = (JSONObject) x;
-			SideMenuLevel1Menu module = new SideMenuLevel1Menu();
-			module.setId(jModule.getLong("id"));
-			module.setTitle(jModule.getString("title"));
-			module.setAuthorities(jModule.getString("authorities"));
-			module.setOrder(jModule.getInteger("order"));
-			module.setLevel2s(new ArrayList<>());
-			JSONArray jGroups = jModule.getJSONArray("groups");
+			JSONObject jL1Menu = (JSONObject) x;
+			SideMenuLevel1Menu l1menu = new SideMenuLevel1Menu();
+			l1menu.setId(jL1Menu.getLong("id"));
+			l1menu.setTitle(jL1Menu.getString("title"));
+			l1menu.setAuthorities(jL1Menu.getString("authorities"));
+			l1menu.setOrder(jL1Menu.getInteger("order"));
+			l1menu.setLevel2s(new ArrayList<>());
+			JSONArray jGroups = jL1Menu.getJSONArray("groups");
 			for (Object y : jGroups) {
-				JSONObject jGroup = (JSONObject) y;
-				SideMenuLevel2Menu group = new SideMenuLevel2Menu();
-				group.setId(jGroup.getLong("id"));
-				group.setTitle(jGroup.getString("title"));
-				group.setOrder(jGroup.getInteger("order"));
-				group.setTemplateGroupId(jGroup.getLong("tmplGroupId"));
-				if(Long.valueOf(0).equals(group.getTemplateGroupId())) {
-					group.setIsDefault(1);
-					group.setTemplateGroupId(null);
+				JSONObject jL2Menu = (JSONObject) y;
+				SideMenuLevel2Menu l2menu = new SideMenuLevel2Menu();
+				l2menu.setId(jL2Menu.getLong("id"));
+				l2menu.setTitle(jL2Menu.getString("title"));
+				l2menu.setOrder(jL2Menu.getInteger("order"));
+				l2menu.setTemplateGroupId(jL2Menu.getLong("tmplGroupId"));
+				l2menu.setAuthorities(jL2Menu.getString("authorities"));
+				if(Long.valueOf(0).equals(l2menu.getTemplateGroupId())) {
+					l2menu.setIsDefault(1);
+					l2menu.setTemplateGroupId(null);
 				}
-				module.getLevel2s().add(group);
+				l1menu.getLevel2s().add(l2menu);
 			}
-			modules.add(module);
+			modules.add(l1menu);
 		}
 		return modules;
 	}

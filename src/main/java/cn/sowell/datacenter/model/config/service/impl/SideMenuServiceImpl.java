@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.annotation.Resource;
 
@@ -82,9 +83,9 @@ public class SideMenuServiceImpl implements SideMenuService, InitializingBean{
 						= sDao.querySideMenuLevel2Map();
 			level1s.forEach(level1->{
 				//转换权限字符串
-				String authorities = level1.getAuthorities();
-				if(authorities != null) {
-					String[] split = authorities.split(";");
+				String l1Authorities = level1.getAuthorities();
+				if(l1Authorities != null) {
+					String[] split = l1Authorities.split(";");
 					for (String auth : split) {
 						if(TextUtils.hasText(auth))
 						level1.getAuthoritySet().add(auth);
@@ -105,6 +106,17 @@ public class SideMenuServiceImpl implements SideMenuService, InitializingBean{
 								l2.setTemplateModuleTitle(module.getTitle());
 								l2.setTemplateModule(module.getName());
 								l2.setLevel1Menu(level1);
+								
+								//转换权限字符串
+								String l2Authorities = l2.getAuthorities();
+								if(l2Authorities != null) {
+									String[] split = l2Authorities.split(";");
+									for (String auth : split) {
+										if(TextUtils.hasText(auth))
+											l2.getAuthoritySet().add(auth);
+									}
+								}
+								
 								continue ;
 							}
 						}
@@ -168,6 +180,7 @@ public class SideMenuServiceImpl implements SideMenuService, InitializingBean{
 		updateLevel2Menu.setBeforeUpdate((o, g)->{
 			o.setOrder(g.getOrder());
 			o.setTitle(g.getTitle());
+			o.setAuthorities(g.getAuthorities());
 		});
 		updateLevel1Menu.doUpdate(originModules, modules);
 		reloadMenuMap();
@@ -183,29 +196,48 @@ public class SideMenuServiceImpl implements SideMenuService, InitializingBean{
 		return getL1MenuMap().get(menuId);
 	}
 
-	@Override
-	public Map<Long, String[]> getMenuAuthNameMap(Set<Long> level1MenuIds) {
+	public Map<Long, String[]> getMenuAuthNameMap(Set<Long> menuIds, Function<Long, Set<String>> authGetter) {
 		Map<Long, String[]> map = new HashMap<>();
-		if(level1MenuIds != null) {
+		if(menuIds != null) {
 			Collection<AuthorityVO> auths = ServiceFactory.getRoleAuthorityService().getFunctionAuth(((ABCUser) UserUtils.getCurrentUser()).getUserInfo());
-			level1MenuIds.forEach(menuId->{
-				SideMenuLevel1Menu menu = getLevel1Menu(menuId);
-				if(menu != null) {
-					Set<String> authorities = menu.getAuthoritySet();
-					if(authorities != null) {
-						List<String> authNameList = Lists.newArrayList();
-						authorities.forEach(authCode->{
-							AuthorityVO auth = auths.stream().filter(au->authCode.equals(au.getCode())).findFirst().orElse(null);
-							if(auth != null) {
-								authNameList.add(auth.getName());
-							}
-						});
-						map.put(menuId, authNameList.toArray(new String[authNameList.size()]));
-					}
+			menuIds.forEach(menuId->{
+				Set<String> authorities = authGetter.apply(menuId);
+				if(authorities != null) {
+					List<String> authNameList = Lists.newArrayList();
+					authorities.forEach(authCode->{
+						AuthorityVO auth = auths.stream().filter(au->authCode.equals(au.getCode())).findFirst().orElse(null);
+						if(auth != null) {
+							authNameList.add(auth.getName());
+						}
+					});
+					map.put(menuId, authNameList.toArray(new String[authNameList.size()]));
 				}
 			});
 		}
 		return map;
 	}
+	
+	@Override
+	public Map<Long, String[]> getMenu1AuthNameMap(Set<Long> level1MenuId) {
+		return getMenuAuthNameMap(level1MenuId, l1MenuId->{
+			SideMenuLevel1Menu menu = getLevel1Menu(l1MenuId);
+			if(menu != null) {
+				return menu.getAuthoritySet();
+			}
+			return null;
+		});
+	}
+	
+	@Override
+	public Map<Long, String[]> getMenu2AuthNameMap(Set<Long> level2MenuId) {
+		return getMenuAuthNameMap(level2MenuId, l1MenuId->{
+			SideMenuLevel2Menu menu = getLevel2Menu(l1MenuId);
+			if(menu != null) {
+				return menu.getAuthoritySet();
+			}
+			return null;
+		});
+	}
+	
 
 }
