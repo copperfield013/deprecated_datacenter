@@ -40,7 +40,7 @@ define(function(require, exports, module){
 					if(data.status === 'suc'){
 						Dialog.notice('保存成功', 'success');
 						$page.getLocatePage().close();
-						var tpage = require('page').getPage('ltmpl_list');
+						var tpage = require('page').getPage( module + '_ltmpl_list');
 						if(tpage){
 							tpage.refresh();
 						}
