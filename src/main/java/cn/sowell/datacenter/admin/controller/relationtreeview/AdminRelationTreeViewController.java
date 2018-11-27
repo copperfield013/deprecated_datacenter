@@ -29,9 +29,11 @@ import com.abc.mapping.node.ABCNode;
 import com.abc.mapping.node.AttributeNode;
 import com.abc.panel.Discoverer;
 import com.abc.panel.PanelFactory;
-import com.abc.query.criteria.Criteria;
-import com.abc.query.criteria.CriteriaFactory;
-import com.abc.query.entity.impl.EntitySortedPagedQuery;
+import com.abc.rrc.query.criteria.CommonSymbol;
+import com.abc.rrc.query.criteria.EntityCriteriaFactory;
+import com.abc.rrc.query.entity.impl.EntitySortedPagedQuery;
+import com.abc.rrc.query.queryrecord.criteria.Criteria;
+import com.abc.rrc.query.queryrecord.criteria.CriteriaFactory;
 import com.abc.service.RelationTreeServiceFactory;
 import com.abc.vo.RelationVO;
 import com.alibaba.fastjson.JSONObject;
@@ -87,13 +89,13 @@ public class AdminRelationTreeViewController {
 		List<AttributeNode> abcNodeAttrList = getAbcNodeList(null, mappingName);
 		int abcNodeAttrSize = 0;
 		if(abcNodeAttrList != null && abcNodeAttrList.size() > 0) {
-			abcNodeAttrSize = abcNodeAttrList.size();
+			abcNodeAttrSize = abcNodeAttrList.size() > 3? 3:abcNodeAttrList.size();
 			model.addAttribute("abcNodeAttrSize", abcNodeAttrSize);
 		}
 		
-		nodeAttrCount = (nodeAttrCount == null || nodeAttrCount.equals("")) ? abcNodeAttrSize : nodeAttrCount;
+		nodeAttrCount = (nodeAttrCount == null || "".equals(nodeAttrCount)) ? abcNodeAttrSize : nodeAttrCount;
 		
-		model.addAttribute("abcNodeAttrSize", abcNodeAttrList.size());
+		model.addAttribute("abcNodeAttrSize", abcNodeAttrSize);
 		model.addAttribute("abcNodeAttrCount", nodeAttrCount);
 		
 		List<String> nameList = new ArrayList<String>();
@@ -173,7 +175,6 @@ public class AdminRelationTreeViewController {
 			}
 		}
 		
-		
 		Set<String> relationNames = dataEntity.getRelationNames();
 		Map<String, List> relationsMap = new HashMap<>();
 		Map<String, Object> resultMap = new HashMap<>();
@@ -219,7 +220,7 @@ public class AdminRelationTreeViewController {
 	}
 	
 	private void getNodeInfo(String mappingName,List<String> nameList, Map<String, String> mappingNameMap, Map<String, List> labelSetMap, Map<String, String> subAbcNodeNameMap) {
-		Collection<RelationVO> relationVoList = RelationTreeServiceFactory.getRelationTreeService().getRelationVO(mappingName);
+		Collection<RelationVO> relationVoList = RelationTreeServiceFactory.getRelationTreeService().a(mappingName);
 		relationVoList.forEach(relationVo -> {
 			
 			nameList.add(relationVo.getName());
@@ -249,6 +250,14 @@ public class AdminRelationTreeViewController {
 	private List<AttributeNode> getAbcNodeList(Integer nodeAttrCount, String mappingName) {
 		ABCNode abcNode = relationTreeViewService.getABCNode(mappingName);
 		List<AttributeNode> attributesNameCollection = abcNode.getOrderAttributes();
+		
+		System.out.println("nodeAttrCount: " + nodeAttrCount + "mappingName: " + mappingName);
+		for (int i = 0; i < attributesNameCollection.size(); i++) {
+			AttributeNode attrNode = attributesNameCollection.get(i);
+			
+			System.out.println("序号："+ i++ +",order："+attrNode.getOrder()+",name:"+attrNode.getTitle()+",fullTitle:"+attrNode.getFullTitle());
+		}
+		
 		List<AttributeNode> attributesNameList = new ArrayList<>();
 		if(nodeAttrCount != null && nodeAttrCount>0) {
 			for(Integer i=0; i<nodeAttrCount; i++) {
@@ -352,21 +361,25 @@ public class AdminRelationTreeViewController {
 		Map<String, Object> attrMap = new TreeMap<String, Object>();
 		
 		//设置查询条件start
-		CriteriaFactory criteriaFactory = new CriteriaFactory(context);
-		List<Criteria> criterias = new ArrayList<Criteria>();
+		//CriteriaFactory criteriaFactory = new CriteriaFactory(context);
+		EntityCriteriaFactory criteriaFactory = new EntityCriteriaFactory(context);
+		
+		List<Criteria> criterias = null;
 		for (AttributeNode attr : attrList) {
 			String param = request.getParameter(attr.getTitle());
 			attrMap.put(attr.getTitle(), param);
 			if (param !=null && param.trim() !="") {
-				Criteria common = criteriaFactory.createLikeQueryCriteria(attr.getTitle(),param);
-				criterias.add(common);
+				//Criteria common = criteriaFactory.createLikeQueryCriteria(attr.getTitle(),param);
+				EntityCriteriaFactory addCriteria = criteriaFactory.addCriteria(attr.getTitle(), param, CommonSymbol.LIKE);
 			}
 		}
+		criterias = criteriaFactory.getCriterias();
+		
 		//end
 		
 		Discoverer discoverer = PanelFactory.getDiscoverer(context);
-		EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(criterias, null);
-		
+		//EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(criterias, null);
+		 EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(criterias, null);
 		Integer pageNo = pageInfo.getPageNo();
 		sortedPagedQuery.setPageSize(pageInfo.getPageSize());
 		pageInfo.setCount(sortedPagedQuery.getAllCount());
@@ -405,7 +418,7 @@ public class AdminRelationTreeViewController {
 		try {
 			List<String> nameList = new ArrayList<String>();
 			Map<String, List> labelSetMap = new HashMap<>();
-			Collection<RelationVO> relationVoList = RelationTreeServiceFactory.getRelationTreeService().getRelationVO(mappingName);
+			Collection<RelationVO> relationVoList = RelationTreeServiceFactory.getRelationTreeService().a(mappingName);
 			relationVoList.forEach(relationVo -> {
 				nameList.add(relationVo.getName());
 				labelSetMap.put(relationVo.getName(), new ArrayList<>(relationVo.getLabelSet()));
@@ -445,7 +458,7 @@ public class AdminRelationTreeViewController {
 			
 			Map<String, List> labelSetMap = new HashMap<>();
 			Map<String, Object> mappingNameMap = new HashMap<String, Object>();
-			Collection<RelationVO> relationVoList = RelationTreeServiceFactory.getRelationTreeService().getRelationVO(mappingName);
+			Collection<RelationVO> relationVoList = RelationTreeServiceFactory.getRelationTreeService().a(mappingName);
 			relationVoList.forEach(relationVo -> {
 				labelSetMap.put(relationVo.getName(), new ArrayList<>(relationVo.getLabelSet()));
 				mappingNameMap.put(relationVo.getName(), relationVo.getMappingName());

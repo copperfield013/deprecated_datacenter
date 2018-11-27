@@ -35,7 +35,7 @@
 		</ul>
 	</li>
 </c:forEach>
-<!-- <li>
+ <!-- <li>
 	<a href="#" class="menu-dropdown">
 		<i class="menu-icon fa fa-bookmark"></i>
 		<span class="menu-text">demo</span>
@@ -53,10 +53,9 @@
 	   		</a>
 	   	</li>
 	   		<li>
-	   		<a class="tab" href="admin/relationtreeview/tree_view_new?id=0de2e569b93f43f1aa68c08965c52460&mappingName=关系树-测试--人口" target="relationtreeview" title="树形控件">
+	   		<a class="tab" href="admin/relationtreeview/tree_view_new?id=cf6b9b33f9c04ad49b18a51f6277620c&mappingName=人口信息" target="relationtreeview" title="树形控件">
 	   			<span class="menu-text">关系人口-tree</span>
 	   		</a>
 	   	</li>
 	</ul>
-</li>
- -->
+</li> -->

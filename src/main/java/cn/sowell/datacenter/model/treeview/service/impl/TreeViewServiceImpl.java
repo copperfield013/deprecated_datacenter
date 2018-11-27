@@ -55,7 +55,7 @@ public class TreeViewServiceImpl implements TreeViewService {
 			});
 		}
 		Integration integration=PanelFactory.getIntegration();
-		return integration.integrate(entity, context);
+		return integration.integrate(context, entity).getCode();
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class TreeViewServiceImpl implements TreeViewService {
 			BizFusionContext context = new BizFusionContext();
 			context.setMappingName(mappingName);
 			context.setSource(FusionContext.SOURCE_COMMON);
-			context.setUserCode("u5");
+			context.setUserCode("e10adc3949ba59abbe56e057f28888u5");
 			Discoverer discoverer = PanelFactory.getDiscoverer(context);
 			Entity result = discoverer.discover(code);
 			if(result != null) {
@@ -97,7 +97,7 @@ public class TreeViewServiceImpl implements TreeViewService {
 	public boolean deleteTree(String code) {
 		RemovedFusionContext entityInfo = new RemovedFusionContext(code, null, null);
 		Integration integration=PanelFactory.getIntegration();
-		boolean bool = integration.remove(entityInfo);
+		boolean bool = integration.remove(entityInfo).success();
 		return bool;
 	}
 

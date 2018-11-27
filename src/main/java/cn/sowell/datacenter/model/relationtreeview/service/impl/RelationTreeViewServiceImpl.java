@@ -62,7 +62,7 @@ public class RelationTreeViewServiceImpl implements RelationTreeViewService {
 			});
 		}
 		Integration integration=PanelFactory.getIntegration();
-		return integration.integrate(entity, context);
+		return integration.integrate(context, entity).getCode();
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class RelationTreeViewServiceImpl implements RelationTreeViewService {
 			BizFusionContext context = new BizFusionContext();
 			context.setMappingName(mappingName);
 			context.setSource(FusionContext.SOURCE_COMMON);
-			context.setUserCode("u5");
+			context.setUserCode("e10adc3949ba59abbe56e057f28888u5");
 			Discoverer discoverer = PanelFactory.getDiscoverer(context);
 			Entity result = discoverer.discover(code);
 			if(result != null) {
@@ -91,7 +91,7 @@ public class RelationTreeViewServiceImpl implements RelationTreeViewService {
 			BizFusionContext context = new BizFusionContext();
 			context.setMappingName(mappingName);
 			context.setSource(FusionContext.SOURCE_COMMON);
-			context.setUserCode("u5");
+			context.setUserCode("e10adc3949ba59abbe56e057f28888u5");
 			Discoverer discoverer = PanelFactory.getDiscoverer(context);
 			Entity result = discoverer.discover(code);
 			return result;
@@ -104,7 +104,7 @@ public class RelationTreeViewServiceImpl implements RelationTreeViewService {
 	public boolean deleteTree(String code) {
 		RemovedFusionContext entityInfo = new RemovedFusionContext(code, null, null);
 		Integration integration=PanelFactory.getIntegration();
-		boolean bool = integration.remove(entityInfo);
+		boolean bool = integration.remove(entityInfo).success();
 		return bool;
 	}
 
@@ -127,7 +127,7 @@ public class RelationTreeViewServiceImpl implements RelationTreeViewService {
 		
 		BizFusionContext context = getBizFusionContext(parentMappingName);
 		EntityRelation entityRelation = getEntityRelation(parentId,chileId,relationName, context, labelsetmap, labelsetvalue);
-		String code = integration.integrateRelation(entityRelation, context);
+		String code = integration.integrateRelation(context, entityRelation).getCode();
 		return code;
 	}
 	

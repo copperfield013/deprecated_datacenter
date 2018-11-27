@@ -181,7 +181,7 @@ public class AdminTreeViewController {
 	}
 	
 	private void getNodeInfo(String mappingName,List<String> nameList, Map<String, String> mappingNameMap, Map<String, List> labelSetMap, Map<String, String> subAbcNodeNameMap) {
-		Collection<RelationVO> relationVoList = RelationTreeServiceFactory.getRelationTreeService().getRelationVO(mappingName);
+		Collection<RelationVO> relationVoList = RelationTreeServiceFactory.getRelationTreeService().a(mappingName);
 		relationVoList.forEach(relationVo -> {
 			
 			nameList.add(relationVo.getName());
