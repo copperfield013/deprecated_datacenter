@@ -220,7 +220,7 @@ public class AdminRelationTreeViewController {
 	}
 	
 	private void getNodeInfo(String mappingName,List<String> nameList, Map<String, String> mappingNameMap, Map<String, List> labelSetMap, Map<String, String> subAbcNodeNameMap) {
-		Collection<RelationVO> relationVoList = RelationTreeServiceFactory.getRelationTreeService().a(mappingName);
+		Collection<RelationVO> relationVoList = RelationTreeServiceFactory.getRelationTreeService().getRelationVO(mappingName);
 		relationVoList.forEach(relationVo -> {
 			
 			nameList.add(relationVo.getName());
@@ -418,7 +418,7 @@ public class AdminRelationTreeViewController {
 		try {
 			List<String> nameList = new ArrayList<String>();
 			Map<String, List> labelSetMap = new HashMap<>();
-			Collection<RelationVO> relationVoList = RelationTreeServiceFactory.getRelationTreeService().a(mappingName);
+			Collection<RelationVO> relationVoList = RelationTreeServiceFactory.getRelationTreeService().getRelationVO(mappingName);
 			relationVoList.forEach(relationVo -> {
 				nameList.add(relationVo.getName());
 				labelSetMap.put(relationVo.getName(), new ArrayList<>(relationVo.getLabelSet()));
@@ -458,7 +458,7 @@ public class AdminRelationTreeViewController {
 			
 			Map<String, List> labelSetMap = new HashMap<>();
 			Map<String, Object> mappingNameMap = new HashMap<String, Object>();
-			Collection<RelationVO> relationVoList = RelationTreeServiceFactory.getRelationTreeService().a(mappingName);
+			Collection<RelationVO> relationVoList = RelationTreeServiceFactory.getRelationTreeService().getRelationVO(mappingName);
 			relationVoList.forEach(relationVo -> {
 				labelSetMap.put(relationVo.getName(), new ArrayList<>(relationVo.getLabelSet()));
 				mappingNameMap.put(relationVo.getName(), relationVo.getMappingName());
