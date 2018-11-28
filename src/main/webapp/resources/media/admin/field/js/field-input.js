@@ -9,6 +9,8 @@ define(function(require, exports, module){
 			//字段类型
 			//text			： 普通文本
 			//textarea		： 长文本
+			//int			：整数
+			//decimal		：小数
 			//select		： 单选下拉框
 			//multiselect	: 多选下拉框
 			//caseelect		: 级联下拉框
@@ -144,6 +146,25 @@ define(function(require, exports, module){
 					$ta.val(param.value);
 				}
 				return $ta;
+			},
+			'int'			: function(){
+				var $text = $('<input type="text" />');
+				setNormalAttrs($text);
+				$text.on('input',function(){
+					this.value = this.value.replace(/[^\d\-]/g, '').replace(/(\d+)\-+(\d*)/, '$1$2').replace(/\-+/, '-');
+			    })
+				if(param.value){
+					$text.val(param.value);
+				}
+				return $text;
+			},
+			'decimal'		: function(){
+				var $text = $('<input type="number" />');
+				setNormalAttrs($text);
+				if(param.value){
+					$text.val(param.value);
+				}
+				return $text;
 			},
 			//下拉选择框
 			'select'		: function(withoutEmpty){

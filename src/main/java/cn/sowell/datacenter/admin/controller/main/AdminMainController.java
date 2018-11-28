@@ -53,16 +53,13 @@ public class  AdminMainController {
 		menus.forEach(l1->{
 			try {
 				authService.vaidateL1MenuAccessable(l1.getId());
-				Iterator<SideMenuLevel2Menu> itrl2 = l1.getLevel2s().iterator();
-				while(itrl2.hasNext()) {
-					SideMenuLevel2Menu l2 = itrl2.next();
+				for(SideMenuLevel2Menu l2 : l1.getLevel2s()) {
 					try {
 						authService.vaidateL2MenuAccessable(l2.getId());
 					} catch (Exception e) {
 						l2disables.put(l2.getId(), true);
 					}
 				}
-				
 			} catch (NonAuthorityException e) {
 				l1disables.put(l1.getId(), true);
 			}
