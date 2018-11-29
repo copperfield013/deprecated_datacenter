@@ -1,14 +1,8 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 
-<c:set var="title">
-	<c:choose>
-		<c:when test="${entity != null }">${menu.title}-修改-${entity.title }</c:when>
-		<c:otherwise>${menu.title }-创建</c:otherwise>
-	</c:choose>
-</c:set>
-<title>${title }</title>
-<div class="entity-detail-tmpl entity-update-page" id="${module.name }-update-tmpl-${entity.code }-${RES_STAMP}">
+<title>修改用户</title>
+<div class="entity-detail-tmpl entity-update-page" id="user-update-${entity.code }-${RES_STAMP}">
 	<div class="float-operate-area">
 		<div class="operate-area-cover"></div>
 		<a id="save" title="保存"><i class="fa fa-check-square"></i></a>
@@ -16,13 +10,9 @@
 	<div class="detail field-input-container">
 		<div class="page-header">
 			<div class="header-title">
-				<h1>${title }</h1>
+				<h1>修改用户</h1>
 			</div>
 			<div class="template-container title-operate">
-				<label style="display: inline-flex" title="是否开启融合模式">
-					<input id="fuse-switch" class="checkbox-slider toggle" type="checkbox">
-					<span class="text"></span>
-				</label> 
 				<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
 					<i style="font-size: 20px" class="glyphicon glyphicon-refresh"></i>
 				</a>
@@ -30,30 +20,8 @@
 		</div>
 		<div class="page-body">
 			<div class="col-lg-offset-1 col-lg-10">
-				<form class="form-horizontal group-container" action="admin/modules/curd/save/${menu.id }/${module.name }">
+				<form class="form-horizontal group-container" action="admin/config/user/save">
 					<input type="hidden" name="${config.codeAttributeName }" value="${entity.code }" />
-					<c:if test="${!empty groupPremises }">
-						<div class="widget field-group">
-							<div class="widget-header">
-								<span class="widget-caption">
-									<span class="group-title">默认字段（不可修改）</span>
-								</span>
-							</div>
-							<div class="widget-body field-container premises-container">
-								<c:forEach var="premise" items="${groupPremises }">
-									<c:if test="${premise.fieldName != null }">
-										<div class="form-group field-item">
-											<label class="control-label field-title">${premise.fieldTitle }</label>
-											<div class="field-value" value-field-name="${premise.fieldName }">
-												${entity== null? premise.fieldValue: entity.smap[premise.fieldName] }
-												<input type="hidden" name="${premise.fieldName }" value="${entity== null? premise.fieldValue: entity.smap[premise.fieldName] }" />
-											</div>
-										</div>
-									</c:if>
-								</c:forEach>
-							</div>
-						</div>
-					</c:if>
 					
 					<c:forEach var="tmplGroup" items="${dtmpl.groups }">
 						<div class="widget field-group">
@@ -212,12 +180,11 @@
 </div>
 <script>
 	seajs.use(['modules/js/modules-update'], function(ModulesUpdate){
-		var $page = $('#${module.name }-update-tmpl-${entity.code }-${RES_STAMP}');
+		var $page = $('#user-update-${entity.code }-${RES_STAMP}');
 		ModulesUpdate.init(
 				$page, 
-				'${module.name}', 
 				'${entity.code}',
-				{type: 'entity', menuId: '${menu.id }'}
+				{type: 'user'}
 				);
 	});
 </script>

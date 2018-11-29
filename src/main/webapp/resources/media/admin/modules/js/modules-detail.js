@@ -4,9 +4,41 @@ define(function(require, exports, module){
 		Ajax = require('ajax'),
 		$CPF = require('$CPF'),
 		DtmplUpdate = require('tmpl/js/dtmpl-update.js'),
-		Utils = require('utils')
+		Utils = require('utils'),
+		uriGeneratorFactory = function(entityCode, uriData){
+			switch(uriData.type){
+				case 'entity': 
+					return {
+						pagingHistory	: function(){
+							return 'admin/modules/curd/paging_history/' + uriData.menuId + '/' + entityCode
+						},
+						detail			: function(){
+							return 'admin/modules/curd/detail/' + uriData.menuId + '/' + entityCode
+						},
+						exportDetail	: function(){
+							return 'admin/modules/export/export_detail/' + uriData.menuId + '/' + entityCode
+						}
+					}
+				case 'user':
+					return {
+						pagingHistory	: function(data){
+							return 'admin/config/user/paging_history/' + entityCode;
+						},
+						detail			: function(){
+							return 'admin/config/user/detail/' + uriData.tmplId;
+						},
+						exportDetail	: function(){
+							return 'admin/config/user/export_detail/' + uriData.tmplId;
+						},
+						dtmplList		: function(){
+							
+						}
+					}
+			}
+		}
 	
-	exports.init = function($page, moduleName, entityCode, menuId, historyId){
+	exports.init = function($page, entityCode, uriData, historyId){
+		var uriGenerator = uriGeneratorFactory(entityCode, uriData);
 		if(entityCode === ''){
 			Dialog.notice('数据不存在', 'warning');
 			$('.header-title h1').text('数据不存在');
@@ -25,7 +57,7 @@ define(function(require, exports, module){
 			var $this = $(this);
 			if(!$this.is('.disabled')){
 				$this.addClass('disabled').text('加载中');
-				Ajax.ajax('admin/modules/curd/paging_history/' + menuId + '/' + entityCode, {
+				Ajax.ajax(uriGenerator.pagingHistory(), {
 					pageNo	: curPageNo + 1
 				}, function(data){
 					if(data.status === 'suc'){
@@ -46,7 +78,7 @@ define(function(require, exports, module){
 		});
 		$('.VivaTimeline', $page).on('click', '.circ', function(){
 			var hid = parseInt($(this).closest('dd').attr('data-id'));
-			$page.getLocatePage().loadContent('admin/modules/curd/detail/' + menuId + '/' + entityCode, null, {historyId:hid});
+			$page.getLocatePage().loadContent(uriGenerator.detail(), null, {historyId:hid});
 			
 		});
 		
@@ -133,7 +165,7 @@ define(function(require, exports, module){
 			autoclose	: true,
 			startView	: 'day'
 		}).on('changeDate', function(e){
-			$page.getLocatePage().loadContent('admin/modules/curd/detail/' + menuId + '/' + entityCode, undefined, {
+			$page.getLocatePage().loadContent(uriGenerator.detail(), undefined, {
 				datetime	: $(this).val()
 			});
 		});
@@ -163,7 +195,7 @@ define(function(require, exports, module){
 			Dialog.confirm('确认导出当前详情页？', function(yes){
 				if(yes){
 					$CPF.showLoading();
-					Ajax.ajax('admin/modules/export/export_detail/' + menuId + '/' + entityCode, {
+					Ajax.ajax(uriGenerator.exportDetail(), {
 						historyId	: historyId
 					}, function(data){
 						if(data.status === 'suc'){

@@ -1,10 +1,10 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <link type="text/css" rel="stylesheet" href="media/admin/modules/css/modules-detail-tmpl.css" />
-<div class="detail entity-detail-tmpl entity-detail-page" id="${moduke.key }-detail-tmpl-${entity.code }-${RES_STAMP}">
+<div class="detail entity-detail-tmpl entity-detail-page" id="user-detail-${entity.code }-${RES_STAMP}">
 	<div class="page-header">
 		<div class="header-title">
-			<h1>${module.title}-${entity.title }-详情</h1>
+			<h1>用户详情</h1>
 			<c:if test="${entity.errors != null && fn:length(entity.errors) > 0 }">
 			    <h1 id="showErrors" class="fa fa-info-circle" style="cursor: pointer;color: #CD5C5C;"></h1>
 			</c:if>
@@ -12,6 +12,9 @@
 		<div class="header-buttons">
 			<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
 				<i class="glyphicon glyphicon-refresh"></i>
+			</a>
+			<a title="修改用户" href="admin/config/user/update/${dtmpl.id }" >
+				<i class="glyphicon glyphicon-edit"></i>
 			</a>
 			<c:if test="${hasHistory == true }">
 				<a href="page:#timeline-area.toggle" title="查看历史" class="toggle-timeline btn-toggle">
@@ -26,29 +29,6 @@
 	<div class="page-body">
 		<div class="col-lg-offset-1 col-lg-10">
 			<form class="form-horizontal group-container">
-				<c:if test="${!empty groupPremises }">
-					<div class="widget field-group">
-						<div class="widget-header">
-							<span class="widget-caption">
-								<span class="group-title">默认字段</span>
-							</span>
-						</div>
-						<div class="widget-body field-container">
-							<c:forEach var="premise" items="${groupPremises }">
-								<c:if test="${premise.fieldName != null }">
-									<div class="form-group field-item">
-										<label class="control-label field-title">${premise.fieldTitle }</label>
-										<div class="field-value">
-											${entity== null? premise.fieldValue: entity.smap[premise.fieldName] }
-											<input type="hidden" name="${premise.fieldName }" value="${entity== null? premise.fieldValue: entity.smap[premise.fieldName] }" />
-										</div>
-									</div>
-								</c:if>
-							</c:forEach>
-						</div>
-					</div>
-				</c:if>
-			
 				<c:forEach var="tmplGroup" items="${dtmpl.groups }">
 					<div class="widget field-group">
 						<div class="widget-header">
@@ -136,11 +116,11 @@
 </div>
 <script>
 	seajs.use(['modules/js/modules-detail.js'], function(ModulesDetail){
-		var $page = $('#${moduke.key }-detail-tmpl-${entity.code }-${RES_STAMP}');
+		var $page = $('#user-detail-${entity.code }-${RES_STAMP}');
 		ModulesDetail.init(
 				$page,
 				'${entity.code}',
-				{type: 'entity', menuId: '${menu.id}'},
+				{type:'user', dtmplId: '${dtmpl.id}'},
 				'${historyId}');
 		
 	});

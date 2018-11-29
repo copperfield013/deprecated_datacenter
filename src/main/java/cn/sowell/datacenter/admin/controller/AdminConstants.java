@@ -113,6 +113,10 @@ public interface AdminConstants {
 
 	final String JSP_CONFIG_SIDEMENU = JSP_CONFIG + "/sidemenu";
 
+	final String JSP_CONFIG_USER = JSP_CONFIG + "/user";
+
+	final String KEY_FUSE_MODE = "%fuseMode%";
+
 	
 
 

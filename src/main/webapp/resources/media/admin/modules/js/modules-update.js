@@ -5,11 +5,27 @@ define(function(require, exports, module){
 		$CPF = require('$CPF'),
 		FieldInput = require('field/js/field-input.js'),
 		DtmplUpdate = require('tmpl/js/dtmpl-update.js'),
-		Utils = require('utils')
-	
-	exports.init = function($page, moduleName, entityCode, menuId){
-		var isUpdateMode = entityCode !== '';
+		Utils = require('utils'),
+		uriGeneratorFactory = function(entityCode, uriData){
+		switch(uriData.type){
+			case 'entity': 
+				return {
+					stmpl	: function(stmplId){
+						return 'admin/modules/curd/open_selection/' + uriData.menuId + '/' + stmplId;
+					}
+				}
+			case 'user':
+				return {
+					stmpl	: function(stmplId){
+						return 'admin/config/user/open_selection/' + stmplId;
+					}
+				}
+		}
+	}
 		
+	exports.init = function($page, entityCode, uriData){
+		var isUpdateMode = entityCode !== '';
+		var uriGenerator = uriGeneratorFactory(entityCode, uriData);
 		$CPF.showLoading();
 		FieldInput.loadGlobalOptions('admin/field/enum_json').done(function(){
 			appendTo($page, $('.field-input', $page)).done(function(initInput, refreshRowTable){
@@ -62,7 +78,9 @@ define(function(require, exports, module){
 			//绑定部分自定义字段控件的表单值
 			bindEmptyMultipleSelectValue(e.target, formData);
 			FieldInput.bindSubmitData(e.target, formData);
-			formData.append('%fuseMode%', fuseMode);
+			if(typeof fuseMode === 'boolean'){
+				formData.append('%fuseMode%', fuseMode);
+			}
 		});
 		function bindEmptyMultipleSelectValue(form, formData){
 			$('select[multiple],select[multiple="multiple"]', form).each(function(){
@@ -74,10 +92,14 @@ define(function(require, exports, module){
 				}
 			});
 		}
-		$('#fuse-switch', $page).change(function(){
-			fuseMode = $(this).prop('checked');
-			$('#save', $page).toggleClass('fuse-mode', fuseMode);
-		});
+		if($('#fuse-switch', $page).length == 0){
+			fuseMode = null;
+		}else{
+			$('#fuse-switch', $page).change(function(){
+				fuseMode = $(this).prop('checked');
+				$('#save', $page).toggleClass('fuse-mode', fuseMode);
+			});
+		}
 		
 		
 		$page.on('click', '.array-item-remove', function(){
@@ -101,7 +123,7 @@ define(function(require, exports, module){
 				}
 			});
 			
-			Dialog.openDialog('admin/modules/curd/open_selection/' + menuId + '/' + stmplId, 
+			Dialog.openDialog(uriGenerator.stmpl(stmplId), 
 					undefined, undefined, {
 				reqParam	: {
 					exists	: existCodes.join()
@@ -308,5 +330,4 @@ define(function(require, exports, module){
 		});
 	}
 	
-		
 });

@@ -170,7 +170,7 @@ public class AdminModulesController {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		String moduleName = menu.getTemplateModule();
 		
-		Object moduleMeta = mService.getModule(moduleName);
+		ModuleMeta moduleMeta = mService.getModule(moduleName);
         TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
         TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
         
@@ -241,18 +241,18 @@ public class AdminModulesController {
 	}
 	
 	
-	final static String KEY_FUSE_MODE = "%fuseMode%";
+	
 	
 	@ResponseBody
     @RequestMapping({"/save/{menuId}/{module}"})
     public AjaxPageResponse save(
     		@PathVariable Long menuId,
-    		@RequestParam(value=KEY_FUSE_MODE, required=false) Boolean fuseMode,
+    		@RequestParam(value=AdminConstants.KEY_FUSE_MODE, required=false) Boolean fuseMode,
     		RequestParameterMapComposite composite){
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		String moduleName = menu.getTemplateModule();
     	 try {
-    		 composite.getMap().remove(KEY_FUSE_MODE);
+    		 composite.getMap().remove(AdminConstants.KEY_FUSE_MODE);
     		 UserIdentifier user = UserUtils.getCurrentUser();
     		 if(Boolean.TRUE.equals(fuseMode)) {
     			 mService.fuseEntity(moduleName, composite.getMap(), user);

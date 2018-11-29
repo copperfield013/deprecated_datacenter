@@ -36,7 +36,11 @@
 	                    <i class="collapse-icon fa fa-bars"></i>
 	             </div>
 	             <div class="cmd-right">
-	             	<span class="user-name">${user.nickname }</span>
+	             	<span class="user-name">
+		             	<a class="tab" href="admin/config/user/detail/" target="user_detail" title="用户信息">
+		             		${user.nickname }
+		             	</a>
+	             	</span>
 	                <a class="jump" href="admin/logout">退出登录</a>
 	             </div>
 
