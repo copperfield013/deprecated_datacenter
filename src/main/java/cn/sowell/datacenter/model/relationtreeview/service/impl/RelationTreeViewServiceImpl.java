@@ -1,9 +1,5 @@
 package cn.sowell.datacenter.model.relationtreeview.service.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 
 import com.abc.application.BizFusionContext;
@@ -141,7 +137,6 @@ public class RelationTreeViewServiceImpl implements RelationTreeViewService {
 		String[] setvalue = labelsetmap.split(",");
 		
 		for (int i = 0; i < val.length; i++) {
-			String string = val[i];
 			entityRelation.addRelation(relationName, val[i], chileId);
 		}
 		

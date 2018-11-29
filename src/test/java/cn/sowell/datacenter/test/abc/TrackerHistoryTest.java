@@ -13,12 +13,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.abc.application.BizFusionContext;
 import com.abc.dto.ErrorInfomation;
 import com.abc.extface.dto.RecordHistory;
-import com.abc.mapping.entity.Entity;
 import com.abc.panel.Discoverer;
 import com.abc.panel.PanelFactory;
 import com.abc.record.HistoryTracker;
 import com.abc.record.Tracker;
-import com.abc.vo.BytesInfoVO;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath*:spring-config/spring-datacenter-context.xml")

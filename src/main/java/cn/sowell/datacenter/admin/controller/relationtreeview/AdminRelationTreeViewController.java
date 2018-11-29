@@ -3,8 +3,6 @@ package cn.sowell.datacenter.admin.controller.relationtreeview;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,17 +31,13 @@ import com.abc.rrc.query.criteria.CommonSymbol;
 import com.abc.rrc.query.criteria.EntityCriteriaFactory;
 import com.abc.rrc.query.entity.impl.EntitySortedPagedQuery;
 import com.abc.rrc.query.queryrecord.criteria.Criteria;
-import com.abc.rrc.query.queryrecord.criteria.CriteriaFactory;
 import com.abc.service.RelationTreeServiceFactory;
 import com.abc.vo.RelationVO;
 import com.alibaba.fastjson.JSONObject;
 
-import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.datacenter.model.relationtreeview.service.RelationTreeViewService;
 import cn.sowell.dataserver.model.modules.service.ViewDataService;
-import cn.sowell.dataserver.model.modules.service.impl.EntityView;
-import cn.sowell.dataserver.model.modules.service.impl.EntityViewCriteria;
 
 
 @Controller
@@ -68,7 +62,7 @@ public class AdminRelationTreeViewController {
 		
 		List<String> nameList = new ArrayList<String>();
 		Map<String, String> mappingNameMap = new HashMap<>();
-		Map<String, List> labelSetMap = new HashMap<>();
+		Map<String, List<String>> labelSetMap = new HashMap<>();
 		Map<String, String> subAbcNodeNameMap = new HashMap<>();
 		getNodeInfo(mappingName, nameList, mappingNameMap, labelSetMap, subAbcNodeNameMap);
 		
@@ -83,7 +77,7 @@ public class AdminRelationTreeViewController {
 	}
 	
 	@RequestMapping("/tree_view_new")
-	public String treeViewNew(@RequestParam String id, @RequestParam String mappingName, @RequestParam(defaultValue="") Integer nodeAttrCount, PageInfo pageInfo, Model model) {
+	public String treeViewNew(@RequestParam String id, @RequestParam String mappingName, Integer nodeAttrCount, PageInfo pageInfo, Model model) {
 		//ABCNode node = relationTreeViewService.getABCNode(mappingName);
 		//model.addAttribute("node", node);
 		List<AttributeNode> abcNodeAttrList = getAbcNodeList(null, mappingName);
@@ -93,18 +87,18 @@ public class AdminRelationTreeViewController {
 			model.addAttribute("abcNodeAttrSize", abcNodeAttrSize);
 		}
 		
-		nodeAttrCount = (nodeAttrCount == null || "".equals(nodeAttrCount)) ? abcNodeAttrSize : nodeAttrCount;
+		nodeAttrCount = nodeAttrCount == null? abcNodeAttrSize : nodeAttrCount;
 		
 		model.addAttribute("abcNodeAttrSize", abcNodeAttrSize);
 		model.addAttribute("abcNodeAttrCount", nodeAttrCount);
 		
 		List<String> nameList = new ArrayList<String>();
 		Map<String, String> mappingNameMap = new HashMap<>();
-		Map<String, List> labelSetMap = new HashMap<>();
+		Map<String, List<String>> labelSetMap = new HashMap<>();
 		Map<String, String> subAbcNodeNameMap = new HashMap<>();
 		getNodeInfo(mappingName, nameList, mappingNameMap, labelSetMap, subAbcNodeNameMap);
 		
-		List result = getDataNew(id, mappingName, nodeAttrCount);
+		List<Object> result = getDataNew(id, mappingName, nodeAttrCount);
 		
 		model.addAttribute("nameList", nameList);
 		model.addAttribute("mappingNameMap", JSONObject.toJSON(mappingNameMap));
@@ -117,14 +111,13 @@ public class AdminRelationTreeViewController {
 		return "/admin/relationtreeview/treeview.jsp";
 	}
 	
-	@SuppressWarnings("unchecked")
 	@ResponseBody
 	@RequestMapping("/data")
 	public String getData(@RequestParam(defaultValue="") String code, @RequestParam String configName, @RequestParam(defaultValue="1") Integer nodeAttrCount) {
 		String dataJsonStr = relationTreeViewService.getData(configName, code);
 		JSONObject dataJsonObj = JSONObject.parseObject(dataJsonStr);
 		List<AttributeNode> abcAttrNodeList = getAbcNodeList(nodeAttrCount, configName);
-		List resultList = new ArrayList<>();
+		List<Object> resultList = new ArrayList<Object>();
 		resultList.add(dataJsonObj.get("唯一编码"));
 		abcAttrNodeList.forEach(key -> {
 			resultList.add(dataJsonObj.get(key.getAbcattrName()));
@@ -133,12 +126,11 @@ public class AdminRelationTreeViewController {
 		//return resultList;
 	}
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private List getDataNew(String code, String configName, Integer nodeAttrCount) {
+	private List<Object> getDataNew(String code, String configName, Integer nodeAttrCount) {
 		String dataJsonStr = relationTreeViewService.getData(configName, code);
 		JSONObject dataJsonObj = JSONObject.parseObject(dataJsonStr);
 		List<AttributeNode> abcAttrNodeList = getAbcNodeList(nodeAttrCount, configName);
-		List resultList = new ArrayList<>();
+		List<Object> resultList = new ArrayList<>();
 		resultList.add(dataJsonObj.get("唯一编码"));
 		abcAttrNodeList.forEach(key -> {
 			resultList.add(dataJsonObj.get(key.getAbcattrName()));
@@ -154,7 +146,6 @@ public class AdminRelationTreeViewController {
 		return JSONObject.toJSONString(result);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@ResponseBody
 	@RequestMapping("/getChildrenNode")
 	public String getChildrenNode(@RequestParam(defaultValue="") String code, @RequestParam String mappingName, @RequestParam(defaultValue="") Integer nodeAttrCount) {
@@ -176,13 +167,13 @@ public class AdminRelationTreeViewController {
 		}
 		
 		Set<String> relationNames = dataEntity.getRelationNames();
-		Map<String, List> relationsMap = new HashMap<>();
+		Map<String, List<Object>> relationsMap = new HashMap<>();
 		Map<String, Object> resultMap = new HashMap<>();
 		
 		//获取当前节点下的节点信息
 		List<String> nameList = new ArrayList<String>();
 		Map<String, String> mappingNameMap = new HashMap<>();
-		Map<String, List> labelSetMap = new HashMap<>();
+		Map<String, List<String>> labelSetMap = new HashMap<>();
 		Map<String, String> subAbcNodeNameMap = new HashMap<>();
 		getNodeInfo(mappingName, nameList, mappingNameMap, labelSetMap, subAbcNodeNameMap);
 		resultMap.put("mappingNameMap", mappingNameMap);
@@ -191,7 +182,7 @@ public class AdminRelationTreeViewController {
 		resultMap.put("labelSetValue", labelSetValue);
 		
 		List<AttributeNode> abcAttrNodeList = getAbcNodeList(nodeAttrCount, mappingName);
-		Map<String, List> relationListMap = new HashMap<>(); 
+		Map<String, List<AttributeNode>> relationListMap = new HashMap<>(); 
 		for(String relationName : relationNames) {
 			List<RelationEntity> relationList = dataEntity.getRelations(relationName);
 			List<AttributeNode> abcAttrNodeList1 = getAbcNodeList(nodeAttrCount, mappingNameMap.get(relationName));
@@ -199,7 +190,7 @@ public class AdminRelationTreeViewController {
 			if(relationList != null && relationList.size() > 0) {
 				for(RelationEntity relationEntity : relationList) {
 					JSONObject nodeJsonObj = JSONObject.parseObject(relationEntity.getEntity().toJson());
-					List result = new ArrayList<>();
+					List<Object> result = new ArrayList<Object>();
 					result.add(relationName);
 					for(AttributeNode attributeNode : abcAttrNodeList1) {
 						result.add(nodeJsonObj.get(attributeNode.getAbcattrName()));
@@ -219,7 +210,7 @@ public class AdminRelationTreeViewController {
 		return JSONObject.toJSONString(resultMap);
 	}
 	
-	private void getNodeInfo(String mappingName,List<String> nameList, Map<String, String> mappingNameMap, Map<String, List> labelSetMap, Map<String, String> subAbcNodeNameMap) {
+	private void getNodeInfo(String mappingName,List<String> nameList, Map<String, String> mappingNameMap, Map<String, List<String>> labelSetMap, Map<String, String> subAbcNodeNameMap) {
 		Collection<RelationVO> relationVoList = RelationTreeServiceFactory.getRelationTreeService().getRelationVO(mappingName);
 		relationVoList.forEach(relationVo -> {
 			
@@ -227,7 +218,7 @@ public class AdminRelationTreeViewController {
 			
 			mappingNameMap.put(relationVo.getName(), relationVo.getMappingName());
 			
-			labelSetMap.put(relationVo.getName(), new ArrayList<>(relationVo.getLabelSet()));
+			labelSetMap.put(relationVo.getName(), new ArrayList<String>(relationVo.getLabelSet()));
 			
 			subAbcNodeNameMap.put(relationVo.getName(), relationVo.getSubAbcNodeName());
 		});
@@ -280,7 +271,7 @@ public class AdminRelationTreeViewController {
 		if(type.equals("relation")) {
 			List<String> nameList = new ArrayList<String>();
 			Map<String, String> mappingNameMap = new HashMap<>();
-			Map<String, List> labelSetMap = new HashMap<>();
+			Map<String, List<String>> labelSetMap = new HashMap<>();
 			Map<String, String> subAbcNodeNameMap = new HashMap<>();
 			getNodeInfo(mappingName, nameList, mappingNameMap, labelSetMap, subAbcNodeNameMap);
 			
@@ -335,7 +326,7 @@ public class AdminRelationTreeViewController {
 	@RequestMapping("/saveNode")
 	public String saveNode(String paramJson) {
 		//String code = relationTreeViewService.saveRole();
-		String code = relationTreeViewService.saveTree(paramJson);
+		relationTreeViewService.saveTree(paramJson);
 		return "true";
 	}
 	
@@ -354,7 +345,6 @@ public class AdminRelationTreeViewController {
 		context.setToEntityRange(FusionContext.ENTITY_CONTENT_RANGE_INTERSECTION);
 		
 		Map<String, Map<String, Object>> reulstMap = new HashMap<String, Map<String, Object>>();
-		Set<String> attrNameSet = null;
 		
 		//属性列表
 		List<AttributeNode> attrList = getAbcNodeList(attrCount, mapperName);
@@ -370,7 +360,7 @@ public class AdminRelationTreeViewController {
 			attrMap.put(attr.getTitle(), param);
 			if (param !=null && param.trim() !="") {
 				//Criteria common = criteriaFactory.createLikeQueryCriteria(attr.getTitle(),param);
-				EntityCriteriaFactory addCriteria = criteriaFactory.addCriteria(attr.getTitle(), param, CommonSymbol.LIKE);
+				criteriaFactory.addCriteria(attr.getTitle(), param, CommonSymbol.LIKE);
 			}
 		}
 		criterias = criteriaFactory.getCriterias();
@@ -417,7 +407,7 @@ public class AdminRelationTreeViewController {
 		JSONObject json = new JSONObject();
 		try {
 			List<String> nameList = new ArrayList<String>();
-			Map<String, List> labelSetMap = new HashMap<>();
+			Map<String, List<String>> labelSetMap = new HashMap<>();
 			Collection<RelationVO> relationVoList = RelationTreeServiceFactory.getRelationTreeService().getRelationVO(mappingName);
 			relationVoList.forEach(relationVo -> {
 				nameList.add(relationVo.getName());
@@ -438,7 +428,6 @@ public class AdminRelationTreeViewController {
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	@ResponseBody
 	@RequestMapping("/getEntityData")
 	public String getEntityData(@RequestParam(defaultValue="") String code, @RequestParam String mappingName, String relationName, @RequestParam(defaultValue="1") Integer nodeAttrCount) {
@@ -456,7 +445,7 @@ public class AdminRelationTreeViewController {
 				map.put(key.getAbcattrName(), dataJsonObj.get(key.getAbcattrName()));
 			});
 			
-			Map<String, List> labelSetMap = new HashMap<>();
+			Map<String, List<String>> labelSetMap = new HashMap<>();
 			Map<String, Object> mappingNameMap = new HashMap<String, Object>();
 			Collection<RelationVO> relationVoList = RelationTreeServiceFactory.getRelationTreeService().getRelationVO(mappingName);
 			relationVoList.forEach(relationVo -> {
@@ -496,7 +485,7 @@ public class AdminRelationTreeViewController {
 		JSONObject json = new JSONObject();
 		try {
 			
-			String addRelation = relationTreeViewService.addRelation(parentMappingName.trim(), 
+			relationTreeViewService.addRelation(parentMappingName.trim(), 
 					parentId.trim(), 
 					chileMappingName.trim(),
 					chileId.trim(), 

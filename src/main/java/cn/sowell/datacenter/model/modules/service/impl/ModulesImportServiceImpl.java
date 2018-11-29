@@ -86,7 +86,7 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 	
 	Logger logger = Logger.getLogger(ModulesImportServiceImpl.class);
 	
-	private DateFormat defaultDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
+	private DateFormat defaultDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	private NumberFormat numberFormat = new DecimalFormat("0.000");
 	
 	

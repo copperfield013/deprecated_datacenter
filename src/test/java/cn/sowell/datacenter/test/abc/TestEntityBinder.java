@@ -1,6 +1,5 @@
 package cn.sowell.datacenter.test.abc;
 
-import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
