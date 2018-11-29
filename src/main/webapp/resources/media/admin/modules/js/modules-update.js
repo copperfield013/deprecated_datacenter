@@ -60,9 +60,20 @@ define(function(require, exports, module){
 		});
 		$('form', $page).on('cpf-submit', function(e, formData){
 			//绑定部分自定义字段控件的表单值
+			bindEmptyMultipleSelectValue(e.target, formData);
 			FieldInput.bindSubmitData(e.target, formData);
 			formData.append('%fuseMode%', fuseMode);
 		});
+		function bindEmptyMultipleSelectValue(form, formData){
+			$('select[multiple],select[multiple="multiple"]', form).each(function(){
+				var $select = $(this);
+				var value = $select.val();
+				var name = $select.attr('name');
+				if(!value && name && !formData.has(name)){
+					formData.append(name, '');
+				}
+			});
+		}
 		$('#fuse-switch', $page).change(function(){
 			fuseMode = $(this).prop('checked');
 			$('#save', $page).toggleClass('fuse-mode', fuseMode);
