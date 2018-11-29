@@ -1,5 +1,6 @@
 package cn.sowell.datacenter.model.config.pojo;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,7 +37,7 @@ public class SideMenuLevel1Menu {
 	
 	
 	@Transient
-	private List<SideMenuLevel2Menu> level2s;
+	private List<SideMenuLevel2Menu> level2s = new ArrayList<SideMenuLevel2Menu>();
 
 	
 	public Long getId() {

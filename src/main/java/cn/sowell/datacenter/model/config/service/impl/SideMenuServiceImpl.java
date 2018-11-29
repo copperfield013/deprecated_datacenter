@@ -92,7 +92,9 @@ public class SideMenuServiceImpl implements SideMenuService, InitializingBean{
 					}
 				}
 				List<SideMenuLevel2Menu> level2s = groupsMap.get(level1.getId());
-				level1.setLevel2s(level2s);
+				if(level2s != null) {
+					level1.setLevel2s(level2s);
+				}
 				if(level2s != null) {
 					Iterator<SideMenuLevel2Menu> itr = level2s.iterator();
 					while(itr.hasNext()) {
