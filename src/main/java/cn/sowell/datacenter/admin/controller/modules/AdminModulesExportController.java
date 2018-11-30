@@ -41,6 +41,7 @@ import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.modules.service.ExportService;
 import cn.sowell.dataserver.model.modules.bean.ExportDataPageInfo;
+import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
 import cn.sowell.dataserver.model.modules.pojo.criteria.NormalCriteria;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
@@ -186,9 +187,21 @@ public class AdminModulesExportController {
 		TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
 		TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
 		UserIdentifier user = UserUtils.getCurrentUser();
-		ModuleEntityPropertyParser parser = mService.getHistoryEntityParser(menu.getTemplateModule(), code, historyId, user);
+		
+		String moduleName = tmplGroup.getModule();
+		ModuleEntityPropertyParser entity = null;
+		EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, code, user);
+		if(historyId != null) {
+			if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
+				entity = mService.getHistoryEntityParser(moduleName, code, historyId, user);
+			}
+        }
+        if(entity == null) {
+        	entity = mService.getEntity(moduleName, code, null, user);
+        }
+		
 		try {
-			String uuid = eService.exportDetailExcel(parser, dtmpl);
+			String uuid = eService.exportDetailExcel(entity, dtmpl);
 			if(uuid != null) {
 				jRes.put("uuid", uuid);
 				jRes.setStatus("suc");

@@ -961,6 +961,7 @@ span.cpf-select2-sign.cpf-select2-sign-or:after {
     position: relative;
 }
 
+
 .account-view {
     display: flex;
     cursor: pointer;
@@ -992,6 +993,15 @@ span.cpf-select2-sign.cpf-select2-sign-or:after {
 .account-dropdown-icon {
     flex: 0 0 40px;
     text-align: center;
+    -webkit-transition: -webkit-transform 0.5s ease-out;
+    -moz-transition: -moz-transform 0.5s ease-out;
+    -o-transition: -o-transform 0.5s ease-out;
+    -ms-transition: -ms-transform 0.5s ease-out;
+}
+.account-area.open .account-dropdown-icon {
+    transform:rotate(-180deg);
+    -ms-transform:rotate(-180deg); /* IE 9 */
+    -webkit-transform:rotate(-180deg); /* Safari and Chrome */
 }
 
 .account-area * {
@@ -1022,17 +1032,27 @@ p.account-username {
     color: #eee;
 }
 
+.account-area.open>.account-dropdown-menu {
+    height: 150px;
+}
+
 .account-dropdown-menu {
     position: absolute;
     top: 49px;
+    height: 0;
     right: 3px;
     width: 130px;
     background-color: rgba(12,23,46,0.7);
     z-index: 1000;
-    border: 1px solid #eee;
     border-radius: 5px;
-    display: none;
+    display: flex;
     flex-direction: column;
+    overflow: hidden;
+    transition: height 0.2s ease-out;
+    -webkit-transition: height 0.1s ease-out;
+    -moz-transition: height 0.1s ease-out;
+    -o-transition: height 0.1s ease-out;
+    -ms-transition: height 0.1s ease-out;
 }
 
 .account-operate-list {

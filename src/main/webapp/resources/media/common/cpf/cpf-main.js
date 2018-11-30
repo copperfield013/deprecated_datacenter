@@ -58,6 +58,15 @@ define(function(require){
 			}
 		}
 	});
+    $('.account-view').click(function(e){
+    	e.stopPropagation();
+    	var $accountArea = $(this).parent();
+    	$accountArea.toggleClass('open');
+    	$(document).one('click', function(){
+    		$accountArea.removeClass('open');
+    	});
+    });
+    
     try{
     	require('main/js/statis-func.js');
     }catch(e){}

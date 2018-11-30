@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <link type="text/css" rel="stylesheet" href="media/admin/modules/css/modules-detail-tmpl.css" />
+<title>用户详情</title>
 <div class="detail entity-detail-tmpl entity-detail-page" id="user-detail-${entity.code }-${RES_STAMP}">
 	<div class="page-header">
 		<div class="header-title">
@@ -140,7 +141,7 @@
 			</c:forEach>
 		</ul>
 		<div class="tmpl-operate">
-			<a class="tab" title="配置模板" target="people_dtmpl_list" href="admin/tmpl/dtmpl/list/people"><i class="icon glyphicon glyphicon-cog"></i></a>
+			<a class="tab" title="配置模板" target="user_dtmpl_config" href="admin/tmpl/dtmpl/list/${dtmpl.module }"><i class="icon glyphicon glyphicon-cog"></i></a>
 		</div>
 	</div>
 </div>

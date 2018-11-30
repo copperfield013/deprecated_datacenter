@@ -38,6 +38,7 @@ import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.impl.ABCNodeProxy;
 import cn.sowell.datacenter.model.admin.pojo.ABCUser;
 import cn.sowell.datacenter.model.config.service.ConfigUserService;
+import cn.sowell.datacenter.model.modules.service.ExportService;
 import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.modules.service.ViewDataService;
@@ -63,6 +64,10 @@ public class AdminConfigUserController {
 	
 	@Resource
 	ModulesService mService;
+	
+	@Resource
+	ExportService eService;
+	
 	
 	static Logger logger = Logger.getLogger(AdminConfigUserController.class);
 	
@@ -251,5 +256,38 @@ public class AdminConfigUserController {
     	
     	return response;
     }
+	
+	@ResponseBody
+	@RequestMapping("/export_detail/{dtmplId}")
+	public ResponseJSON exportDetail(
+			@PathVariable Long dtmplId,
+			Long historyId) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		TemplateDetailTemplate dtmpl = userService.getUserDetailTemplate(dtmplId);
+		ABCUser user = UserUtils.getCurrentUser(ABCUser.class);
+		String moduleName = dtmpl.getModule();
+		ModuleEntityPropertyParser entity = null;
+		EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, user.getCode(), user);
+		if(historyId != null) {
+			if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
+				entity = mService.getHistoryEntityParser(moduleName, user.getCode(), historyId, user);
+			}
+        }
+        if(entity == null) {
+        	entity = mService.getEntity(moduleName, user.getCode(), null, user);
+        }
+		try {
+			String uuid = eService.exportDetailExcel(entity, dtmpl);
+			if(uuid != null) {
+				jRes.put("uuid", uuid);
+				jRes.setStatus("suc");
+			}
+		} catch (Exception e) {
+			logger.error("导出时发生错误", e);
+			jRes.setStatus("error");
+		}
+		return jRes;
+	}
+	
 	
 }

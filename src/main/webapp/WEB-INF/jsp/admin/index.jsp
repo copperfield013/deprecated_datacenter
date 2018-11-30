@@ -41,7 +41,7 @@
 		             		<i class="fa fa-user"></i>
 		             	</div>
 		             	<div class="account-userdesc">
-		             		<p class="account-username">admin</p>
+		             		<p class="account-username">${user.nickname }</p>
 		             		<p>管理员</p>
 		             	</div>
 		             	<div class="account-dropdown-icon">

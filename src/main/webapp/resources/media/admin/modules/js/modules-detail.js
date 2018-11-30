@@ -28,7 +28,7 @@ define(function(require, exports, module){
 							return 'admin/config/user/detail';
 						},
 						exportDetail	: function(){
-							return 'admin/config/user/export_detail/' + uriData.tmplId;
+							return 'admin/config/user/export_detail/' + uriData.dtmplId;
 						},
 						dtmplList		: function(){
 							

@@ -16,9 +16,6 @@
 				<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
 					<i class="glyphicon glyphicon-refresh"></i>
 				</a>
-				<a title="返回详情页" href="admin/config/user/detail?dtmplId=${dtmpl.id }">
-					<i class="fa fa-mail-reply"></i>
-				</a>
 				<a href="page:#tmpl-list.toggle" title="查看模板" class="toggle-template">
 					<i class="iconfont icon-template"></i>
 				</a>
@@ -207,7 +204,7 @@
 			</c:forEach>
 		</ul>
 		<div class="tmpl-operate">
-			<a class="tab" title="配置模板" target="people_dtmpl_list" href="admin/tmpl/dtmpl/list/people"><i class="icon glyphicon glyphicon-cog"></i></a>
+			<a class="tab" title="配置模板" target="user_dtmpl_config" href="admin/tmpl/dtmpl/list/${dtmpl.module }"><i class="icon glyphicon glyphicon-cog"></i></a>
 		</div>
 	</div>
 </div>
