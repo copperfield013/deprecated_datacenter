@@ -16,6 +16,9 @@
 				<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
 					<i class="glyphicon glyphicon-refresh"></i>
 				</a>
+				<a title="返回详情页" href="admin/config/user/detail?dtmplId=${dtmpl.id }">
+					<i class="fa fa-mail-reply"></i>
+				</a>
 				<a href="page:#tmpl-list.toggle" title="查看模板" class="toggle-template">
 					<i class="iconfont icon-template"></i>
 				</a>

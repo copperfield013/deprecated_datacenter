@@ -948,3 +948,105 @@ span.cpf-select2-sign.cpf-select2-sign-or:after {
 .page-sidebar>ul>li:last-child>ul>li:last-child {
     margin-bottom: 50px;
 }
+
+
+
+
+
+
+.account-area {
+    float: right;
+    width: 150px;
+    height: 50px;
+    position: relative;
+}
+
+.account-view {
+    display: flex;
+    cursor: pointer;
+    flex-direction: row;
+}
+.account-view:hover {
+    background-color: rgba(200,200,200,0.5);
+}
+
+.account-headicon {
+    flex: 0 0 50px;
+    line-height: 50px;
+    vertical-align: middle;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+.account-headicon>i{
+    font-size: 35px;
+    color: #fff;
+}
+
+.account-userdesc {
+    flex: 1 1 0;
+}
+
+.account-dropdown-icon {
+    flex: 0 0 40px;
+    text-align: center;
+}
+
+.account-area * {
+    color: #fff;
+    font-size: 16px;
+}
+
+.account-userdesc {
+    display: flex;
+    flex-direction: column;
+}
+
+.account-userdesc>p {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    font-size: 10px;
+    color: #999;
+    flex: 0 0 20px;
+    height: 20px;
+    line-height: 20px;
+}
+
+p.account-username {
+    flex: 0 0 30px;
+    line-height: 30px;
+    font-size: 18px;
+    color: #eee;
+}
+
+.account-dropdown-menu {
+    position: absolute;
+    top: 49px;
+    right: 3px;
+    width: 130px;
+    background-color: rgba(12,23,46,0.7);
+    z-index: 1000;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    display: none;
+    flex-direction: column;
+}
+
+.account-operate-list {
+    display: flex;
+    flex-direction: column;
+}
+.account-operate-list>a {
+    text-align: center;
+}
+
+.account-operate-list>a:hover {
+	color: #111;
+	background-color: rgba(200,200,200,0.7);
+}
+.account-operate-list>a:hover>* {
+	color: #111;
+}

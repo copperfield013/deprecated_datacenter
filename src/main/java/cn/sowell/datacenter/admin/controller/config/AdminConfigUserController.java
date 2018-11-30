@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 import cn.sowell.copframe.dao.utils.UserUtils;
@@ -89,6 +90,9 @@ public class AdminConfigUserController {
 		        	entity = mService.getEntity(moduleName, code, null, user);
 		        }
 				
+		        if(lastHistory != null) {
+		        	model.addAttribute("hasHistory", true);
+		        }
 		        model.addAttribute("historyId", historyId);
 				model.addAttribute("dtmpl", dtmpl);
 				model.addAttribute("user", user);
@@ -226,5 +230,26 @@ public class AdminConfigUserController {
 		}
 		return entities;
 	}
+	
+	@ResponseBody
+    @RequestMapping("/paging_history")
+    public JSONObjectResponse pagingHistory(
+    		@RequestParam Integer pageNo, 
+    		@RequestParam(defaultValue="100") Integer pageSize){
+		ABCUser user = UserUtils.getCurrentUser(ABCUser.class);
+    	JSONObjectResponse response = new JSONObjectResponse();
+    	try {
+			List<EntityHistoryItem> historyItems = mService.queryHistory(userService.getUserModuleName(), user.getCode(), pageNo, pageSize, user);
+			response.put("history", JSON.toJSON(historyItems));
+			response.setStatus("suc");
+			if(historyItems.size() < pageSize){
+				response.put("isLast", true);
+			}
+		} catch (Exception e) {
+			logger.error("查询历史失败", e);
+		}
+    	
+    	return response;
+    }
 	
 }

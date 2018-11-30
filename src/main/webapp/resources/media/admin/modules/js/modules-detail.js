@@ -22,7 +22,7 @@ define(function(require, exports, module){
 				case 'user':
 					return {
 						pagingHistory	: function(data){
-							return 'admin/config/user/paging_history/' + entityCode;
+							return 'admin/config/user/paging_history';
 						},
 						detail			: function(){
 							return 'admin/config/user/detail';

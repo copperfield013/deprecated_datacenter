@@ -35,6 +35,39 @@
 	             <div class="sidebar-collapse" id="sidebar-collapse">
 	                    <i class="collapse-icon fa fa-bars"></i>
 	             </div>
+	             <div class="account-area">
+	             	<div class="account-view">
+	             		<div class="account-headicon">
+		             		<i class="fa fa-user"></i>
+		             	</div>
+		             	<div class="account-userdesc">
+		             		<p class="account-username">admin</p>
+		             		<p>管理员</p>
+		             	</div>
+		             	<div class="account-dropdown-icon">
+		             		<i class="fa fa-caret-down"></i>
+		             	</div>
+	             	</div>
+	             	<div class="account-dropdown-menu">
+             			<div class="account-operate-list">
+	             			<a class="tab" href="admin/config/user/detail" target="user_info">
+             					<i class="fa fa-book"></i>
+	             				用户详情
+	             			</a>
+	             			<a class="tab" href="admin/config/user/update" target="user_info">
+             					<i class="fa fa-edit"></i>
+	             				用户修改
+	             			</a>
+	             			<a class="jump" href="admin/logout">
+             					<i class="glyphicon glyphicon-log-out"></i>
+             					退出登录
+             				</a>
+             			</div>
+             		</div>
+	             	
+	             </div>
+	             
+	             <%-- 
 	             <div class="cmd-right">
 	             	<span class="user-name">
 		             	<a class="tab" href="admin/config/user/detail/" target="user_detail" title="用户信息">
@@ -42,7 +75,7 @@
 		             	</a>
 	             	</span>
 	                <a class="jump" href="admin/logout">退出登录</a>
-	             </div>
+	             </div> --%>
 
 			</div>
 		</div>
