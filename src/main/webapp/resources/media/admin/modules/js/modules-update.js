@@ -7,21 +7,21 @@ define(function(require, exports, module){
 		DtmplUpdate = require('tmpl/js/dtmpl-update.js'),
 		Utils = require('utils'),
 		uriGeneratorFactory = function(entityCode, uriData){
-		switch(uriData.type){
-			case 'entity': 
-				return {
-					stmpl	: function(stmplId){
-						return 'admin/modules/curd/open_selection/' + uriData.menuId + '/' + stmplId;
+			switch(uriData.type){
+				case 'entity': 
+					return {
+						stmpl	: function(stmplId){
+							return 'admin/modules/curd/open_selection/' + uriData.menuId + '/' + stmplId;
+						}
 					}
-				}
-			case 'user':
-				return {
-					stmpl	: function(stmplId){
-						return 'admin/config/user/open_selection/' + stmplId;
+				case 'user':
+					return {
+						stmpl	: function(stmplId){
+							return 'admin/config/user/open_selection/' + stmplId;
+						}
 					}
-				}
+			}
 		}
-	}
 		
 	exports.init = function($page, entityCode, uriData){
 		var isUpdateMode = entityCode !== '';
@@ -184,7 +184,7 @@ define(function(require, exports, module){
 		function addRow($table, withData){
 			var $tbody = $table.children('tbody');
 			var $titleRow = $table.find('.title-row');
-			var $dataRow = $('<tr>').append('<td><span></span></td>')
+			var $dataRow = $('<tr class="value-row">').append('<td><span></span></td>')
 			$titleRow.children('th.th-field-title').each(function(){
 				var $title = $(this);
 				var $td = $('<td>');

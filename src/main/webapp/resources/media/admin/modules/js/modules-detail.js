@@ -25,7 +25,7 @@ define(function(require, exports, module){
 							return 'admin/config/user/paging_history/' + entityCode;
 						},
 						detail			: function(){
-							return 'admin/config/user/detail/' + uriData.tmplId;
+							return 'admin/config/user/detail';
 						},
 						exportDetail	: function(){
 							return 'admin/config/user/export_detail/' + uriData.tmplId;
@@ -78,7 +78,7 @@ define(function(require, exports, module){
 		});
 		$('.VivaTimeline', $page).on('click', '.circ', function(){
 			var hid = parseInt($(this).closest('dd').attr('data-id'));
-			$page.getLocatePage().loadContent(uriGenerator.detail(), null, {historyId:hid});
+			$page.getLocatePage().loadContent(uriGenerator.detail(), null, {historyId:hid, dtmplId: uriData.dtmplId});
 			
 		});
 		
@@ -397,6 +397,12 @@ define(function(require, exports, module){
 		 */
 		$('.field-array-table>table', $page).each(function(){
 			refreshPagination($('>tbody', this))
+		});
+		
+		console.log($('#tmpl-list>ul>li:not(.active)', $page));
+		$('#tmpl-list>ul>li:not(.active)', $page).click(function(){
+			var dtmplId = $(this).attr('data-id');
+			$page.getLocatePage().loadContent(uriGenerator.detail(), undefined, {dtmplId: dtmplId, historyId: uriData.historyId});
 		});
 		
 		setTimeout(function(){

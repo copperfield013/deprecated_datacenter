@@ -6,8 +6,7 @@
 <c:set var="ltmpl" value="${view.selectionTemplate }" />
 <div id="selections-${RES_STAMP}" class="detail modules-selection">
 	<div class="page-body">
-		<form class="form-inline"  action="admin/modules/curd/open_selection/${menu.id }/${stmpl.id}">
-			<input type="hidden" id="tmplId" name="tmplId" value="${stmpl.id }" />
+		<form class="form-inline"  action="admin/config/user/open_selection/${stmpl.id}">
 			<c:if test="${not empty stmpl.criterias }">
 				<c:forEach var="criteriaItem" items="${stmpl.criterias }">
 					<c:if test="${criteriaItem.queryShow != null }">
@@ -118,7 +117,10 @@
 	seajs.use(['modules/js/modules-selection.js'], function(ModulesSelection){
 		var $page = $('#selections-${RES_STAMP}');
 		ModulesSelection.init($page, '${module.name}', 
-			'${menu.id}', {
+			{
+				type: 'user',
+				stmplId	: '${stmpl.id}'
+			}, {
 				pageNo	: '${criteria.pageInfo.pageNo}',
 				pageSize: '${criteria.pageInfo.pageSize}'
 			}, '${stmpl.multiple}', '${stmpl.id}'

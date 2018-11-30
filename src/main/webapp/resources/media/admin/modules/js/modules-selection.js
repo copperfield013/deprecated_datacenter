@@ -2,12 +2,28 @@ define(function(require, exports, module){
 	"use strict";
 	var Form = require('form'),
 		Ajax = require('ajax'),
-		Utils = require('utils')
+		Utils = require('utils'),
+		uriGeneratorFactory = function(uriData){
+			switch(uriData.type){
+				case 'entity': 
+					return {
+						load_entity	: function(){
+							return 'admin/modules/curd/load_entities/' + uriData.menuId + '/' + uriData.stmplId;
+						}
+					}
+				case 'user':
+					return {
+						load_entity	: function(stmplId){
+							return 'admin/config/user/load_entities/' + uriData.stmplId;
+						}
+					}
+			}
+		}
 	
-	exports.init = function($page, moduleName, menuId, 
-			pageInfo, multiple, stmplId){
+	exports.init = function($page, moduleName, uriData, 
+			pageInfo, multiple){
 			
-		
+		var uriGenerator = uriGeneratorFactory(uriData);
 		var initParam = {};
 		Utils.botByDom($page.getLocatePage().getContent(), 'cpf-page-inited', function(){
 			var $form = $('form', $page),
@@ -41,7 +57,7 @@ define(function(require, exports, module){
 			var entitiesLoader = function(fields){
 				var deferred = $.Deferred();
 				if($.isArray(fields) && fields.length > 0){
-					Ajax.ajax('admin/modules/curd/load_entities/' + menuId + '/' + stmplId, {
+					Ajax.ajax(uriGenerator.load_entity(), {
 						codes	: codes.join(),
 						fields	: fields.join()
 					}, function(data){

@@ -2,6 +2,7 @@ package cn.sowell.datacenter.admin.controller.config;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,21 +15,29 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.ServletRequestParameterPropertyValues;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSONObject;
 
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
+import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.NoticeType;
+import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.common.RequestParameterMapComposite;
+import cn.sowell.datacenter.entityResolver.CEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.FieldDescCacheMap;
 import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
+import cn.sowell.datacenter.entityResolver.impl.ABCNodeProxy;
 import cn.sowell.datacenter.model.admin.pojo.ABCUser;
 import cn.sowell.datacenter.model.config.service.ConfigUserService;
+import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.modules.service.ViewDataService;
 import cn.sowell.dataserver.model.modules.service.impl.SelectionTemplateEntityView;
@@ -57,17 +66,37 @@ public class AdminConfigUserController {
 	static Logger logger = Logger.getLogger(AdminConfigUserController.class);
 	
 	
-	@RequestMapping({"/detail/{tmplId}", "/detail", "/detail/"})
-	public String detail(@PathVariable(required=false) Long tmplId, 
+	@RequestMapping({"/detail", "/detail/"})
+	public String detail(Long dtmplId, 
 			Long historyId, Model model) {
 		ABCUser user = UserUtils.getCurrentUser(ABCUser.class);
 		if(user != null) {
-			TemplateDetailTemplate dtmpl = userService.getUserDetailTemplate(tmplId);
+			TemplateDetailTemplate dtmpl = userService.getUserDetailTemplate(dtmplId);
 			if(dtmpl != null){
-				ModuleEntityPropertyParser entity = userService.getUserEntity(user, historyId);
+				
+				String moduleName = userService.getUserModuleName();
+				String code = user.getCode();
+				
+				
+				ModuleEntityPropertyParser entity = null;
+				EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, code, user);
+				if(historyId != null) {
+					if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
+						entity = mService.getHistoryEntityParser(moduleName, code, historyId, user);
+					}
+		        }
+		        if(entity == null) {
+		        	entity = mService.getEntity(moduleName, code, null, user);
+		        }
+				
+		        model.addAttribute("historyId", historyId);
 				model.addAttribute("dtmpl", dtmpl);
 				model.addAttribute("user", user);
 				model.addAttribute("entity", entity);
+				
+				List<TemplateDetailTemplate> dtmpls = tService.queryDetailTemplates(dtmpl.getModule());
+				model.addAttribute("dtmpls", dtmpls);
+				
 			}
 		}
 		return AdminConstants.JSP_CONFIG_USER + "/user_detail.jsp";
@@ -79,7 +108,7 @@ public class AdminConfigUserController {
 		if(user != null) {
 			TemplateDetailTemplate dtmpl = userService.getUserDetailTemplate(tmplId);
 			if(dtmpl != null){
-				ModuleEntityPropertyParser entity = userService.getUserEntity(user, null);
+				ModuleEntityPropertyParser entity = mService.getEntity(dtmpl.getModule(), user.getCode(), null, user);
 				FusionContextConfig config = userService.getUserModuleConfig();
 				model.addAttribute("module", mService.getModule(config.getModule()));
 				model.addAttribute("config", config);
@@ -87,6 +116,11 @@ public class AdminConfigUserController {
 				model.addAttribute("user", user);
 				model.addAttribute("entity", entity);
 				model.addAttribute("fieldDescMap", new FieldDescCacheMap(config.getConfigResolver()));
+				
+				
+				List<TemplateDetailTemplate> dtmpls = tService.queryDetailTemplates(dtmpl.getModule());
+				model.addAttribute("dtmpls", dtmpls);
+				
 				return AdminConstants.JSP_CONFIG_USER + "/user_update.jsp";
 			}
 		}
@@ -143,7 +177,7 @@ public class AdminConfigUserController {
 		
 		model.addAttribute("stmpl", stmpl);
 		model.addAttribute("criteria", criteria);
-		return AdminConstants.JSP_MODULES + "/user_relation_selection.jsp";
+		return AdminConstants.JSP_CONFIG_USER + "/user_relation_selection.jsp";
 	}
 	
 	private Map<Long, String> exractTemplateCriteriaMap(HttpServletRequest request) {
@@ -156,6 +190,41 @@ public class AdminConfigUserController {
 			 }
 		 });
 		return criteriaMap;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/load_entities/{stmplId}")
+	public ResponseJSON loadEntities(
+			@PathVariable Long stmplId,
+			@RequestParam String codes, 
+			@RequestParam String fields) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		TemplateSelectionTemplate stmpl = tService.getSelectionTemplate(stmplId);
+		userService.validateUserAuthentication(stmpl.getModule());
+		Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(
+				stmpl.getModule(), 
+				stmpl.getRelationName(), 
+				TextUtils.split(codes, ",", HashSet<String>::new, c->c), UserUtils.getCurrentUser())
+				;
+		JSONObject entities = toEntitiesJson(parsers, TextUtils.split(fields, ",", HashSet<String>::new, f->f));
+		jRes.put("entities", entities);
+		jRes.setStatus("suc");
+		return jRes;
+	}
+	
+	private JSONObject toEntitiesJson(Map<String, CEntityPropertyParser> parsers, Set<String> fieldNames) {
+		JSONObject entities = new JSONObject();
+		if(parsers != null && fieldNames != null) {
+			parsers.forEach((code, parser)->{
+				JSONObject entity = new JSONObject();
+				entity.put(ABCNodeProxy.CODE_PROPERTY_NAME, parser.getCode());
+				entities.put(parser.getCode(), entity);
+				for (String fieldName : fieldNames) {
+					entity.put(fieldName, parser.getFormatedProperty(fieldName));
+				}
+			});
+		}
+		return entities;
 	}
 	
 }

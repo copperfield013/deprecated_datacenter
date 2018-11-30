@@ -9,8 +9,6 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 
 public interface ConfigUserService {
 
-	ModuleEntityPropertyParser getUserEntity(ABCUser user, Long historyId);
-
 	TemplateDetailTemplate getUserDetailTemplate(Long tmplId);
 
 	void validateUserAuthentication(String moduleName);
@@ -18,5 +16,7 @@ public interface ConfigUserService {
 	void mergeUserEntity(Map<String, Object> map, ABCUser operateUser);
 
 	FusionContextConfig getUserModuleConfig();
+
+	String getUserModuleName();
 
 }

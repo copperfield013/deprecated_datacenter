@@ -215,7 +215,6 @@
 		var $page = $('#${module.name }-update-tmpl-${entity.code }-${RES_STAMP}');
 		ModulesUpdate.init(
 				$page, 
-				'${module.name}', 
 				'${entity.code}',
 				{type: 'entity', menuId: '${menu.id }'}
 				);

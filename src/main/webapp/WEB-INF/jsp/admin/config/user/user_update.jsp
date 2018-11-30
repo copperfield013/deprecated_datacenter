@@ -12,9 +12,12 @@
 			<div class="header-title">
 				<h1>修改用户</h1>
 			</div>
-			<div class="template-container title-operate">
+			<div class="header-buttons">
 				<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
-					<i style="font-size: 20px" class="glyphicon glyphicon-refresh"></i>
+					<i class="glyphicon glyphicon-refresh"></i>
+				</a>
+				<a href="page:#tmpl-list.toggle" title="查看模板" class="toggle-template">
+					<i class="iconfont icon-template"></i>
 				</a>
 			</div>
 		</div>
@@ -175,6 +178,33 @@
 					</c:forEach>
 				</form>
 			</div>
+		</div>
+	</div>
+	<div id="tmpl-list" style="display: none;">
+		<ul class="tmpl-list-wrapper">
+			<c:if test="${dtmpl != null }">
+				<li data-id="${dtmpl.id }" class="active">
+					<span class="tmpl-icon"><i class="fa fa-lightbulb-o"></i></span>
+					<span class="tmpl-item-body">
+						<span class="tmpl-name">${dtmpl.title }</span>
+						<span class="tmpl-date"><fmt:formatDate value="${dtmpl.updateTime }" pattern="yyyy-MM-dd HH:mm:ss" /> </span>
+					</span>
+				</li>
+			</c:if>
+			<c:forEach var="dtmplItem" items="${dtmpls }">
+				<c:if test="${dtmplItem.id != dtmpl.id }">
+					<li data-id="${dtmplItem.id }">
+						<span class="tmpl-icon"><i class="fa fa-lightbulb-o"></i></span>
+						<span class="tmpl-item-body">
+							<span class="tmpl-name">${dtmplItem.title }</span>
+							<span class="tmpl-date"><fmt:formatDate value="${dtmplItem.updateTime }" pattern="yyyy-MM-dd HH:mm:ss" /> </span>
+						</span>
+					</li>
+				</c:if>
+			</c:forEach>
+		</ul>
+		<div class="tmpl-operate">
+			<a class="tab" title="配置模板" target="people_dtmpl_list" href="admin/tmpl/dtmpl/list/people"><i class="icon glyphicon glyphicon-cog"></i></a>
 		</div>
 	</div>
 </div>

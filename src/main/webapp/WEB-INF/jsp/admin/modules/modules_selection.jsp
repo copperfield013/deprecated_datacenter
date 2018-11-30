@@ -143,10 +143,10 @@
 	seajs.use(['modules/js/modules-selection.js'], function(ModulesSelection){
 		var $page = $('#selections-${RES_STAMP}');
 		ModulesSelection.init($page, '${module.name}', 
-			'${menu.id}', {
+			{type: 'entity', menuId: '${menu.id}', stmplId: '${stmpl.id}'}, {
 				pageNo	: '${criteria.pageInfo.pageNo}',
 				pageSize: '${criteria.pageInfo.pageSize}'
-			}, '${stmpl.multiple}', '${stmpl.id}'
+			}, '${stmpl.multiple}'
 		);
 	});
 </script>

@@ -13,6 +13,9 @@
 			<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
 				<i class="glyphicon glyphicon-refresh"></i>
 			</a>
+			<a href="page:#tmpl-list.toggle" title="查看模板" class="toggle-template">
+				<i class="iconfont icon-template"></i>
+			</a>
 			<a title="修改用户" href="admin/config/user/update/${dtmpl.id }" >
 				<i class="glyphicon glyphicon-edit"></i>
 			</a>
@@ -113,6 +116,33 @@
 			</div>
 		</div>
 	</div>
+	<div id="tmpl-list" style="display: none;">
+		<ul class="tmpl-list-wrapper">
+			<c:if test="${dtmpl != null }">
+				<li data-id="${dtmpl.id }" class="active">
+					<span class="tmpl-icon"><i class="fa fa-lightbulb-o"></i></span>
+					<span class="tmpl-item-body">
+						<span class="tmpl-name">${dtmpl.title }</span>
+						<span class="tmpl-date"><fmt:formatDate value="${dtmpl.updateTime }" pattern="yyyy-MM-dd HH:mm:ss" /> </span>
+					</span>
+				</li>
+			</c:if>
+			<c:forEach var="dtmplItem" items="${dtmpls }">
+				<c:if test="${dtmplItem.id != dtmpl.id }">
+					<li data-id="${dtmplItem.id }">
+						<span class="tmpl-icon"><i class="fa fa-lightbulb-o"></i></span>
+						<span class="tmpl-item-body">
+							<span class="tmpl-name">${dtmplItem.title }</span>
+							<span class="tmpl-date"><fmt:formatDate value="${dtmplItem.updateTime }" pattern="yyyy-MM-dd HH:mm:ss" /> </span>
+						</span>
+					</li>
+				</c:if>
+			</c:forEach>
+		</ul>
+		<div class="tmpl-operate">
+			<a class="tab" title="配置模板" target="people_dtmpl_list" href="admin/tmpl/dtmpl/list/people"><i class="icon glyphicon glyphicon-cog"></i></a>
+		</div>
+	</div>
 </div>
 <script>
 	seajs.use(['modules/js/modules-detail.js'], function(ModulesDetail){
@@ -120,7 +150,7 @@
 		ModulesDetail.init(
 				$page,
 				'${entity.code}',
-				{type:'user', dtmplId: '${dtmpl.id}'},
+				{type:'user', dtmplId: '${dtmpl.id}', historyId: '${history.id}'},
 				'${historyId}');
 		
 	});

@@ -10,11 +10,9 @@ import org.springframework.util.Assert;
 import cn.sowell.copframe.spring.properties.PropertyPlaceholder;
 import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
-import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.admin.pojo.ABCUser;
 import cn.sowell.datacenter.model.config.service.ConfigUserService;
 import cn.sowell.datacenter.model.config.service.NonAuthorityException;
-import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.service.TemplateService;
@@ -32,28 +30,7 @@ public class ConfigUserServiceImpl implements ConfigUserService {
 	TemplateService tService;
 	
 	@Override
-	public ModuleEntityPropertyParser getUserEntity(ABCUser user, Long historyId) {
-		String moduleName = getUserModuleName();
-		String code = user.getCode();
-		
-		
-		ModuleEntityPropertyParser entity = null;
-		EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, code, user);
-		if(historyId != null) {
-			if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
-				entity = mService.getHistoryEntityParser(moduleName, code, historyId, user);
-			}
-        }
-        if(entity == null) {
-        	entity = mService.getEntity(moduleName, code, null, user);
-        }
-        
-        return entity;
-		
-		
-	}
-
-	private String getUserModuleName() {
+	public String getUserModuleName() {
 		return PropertyPlaceholder.getProperty("user_module_name");
 	}
 	
