@@ -75,6 +75,22 @@ define(function(require, exports, module){
 				}
 			}
 		}
+		var ui = {
+			tipError	: function($dom, message){
+				var $dom = $($dom);
+				$dom.tooltip({
+					title		: message,
+					trigger		: 'manual',
+					container	: param.$container,
+					template	: '<div class="tooltip field-input-error-tip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
+				}).tooltip('show');
+				$dom.addClass('field-input-error');
+			},
+			removeError	: function($dom){
+				$dom.removeClass('field-input-error');
+				$dom.tooltip('destroy');
+			}
+		};
 		function resolveOptionsSet(arg){
 			if(typeof arg === 'string'){
 				arg = arg.trim();
@@ -146,6 +162,77 @@ define(function(require, exports, module){
 					$ta.val(param.value);
 				}
 				return $ta;
+			},
+			'password'		: function(){
+				var Utils = require('utils');
+				var $span = $('<span class="cpf-field-input-password">');
+				var $view = $('<span class="cpf-field-input-password-view">').appendTo($span);
+				var $psd = $('<input type="password" autocomplete="off"/>').attr('id', Utils.uuid()),
+					$repsd = $('<input type="password" autocomplete="off" />').attr('id', Utils.uuid());
+				var $psdContainer = $('<span class="cpf-field-input-password-wrapper">').append($psd).append($repsd);
+				var disabled = false;
+				var valueChanged = false;
+				$span.attr('id', param.id);
+				var viewVal = '******';
+				if(param.value){
+					$psd.val(param.value);
+					$repsd.val(param.value);
+					$view.text(viewVal);
+				}
+				$view.click(function(){
+					if(!disabled){
+						$psdContainer.appendTo($span);
+						$psd.focus();
+					}
+				});
+				$psd.add($repsd).blur(function(){
+					setTimeout(function(){
+						if(document.activeElement.id !== $psd[0].id && document.activeElement.id !== $repsd[0].id){
+							checkPasswordDiff();
+						}
+					}, 50);
+				});
+				$span.val = function(){
+					return $psd.val();
+				};
+				$span.funcMap = {
+					setDisabled	: function(toDisabled){
+						disabled = toDisabled != false;
+					},
+					setReadonly	: function(toReadonly){
+						disabled = toReadonly != false;
+					},
+					getSubmitData	: function(){
+						return $span.val();
+					},
+					isValueChanged	: function(){
+						return valueChanged;
+					},
+					validate		: function(ui){
+						return checkPasswordDiff();
+					}
+				}
+				$span.addClass('cpf-field-input').data('fieldInputObject', _this);
+				function checkPasswordDiff(){
+					var val1 = $psd.val(),
+						val2 = $repsd.val();
+					if(!val1 && !val2){
+						$view.text('');
+						valueChanged = true;
+						ui.removeError($span);
+						$psdContainer.detach();
+					}else if(val1 === val2){
+						$view.text(viewVal);
+						valueChanged = true;
+						ui.removeError($span);
+						$psdContainer.detach();
+					}else{
+						$span.addClass('cpf-field-input-password-invalid');
+						ui.tipError($span, '密码不一致');
+						return false;
+					}
+				}
+				return $span;
 			},
 			'int'			: function(){
 				var $text = $('<input type="text" />');
@@ -1017,23 +1104,6 @@ define(function(require, exports, module){
 		this.__triggerValueChanged = function(){
 			if(param.$dom){
 				param.$dom.trigger('field-input-changed', [this]);
-			}
-		}
-		
-		var ui = {
-			tipError	: function($dom, message){
-				var $dom = $($dom);
-				$dom.tooltip({
-					title		: message,
-					trigger		: 'manual',
-					container	: param.$container,
-					template	: '<div class="tooltip field-input-error-tip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
-				}).tooltip('show');
-				$dom.addClass('field-input-error');
-			},
-			removeError	: function($dom){
-				$dom.removeClass('field-input-error');
-				$dom.tooltip('destroy');
 			}
 		}
 		

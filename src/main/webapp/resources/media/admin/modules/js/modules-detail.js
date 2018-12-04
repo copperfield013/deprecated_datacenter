@@ -407,6 +407,25 @@ define(function(require, exports, module){
 		
 		setTimeout(function(){
 			$CPF.showLoading();
+			var Indexer = require('indexer')
+			var indexer = new Indexer({
+				scrollTarget: $page.closest('.main-tab-content')[0],
+				elements	: $('.group-container>.field-group', $page),
+				titleGetter	: function(ele){
+					return $(this).find('.group-title').text();
+				},
+				offsetGetter: function(){
+					var $this = $(this);
+					var thisOffsetTop = $this[0].offsetTop;
+					var top = 0;
+					if($this[0].offsetParent){
+						top = $this[0].offsetParent.offsetTop;
+					}
+					return thisOffsetTop + top;
+				}
+			});
+			$page.append(indexer.getContainer());
+			indexer.triggerScroll();
 			$('.field-title', $page).each(function(){DtmplUpdate.adjustFieldTitle($(this))});
 			$CPF.closeLoading();
 		}, 100);

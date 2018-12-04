@@ -37,6 +37,9 @@ define(function(require, exports, module){
 		
 		var tmplData = param.tmplData;
 		
+		//
+		var indexer = null;
+		
 		/**
 		 * 初始化某个字段组内的字段容器的拖拽事件
 		 */
@@ -253,6 +256,9 @@ define(function(require, exports, module){
 					if($this.is('.field-title')){
 						adjustFieldTitle($this);
 					}else if($this.is('.group-title')){
+						if(indexer){
+							indexer.syncTitle();
+						}
 						//焦点放到字段搜索框中
 						getLocateGroup($this).find('.search-text-input').select();
 					}
@@ -376,7 +382,13 @@ define(function(require, exports, module){
 			opacity		: 0.5,
 			placeholder	: 'group-item-placeholder',
 			handle		: '.group-title',
-			tolerance 	: 'pointer'
+			tolerance 	: 'pointer',
+			update		: function(){
+				if(indexer){
+					indexer.refresh(getAllGroups());
+				}
+			}
+			
 		});
 		
 		//绑定点击添加字段组按钮的事件
@@ -573,7 +585,7 @@ define(function(require, exports, module){
 		//字段的标题初始化，需要延迟，等到页面加载完之后执行
 		setTimeout(function(){
 			var Indexer = require('indexer')
-			var indexer = new Indexer({
+			indexer = new Indexer({
 				scrollTarget: $page.closest('.main-tab-content')[0],
 				elements	: getAllGroups(),
 				titleGetter	: function(ele){
@@ -584,10 +596,17 @@ define(function(require, exports, module){
 					var thisOffsetTop = $this[0].offsetTop;
 					var top = $this[0].offsetParent.offsetTop;
 					return thisOffsetTop + top;
-				}
+				},
+				dragable	: true
 			});
 			
 			$('.page-body', $page).append(indexer.getContainer());
+			indexer.bindSortUpdate(function(eles){
+				for(var i = 0; i < eles.length; i++){
+					var ele = eles[i];
+					$groupContainer.append(ele.element);
+				}
+			});
 			indexer.triggerScroll();
 			$('.field-title', $page).each(function(){adjustFieldTitle($(this))});
 			$('#tmplName', $page).focus().select();

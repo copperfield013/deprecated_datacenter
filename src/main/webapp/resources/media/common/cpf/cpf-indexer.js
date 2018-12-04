@@ -20,7 +20,9 @@ define(function(require, exports, module){
 			//窗口滚动方法
 			scrollTo	: function(scrollTarget, offset){scrollTarget.scrollTop = offset},
 			//elements的offset是否是有序的，此处关系到根据位置查找元素的算法，尽量传入有序的elements
-			sorted		: true
+			sorted		: true,
+			//元素是否可以拖拽
+			dragable	: false
 		};
 		
 		var param = $.extend({}, defParam, _param);
@@ -28,11 +30,11 @@ define(function(require, exports, module){
 		
 		var $container = null;
 		var _this = this;
-		this.get = function(index){
+		this.getElement = function(index){
 			return param.elements[index];
 		}
 		this.getElementOffset = function(index){
-			var ele = this.get(index);
+			var ele = this.getElement(index);
 			if(ele){
 				return getElementOffset(ele);
 			}
@@ -47,7 +49,7 @@ define(function(require, exports, module){
 		this.go = function(index){
 			var data = index;
 			if(typeof index === 'number'){
-				data = this.get(index);
+				data = this.getElement(index);
 			}
 			if(data.offsetGetter){
 				var viewHeight = param.scrollTarget.offsetHeight;
@@ -81,13 +83,12 @@ define(function(require, exports, module){
 		
 		this.getContainer = function(){
 			if($container == null){
-				$container = this.createContainer();
+				$container = createContainer();
 			}
 			return $container
 		}
 		
-		
-		this.createContainer = function(){
+		function createContainer(){
 			var $container = $('<div class="index-area">');
 			if(param.button){
 				var $btn = null;
@@ -101,7 +102,7 @@ define(function(require, exports, module){
 				}
 				$container.append($btn);
 			}
-			var $wrapper = $('<div class="index-title-wrapper">');
+			var $wrapper = $('<div class="index-title-wrapper">').css('margin-right', '-' + require('utils').getScrollbarWidth() + 'px');
 			var $list = $('<div class="index-title-list">');
 			syncFromElements(param.elements, $list);
 			bindScrollEvent();
@@ -110,6 +111,43 @@ define(function(require, exports, module){
 		
 		this.triggerScroll = function(){
 			$(param.scrollTarget).trigger('scroll');
+		}
+		
+		this.bindSortUpdate = function(func){
+			if(typeof func === 'function' && param.dragable){
+				$container.on('indexer-sort-updated', function(){
+					func.apply(this, [param.elements]);
+				});
+			}
+		}
+		
+		this.syncTitle = function(index){
+			if(typeof index === 'undefined'){
+				for(var i = 0; i < param.elements.length; i++){
+					setElementTitle(this.getElement(i));
+				}
+			}else if(typeof index === 'number'){
+				setElementTitle(this.getElement(index));
+			}
+		}
+		
+		this.refresh = function(elements){
+			syncFromElements(elements, $container.find('.index-title-list'));
+			this.triggerScroll();
+		}
+		
+		function triggerSortUpdated(){
+			$container.trigger('indexer-sort-updated');
+		}
+		
+		function setElementTitle(ele){
+			if(ele){
+				if(typeof ele.titleGetter === 'function'){
+					$(ele.dom).text(ele.titleGetter.apply(ele.element, [ele.element, ele]));
+				}else{
+					$(ele.dom).text('');
+				}
+			}
 		}
 		
 		function syncFromElements(elements, $list){
@@ -134,15 +172,29 @@ define(function(require, exports, module){
 			for(var i in datas){
 				var data = datas[i];
 				var $p = $('<p>');
-				if(typeof data.titleGetter === 'function'){
-					$p.text(data.titleGetter.apply(data.element, [data.element, data, datas]));
-				}else{
-					$p.text('');
-				}
 				data.dom = $p;
+				setElementTitle(data);
 				$p.data('indexer-data', data);
 				$p.click(bindElementClickEvent);
 				$list.append($p);
+			}
+			if(param.dragable){
+				$list.sortable({
+					helper 		: "clone",
+					cursor 		: "move",// 移动时候鼠标样式
+					opacity		: 0.5, // 拖拽过程中透明度
+					tolerance 	: 'pointer',
+					update		: function( event, ui ) {
+						var elements = [];
+						$list.children('p').each(function(){
+							var data = $(this).data('indexer-data');
+							elements.push(data);
+						});
+						param.elements = elements;
+						triggerSortUpdated();
+						_this.triggerScroll();
+					}
+				});
 			}
 			param.elements = datas;
 		}
@@ -165,7 +217,7 @@ define(function(require, exports, module){
 			var maxScroll = scrollHeight - viewHeight;
 			var invertElements = [];
 			var hasOffset = typeof offset === 'number';
-			for(var i = param.elements.length - 1; i > 0; i--){
+			for(var i = param.elements.length - 1; i >= 0; i--){
 				var ele = param.elements[i];
 				var eleOffset = getElementOffset(ele);
 				var eleHeight = 0;
@@ -213,12 +265,12 @@ define(function(require, exports, module){
 						return lastElement;
 					}
 					for(var i = 0; i < param.elements.length; i++){
-						var ele = _this.get(i);
+						var ele = _this.getElement(i);
 						var thisElementOffset = getElementOffset(ele);
 						if(offset <= thisElementOffset){
 							return ele;
 						}else if(i < param.elements.length - 1){
-							var nextElementOffset = getElementOffset(_this.get(i + 1));
+							var nextElementOffset = getElementOffset(_this.getElement(i + 1));
 							if(nextElementOffset > offset + param.scrollTarget.offsetHeight){
 								return ele;
 							}
