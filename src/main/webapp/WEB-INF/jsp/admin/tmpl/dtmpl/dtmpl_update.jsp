@@ -10,6 +10,7 @@
 
 <title>${title }</title>
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/dtmpl-update.css" />
+<link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/index-area.css" />
 <div id="dtmpl-update-${module.name}-${tmpl.id }" class="dtmpl-update">
 	<script type="jquery/tmpl" id="tmpl-field-group">
 		<div class="widget field-group" data-id="\${id}" stmpl-id="\${selectionTemplateId}">

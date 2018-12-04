@@ -276,7 +276,6 @@ define(function(require, exports, module){
 		function bindPageEvent(event, selector, callback){
 			$page.bind(event, selector, function(e){
 				var $target = $(e.target);
-				console.log($target);
 				if($target.is(selector)){
 					try{
 						callback.apply($target, [e]);
@@ -573,6 +572,23 @@ define(function(require, exports, module){
 		}
 		//字段的标题初始化，需要延迟，等到页面加载完之后执行
 		setTimeout(function(){
+			var Indexer = require('indexer')
+			var indexer = new Indexer({
+				scrollTarget: $page.closest('.main-tab-content')[0],
+				elements	: getAllGroups(),
+				titleGetter	: function(ele){
+					return $(this).find('.group-title').text();
+				},
+				offsetGetter: function(){
+					var $this = $(this);
+					var thisOffsetTop = $this[0].offsetTop;
+					var top = $this[0].offsetParent.offsetTop;
+					return thisOffsetTop + top;
+				}
+			});
+			
+			$('.page-body', $page).append(indexer.getContainer());
+			indexer.triggerScroll();
 			$('.field-title', $page).each(function(){adjustFieldTitle($(this))});
 			$('#tmplName', $page).focus().select();
 		}, 50);

@@ -147,7 +147,8 @@
 					'checkbox'	: 'COMMON/cpf/cpf-checkbox.js?v=${cpfVersion}',
 					'innerpage'	: 'COMMON/cpf/cpf-innerpage.js?v=$${cpfVersion}',
 					'tmpl'		: 'COMMON/cpf/cpf-tmpl.js?v=${cpfVersion}',
-					'select2'	: '${basePath}media/admin/plugins/select2/js/select2.full.js'
+					'select2'	: '${basePath}media/admin/plugins/select2/js/select2.full.js',
+					'indexer'	: 'COMMON/cpf/cpf-indexer.js?v=${cpfVersion}'
 				}
 	    		});
 	    		

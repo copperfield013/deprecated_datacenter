@@ -1,5 +1,6 @@
 package cn.sowell.datacenter.model.config.service.impl;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -53,11 +54,11 @@ public class ConfigureServiceImpl implements ConfigureService{
 	@Override
 	public List<Module> getSiblingModules(String moduleName) {
 		Module sourceModule = fFactory.getModule(moduleName);
-		ABCNode node = MappingContainer.getABCNode(sourceModule.getMappingName());
+		ABCNode node = MappingContainer.getABCNode(BigInteger.valueOf(sourceModule.getMappingId()));
 		String abcattr = node.getAbcattr();
 		return getEnabledModules().stream().filter(module->{
-			if(module.getMappingName() != null) {
-				ABCNode abcNode = MappingContainer.getABCNode(module.getMappingName());
+			if(module.getMappingId() != null) {
+				ABCNode abcNode = MappingContainer.getABCNode(BigInteger.valueOf(module.getMappingId()));
 				return abcattr.equals(abcNode.getAbcattr());
 			}
 			return false;
