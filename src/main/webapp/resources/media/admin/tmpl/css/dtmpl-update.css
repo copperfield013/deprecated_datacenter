@@ -354,11 +354,18 @@ th.field-unavailable:before {
     line-height: 20px;
 }
 
-.create-arrayitem-control>label{
+.dtmpl-update .create-arrayitem-control>label{
     border-right: 2px solid #ddd;
     padding-right: 10px;
 }
 
-.create-arrayitem-control>label>input[type=checkbox]+span.text {
+.dtmpl-update .create-arrayitem-control>label>input[type=checkbox]+span.text {
     z-index: inherit;
+}
+
+.dtmpl-update a.field-setdefval>i:before {
+    content: "V";
+}
+.dtmpl-update a.field-setdefval.tounsetdefval>i:before {
+    text-decoration: line-through;
 }

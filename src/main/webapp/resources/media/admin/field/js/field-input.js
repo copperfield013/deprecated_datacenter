@@ -692,6 +692,11 @@ define(function(require, exports, module){
 						}
 					}
 				};
+				$div.funcMap = {
+					isEmpty	: function(){
+						return $start.val() === '' && $end.val() === '';
+					}
+				};
 				if(param.value){
 					$div.val(param.value);
 				}
@@ -725,6 +730,11 @@ define(function(require, exports, module){
 							$start.val(split[0]).trigger('changeDate');
 							$end.val(split[1]).trigger('changeDate');
 						}
+					}
+				};
+				$div.funcMap = {
+					isEmpty	: function(){
+						return $start.val() === '' && $end.val() === '';
 					}
 				};
 				if(param.value){
@@ -979,7 +989,6 @@ define(function(require, exports, module){
 					
 			}
 		};
-		
 		/**
 		 * 手动设置当前表单的值
 		 */
@@ -1023,6 +1032,15 @@ define(function(require, exports, module){
 						}
 					});
 				}
+			}
+		}
+		
+		this.isEmpty = function(){
+			var $dom = this.getDom();
+			if($dom.funcMap && typeof $dom.funcMap['isEmpty'] === 'function'){
+				$dom.funcMap['isEmpty']();
+			}else{
+				return !this.getValue();
 			}
 		}
 		

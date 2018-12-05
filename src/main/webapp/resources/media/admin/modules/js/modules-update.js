@@ -92,11 +92,14 @@ define(function(require, exports, module){
 				}
 			});
 		}
-		if($('#fuse-switch', $page).length == 0){
+		if($('#fusion-toggler', $page).length == 0){
 			fuseMode = null;
 		}else{
-			$('#fuse-switch', $page).change(function(){
-				fuseMode = $(this).prop('checked');
+			$('#fusion-toggler', $page).click(function(){
+				var $this = $(this);
+				$this.toggleClass('on');
+				fuseMode = $this.is('.on');
+				$this.attr('title', '融合模式：（' + (fuseMode? '开': '关') + '）');
 				$('#save', $page).toggleClass('fuse-mode', fuseMode);
 			});
 		}
@@ -234,7 +237,10 @@ define(function(require, exports, module){
 				offsetGetter: function(){
 					var $this = $(this);
 					var thisOffsetTop = $this[0].offsetTop;
-					var top = $this[0].offsetParent.offsetTop;
+					var top = 0;
+					if($this[0].offsetParent){
+						top = $this[0].offsetParent.offsetTop;
+					}
 					return thisOffsetTop + top;
 				}
 			});

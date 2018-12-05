@@ -77,6 +77,7 @@ define(function(require, exports, module){
 									title		: thisField.cname,
 									c_title		: thisComposite.cname,
 									optGroupId	: thisField.optionGroupId,
+									optGroupKey	: thisField.optionGroupId + (thisField.casLevel? ('@' + thisField.casLevel): ''),
 									fieldPattern: thisField.fieldPattern,
 									composite	: $.extend({}, thisComposite, {
 											data	: {}

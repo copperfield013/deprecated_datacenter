@@ -18,13 +18,12 @@
 			<div class="header-title">
 				<h1>${title }</h1>
 			</div>
-			<div class="template-container title-operate">
-				<label style="display: inline-flex" title="是否开启融合模式">
-					<input id="fuse-switch" class="checkbox-slider toggle" type="checkbox">
-					<span class="text"></span>
-				</label> 
+			<div class="header-buttons">
 				<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
-					<i style="font-size: 20px" class="glyphicon glyphicon-refresh"></i>
+					<i class="glyphicon glyphicon-refresh"></i>
+				</a>
+				<a class="fusion-mode" title="融合模式：关" id="fusion-toggler" href="javascript:;">
+					<i class="fa fa-lightbulb-o"></i>
 				</a>
 			</div>
 		</div>

@@ -217,6 +217,7 @@ li.main-tab-title>a{
     width: 100%;
     min-height: 95%;
     font-size: 15px;
+    position: relative;
 }
 .detail .row {
     margin-top: 9px;
@@ -806,7 +807,7 @@ span.cpf-select2-sign.cpf-select2-sign-or:after {
     cursor: text;
     display: inline-block;
     vertical-align: middle;
-    line-height: 1em;
+    /* line-height: 1em; */
 }
 
 .field-input-error-tip.tooltip .tooltip-arrow
