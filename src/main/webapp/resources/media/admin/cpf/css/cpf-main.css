@@ -4,6 +4,9 @@ html,body{
 	width: 100%;
 	overflow: hidden;
 }
+.tabbable {
+    overflow: hidden;
+}
 .main-container {
     position: absolute;
     padding: 0;

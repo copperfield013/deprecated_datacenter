@@ -84,7 +84,7 @@
 													<span class="field-input" 
 														fInp-type="${tmplField.type }"
 														fInp-name="${tmplField.fieldName }"
-														fInp-value="${fieldValue }"
+														fInp-value="${entity != null? fieldValue: tmplField.viewValue }"
 														fInp-optkey="${tmplField.optionGroupKey }"
 														fInp-fieldkey="${module.name }@${tmplField.fieldName }"
 														fInp-readonly="${fieldReadonly}"

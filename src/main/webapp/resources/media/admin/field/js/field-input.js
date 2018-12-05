@@ -12,6 +12,7 @@ define(function(require, exports, module){
 			//int			：整数
 			//decimal		：小数
 			//select		： 单选下拉框
+			//preselect		：单选可编辑下拉框
 			//multiselect	: 多选下拉框
 			//caseelect		: 级联下拉框
 			//checkbox		: 多选
@@ -254,7 +255,7 @@ define(function(require, exports, module){
 				return $text;
 			},
 			//下拉选择框
-			'select'		: function(withoutEmpty){
+			'select'		: function(withoutEmpty, tags){
 				var $span = $('<span class="field-input-wrapper">');
 				var $select = $('<select>').appendTo($span);
 				setNormalAttrs($select);
@@ -283,10 +284,41 @@ define(function(require, exports, module){
 						}
 					}
 					if($.fn.select2){
-						$select.select2({
+						var tagsParam = {
+							tags			: true,
+							closeOnSelect	: false
+						}
+						$select.select2($.extend({
 							theme	: "bootstrap",
 							width	: null
-						});
+						}, tags === true? tagsParam: {}));
+						if(tags === true){
+							var $optionSearcher = function(){return $('.select2-search__field')};
+							var premitClose = false;
+							$(document).on('keyup', $optionSearcher(), function(e){
+								if(e.keyCode === 13){
+									$select.val($(e.target).val()).select2('close');
+									premitClose = true;
+								}
+							});
+							$(document).on('click', function(e){
+								var $searcher = $optionSearcher();
+								var $target = $(e.target);
+								if($target.closest($select.parent()).length === 0 && $target.closest('.select2-container').length === 0){
+									$select.val($searcher.val()).select2('close');
+									premitClose = true;
+								}
+							});
+							$select.on('select2:select', function(e){
+								$optionSearcher().val(e.params.data.text).focus().select();
+							}).on('select2:closing', function(e){
+								if(!premitClose){
+									e.preventDefault();
+								}
+							}).on('select2:open', function(e){
+								premitClose = false;
+							});
+						}
 					}
 					if(param.value !== undefined && param.value !== ''){
 						if($select.find('option[value="' + param.value + '"]').length > 0){
@@ -321,6 +353,9 @@ define(function(require, exports, module){
 					}
 				};
 				return $span;
+			},
+			'preselect'				: function(){
+				return this['select'](false, true);
 			},
 			'select-without-empty'	: function(){
 				return this['select'](true);
