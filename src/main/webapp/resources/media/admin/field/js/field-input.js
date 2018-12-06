@@ -259,12 +259,15 @@ define(function(require, exports, module){
 				var $span = $('<span class="field-input-wrapper">');
 				var $select = $('<select>').appendTo($span);
 				setNormalAttrs($select);
+				var shouldSetValue = param.value !== undefined && param.value !== '';
 				if(withoutEmpty != true){
 					var $defOption = $('<option value="">--请选择---</option>');
 					$select.append($defOption);
 					$select.val('');
 				}
 				if($.isArray(param.options)){
+					var optionsHasValue = false;
+					
 					for(var i in param.options){
 						var option = param.options[i];
 						if(option.view){
@@ -280,6 +283,9 @@ define(function(require, exports, module){
 							if(option.value){
 								$option.attr('value', option.value);
 							}
+							if(shouldSetValue && option.value === param.value){
+								optionsHasValue = true;
+							}
 							$select.append($option);
 						}
 					}
@@ -293,37 +299,38 @@ define(function(require, exports, module){
 							width	: null
 						}, tags === true? tagsParam: {}));
 						if(tags === true){
-							var $optionSearcher = function(){return $('.select2-search__field')};
-							var premitClose = false;
+							if(shouldSetValue && !optionsHasValue){
+								$select.append($('<option>').attr('value', param.value).text(param.value));
+							}
+							var $optionSearcher = function(){return $('.select2-container--open .select2-search__field')};
+							var permitClose = false;
 							$(document).on('keyup', $optionSearcher(), function(e){
 								if(e.keyCode === 13){
-									$select.val($(e.target).val()).select2('close');
-									premitClose = true;
-								}
-							});
-							$(document).on('click', function(e){
-								var $searcher = $optionSearcher();
-								var $target = $(e.target);
-								if($target.closest($select.parent()).length === 0 && $target.closest('.select2-container').length === 0){
-									$select.val($searcher.val()).select2('close');
-									premitClose = true;
+									permitClose = true;
+									$select.select2('close');
 								}
 							});
 							$select.on('select2:select', function(e){
 								$optionSearcher().val(e.params.data.text).focus().select();
 							}).on('select2:closing', function(e){
-								if(!premitClose){
+								if(!permitClose){
+									var $searcher = $optionSearcher();
+									permitClose = true;
 									e.preventDefault();
+									$select.val($searcher.val()).trigger('change').select2('close');
+								}
+							}).on('select2:close', function(e){
+								if(!permitClose){
+									e.preventDefault();
+									permitClose = true;
 								}
 							}).on('select2:open', function(e){
-								premitClose = false;
+								permitClose = false;
 							});
 						}
 					}
 					if(param.value !== undefined && param.value !== ''){
-						if($select.find('option[value="' + param.value + '"]').length > 0){
-							$select.val(param.value).trigger('change');
-						}
+						$select.val(param.value).trigger('change');
 					}
 				}
 				$span.val = function(){
