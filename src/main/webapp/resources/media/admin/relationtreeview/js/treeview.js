@@ -25,13 +25,10 @@ seajs.use(['dialog','utils', 'ajax', '$CPF'], function(Dialog, Utils, Ajax, $CPF
     
 	function addUnfold(el) {	
 		if($(el).hasClass("icon-add") && $(el).siblings(".icon-arrow").hasClass("active")) {
-			alert("111111111");
         	$(el).siblings(".icon-arrow").trigger("click");        	
         }else if($(el).hasClass("icon-add-sm") && $(el).siblings(".icon-arrow-sm").hasClass("active")){
-        	alert("2222222222");
         	$(el).siblings(".icon-arrow-sm").trigger("click");
         }else if($(el).hasClass("icon-add-abc") && $(el).siblings(".icon-arrow-sm").hasClass("active")){
-        	alert("333333");
         	$(el).siblings(".icon-arrow-sm").trigger("click");
         } 
 	} 	
