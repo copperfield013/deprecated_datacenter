@@ -84,6 +84,8 @@ public interface AdminConstants {
 	
 	final String JSP_TMPL_SELECTION = JSP_TMPL + "/stmpl";
 	
+	final String JSP_TMPL_ACTION = JSP_TMPL + "/atmpl";
+	
 	final String JSP_MODULES = JSP_BASE + "/modules";
 	
 	/**
@@ -116,6 +118,8 @@ public interface AdminConstants {
 	final String JSP_CONFIG_USER = JSP_CONFIG + "/user";
 
 	final String KEY_FUSE_MODE = "%fuseMode%";
+
+	
 
 	
 

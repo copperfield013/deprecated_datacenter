@@ -488,7 +488,7 @@ public class ApiEntityController {
 		if(parsers != null && fieldNames != null) {
 			parsers.forEach((code, parser)->{
 				JSONObject entity = new JSONObject();
-				entity.put(ABCNodeProxy.CODE_PROPERTY_NAME, parser.getCode());
+				entity.put(ABCNodeProxy.CODE_PROPERTY_NAME_NORMAL, parser.getCode());
 				entities.put(parser.getCode(), entity);
 				for (String fieldName : fieldNames) {
 					entity.put(fieldName, parser.getFormatedProperty(fieldName));

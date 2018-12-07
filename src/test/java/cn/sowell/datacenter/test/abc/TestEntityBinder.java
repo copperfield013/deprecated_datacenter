@@ -18,10 +18,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.abc.auth.pojo.UserInfo;
-import com.abc.mapping.conf.MappingContainer;
 import com.abc.mapping.entity.Entity;
-import com.abc.mapping.node.ABCNode;
-import com.abc.mapping.node.AttributeNode;
 
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.UserUtils;
@@ -97,29 +94,6 @@ public class TestEntityBinder {
 	}
 	
 	
-	public void testNode() {
-		FusionContextConfig config = fFactory.getModuleConfig("people");
-		ABCNode rootNode = MappingContainer.getABCNode(config.getMappingName());
-		AttributeNode node = rootNode.getAttribute("birthday");
-		System.out.println("getTitle--" + node.getTitle());
-		System.out.println("getParentcode--" + node.getParentcode());
-		System.out.println("getOpsTypeName--" + node.getOpsTypeName());
-		System.out.println("getAbcattr--" + node.getAbcattr());
-		System.out.println("getAbcattrName--" + node.getAbcattrName());
-		System.out.println("getFullAbcattr--" + node.getFullAbcattr());
-		System.out.println("getDatatype--" + node.getDatatype());
-		System.out.println("getAttrsubtype--" + node.getAttrsubtype());
-		
-		
-		/*getTitle--birthday
-		getParentcode--ABCE010
-		getOpsTypeName--WRITE
-		getAbcattr--SW0068
-		getAbcattrName--出生日期
-		getFullAbcattr--ABCE010_SW0068
-		getDatatype--DATE
-		getAttrsubtype--null*/
-	}
 	
 	
 	public void testABCNodeResolver() {

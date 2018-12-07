@@ -57,10 +57,11 @@ public class AdminTemplateGroupController {
 	}
 	
 	@RequestMapping("/to_create/{module}")
-	public String toCreate(@PathVariable String module, Model model) {
-		ModuleMeta moduleMeta = mService.getModule(module);
-		if(module != null) {
+	public String toCreate(@PathVariable String moduleName, Model model) {
+		ModuleMeta moduleMeta = mService.getModule(moduleName);
+		if(moduleName != null) {
 			model.addAttribute("module", moduleMeta);
+			model.addAttribute("moduleWritable", mService.getModuleEntityWritable(moduleName));
 			return AdminConstants.JSP_TMPL_GROUP + "/tmpl_group_update.jsp";
 		}
 		return null;
