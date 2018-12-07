@@ -120,7 +120,7 @@ public class AdminRelationTreeViewController {
 		List<Object> resultList = new ArrayList<Object>();
 		resultList.add(dataJsonObj.get("唯一编码"));
 		abcAttrNodeList.forEach(key -> {
-			resultList.add(dataJsonObj.get(key.getAbcattrName()));
+			resultList.add(dataJsonObj.get(key.getAbcattr()));
 		});
 		return JSONObject.toJSONString(resultList);
 		//return resultList;
@@ -133,7 +133,7 @@ public class AdminRelationTreeViewController {
 		List<Object> resultList = new ArrayList<>();
 		resultList.add(dataJsonObj.get("唯一编码"));
 		abcAttrNodeList.forEach(key -> {
-			resultList.add(dataJsonObj.get(key.getAbcattrName()));
+			resultList.add(dataJsonObj.get(key.getAbcattr()));
 		});
 		return resultList;
 	}
@@ -193,7 +193,7 @@ public class AdminRelationTreeViewController {
 					List<Object> result = new ArrayList<Object>();
 					result.add(relationName);
 					for(AttributeNode attributeNode : abcAttrNodeList1) {
-						result.add(nodeJsonObj.get(attributeNode.getAbcattrName()));
+						result.add(nodeJsonObj.get(attributeNode.getAbcattr()));
 					}
 					//relationListMap.put(relationName, result);
 					relationsMap.put(nodeJsonObj.getString("唯一编码"), result);
@@ -296,7 +296,7 @@ public class AdminRelationTreeViewController {
 		Map<String, Object> nodeMap = new HashMap<>();
 		for(Map.Entry<String, Object> entry : nodeJsonObj.entrySet()) {
 			for(AttributeNode attributeNode : abcAttrNodeList) {
-				if(entry.getKey().equals(attributeNode.getAbcattrName())) {
+				if(entry.getKey().equals(attributeNode.getAbcattr())) {
 					nodeMap.put(entry.getKey(), entry.getValue());
 				}
 			}
@@ -442,7 +442,7 @@ public class AdminRelationTreeViewController {
 			Map<String, Object> map = new TreeMap<String, Object>();
 			resulmap.put((String) dataJsonObj.get("唯一编码"), map);
 			abcAttrNodeList.forEach(key -> {
-				map.put(key.getAbcattrName(), dataJsonObj.get(key.getAbcattrName()));
+				map.put(key.getAbcattr(), dataJsonObj.get(key.getAbcattr()));
 			});
 			
 			Map<String, List<String>> labelSetMap = new HashMap<>();
