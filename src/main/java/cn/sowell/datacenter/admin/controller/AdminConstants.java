@@ -119,6 +119,8 @@ public interface AdminConstants {
 
 	final String KEY_FUSE_MODE = "%fuseMode%";
 
+	final String KEY_ACTION_ID = "%actionId%";
+
 	
 
 	

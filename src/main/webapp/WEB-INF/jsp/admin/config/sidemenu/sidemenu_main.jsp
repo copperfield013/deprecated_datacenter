@@ -7,6 +7,9 @@
 			<h1>功能列表管理</h1>
 		</div>
 		<div class="header-buttons">
+			<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
+				<i class="glyphicon glyphicon-refresh"></i>
+			</a>
 			<a confirm="确认重载系统数据？" href="admin/config/sidemenu/reload" >
 				<i class="fa fa-bolt"></i>
 			</a>

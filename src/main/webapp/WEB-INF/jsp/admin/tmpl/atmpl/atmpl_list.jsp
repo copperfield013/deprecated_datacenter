@@ -91,15 +91,15 @@
 				container	: $page
 			}).done(function(selected){
 				if(selected.title && selected.moduleName){
-					var tmplTitle = $btn.attr('dtmpl-title'),
-						tmplId = $btn.attr('dtmpl-id');
+					var tmplTitle = $btn.attr('atmpl-title'),
+						tmplId = $btn.attr('atmpl-id');
 					Dialog.confirm('确认复制详情模板[' + tmplTitle + ']到模块[' + selected.title + ']？', function(yes){
 						if(yes){
 							Ajax.ajax('admin/tmpl/dtmpl/copy/' + tmplId + '/' + selected.moduleName, function(res){
 								if(res.status === 'suc' && res.newTmplId){
 									Dialog.confirm('复制成功，是否打开复制成功的详情模板编辑页？', function(yes){
 										if(yes){
-											Tab.openInTab('admin/tmpl/dtmpl/update/' + res.newTmplId, 'dtmpl_update_' + res.newTmplId);
+											Tab.openInTab('admin/tmpl/atmpl/update/' + res.newTmplId, 'dtmpl_update_' + res.newTmplId);
 										}
 									})
 								}else{

@@ -1,83 +1,208 @@
-define(function(require, exports, module){
+define(function(require, exports, module) {
 	var $CPF = require('$CPF');
 	var FieldInput = require('field/js/field-input.js');
-	exports.init = function($page, moduleName, premisesJson){
+	exports.init = function($page, moduleName, premisesJson, data) {
 		var $chooseLtmpl = $('#choose-ltmpl', $page);
-		
+
 		var $tmplField = $('#tmpl-field', $page);
-		
+
 		var $fieldSearch = $('.field-search', $page);
 		var $fieldContainer = $('.field-container', $page);
-		
-		
+
 		$CPF.showLoading();
-		FieldInput.loadGlobalOptions('admin/field/enum_json').done(function(){
-			$CPF.closeLoading();
-			var fieldSearch = require('field/js/field-search.js').bind($fieldSearch, {
-				single				: true,
-				textPicked			: true,
-				module				: moduleName,
-				showArrayComposite	: false,
-				fieldFilters		: ['file'],
-				afterChoose			: function(field){
-					showPremiseField(field);
-				}
-			});
-			function showPremiseField(f){
-				fieldSearch.getFieldData(f.id).done(function(field){
-					fieldSearch.enableField(field.id, false);
-					var fieldData = {
-						id				: f.premiseId || '',
-						fieldId			: f.id,
-						title			: field && field.title || '' 
+		FieldInput.loadGlobalOptions('admin/field/enum_json').done(
+				function() {
+					$CPF.closeLoading();
+					var fieldSearch = require('field/js/field-search.js').bind(
+							$fieldSearch, {
+								single : true,
+								textPicked : true,
+								module : moduleName,
+								showArrayComposite : false,
+								fieldFilters : [ 'file' ],
+								afterChoose : function(field) {
+									showPremiseField(field);
+								}
+							});
+					function showPremiseField(f) {
+						fieldSearch.getFieldData(f.id).done(
+								function(field) {
+									fieldSearch.enableField(field.id, false);
+									var fieldData = {
+										id : f.premiseId || '',
+										fieldId : f.id,
+										title : field && field.title || ''
+									}
+									var $field = $tmplField.tmpl(fieldData);
+									$field.data('field-data', fieldData)
+											.appendTo($fieldContainer);
+									$field.find('.remove-field').click(
+											function() {
+												$field.remove();
+												fieldSearch.enableField(f.id,
+														true);
+											});
+									if (field) {
+										var input = new FieldInput({
+											type : field.type,
+											optionsKey : field.optGroupId,
+											fieldKey : field.composite.module
+													+ '@' + field.name
+										});
+										$field.find('.field-view').append(
+												input.getDom());
+										if (f.value) {
+											input.setValue(f.value);
+										}
+										$field.data('field-input', input);
+									}
+									// Dtmpl.adjustFieldTitle($field.find('.field-title'));
+								});
 					}
-					var $field = $tmplField.tmpl(fieldData);
-					$field.data('field-data', fieldData).appendTo($fieldContainer);
-					$field.find('.remove-field').click(function(){
-						$field.remove();
-						fieldSearch.enableField(f.id, true);
-					});
-					if(field){
-						var input = new FieldInput({
-							type		: field.type,
-							optionsKey	: field.optGroupId,
-							fieldKey	: field.composite.module + '@' + field.name
+					for ( var i in premisesJson) {
+						var premise = premisesJson[i];
+						showPremiseField({
+							premiseId : premise.id,
+							id : premise.fieldId,
+							value : premise.fieldValue
 						});
-						$field.find('.field-view').append(input.getDom());
-						if(f.value){
-							input.setValue(f.value);
-						}
-						$field.data('field-input', input);
 					}
-					//Dtmpl.adjustFieldTitle($field.find('.field-title'));
 				});
+
+		var $C = require('common/chooser/chooser.js');
+		var actionsSortParam = {
+			helper : 'clone',
+			cursor : 'move',
+			opacity : 0.5,
+			tolerance : 'pointer',
+			distance : 5,
+			update : function() {
+				refreshActionIndex(this);
 			}
-			for(var i in premisesJson){
-				var premise = premisesJson[i];
-				showPremiseField({
-					premiseId	: premise.id,
-					id			: premise.fieldId,
-					value		: premise.fieldValue
-				});
+		};
+		var $listActions = $('#list-actions', $page).sortable(actionsSortParam), $detailActions = $(
+				'#detail-actions', $page).sortable(actionsSortParam);
+
+		var listChooser = $C('#list-action-select', $page).chooser({
+			list : data.atmpls,
+			onSelected : function(item) {
+				appendAction(item, $listActions, true);
+				item.hide();
 			}
 		});
 		
-		$('form', $page).on('cpf-submit', function(e, formData){
-			var $form = $(this);
-			formData.append('hideCreateButton', $('#showCreateButton', $page).prop('checked')? '': 1);
-			formData.append('hideImportButton', $('#showImportButton', $page).prop('checked')? '': 1);
-			formData.append('hideExportButton', $('#showExportButton', $page).prop('checked')? '': 1);
-			$('.field-item', $page).each(function(index){
-				var $this = $(this);
-				var fieldData = $this.data('field-data');
-				var fieldInput = $this.data('field-input');
-				var premiseName = 'premises[' + index + ']';
-				formData.append(premiseName + '.id', $this.attr('data-id'));
-				formData.append(premiseName + '.fieldId', fieldData.fieldId);
-				formData.append(premiseName + '.fieldValue', fieldInput.getValue());
-				formData.append(premiseName + '.order', index);
+		var detailChooser = $C('#detail-action-select', $page).chooser({
+			list : data.atmpls,
+			onSelected : function(item) {
+				appendAction(item, $detailActions, false);
+				item.hide();
+			}
+		});
+		
+		
+		var $tmplAction = $('#tmpl-action', $page);
+		function appendAction(item, $actionsBody, multable) {
+			var data = item.data;
+			var $row = $tmplAction.tmpl({
+				index : $actionsBody.children('tr').length,
+				title : data.title,
+				multable : multable || false
+			});
+			$row.data('action-item', item);
+			var $multiCheckbox = $row.find('label.multi-checkbox :checkbox'), $multiTransaction = $row
+					.find('label.multi-transactional');
+			$multiCheckbox.change(function() {
+				var checked = $(this).prop('checked');
+				$multiTransaction.toggleClass('show', checked);
+			});
+			$row.find('a.delete').click(function() {
+				$row.remove();
+				item.show();
+				refreshActionIndex($actionsBody);
+			});
+			$actionsBody.append($row);
+		}
+		function refreshActionIndex($actionsBody) {
+			$($actionsBody).children('tr').each(function(i) {
+				$(this).children('td').eq(0).text(i + 1);
+			});
+		}
+
+		var $form = $('form', $page);
+		$('.btn-save', $page).click(function(){
+			require('dialog').confirm('确认提交？', function(yes){
+				$form.trigger('submit');
 			});
 		});
+		
+		$form.on(
+				'cpf-submit',
+				function(e, formData) {
+					var $form = $(this);
+					formData.append('hideCreateButton', $('#showCreateButton',
+							$page).prop('checked') ? '' : 1);
+					formData.append('hideImportButton', $('#showImportButton',
+							$page).prop('checked') ? '' : 1);
+					formData.append('hideExportButton', $('#showExportButton',
+							$page).prop('checked') ? '' : 1);
+					formData.append('hideQueryButton', $('#showQueryButton',
+							$page).prop('checked') ? '' : 1);
+					formData.append('hideDeleteButton', $('#showDeleteButton',
+							$page).prop('checked') ? '' : 1);
+					$('.field-item', $page).each(
+							function(index) {
+								var $this = $(this);
+								var fieldData = $this.data('field-data');
+								var fieldInput = $this.data('field-input');
+								var premiseName = 'premises[' + index + ']';
+								formData.append(premiseName + '.id', $this
+										.attr('data-id'));
+								formData.append(premiseName + '.fieldId',
+										fieldData.fieldId);
+								formData.append(premiseName + '.fieldValue',
+										fieldInput.getValue());
+								formData.append(premiseName + '.order', index);
+							});
+					function appendActions(face, indexStart){
+						return function(index){
+							var $row = $(this);
+							var data = $row.data('action-item').data;
+							var id = data.cache.dataId || '';
+							var title = $row.find('input.action-title').val();
+							var atmplId = data.id;
+
+							var multiple = $row.find('select.multiple').val() || 0;
+							
+							var actionName = 'actions[' + (indexStart + index) + ']';
+							formData.append(actionName + '.id', id);
+							formData.append(actionName + '.title', title);
+							formData.append(actionName + '.multiple', multiple);
+							formData.append(actionName + '.atmplId', atmplId);
+							formData.append(actionName + '.order', index);
+							formData.append(actionName + '.face', face);
+						}
+					}
+					var lactionsCount = $listActions.children('tr').each(appendActions('list', 0)).length;
+					$detailActions.children('tr').each(appendActions('detail', lactionsCount));
+				});
+		
+		function initChooserSelect(tmplAction){
+			return [function(item){
+				return item.id === tmplAction.atmplId
+			}, function(item){
+				item.cache.dataId = tmplAction.id;
+			}];
+		}
+		
+		for(var i = 0; i < data.tmplActions.length; i++){
+			var tmplAction = data.tmplActions[i];
+			if(tmplAction.face === 'list'){
+				listChooser.chooser('select', initChooserSelect(tmplAction));
+			}else if(tmplAction.face === 'detail'){
+				detailChooser.chooser('select',initChooserSelect(tmplAction));
+			}
+		}
+		
 	}
-	
+
 });

@@ -11,6 +11,14 @@
 <div class="entity-detail-tmpl entity-update-page" id="${module.name }-update-tmpl-${entity.code }-${RES_STAMP}">
 	<div class="float-operate-area">
 		<div class="operate-area-cover"></div>
+		<c:if test="${!empty groupActions }">
+			<a id="actions" title="操作"><i class="fa fa-toggle-left"></i></a>
+			<ul id="action-list" style="display: none;">
+				<c:forEach var="action" items="${groupActions }">
+					<li title="${action.title }" data-id="${action.id }">${action.title }</li>
+				</c:forEach>
+			</ul>
+		</c:if>
 		<a id="save" title="保存"><i class="fa fa-check-square"></i></a>
 	</div>
 	<div class="detail field-input-container">

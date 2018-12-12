@@ -249,10 +249,6 @@
 														<input id="show-operate-update" type="checkbox" class="colored-blue" checked="checked">
 														<span class="text">修改</span>
 													</label>
-													<label class="col-lg-3 col-xs-3">
-														<input id="show-operate-remove" type="checkbox" class="colored-blue" checked="checked">
-														<span class="text">删除</span>
-													</label>
 												</div>
 											</div>
 										</div>

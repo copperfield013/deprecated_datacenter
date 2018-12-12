@@ -51,7 +51,7 @@ define(function(require, exports, module){
 	}
 	
 	$CPF.putPageInitSequeue(4, function($page){
-		$('form', $page).not('.nform').submit(function(e){
+		$('form', $page).not('.nform').submit(function(e, handlerFunc){
 			if(typeof CKEDITOR === 'object'){
 				for (var key in CKEDITOR.instances){
 					if($(CKEDITOR.instances[key].element.$).closest(this).length > 0){
@@ -88,6 +88,9 @@ define(function(require, exports, module){
 					var canceled = false;
 					submitEvent.doCancel = function(){canceled = true};
 					var result = $this.trigger(submitEvent, [formData, $this, page]);
+					if(typeof handlerFunc === 'function'){
+						handlerFunc.apply($this[0], [formData, $this, page]);
+					}
 					try{
 						if(!canceled){
 							page.loadContent(url, undefined, formData);

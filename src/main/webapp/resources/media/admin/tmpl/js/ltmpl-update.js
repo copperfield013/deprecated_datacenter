@@ -69,17 +69,13 @@ define(function(require, exports, module){
 					col.specField = 'number';
 				}else if(fieldId === 'row-operates'){
 					var hasDetail = $('#show-operate-detail', $page).prop('checked'),
-						hasUpdate = $('#show-operate-update', $page).prop('checked'),
-						hasRemove = $('#show-operate-remove', $page).prop('checked');
+						hasUpdate = $('#show-operate-update', $page).prop('checked');
 					col.specField = 'operate';
 					if(hasDetail){
 						col.specField += '-d';
 					}
 					if(hasUpdate){
 						col.specField += '-u';
-					}
-					if(hasRemove){
-						col.specField += '-r';
 					}
 				}else{
 					col.fieldId = fieldId;
@@ -1134,7 +1130,6 @@ define(function(require, exports, module){
 		
 		var $operateMap = {
 				update	: $('<a href="#" class="btn btn-info btn-xs edit operate-update"><i class="fa fa-edit"></i>修改</a>'),
-				remove	: $('<a href="#" class="btn btn-danger btn-xs delete operate-remove"><i class="fa fa-trash-o"></i>删除</a>'),
 				detail	: $('<a href="#" class="btn btn-success btn-xs operate-detail"><i class="fa fa-book"></i>详情</a>')
 		};
 		
@@ -1173,9 +1168,6 @@ define(function(require, exports, module){
 					if(isOperateChecked('update')){
 						$td.append($operateMap['update'].clone());
 					}
-					if(isOperateChecked('remove')){
-						$td.append($operateMap['remove'].clone());
-					}
 					
 				}else{
 					$td.addClass(column.isFieldAvailable()? '': 'col-field-unavailable');
@@ -1203,8 +1195,7 @@ define(function(require, exports, module){
 						var Utils = require('utils');
 						var indexMap = {
 							detail	: 0,
-							update	: 1,
-							remove	: 2
+							update	: 1
 						};
 						Utils.prependTo($operateMap[operateName].clone(), $cell, indexMap[operateName]);
 					}
@@ -1296,9 +1287,6 @@ define(function(require, exports, module){
 		$('#show-operate-update', $page).change(function(){
 			toggleOperate('update', isOperateChecked('update'));
 		});
-		$('#show-operate-remove', $page).change(function(){
-			toggleOperate('remove',isOperateChecked('remove'));
-		});
 		$('#show-operate-detail', $page).change(function(){
 			toggleOperate('detail',isOperateChecked('detail'));
 		});
@@ -1340,7 +1328,6 @@ define(function(require, exports, module){
 						var res = operateReg.exec(column.specialField);
 						$('#show-operate-detail', $page).prop('checked', !!res[1]).trigger('change');
 						$('#show-operate-update', $page).prop('checked', !!res[2]).trigger('change');
-						$('#show-operate-remove', $page).prop('checked', !!res[3]).trigger('change');
 					}else{
 						addColumn({
 							columnId 		: column.id,

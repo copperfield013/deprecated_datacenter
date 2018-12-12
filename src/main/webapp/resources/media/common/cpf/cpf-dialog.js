@@ -396,7 +396,8 @@ define(function(require, exports, module){
 				},
 				'success'	: {
 					type	: 'success',
-					icon	: 'fa-check'
+					icon	: 'fa-check',
+					defer	: 1000
 				},
 				'info'		: {
 					type	: 'info',
@@ -405,7 +406,7 @@ define(function(require, exports, module){
 			};
 			var nTypeObj = nTypeMap[type];
 			if(nTypeObj){
-				Notify(msg, 'center', '3000', nTypeObj.type, nTypeObj.icon, false);
+				Notify(msg, 'center', nTypeObj.defer || '3000', nTypeObj.type, nTypeObj.icon, false);
 			}
 		},
 		/**

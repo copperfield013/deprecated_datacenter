@@ -93,13 +93,6 @@
 			</div>
 			<div class="operate-buttons">
 				<a class="remove-field" title="删除字段"><i class="fa fa-trash-o"></i></a>
-				<a class="toggle-expand-field" title="拓展字段显示长度"><i class="fa fa-expand"></i></a>
-				<a class="recover-field" title="恢复默认名称"><i class="iconfont icon-recover"></i></a>
-				<a class="field-setdefval" title="设置默认值"><i></i></a>
-				<a class="field-validate-a" title="字段约束"><i class="icon iconfont icon-rule"></i></a>
-				<ul class="field-validate-menu">
-					<li validate-name="required" class="\${validators.required? 'checked-validate': ''}">必填</li>
-				</ul>
 			</div>
 		</div>
 	</script>

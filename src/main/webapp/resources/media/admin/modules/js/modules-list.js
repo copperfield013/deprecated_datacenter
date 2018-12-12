@@ -219,5 +219,67 @@ define(function(require, exports, module){
 			$('.data-range', $page).hide();
 			$('.external-export-message', $page).show();
 		}
+		
+		var $actionButtons = $('button.action-button', $page);
+		var $btnDelete = $('#btn-delete', $page);
+		var $table = $('table', $page).on('row-selected-change', function(e, $checkedRows){
+			if($checkedRows.length === 0){
+				$actionButtons.attr('disabled', 'disabled');
+				$btnDelete.attr('disabled', 'disabled');
+			}else{
+				$actionButtons.removeAttr('disabled');
+				$btnDelete.removeAttr('disabled');
+				if($checkedRows.length > 1){
+					$actionButtons.filter('[data-multiple="0"]').attr('disabled', 'disabled');
+				}
+			}
+		});
+		function doAction(actionId, actionTitle){
+			var codes = [];
+			var checkedRowGetter = $table.data('checkedRowGetter');
+			if(typeof checkedRowGetter === 'function'){
+				var $rows = checkedRowGetter();
+				if($rows){
+					$rows.each(function(){
+						codes.push($(this).attr('data-code'));
+					});
+				}
+			}
+			var url = null;
+			var confirm = '';
+			switch(actionId){
+				case 'delete':
+					url = 'admin/modules/curd/remove/' + menuId;
+					confirm = '确定删除？共选择了' + codes.length + '项';
+					break;
+				default:
+					url = 'admin/modules/curd/do_action/' + menuId + '/' + actionId;
+					confirm = '确定执行操作【' + actionTitle + '】？共选择了' + codes.length + '项';
+			}
+			if(actionId){
+				require('dialog').confirm(confirm, function(yes){
+					if(yes){
+						require('ajax').ajax(url, {
+							codes	: codes.join()
+						}, {
+							page	: $page
+						});
+					}
+				});
+				
+			}
+		}
+		
+		$btnDelete.click(function(e){
+			e.preventDefault();
+			doAction('delete');
+		});
+		$actionButtons.click(function(e){
+			var $this = $(this);
+			e.preventDefault();
+			doAction($this.attr('data-id'), $this.attr('title'));
+		})
+		
+		
 	}
 });

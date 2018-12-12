@@ -33,8 +33,34 @@ define(function(require){
 	require('control');
 	require('checkbox');
 	$CPF.putPageInitSequeue(12, function($page){
-		$(':text.dtrangepicker').each(function(){
+		$(':text.dtrangepicker', $page).each(function(){
 			require('utils').daterangepicker($(this));
+		});
+		$('table.row-selectable', $page).each(function(){
+			var $table = $(this);
+			var $rows = $('>tbody>tr', $table);
+			$table.data('checkedRowGetter', function(){
+				return $rows.filter(function(){
+					return $(this).find('.row-selectable-checkbox').prop('checked');
+				});
+			});
+			$table.find('.row-selectable-checkbox').change(function(){
+				var $checkedRows = $table.data('checkedRowGetter')();
+				if($checkedRows.length === 0){
+					$selectAll.prop('checked', false);
+				}else if($checkedRows.length === $rows.length){
+					$selectAll.removeClass('partly').prop('checked', true);
+				}else{
+					$selectAll.addClass('partly').prop('checked', true);
+				}
+				$table.trigger('row-selected-change', [$checkedRows]);
+			});
+			var $selectAll = $table.find(':checkbox.select-all').change(function(){
+				$selectAll.removeClass('partly');
+				var checkAll = $selectAll.prop('checked');
+				$table.children('tbody').find('.row-selectable-checkbox').prop('checked', checkAll);
+				$table.trigger('row-selected-change', [checkAll? $rows: $()]);
+			});
 		});
 	});
 	$CPF.init({

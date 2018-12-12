@@ -246,10 +246,14 @@ public class ApiEntityController {
         
         ModuleEntityPropertyParser entity = null;
         
-        if(historyId == null) {
+        EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, code, user);
+		if(historyId != null) {
+			if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
+				entity = mService.getHistoryEntityParser(moduleName, code, historyId, user);
+			}
+        }
+        if(entity == null) {
         	entity = mService.getEntity(moduleName, code, null, user);
-        }else {
-        	entity = mService.getHistoryEntityParser(moduleName, code, historyId, user);
         }
     	
         if(entity != null) {

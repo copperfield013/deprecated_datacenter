@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
@@ -24,6 +26,7 @@ import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.config.service.ConfigureService;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
@@ -56,7 +59,7 @@ public class AdminTemplateGroupController {
 		return null;
 	}
 	
-	@RequestMapping("/to_create/{module}")
+	@RequestMapping("/to_create/{moduleName}")
 	public String toCreate(@PathVariable String moduleName, Model model) {
 		ModuleMeta moduleMeta = mService.getModule(moduleName);
 		if(moduleName != null) {
@@ -75,11 +78,27 @@ public class AdminTemplateGroupController {
 			model.addAttribute("module", module);
 			model.addAttribute("group", group);
 			model.addAttribute("premisesJson", JSON.toJSON(group.getPremises()));
+			model.addAttribute("tmplActions", JSON.toJSON(group.getActions()));
+			model.addAttribute("atmpls", toActionListJson(tService.getModuleActionTemplates(group.getModule())));
+			model.addAttribute("moduleWritable", mService.getModuleEntityWritable(group.getModule()));
 			return AdminConstants.JSP_TMPL_GROUP + "/tmpl_group_update.jsp";
 		}
 		return null;
 	}
 	
+	private JSONArray toActionListJson(List<TemplateActionTemplate> actions) {
+		JSONArray aActions = new JSONArray();
+		if(actions != null) {
+			for (TemplateActionTemplate action : actions) {
+				JSONObject jAction = new JSONObject();
+				jAction.put("id", action.getId());
+				jAction.put("title", action.getTitle());
+				aActions.add(jAction);
+			}
+		}
+		return aActions;
+	}
+
 	@ResponseBody
 	@RequestMapping("/save")
 	public AjaxPageResponse save(TemplateGroup group) {

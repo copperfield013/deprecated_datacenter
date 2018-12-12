@@ -89,6 +89,8 @@ define(function(require, exports, module){
 				var name = $select.attr('name');
 				if(!value && name && !formData.has(name)){
 					formData.append(name, '');
+				}else if($.isArray(value)){
+					formData.set(name, value.join());
 				}
 			});
 		}
@@ -226,6 +228,32 @@ define(function(require, exports, module){
 			return deferred;
 		}
 		
+		var $actionsBtn = $('#actions', $page);
+		function toggleActionBtn(){
+			require('utils').switchClass($actionsBtn.children('i'), 'fa-toggle-left', 'fa-toggle-right', function(isHidden){
+				$actionsBtn.next('ul')[isHidden? 'fadeOut': 'fadeIn']({
+					duration	: 100,
+					easing 		: 'linear'
+				});
+			});
+		}
+		
+		$actionsBtn.click(function(){
+			toggleActionBtn();
+		});
+		$actionsBtn.next('ul').children('li').click(function(){
+			var $action = $(this);
+			var actionId = $action.attr('data-id');
+			if(actionId){
+				Dialog.confirm('是否执行操作【' + $action.attr('title') + '】', function(yes){
+					if(yes){
+						$('form', $page).trigger('submit', function(formData){
+							formData.append('%actionId%', actionId);
+						});
+					}
+				});
+			}
+		});
 		setTimeout(function(){
 			var Indexer = require('indexer')
 			var indexer = new Indexer({

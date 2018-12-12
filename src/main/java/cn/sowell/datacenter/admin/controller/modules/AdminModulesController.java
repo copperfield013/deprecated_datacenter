@@ -2,9 +2,11 @@ package cn.sowell.datacenter.admin.controller.modules;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -43,6 +45,7 @@ import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.impl.ABCNodeProxy;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
+import cn.sowell.datacenter.model.config.service.NonAuthorityException;
 import cn.sowell.datacenter.model.config.service.SideMenuService;
 import cn.sowell.datacenter.model.modules.service.ExportService;
 import cn.sowell.dataserver.model.dict.service.DictionaryService;
@@ -54,12 +57,15 @@ import cn.sowell.dataserver.model.modules.service.impl.ListTemplateEntityView;
 import cn.sowell.dataserver.model.modules.service.impl.ListTemplateEntityViewCriteria;
 import cn.sowell.dataserver.model.modules.service.impl.SelectionTemplateEntityView;
 import cn.sowell.dataserver.model.modules.service.impl.SelectionTemplateEntityViewCriteria;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupAction;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupPremise;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionTemplate;
+import cn.sowell.dataserver.model.tmpl.service.ActionTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
 @Controller
@@ -93,6 +99,9 @@ public class AdminModulesController {
 	
 	@Resource
 	AuthorityService authService;
+	
+	@Resource
+	ActionTemplateService actService;
 	
 	
 	Logger logger = Logger.getLogger(AdminModulesController.class);
@@ -235,6 +244,7 @@ public class AdminModulesController {
 		model.addAttribute("module", mMeta);
 		model.addAttribute("dtmpl", dtmpl);
 		model.addAttribute("groupPremises", tmplGroup.getPremises());
+		model.addAttribute("groupActions", tmplGroup.getActions().stream().filter(action->TemplateGroupAction.ACTION_FACE_DETAIL.equals(action.getFace())).collect(Collectors.toList()));
 		model.addAttribute("config", config);
 		model.addAttribute("fieldDescMap", new FieldDescCacheMap(config.getConfigResolver()));
 		return AdminConstants.JSP_MODULES + "/modules_update_tmpl.jsp";
@@ -248,11 +258,18 @@ public class AdminModulesController {
     public AjaxPageResponse save(
     		@PathVariable Long menuId,
     		@RequestParam(value=AdminConstants.KEY_FUSE_MODE, required=false) Boolean fuseMode,
+    		@RequestParam(value=AdminConstants.KEY_ACTION_ID, required=false) Long actionId,
     		RequestParameterMapComposite composite){
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		String moduleName = menu.getTemplateModule();
+		if(actionId != null) {
+			TemplateGroupAction groupAction = tService.getTempateGroupAction(actionId);
+			validateGroupAction(groupAction, menu, "");
+			actService.coverActionFields(groupAction, composite.getMap());
+		}
     	 try {
     		 composite.getMap().remove(AdminConstants.KEY_FUSE_MODE);
+    		 composite.getMap().remove(AdminConstants.KEY_ACTION_ID);
     		 UserIdentifier user = UserUtils.getCurrentUser();
     		 if(Boolean.TRUE.equals(fuseMode)) {
     			 mService.fuseEntity(moduleName, composite.getMap(), user);
@@ -300,6 +317,21 @@ public class AdminModulesController {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		try {
 			mService.deleteEntity(menu.getTemplateModule(), code, UserUtils.getCurrentUser());
+			return AjaxPageResponse.REFRESH_LOCAL("删除成功");
+		} catch (Exception e) {
+			logger.error("删除失败", e);
+			return AjaxPageResponse.FAILD("删除失败");
+		}
+	}
+	
+	@ResponseBody
+	@RequestMapping("/remove/{menuId}")
+	public AjaxPageResponse remove(
+			@PathVariable Long menuId,
+			@RequestParam String codes) {
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		try {
+			mService.removeEntities(menu.getTemplateModule(), collectCode(codes), UserUtils.getCurrentUser());
 			return AjaxPageResponse.REFRESH_LOCAL("删除成功");
 		} catch (Exception e) {
 			logger.error("删除失败", e);
@@ -383,5 +415,68 @@ public class AdminModulesController {
 		}
 		return entities;
 	}
+	
+	
+	
+	
+	@SuppressWarnings("unchecked")
+	@ResponseBody
+	@RequestMapping("/do_action/{menuId}/{actionId}")
+	public AjaxPageResponse doAction(@PathVariable Long menuId, @PathVariable Long actionId, @RequestParam(name="codes") String codeStr) {
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		TemplateGroupAction groupAction = tService.getTempateGroupAction(actionId);
+		Object vRes = validateGroupAction(groupAction, menu, codeStr);
+		if(vRes instanceof AjaxPageResponse) {
+			return (AjaxPageResponse) vRes;
+		}
+		Set<String> codes = (Set<String>) vRes;
+		TemplateActionTemplate atmpl = tService.getActionTemplate(groupAction.getAtmplId());
+		if(atmpl != null) {
+			try {
+				int sucs = actService.doAction(atmpl, codes, 
+						TemplateGroupAction.ACTION_MULTIPLE_TRANSACTION.equals(groupAction.getMultiple()), 
+						UserUtils.getCurrentUser());
+				return AjaxPageResponse.REFRESH_LOCAL("执行结束, 共成功处理" + sucs + "个实体");
+			} catch (Exception e) {
+				logger.error("操作失败", e);
+				return AjaxPageResponse.FAILD("执行失败");
+			}
+		}else {
+			return AjaxPageResponse.FAILD("操作不存在");
+		}
+		
+	}
+
+	private Object validateGroupAction(TemplateGroupAction groupAction, SideMenuLevel2Menu menu, String codes) {
+		if(!groupAction.getGroupId().equals(menu.getTemplateGroupId())) {
+			throw new NonAuthorityException("二级菜单[id=" + menu.getId() + "]对应的模板组合[id=" + menu.getTemplateGroupId() + "]与操作[id=" + groupAction.getId() + "]对应的模板组合[id=" + groupAction.getGroupId() + "]不一致");
+		}
+		if(!codes.isEmpty()) {
+			Set<String> codeSet = collectCode(codes);
+			if(!codeSet.isEmpty()) {
+				if(codeSet.size() > 1) {
+					if(TemplateGroupAction.ACTION_MULTIPLE_SINGLE.equals(groupAction.getMultiple())
+						|| TemplateGroupAction.ACTION_FACE_DETAIL.equals(groupAction.getFace())) {
+						//操作要单选，那么不能处理多个code
+						return AjaxPageResponse.FAILD("该操作只能处理一个编码");
+					}
+				}
+				return codeSet;
+			}
+		}
+		return AjaxPageResponse.FAILD("没有传入编码参数");
+		
+	}
+
+	private Set<String> collectCode(String codes) {
+		Set<String> codeSet = new LinkedHashSet<>();
+		for (String code : codes.split(",")) {
+			if(!code.isEmpty()) {
+				codeSet.add(code);
+			}
+		};
+		return codeSet;
+	}
+	
 	
 }

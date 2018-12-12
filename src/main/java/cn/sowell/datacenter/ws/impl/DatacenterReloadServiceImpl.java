@@ -9,6 +9,7 @@ import org.springframework.beans.factory.InitializingBean;
 import cn.sowell.datacenter.entityResolver.FieldService;
 import cn.sowell.datacenter.entityResolver.config.DBFusionConfigContextFactory;
 import cn.sowell.datacenter.entityResolver.config.ModuleConfigureMediator;
+import cn.sowell.datacenter.model.config.service.SideMenuService;
 import cn.sowell.datacenter.ws.DatacenterReloadService;
 import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
@@ -26,13 +27,19 @@ public class DatacenterReloadServiceImpl implements DatacenterReloadService, Ini
 	@Resource
 	TemplateService tService;
 	
+	@Resource
+	SideMenuService menuService;
+	
 	
 	Logger logger = Logger.getLogger(DatacenterReloadServiceImpl.class);
 	
-	
+	/**
+	 * 同步模块。只是清除缓存，将会在下一次请求的时候加载数据
+	 */
 	@Override
 	public String syncModule() {
 		logger.info("接口通知模块数据刷新");
+		menuService.reloadMenuMap();
 		fService.refreshFields();
 		moduleMediator.refresh();
 		fFactory.sync();
@@ -45,6 +52,9 @@ public class DatacenterReloadServiceImpl implements DatacenterReloadService, Ini
 		fService.refreshFields();
 	}
 	
+	/**
+	 * 清除缓存，并立即加载数据
+	 */
 	@Override
 	public String syncCache() {
 		syncModule();

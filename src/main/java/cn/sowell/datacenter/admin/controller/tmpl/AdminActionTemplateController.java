@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
@@ -66,6 +68,17 @@ public class AdminActionTemplateController {
 		return AdminConstants.JSP_TMPL_ACTION + "/atmpl_update.jsp";
 	}
 	
+	@RequestMapping("/update/{tmplId}")
+	public String update(@PathVariable Long tmplId, Model model){
+		TemplateActionTemplate tmpl = tService.getActionTemplate(tmplId);
+		JSONObject tmplJson = (JSONObject) JSON.toJSON(tmpl);
+		ModuleMeta moduleMeta = mService.getModule(tmpl.getModule());
+		model.addAttribute("module", moduleMeta);
+		model.addAttribute("tmpl", tmpl);
+		model.addAttribute("tmplJson", tmplJson);
+		return AdminConstants.JSP_TMPL_ACTION + "/atmpl_update.jsp";
+	}
+	
 	
 	@ResponseBody
 	@RequestMapping("/save")
@@ -80,6 +93,18 @@ public class AdminActionTemplateController {
 			jRes.setStatus("error");
 		}
 		return jRes;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/remove/{tmplId}")
+	public AjaxPageResponse remove(@PathVariable Long tmplId){
+		try {
+			tService.removeActionTemplate(tmplId);
+			return AjaxPageResponse.REFRESH_LOCAL("删除成功");
+		} catch (Exception e) {
+			logger.error("删除失败", e);
+			return AjaxPageResponse.FAILD("删除失败");
+		}
 	}
 	
 	private TemplateActionTemplate parseToTmplData(JSONObject jo) {

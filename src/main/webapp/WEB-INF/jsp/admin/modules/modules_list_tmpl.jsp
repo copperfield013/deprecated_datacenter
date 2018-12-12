@@ -35,103 +35,126 @@
 	<div class="page-body">
 		<form class="form-inline"  action="admin/modules/curd/list/${menu.id }">
 			<input type="hidden" id="tmplId" name="tmplId" value="${ltmpl.id }" />
-			<c:if test="${not empty ltmpl.criterias }">
-				<c:forEach var="criteriaItem" items="${ltmpl.criterias }">
-					<c:if test="${criteriaItem.queryShow != null }">
-						<div class="form-group ${criteriaItem.fieldAvailable? '': 'criteria-field-unavailable'}"
-							title="${criteriaItem.fieldAvailable? '': '无效字段'}">
-							<label class="control-label">${criteriaItem.title }</label>
-							<c:if test="${criteriaItem.fieldAvailable }">
-								<c:choose>
-									<c:when test="${criteriaItem.inputType == 'text' }">
-										<input class="form-control" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}" placeholder="${criteriaItem.placeholder }" />
-									</c:when>
-									<c:when test="${criteriaItem.inputType == 'select' }">
-										<select class="form-control cpf-select2" name="criteria_${criteriaItem.id }" data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
-											<option value="">--请选择--</option>
-											<c:forEach var="option" items="${view.criteriaOptionMap[criteriaItem.fieldId]}">
-												<option value="${option.value }">${option.title}</option>
+			<c:forEach var="criteriaItem" items="${ltmpl.criterias }">
+				<c:if test="${criteriaItem.queryShow != null }">
+					<div class="form-group ${criteriaItem.fieldAvailable? '': 'criteria-field-unavailable'}"
+						title="${criteriaItem.fieldAvailable? '': '无效字段'}">
+						<label class="control-label">${criteriaItem.title }</label>
+						<c:if test="${criteriaItem.fieldAvailable }">
+							<c:choose>
+								<c:when test="${criteriaItem.inputType == 'text' }">
+									<input class="form-control" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}" placeholder="${criteriaItem.placeholder }" />
+								</c:when>
+								<c:when test="${criteriaItem.inputType == 'select' }">
+									<select class="form-control cpf-select2" name="criteria_${criteriaItem.id }" data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
+										<option value="">--请选择--</option>
+										<c:forEach var="option" items="${view.criteriaOptionMap[criteriaItem.fieldId]}">
+											<option value="${option.value }">${option.title}</option>
+										</c:forEach>								
+									</select>
+								</c:when>
+								<c:when test="${criteriaItem.inputType == 'multiselect' }">
+									<select class="form-control cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
+										<c:forEach var="option" items="${view.criteriaOptionMap[criteriaItem.fieldId]}">
+											<option value="${option.value }">${option.title}</option>
+										</c:forEach>								
+									</select>
+								</c:when>
+								<c:when test="${criteriaItem.inputType == 'date' }">
+									<input class="form-control datepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}"  />
+								</c:when>
+								<c:when test="${criteriaItem.inputType == 'label' }">
+									<span class="cpf-select2-container">
+										<select class="cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
+											<c:forEach var="label" items="${view.criteriaLabelMap[criteriaItem.fieldKey].subdomain}">
+												<option value="${label }">${label}</option>
 											</c:forEach>								
 										</select>
-									</c:when>
-									<c:when test="${criteriaItem.inputType == 'multiselect' }">
-										<select class="form-control cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
-											<c:forEach var="option" items="${view.criteriaOptionMap[criteriaItem.fieldId]}">
-												<option value="${option.value }">${option.title}</option>
+										<c:choose>
+											<c:when test="${criteriaItem.comparator == 'l1' }">
+												<c:set var="labelSelectClass" value="cpf-select2-sign-or"></c:set>
+											</c:when>
+											<c:when test="${criteriaItem.comparator == 'l2' }">
+												<c:set var="labelSelectClass" value="cpf-select2-sign-and"></c:set>
+											</c:when>
+										</c:choose>
+										<span class="cpf-select2-sign ${labelSelectClass }"></span>
+									</span>
+								</c:when>
+								<c:when test="${criteriaItem.inputType == 'relation_existion' && criteriaItem.composite != null }">
+									<span class="cpf-select2-container">
+										<select class="cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
+											<c:forEach var="label" items="${criteriaItem.composite.relationSubdomain}">
+												<option value="${label }">${label}</option>
 											</c:forEach>								
 										</select>
-									</c:when>
-									<c:when test="${criteriaItem.inputType == 'date' }">
-										<input class="form-control datepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}"  />
-									</c:when>
-									<c:when test="${criteriaItem.inputType == 'label' }">
-										<span class="cpf-select2-container">
-											<select class="cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
-												<c:forEach var="label" items="${view.criteriaLabelMap[criteriaItem.fieldKey].subdomain}">
-													<option value="${label }">${label}</option>
-												</c:forEach>								
-											</select>
-											<c:choose>
-												<c:when test="${criteriaItem.comparator == 'l1' }">
-													<c:set var="labelSelectClass" value="cpf-select2-sign-or"></c:set>
-												</c:when>
-												<c:when test="${criteriaItem.comparator == 'l2' }">
-													<c:set var="labelSelectClass" value="cpf-select2-sign-and"></c:set>
-												</c:when>
-											</c:choose>
-											<span class="cpf-select2-sign ${labelSelectClass }"></span>
-										</span>
-									</c:when>
-									<c:when test="${criteriaItem.inputType == 'relation_existion' && criteriaItem.composite != null }">
-										<span class="cpf-select2-container">
-											<select class="cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
-												<c:forEach var="label" items="${criteriaItem.composite.relationSubdomain}">
-													<option value="${label }">${label}</option>
-												</c:forEach>								
-											</select>
-										</span>
-									</c:when>
-									<c:when test="${criteriaItem.inputType == 'daterange' }">
-										<span class="cpf-daterangepicker format-submit-value" 
-											data-name="criteria_${criteriaItem.id }" 
-											data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
-										</span>
-									</c:when>
-									<c:when test="${criteriaItem.inputType == 'range' }">
-										<span class="cpf-textrange format-submit-value" 
-											data-name="criteria_${criteriaItem.id }" 
-											data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
-										</span>
-									</c:when>
-									<c:when test="${criteriaItem.inputType == 'datetime' }">
-										<input class="form-control datetimepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}"  />
-									</c:when>
-									<c:when test="${criteriaItem.inputType == 'time' }">
-										<input class="form-control timepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}"  />
-									</c:when>
-									<c:when test="${criteriaItem.inputType == 'yearmonth' }">
-										<input class="form-control yearmonthpicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}"  />
-									</c:when>
-									<c:when test="${criteriaItem.inputType == 'ymrange' }">
-										<input class="form-control ymrangepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}"  />
-									</c:when>
-									<c:otherwise>
-										<input type="text" disabled="disabled" placeholder="没有配置对应的控件${criteriaItem.inputType }" />
-									</c:otherwise>
-								</c:choose>
-							</c:if>
-						</div>
+									</span>
+								</c:when>
+								<c:when test="${criteriaItem.inputType == 'daterange' }">
+									<span class="cpf-daterangepicker format-submit-value" 
+										data-name="criteria_${criteriaItem.id }" 
+										data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
+									</span>
+								</c:when>
+								<c:when test="${criteriaItem.inputType == 'range' }">
+									<span class="cpf-textrange format-submit-value" 
+										data-name="criteria_${criteriaItem.id }" 
+										data-value="${criteria.listTemplateCriteria[criteriaItem.id]}">
+									</span>
+								</c:when>
+								<c:when test="${criteriaItem.inputType == 'datetime' }">
+									<input class="form-control datetimepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}"  />
+								</c:when>
+								<c:when test="${criteriaItem.inputType == 'time' }">
+									<input class="form-control timepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}"  />
+								</c:when>
+								<c:when test="${criteriaItem.inputType == 'yearmonth' }">
+									<input class="form-control yearmonthpicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}"  />
+								</c:when>
+								<c:when test="${criteriaItem.inputType == 'ymrange' }">
+									<input class="form-control ymrangepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}"  />
+								</c:when>
+								<c:when test="${criteriaItem.inputType == 'decimal' }">
+									<input class="form-control cpf-field-decimal" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}"  />
+								</c:when>
+								<c:when test="${criteriaItem.inputType == 'int' }">
+									<input class="form-control cpf-field-int" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.listTemplateCriteria[criteriaItem.id]}"  />
+								</c:when>
+								<c:otherwise>
+									<input type="text" disabled="disabled" placeholder="没有配置对应的控件${criteriaItem.inputType }" />
+								</c:otherwise>
+							</c:choose>
+						</c:if>
+					</div>
+				</c:if>
+			</c:forEach>
+			<div class="form-group">
+				<c:if test="${not empty ltmpl.criterias and tmplGroup.hideQueryButton != 1}">
+					<button type="submit" class="btn btn-default" title="${hidenCriteriaDesc }">查询</button>
+				</c:if>
+				<c:if test="${tmplGroup.hideDeleteButton != 1 }">
+					<button id="btn-delete" class="btn btn-danger" disabled="disabled">删除选中</button>
+				</c:if>
+				<c:forEach items="${tmplGroup.actions }" var="action">
+					<c:if test="${action.face == 'list' }">
+						<button class="btn btn-azure shiny action-button" 
+						data-id="${action.id }" data-multiple="${action.multiple }"
+						title="${action.title }"
+						disabled="disabled">${action.title }</button>
 					</c:if>
 				</c:forEach>
-				<div class="form-group">
-					<button type="submit" class="form-control btn btn-default" title="${hidenCriteriaDesc }">查询</button>
-				</div>
-			</c:if>
+			</div>
 		</form>
 		<div class="row list-area">
-			<table class="table">
+			<table class="table row-selectable">
 				<thead>
 					<tr>
+						<th width="30">
+							<label title="全选">
+								<input type="checkbox" class="colored-blue select-all partly">
+                                <span class="text"></span>
+                            </label>
+                        </th>
 						<c:forEach items="${ltmpl.columns }" var="column">
 							<th class="${column.fieldAvailable? '': 'col-field-unavailable' }"
 								title="${column.fieldAvailable? '': '无效字段'}">${column.title }</th>
@@ -140,7 +163,13 @@
 				</thead>
 				<tbody>
 					<c:forEach items="${view.parsers }" var="parser" varStatus="i">
-						<tr>
+						<tr data-code="${parser.code }">
+							<td>
+								<label>
+									<input type="checkbox" class="colored-blue row-selectable-checkbox">
+	                                <span class="text"></span>
+	                            </label>
+	                        </td>
 							<c:forEach items="${ltmpl.columns }" var="column" varStatus="j" >
 								<td class="${column.fieldAvailable? '': 'col-field-unavailable' }">
 									<c:choose >
@@ -163,13 +192,6 @@
 														href="admin/modules/curd/update/${menu.id }/${parser.code }" 
 														class="tab btn btn-info btn-xs edit">
 														<i class="fa fa-edit"></i>修改
-													</a>
-												</c:if>
-												<c:if test="${fn:contains(column.specialField, '-r') }">
-													<a confirm="确认删除？"
-														href="admin/modules/curd/delete/${menu.id }/${parser.code }" 
-														class="btn btn-danger btn-xs delete">
-														<i class="fa fa-trash-o"></i>删除
 													</a>
 												</c:if>
 											</c:if>

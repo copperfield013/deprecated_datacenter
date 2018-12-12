@@ -305,6 +305,80 @@
 			}
 		]
 	},
+	"int"	: {
+		"comparators"		: [
+			{
+				"title"	: "等于",
+				"key"	: "n1"
+			},
+			{
+				"title"	: "小于",
+				"key"	: "n2"
+			},
+			{
+				"title"	: "大于",
+				"key"	: "n3"
+			},
+			{
+				"title"	: "不等于",
+				"key"	: "n1n",
+				"class"	: "negative"
+			},
+			{
+				"title"	: "不大于",
+				"key"	: "n3n",
+				"class"	: "negative"
+			},
+			{
+				"title"	: "不小于",
+				"key"	: "n2n",
+				"class"	: "negative"
+			}
+		]
+	},
+	"decimal"	: {
+		"comparators"		: [
+			{
+				"title"	: "等于",
+				"key"	: "n1"
+			},
+			{
+				"title"	: "小于",
+				"key"	: "n2"
+			},
+			{
+				"title"	: "大于",
+				"key"	: "n3"
+			},
+			{
+				"title"	: "不等于",
+				"key"	: "n1n",
+				"class"	: "negative"
+			},
+			{
+				"title"	: "不大于",
+				"key"	: "n3n",
+				"class"	: "negative"
+			},
+			{
+				"title"	: "不小于",
+				"key"	: "n2n",
+				"class"	: "negative"
+			}
+		]
+	},
+	"caseelect"		: {
+		"comparators"		: [
+			{
+				"title"	: "为",
+				"key"	: "s1"
+			},
+			{
+				"title"	: "不为",
+				"key"	: "s1n"
+			}
+		]
+	},
 	"none"			: {
 		"class"		: "hidden-only",
 		"comparators"		: [
@@ -318,5 +392,4 @@
 			}
 		]
 	}
-	
 }

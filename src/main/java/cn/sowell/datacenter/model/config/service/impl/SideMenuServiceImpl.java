@@ -58,7 +58,8 @@ public class SideMenuServiceImpl implements SideMenuService, InitializingBean{
 	
 	Map<Long, SideMenuLevel2Menu> l2MenuMap;
 	
-	synchronized void reloadMenuMap() {
+	@Override
+	public synchronized void reloadMenuMap() {
 		l1MenuMap = null;
 		l2MenuMap = null;
 	}
@@ -158,7 +159,7 @@ public class SideMenuServiceImpl implements SideMenuService, InitializingBean{
 	}
 	
 	@Override
-	public void updateSideMenuModules(UserIdentifier user, List<SideMenuLevel1Menu> modules) {
+	public void updateSideMenuModules(UserIdentifier user, List<SideMenuLevel1Menu> l1Menus) {
 		List<SideMenuLevel1Menu> originModules = getSideMenuLevelMenus(user);
 		CollectionUpdateStrategy<SideMenuLevel1Menu> updateLevel1Menu = 
 				new CollectionUpdateStrategy<>(SideMenuLevel1Menu.class, nDao,
@@ -184,7 +185,7 @@ public class SideMenuServiceImpl implements SideMenuService, InitializingBean{
 			o.setTitle(g.getTitle());
 			o.setAuthorities(g.getAuthorities());
 		});
-		updateLevel1Menu.doUpdate(originModules, modules);
+		updateLevel1Menu.doUpdate(originModules, l1Menus);
 		reloadMenuMap();
 	}
 	

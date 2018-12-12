@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
 
-<link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_546680_kteq857ve4.css">
+<link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_546680_3g5emsgb36v.css">
 
 <!--Basic Styles-->
 <!-- <link href="media/admin/plugins/typeahead/dist/examples.css" rel="stylesheet" /> -->
@@ -27,6 +27,7 @@
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/dtmpl-update.css" />
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/ltmpl-update.css" />
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/index-area.css" />
+<link type="text/css" rel="stylesheet" href="media/admin/common/chooser/chooser.css" />
 
 <script src="${basePath }media/common/compat/weakmap-polyfill.min.js"></script>
 <script src="${basePath }media/common/compat/formdata.min.js"></script>
@@ -39,6 +40,7 @@
 <script src="media/admin/plugins/beyond/js/datetimepicker/js/bootstrap-datetimepicker.js"></script>
 <script type="text/javascript" src="media/admin/plugins/beyond/js/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
 <script src="${basePath }media/admin/plugins/timeline/jquery.eeyellow.Timeline.js"></script>
+
 <!-- SeaJS -->
 <script src="${basePath }media/sea-debug.js"></script>
 <script src="${basePath }media/seajs-css-debug.js"></script>

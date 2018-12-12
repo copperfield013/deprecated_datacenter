@@ -93,6 +93,7 @@ define(function(require, exports, module){
 					textPicked		: true,
 					module			: param.module,
 					exceptComposites: choosedArrayCompositeIdSet,
+					fieldFilters	: ['file'],
 					afterChoose		: function(field){
 						if(field.composite.isArray){
 							//选择的字段是一个数组字段，锁定当前选择器的标签页
@@ -239,7 +240,7 @@ define(function(require, exports, module){
 					}else{
 						var $field = $tmplField.tmpl(fieldData);
 						$field.data('field-data', fieldData).appendTo($fieldContainer);
-						initFieldDefaultValue($field, fieldData.dv !== '' && fieldData.dv !== undefined);
+						initFieldDefaultValue($field, true);
 						adjustFieldTitle($field.find('.field-title'));
 					}
 					fieldSearch.enableField(fieldData.fieldId, false).done(function(field){
@@ -478,78 +479,30 @@ define(function(require, exports, module){
 					}
 				});
 			});
-			//恢复字段名称
-			bindPageEvent('click', '.recover-field i', function(e){
-				var $field = getLocateField(e.target),
-				$fieldTitle = $field.find('.field-title'),
-				fieldTitle = $fieldTitle.text(),
-				fieldData = $field.data('field-data'),
-				fieldName = fieldTitle;
-				if(fieldData && fieldData.title){
-					fieldName = fieldData.title;
-				}
-				require('dialog').confirm('确认恢复字段[' + fieldTitle + ']为原始名称[' + fieldName + ']？', function(yes){
-					if(yes){
-						$fieldTitle.text(fieldName);
-						adjustFieldTitle($fieldTitle);
-					}
-				});
-			});
-			
-			bindPageEvent('click', '.field-setdefval i', function(e){
-				var $a = $(e.target).closest('.field-setdefval');
-				var tounsetdefval = $a.is('.tounsetdefval');
-				var $field = getLocateField(e.target);
-				var $fieldValue = $field.find('.field-value').eq(0);
-				if(tounsetdefval){
-					require('dialog').confirm('是否取消当前字段的默认值？', function(yes){
-						if(yes){
-							initFieldDefaultValue($field, false);
-							$a.removeClass('tounsetdefval');
-						}
-					})
-				}else{
-					initFieldDefaultValue($field, true);
-					$a.attr('title', '取消默认值');
-					$a.addClass('tounsetdefval');
-				}
-			});
 			
 			var ignoredFieldType = ['file', 'image'];
 			function initFieldDefaultValue($field, toSetDefVal){
 				var $fieldValue = $field.find('.field-value').eq(0);
-				if(toSetDefVal){
-					var fieldData = $field.data('field-data');
-					console.log(fieldData);
-					if(ignoredFieldType.indexOf(fieldData.fieldType) < 0){
-						var fieldInputParam = {
-								$page: $page,
-								fieldKey: param.module + '@' + fieldData.fieldName,
-								name: fieldData.fieldName,
-								optionsKey: fieldData.optGroupKey,
-								//optionsSet: undefined,
-								readonly: false,
-								//styleClass: undefined
-								type: fieldData.fieldType,
-								value: fieldData.dv
-						};
-						var fieldInput = new FieldInput(fieldInputParam);
-						$fieldValue.empty().append($('<div class="field-input">').append(fieldInput.getDom()));
-						$fieldValue.data('field-input', fieldInput);
-						return;
-					}
+				var fieldData = $field.data('field-data');
+				console.log(fieldData);
+				if(ignoredFieldType.indexOf(fieldData.fieldType) < 0){
+					var fieldInputParam = {
+							$page: $page,
+							fieldKey: param.module + '@' + fieldData.fieldName,
+							name: fieldData.fieldName,
+							optionsKey: fieldData.optGroupKey,
+							//optionsSet: undefined,
+							readonly: false,
+							//styleClass: undefined
+							type: fieldData.fieldType,
+							value: fieldData.dv
+					};
+					var fieldInput = new FieldInput(fieldInputParam);
+					$fieldValue.empty().append($('<div class="field-input">').append(fieldInput.getDom()));
+					$fieldValue.data('field-input', fieldInput);
+					return;
 				}
-				$fieldValue.empty().append('<span class="field-view">XXXXX</span>').removeData('field-input');
 			}
-			
-			bindPageEvent('click', 'ul.field-validate-menu>li', function(e){
-				var $field = getLocateField(e.target);
-				var $li = $(this);
-				var toChecked = !$li.is('.checked-validate');
-				var validateName = $li.attr('validate-name');
-				$field.find('.dtmpl-field-validates>.dtmpl-field-validate-' + validateName).toggleClass('active-validator', toChecked);
-				$li.toggleClass('checked-validate', toChecked);
-			});
 			
 			//删除数组字段
 			bindPageEvent('click', '.remove-array-field i', function(e){

@@ -1073,3 +1073,40 @@ p.account-username {
 .account-operate-list>a:hover>* {
 	color: #111;
 }
+
+span.badge-helper {
+    display: inline-block !important;
+    width: 13px;
+    height: 13px;
+    line-height: 13px;
+    padding: 0;
+    font-size: 8px !important;
+    cursor: pointer;
+    text-align: center;
+}
+span.badge-helper:hover{
+	opacity: 0.8;
+}
+span.badge-helper:after{
+    content: "?";
+}
+
+table.table.row-selectable input[type=checkbox]+.text:before {
+    font-size: 8px;
+    height: 15px;
+    line-height: 15px;
+    width: 15px;
+    min-width: 15px;
+    margin: 0;
+}
+
+table.table.row-selectable input[type=checkbox]+.text {
+    line-height: 14px;
+    min-height: 15px;
+    min-width: 15px;
+}
+table.table.row-selectable input[type=checkbox].partly:checked+.text:before {
+    content: "\e63b";
+    font-family: "iconfont" !important;
+    font-style:normal;
+}
