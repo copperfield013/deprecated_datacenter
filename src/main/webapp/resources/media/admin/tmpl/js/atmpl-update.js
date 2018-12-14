@@ -156,14 +156,15 @@ define(function(require, exports, module){
 							//还没有添加字段过
 							$arrayTable = $('#tmpl-field-array-table', $page).tmpl();
 							$arrayTable.appendTo($fieldContainer);
+							var $relationSelect = null;
 							if($.isArray(option.relations)){
 								var $titleCell = $('<th>关系</th>')
-								var $relationSelect = $('<select class="tmpl-relation-labels">');
+								$relationSelect = $('<select class="tmpl-relation-labels">');
 								for(var i in option.relations){
 									$relationSelect.append('<option value="' + option.relations[i] + '">' + option.relations[i] + '</option>');
 								}
-								$arrayTable.find('.title-row').append($titleCell);
-								$arrayTable.find('.value-row').append($('<td>').append($relationSelect));
+								$arrayTable.find('.title-row').children('.delete-col').before($titleCell);
+								//$arrayTable.find('.value-row').append($('<td>').append($relationSelect));
 							}
 							$arrayTable.find('.title-row').sortable({
 								helper		: 'original',
@@ -171,39 +172,89 @@ define(function(require, exports, module){
 								axis		: 'x',
 								opacity		: 0.5,
 								tolerance 	: 'pointer',
+								items		: '>th[field-id]',
 								stop		: function(e, ui){
 									var Utils = require('utils');
 									$(this).children().each(function(index){
 										var $title = $(this);
 										var fieldId = $title.attr('field-id');
-										$arrayTable.find('tbody').children('tr').each(function(){
-											var $row = $(this);
-											var $cell = null;
-											if(fieldId){
-												$cell = $row.find('td[field-id="' + fieldId + '"]');
-											}else if($title.is('.number-col')){
-												$cell = $row.find('td.number-col');
-											}
-											if($cell != null){
-												Utils.prependTo($cell, $row, index);
-											}
-										});
+										if(fieldId){
+											$arrayTable.find('tbody').children('tr').each(function(){
+												var $row = $(this);
+												var $cell = null;
+												if(fieldId){
+													$cell = $row.find('td[field-id="' + fieldId + '"]');
+												}
+												if($cell != null){
+													Utils.prependTo($cell, $row, index);
+												}
+											});
+										}
 									});
 								}
 							});
 							var $createArrayControl = $group.find('.create-arrayitem-control');
 							
+							function createRow(e, initData){
+								var fields = [];
+								initData = initData || {};
+								var $arrayTable = $('.field-array-table', $fieldContainer);
+								$arrayTable.find('.title-row').children('th[field-id]').each(function(){
+									fields.push($(this).data('originField'));
+								});
+								var $tbody = $arrayTable.find('tbody');
+								var $row = $('#tmpl-field-array-value-row', $page).tmpl({
+									arrayEntityId	: initData.arrayEntityId,
+									index		: $tbody.children('tr').length, 
+									composite	: field.composite,
+									fields		: fields
+								});
+								$row.find('.field-input.relation').append($relationSelect && $relationSelect.clone());
+								$row.find('.array-item-remove').click(function(){
+									$row.nextAll('tr').each(function(){
+										var $thisRow = $(this);
+										var index = $thisRow.index();
+										$thisRow.find('td.number-col').text(index);
+									});
+									$row.remove();
+								})
+								$row.find('.field-input[field-id]').each(function(i){
+									var $cell = $(this).closest('td');
+									var field = fields[i];
+									var entityFieldValue = '';
+									if(initData.fieldMap){
+										var entityField = initData.fieldMap['f_' + field.id];
+										if(entityField){
+											entityFieldValue = entityField.value;
+											$cell.attr('data-id', entityField.id)
+										}
+									}
+									var fieldInput = new FieldInput({
+										type		: field.type,
+										value		: entityFieldValue,
+										optionsKey	: field.optGroupKey,
+										$page		: $page
+									});
+									$(this).append(fieldInput.getDom()).data('field-input', fieldInput);
+								});
+								$tbody.append($row);
+							}
+							$createArrayControl.show();
+							if($createArrayControl.data('bindedCreateRowFunc')){
+								$createArrayControl.off('click', $createArrayControl.data('bindedCreateRowFunc'));
+							}
+							$createArrayControl.on('click', createRow).data('bindedCreateRowFunc', createRow);
+							
+							
 							var $arrayitemControl = $group.find('.select-arrayitem-control');
 							if(field.composite.addType == 5){
-								$createArrayControl.show();
-								$arrayitemControl
-								.find(':checkbox').change(function(){
+								function checkboxChange(){
 									//勾选是否显示选择按钮
 									var $checkbox = $(this);
 									var $a = $checkbox.closest('label').prev('a');
 									$a.toggle($checkbox.prop('checked'));
-								})
-								.end().find('a.btn-select').click(function(){
+								}
+								function selectClick(){
 									var reqParam = {};
 									var stmplId = $group.attr('stmpl-id'); 
 									if(!stmplId){
@@ -225,18 +276,38 @@ define(function(require, exports, module){
 													}
 												}
 											});
-								})
-								.end().show();
+								}
+								
+								if($arrayitemControl.data('bindedClickEvent')){
+									$arrayitemControl.find(':checkbox').off('change', $arrayitemControl.data('bindedClickEvent').checkboxChange)
+									$arrayitemControl.find('a.btn-select').off('click', $arrayitemControl.data('bindedClickEvent').selectClick)
+								}
+								$arrayitemControl.find(':checkbox').on('change', checkboxChange);
+								$arrayitemControl.find('a.btn-select').on('click', selectClick);
+								$arrayitemControl.data('bindedClickEvent', {checkboxChange: checkboxChange, selectClick:selectClick}).show();
 								$arrayitemControl.find(':checkbox.selectable').prop('checked', !!$group.attr('stmpl-id')).trigger('change');
 							}else{
-								$createArrayControl.remove();
 								$arrayitemControl.remove();
 							}
 						}
 						var $titleCell = $('#tmpl-field-array-title', $page).tmpl(fieldData);
 						$titleCell.data('field-data', fieldData);
-						$arrayTable.find('.title-row').append($titleCell);
-						$arrayTable.find('.value-row').append($('#tmpl-field-array-value', $page).tmpl(fieldData));
+						$titleCell.data('originField', field);
+						$arrayTable.find('.title-row').children('.delete-col').before($titleCell);
+						$arrayTable.find('tbody').children('tr').each(function(){
+							var $row = $(this);
+							var $valueCell = $('#tmpl-field-array-value-cell', $page).tmpl({field:field});
+							var fieldInput = new FieldInput({
+								type		: field.type,
+								value		: '',
+								optionsKey	: field.optGroupKey,
+								$page		: $page
+							});
+							$valueCell.append(fieldInput.getDom());
+							$row.children('.delete-col').before($valueCell);
+						});
+						$arrayTable.find('tfoot td').attr('colspan', $arrayTable.find('.title-row').children().length);
+						//$arrayTable.find('.value-row').append($('#tmpl-field-array-value', $page).tmpl(fieldData));
 					}else{
 						var $field = $tmplField.tmpl(fieldData);
 						$field.data('field-data', fieldData).appendTo($fieldContainer);
@@ -252,6 +323,9 @@ define(function(require, exports, module){
 							}else{
 								fieldSearch.hideArrayComposites();
 							}
+						}
+						if(option.deferred){
+							option.deferred.complete();
 						}
 					});
 				});
@@ -325,10 +399,11 @@ define(function(require, exports, module){
 							id		: $group.attr('data-id'),
 							title	: $group.find('span.group-title').text(),
 							isArray	: isArray,
-							fields	: []							
+							fields	: []
 					};
 					saveData.groups.push(group);
 					if(isArray){
+						group.entities = [];
 						var $selectable = $group.find('.selectable:checkbox');
 						if($selectable.prop('checked')){
 							group.selectionTemplateId = $group.attr('stmpl-id');
@@ -341,10 +416,32 @@ define(function(require, exports, module){
 							group.fields.push({
 								id		: $th.attr('data-id'),
 								fieldId	: $th.attr('field-id'),
-								title	: $th.children('span').text(),
-								viewVal	: 'XXX'
+								title	: $th.children('span').text()
 							});
 						});
+						
+						$arrayTable.find('tbody>tr').each(function(){
+							var $row = $(this);
+							var fieldMap = {};
+							$row.find('td[field-id]').each(function(){
+								var $cell = $(this);
+								var fieldId = $cell.attr('field-id');
+								var fieldInput = $cell.find('span.field-input[field-id]').data('field-input');
+								if(fieldInput){
+									fieldMap['f_' + fieldId] = {
+										id		: $cell.attr('data-id'),
+										value	: fieldInput.getValue() + ''
+									}
+								}
+							});
+							group.entities.push({
+								id					: $row.attr('data-id'),
+								setRelationLabel	: $row.find('select.tmpl-relation-labels').val(),
+								relationEntityCode	: $row.attr('data-code'),
+								fieldMap			: fieldMap
+							});
+						});
+						
 					}else{
 						//遍历所有字段
 						$group.find('.field-item').each(function(){
@@ -577,7 +674,7 @@ define(function(require, exports, module){
 			
 			//初始化默认数据
 			if(tmplData && tmplData.groups){
-				for(var i in tmplData.groups){
+				$.each(tmplData.groups, function(i){
 					var group = tmplData.groups[i];
 					var $group = 
 						$tmplFieldGroup
@@ -589,6 +686,7 @@ define(function(require, exports, module){
 					}
 					//初始化字段组的字段搜索自动完成功能
 					initGroupFieldSearchAutocomplete($group);
+					var deferred = new MultiDeferred();
 					for(var j in group.fields){
 						var field = group.fields[j];
 						if(field.validators){
@@ -596,10 +694,31 @@ define(function(require, exports, module){
 						}
 						appendFieldToGroup(field, $group, {
 							isArrayField	: group.isArray == 1,
-							relations		: group.relationSubdomain
+							relations		: group.relationSubdomain,
+							deferred		: deferred.delay()
 						});
 					}
-				}
+					if(group.isArray){
+						deferred.allDone(function(){
+							for(var k in group.entities){
+								var entity = group.entities[k];
+								var entityFieldMap = {}
+								$.each(entity.fields, function(){
+									entityFieldMap['f_' + this.fieldId] = this;
+								});
+								//创建行
+								$group.find('.create-arrayitem-control').trigger('click', [{
+									arrayEntityId	: entity.id,
+									fieldMap		: entityFieldMap
+								}]);
+								//对行内的dom进行操作
+								
+							}
+						});
+						console.log('deferreds start');
+						deferred.start();
+					}
+				});
 			}
 			//字段的标题初始化，需要延迟，等到页面加载完之后执行
 			setTimeout(function(){
@@ -636,5 +755,60 @@ define(function(require, exports, module){
 			
 		});
 		
+	}
+	
+	function MultiDeferred(){
+		var items = [];
+		var allDoneCallback = $.noop;
+		var started = false;
+		var done = false;
+		var _this = this;
+		this.delay = function(){
+			var completed = false;
+			var delayItem = {
+				isCompleted	: function(){
+					return completed;
+				},
+				complete	: function(){
+					if(!completed){
+						completed = true;
+						if(started){
+							_this.checkAllCompleted();
+						}
+					}
+				}
+			}
+			items.push(delayItem);
+			return delayItem;
+		}
+		this.start = function(){
+			started = true;
+			console.log('start');
+			this.checkAllCompleted();
+		}
+		var checkReq = 0;
+		this.checkAllCompleted = function(){
+			if(!done){
+				if(checkReq > 0){
+					checkReq++;
+					return;
+				}
+				checkReq++;
+				while(checkReq > 0){
+					for(var i in items){
+						if(!items[i].isCompleted()){
+							checkReq--;
+							return;
+						}
+					}
+					done = true;
+					allDoneCallback.apply(this, []);
+					checkReq = 0;
+				}
+			}
+		}
+		this.allDone = function(callback){
+			allDoneCallback = callback;
+		}
 	}
 });

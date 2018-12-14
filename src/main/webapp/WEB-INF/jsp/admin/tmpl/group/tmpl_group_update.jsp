@@ -126,7 +126,7 @@
 											<div class="col-lg-9">
 												<label class="col-lg-2 control-label" for="name">功能按钮</label>
 												<div class="col-lg-9">
-													<label class="col-lg-4 col-xs-3">
+													<label class="col-lg-4 col-xs-3 form-control-static">
 														<input id="showCreateButton" 
 															type="checkbox" 
 															class="checkbox-slider colored-blue" 
@@ -134,14 +134,14 @@
 															${group.hideCreateButton == 1? '': 'checked="checked"' }>
 														<span class="text">创建按钮</span>
 													</label>
-													<label class="col-lg-4 col-xs-3">
+													<label class="col-lg-4 col-xs-3 form-control-static">
 														<input id="showImportButton" 
 															type="checkbox" class="checkbox-slider colored-success" 
 															${moduleWritable? '': 'disabled="disabled"' } 
 															${group.hideImportButton == 1? '': 'checked="checked"' }>
 														<span class="text">导入按钮</span>
 													</label>
-													<label class="col-lg-4 col-xs-3">
+													<label class="col-lg-4 col-xs-3 form-control-static">
 														<input id="showExportButton" 
 															type="checkbox" 
 															class="checkbox-slider colored-darkorange" 
@@ -157,7 +157,7 @@
 											<div class="col-lg-9">
 												<label class="col-lg-2 control-label" for="name">操作按钮</label>
 												<div class="col-lg-9">
-													<label class="col-lg-4 col-xs-3">
+													<label class="col-lg-4 col-xs-3 form-control-static">
 														<input id="showQueryButton" 
 															type="checkbox" 
 															class="checkbox-slider colored-magenta" 
@@ -165,7 +165,7 @@
 															${group.hideQueryButton == 1? '': 'checked="checked"' }>
 														<span class="text">查询及条件</span>
 													</label>
-													<label class="col-lg-4 col-xs-3">
+													<label class="col-lg-4 col-xs-3 form-control-static">
 														<input id="showDeleteButton" 
 															type="checkbox" class="checkbox-slider colored-danger" 
 															${moduleWritable? '': 'disabled="disabled"' } 

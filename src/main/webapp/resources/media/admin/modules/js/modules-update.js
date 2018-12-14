@@ -229,19 +229,24 @@ define(function(require, exports, module){
 		}
 		
 		var $actionsBtn = $('#actions', $page);
+		var $actionList = $('#action-list', $page);
+		var $actionsContainer = $actionList.parent();
+		(function(){
+			var height = $actionsContainer.outerHeight();
+			$actionsContainer.css('height', height + 'px');
+			$actionsContainer.addClass('close');
+		})();
 		function toggleActionBtn(){
 			require('utils').switchClass($actionsBtn.children('i'), 'fa-toggle-left', 'fa-toggle-right', function(isHidden){
-				$actionsBtn.next('ul')[isHidden? 'fadeOut': 'fadeIn']({
-					duration	: 100,
-					easing 		: 'linear'
-				});
+				$actionsContainer.removeClass('init');
+				$actionsContainer.toggleClass('close', isHidden);
 			});
 		}
 		
 		$actionsBtn.click(function(){
 			toggleActionBtn();
 		});
-		$actionsBtn.next('ul').children('li').click(function(){
+		$actionList.children('a').click(function(){
 			var $action = $(this);
 			var actionId = $action.attr('data-id');
 			if(actionId){

@@ -27,6 +27,8 @@ import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.config.service.ConfigureService;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionArrayEntity;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionArrayEntityField;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionField;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionFieldGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionTemplate;
@@ -144,6 +146,36 @@ public class AdminActionTemplateController {
 									field.setOrder(j++);
 									field.setValidators(jField.getString("validators"));
 									group.getFields().add(field);
+								}
+							}
+							if(j > 0) {
+								JSONArray aEntities = jGroup.getJSONArray("entities");
+								if(aEntities != null && !aEntities.isEmpty()) {
+									for (int k = 0; k < aEntities.size(); k++) {
+										JSONObject jEntity = (JSONObject) aEntities.get(k);
+										TemplateActionArrayEntity entity = new TemplateActionArrayEntity();
+										entity.setId(jEntity.getLong("id"));
+										entity.setIndex(k);
+										entity.setRelationEntityCode(jEntity.getString("relationEntityCode"));
+										entity.setRelationLabel(jEntity.getString("relationLabel"));
+										entity.setTmplFieldGroupId(group.getId());
+										JSONObject fieldsMap = jEntity.getJSONObject("fieldMap");
+										group.getFields().forEach(field->{
+											if(field.getFieldId() != null) {
+												JSONObject jField = fieldsMap.getJSONObject("f_" + field.getFieldId());
+												if(jField != null) {
+													TemplateActionArrayEntityField eField = new TemplateActionArrayEntityField();
+													eField.setId(jField.getLong("id"));
+													eField.setTmplFieldId(field.getId());
+													eField.setActionArrayEntityId(entity.getId());
+													eField.setValue(jField.getString("value"));
+													entity.getFields().add(eField);
+													field.getArrayEntityFields().add(eField);
+												}
+											}
+										});
+										group.getEntities().add(entity);
+									}
 								}
 							}
 						}

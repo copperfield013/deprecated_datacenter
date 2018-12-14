@@ -17,10 +17,10 @@
 					<span class="group-title">\${title}</span>
 				</span>
 				<div class="widget-buttons create-arrayitem-control" style="display:none">
-					<label>
-						<input type="checkbox" class="colored-blue" \${unallowedCreate==1?'checked="checked"': ''}>
-						<span class="text">禁止创建</span>
-					</label>
+					<a class="btn btn-info btn-xs btn-select">
+						<i class="fa fa-plus"></i>
+						添加
+					</a>
              	</div>
 				<div class="widget-buttons select-arrayitem-control" style="display:none">
 					<a class="btn btn-info btn-xs btn-select">
@@ -53,15 +53,43 @@
 				<thead>
 					<tr class="title-row">
 						<th class="number-col">#</th>
+						<th class="delete-col"></th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr class="value-row">
-						<td class="number-col">1</td>
-					</tr>
 				</tbody>
+				<tfoot><tr><td colspan="2"></td></tr></tfoot>
 			</table>
 		</div>
+	</script>
+	<script type="jquery/tmpl" id="tmpl-field-array-value-cell">
+		<td field-id="\${field.id}">
+			<span class="field-value">
+				<span class="field-input" field-id="\${field.id}"></span>
+			</span> 
+		</td>
+	</script>
+	<script type="jquery/tmpl" id="tmpl-field-array-value-row">
+		<tr class="" data-id="\${arrayEntityId}">
+			<td class="number-col">\${index + 1}</td>
+			{{if composite.addType == 5}}
+				<td>
+					<span class="field-value">
+						<span class="field-input relation"></span>
+					</span> 
+				</td>
+			{{/if}}
+			{{each(i, field) fields}}
+				<td field-id="\${field.id}">
+					<span class="field-value">
+						<span class="field-input" field-id="\${field.id}"></span>
+					</span> 
+				</td>
+			{{/each}}
+			<td class="delete-col">
+				<span class="array-item-remove" title="移除当前行">×</span>
+			</td>
+		</tr>
 	</script>
 	<script type="jquery/tmpl" id="tmpl-field-array-title">
 		<th data-id="\${id}" field-id="\${fieldId}" 

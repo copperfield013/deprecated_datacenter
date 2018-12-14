@@ -13,11 +13,16 @@
 		<div class="operate-area-cover"></div>
 		<c:if test="${!empty groupActions }">
 			<a id="actions" title="操作"><i class="fa fa-toggle-left"></i></a>
-			<ul id="action-list" style="display: none;">
-				<c:forEach var="action" items="${groupActions }">
-					<li title="${action.title }" data-id="${action.id }">${action.title }</li>
-				</c:forEach>
-			</ul>
+			<div id="actions-container" class="init">
+				<div id="action-list">
+					<c:forEach var="action" items="${groupActions }">
+						<a class="btn btn-azure shiny" href="javascript:;" title="${action.title }" data-id="${action.id }">
+							<i class="iconfont icon-action"></i>
+							${action.title }
+						</a>
+					</c:forEach>
+				</div>
+			</div>
 		</c:if>
 		<a id="save" title="保存"><i class="fa fa-check-square"></i></a>
 	</div>
