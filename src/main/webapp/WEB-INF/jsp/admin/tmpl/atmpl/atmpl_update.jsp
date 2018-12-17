@@ -23,14 +23,14 @@
 					</a>
              	</div>
 				<div class="widget-buttons select-arrayitem-control" style="display:none">
-					<a class="btn btn-info btn-xs btn-select">
+					<a class="btn btn-info btn-xs btn-tmpl">
+						<i class="fa fa-link"></i>
+						模板
+					</a>
+					<a class="btn btn-info btn-xs btn-toselect">
 						<i class="fa fa-link"></i>
 						选择
 					</a>
-          	         <label title="是否显示选择按钮">
-         	            <input type="checkbox" class="selectable colored-blue">
-         	            <span class="text"></span>
-         	         </label>
              	</div>
 				<div class="widget-buttons buttons-bordered">
 					<div class="input-icon field-search">
@@ -70,7 +70,7 @@
 		</td>
 	</script>
 	<script type="jquery/tmpl" id="tmpl-field-array-value-row">
-		<tr class="" data-id="\${arrayEntityId}">
+		<tr class="" data-id="\${arrayEntityId}" data-code="\${entityCode}">
 			<td class="number-col">\${index + 1}</td>
 			{{if composite.addType == 5}}
 				<td>

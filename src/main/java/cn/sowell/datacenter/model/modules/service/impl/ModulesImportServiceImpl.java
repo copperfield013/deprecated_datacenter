@@ -28,13 +28,16 @@ import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -221,7 +224,15 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 		XSSFWorkbook workbook = new XSSFWorkbook();
 		try {
 			XSSFSheet sheet = workbook.createSheet("导入数据");
-			sheet.createRow(0);
+			
+			//导入说明
+			XSSFRow titleRow = sheet.createRow(0);
+			titleRow.setHeight((short) 2000);
+			XSSFCell descriptionCell = titleRow.createCell(0);
+			XSSFRichTextString desc = getEntityImportDescrption();
+			descriptionCell.setCellValue(desc);
+			descriptionCell.setCellStyle(descCellStyle(workbook));
+			
 			XSSFRow headerRow = sheet.createRow(1);
 			XSSFRow firstDataRow = sheet.createRow(2);
 			
@@ -252,6 +263,8 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 				}
 				
 			}
+			CellRangeAddress region = new CellRangeAddress(0, 0, 0, fields.size() + 1);
+			sheet.addMergedRegion(region);
 			
 			try {
 				ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -271,6 +284,25 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 	}
 
 	
+
+	private CellStyle descCellStyle(XSSFWorkbook workbook) {
+		XSSFCellStyle style = workbook.createCellStyle();
+		style.setWrapText(true);
+		return style;
+	}
+
+	private static XSSFRichTextString getEntityImportDescrption() {
+		ClassPathResource file = new ClassPathResource("entity-import-desc.txt");
+		if(file.exists()) {
+			try {
+				String desc = TextUtils.trim(TextUtils.readAsString(file.getInputStream()));
+				return new XSSFRichTextString(desc);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return new XSSFRichTextString("（读取导入说明失败）");
+	}
 
 	private CellStyle getTitleStyle(XSSFWorkbook workbook) {
 		XSSFCellStyle style = workbook.createCellStyle();

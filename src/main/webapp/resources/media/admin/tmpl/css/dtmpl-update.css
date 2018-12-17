@@ -348,7 +348,7 @@ th.field-unavailable:before {
 	
 }
 
-.dtmpl-update .field-group .btn-select {
+.dtmpl-update .create-arrayitem-control a.btn, .dtmpl-update .select-arrayitem-control a.btn {
     padding: 0px 5px;
     font-size: 12px;
     line-height: 20px;
@@ -368,4 +368,12 @@ th.field-unavailable:before {
 }
 .dtmpl-update a.field-setdefval.tounsetdefval>i:before {
     text-decoration: line-through;
+}
+
+
+.dtmpl-update .field-group[stmpl-id=""] .btn-toselect{
+	display: none !important;
+}
+.dtmpl-update .field-group[stmpl-id] .btn-toselect{
+	display: inline-block;
 }

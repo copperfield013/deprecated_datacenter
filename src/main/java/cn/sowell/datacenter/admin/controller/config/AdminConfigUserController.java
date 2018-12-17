@@ -30,12 +30,12 @@ import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.admin.controller.modules.AdminModulesController;
 import cn.sowell.datacenter.common.RequestParameterMapComposite;
 import cn.sowell.datacenter.entityResolver.CEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.FieldDescCacheMap;
 import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
-import cn.sowell.datacenter.entityResolver.impl.ABCNodeProxy;
 import cn.sowell.datacenter.model.admin.pojo.ABCUser;
 import cn.sowell.datacenter.model.config.service.ConfigUserService;
 import cn.sowell.datacenter.model.modules.service.ExportService;
@@ -215,25 +215,10 @@ public class AdminConfigUserController {
 				stmpl.getRelationName(), 
 				TextUtils.split(codes, ",", HashSet<String>::new, c->c), UserUtils.getCurrentUser())
 				;
-		JSONObject entities = toEntitiesJson(parsers, TextUtils.split(fields, ",", HashSet<String>::new, f->f));
+		JSONObject entities = AdminModulesController.toEntitiesJson(parsers, TextUtils.split(fields, ",", HashSet<String>::new, f->f));
 		jRes.put("entities", entities);
 		jRes.setStatus("suc");
 		return jRes;
-	}
-	
-	private JSONObject toEntitiesJson(Map<String, CEntityPropertyParser> parsers, Set<String> fieldNames) {
-		JSONObject entities = new JSONObject();
-		if(parsers != null && fieldNames != null) {
-			parsers.forEach((code, parser)->{
-				JSONObject entity = new JSONObject();
-				entity.put(ABCNodeProxy.CODE_PROPERTY_NAME_NORMAL, parser.getCode());
-				entities.put(parser.getCode(), entity);
-				for (String fieldName : fieldNames) {
-					entity.put(fieldName, parser.getFormatedProperty(fieldName));
-				}
-			});
-		}
-		return entities;
 	}
 	
 	@ResponseBody

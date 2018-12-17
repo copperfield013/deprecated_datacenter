@@ -159,7 +159,7 @@ public class AdminModulesController {
 		return AdminConstants.JSP_MODULES + "/modules_list_tmpl.jsp";
 	}
 	
-	private Map<Long, String> exractTemplateCriteriaMap(HttpServletRequest request) {
+	public static Map<Long, String> exractTemplateCriteriaMap(HttpServletRequest request) {
 		ServletRequestParameterPropertyValues pvs = new ServletRequestParameterPropertyValues(request, "criteria", "_");
 		Map<Long, String> criteriaMap = new HashMap<Long, String>();
 		pvs.getPropertyValueList().forEach(pv->{
@@ -401,7 +401,7 @@ public class AdminModulesController {
 		return jRes;
 	}
 
-	private JSONObject toEntitiesJson(Map<String, CEntityPropertyParser> parsers, Set<String> fieldNames) {
+	public static JSONObject toEntitiesJson(Map<String, CEntityPropertyParser> parsers, Set<String> fieldNames) {
 		JSONObject entities = new JSONObject();
 		if(parsers != null && fieldNames != null) {
 			parsers.forEach((code, parser)->{

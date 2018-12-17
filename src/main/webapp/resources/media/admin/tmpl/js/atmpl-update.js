@@ -204,6 +204,7 @@ define(function(require, exports, module){
 								});
 								var $tbody = $arrayTable.find('tbody');
 								var $row = $('#tmpl-field-array-value-row', $page).tmpl({
+									entityCode	: initData.entityCode,
 									arrayEntityId	: initData.arrayEntityId,
 									index		: $tbody.children('tr').length, 
 									composite	: field.composite,
@@ -211,12 +212,16 @@ define(function(require, exports, module){
 								});
 								$row.find('.field-input.relation').append($relationSelect && $relationSelect.clone());
 								$row.find('.array-item-remove').click(function(){
-									$row.nextAll('tr').each(function(){
-										var $thisRow = $(this);
-										var index = $thisRow.index();
-										$thisRow.find('td.number-col').text(index);
+									require('dialog').confirm('确定删除该行？', function(yes){
+										if(yes){
+											$row.nextAll('tr').each(function(){
+												var $thisRow = $(this);
+												var index = $thisRow.index();
+												$thisRow.find('td.number-col').text(index);
+											});
+											$row.remove();
+										}
 									});
-									$row.remove();
 								})
 								$row.find('.field-input[field-id]').each(function(i){
 									var $cell = $(this).closest('td');
@@ -248,13 +253,7 @@ define(function(require, exports, module){
 							
 							var $arrayitemControl = $group.find('.select-arrayitem-control');
 							if(field.composite.addType == 5){
-								function checkboxChange(){
-									//勾选是否显示选择按钮
-									var $checkbox = $(this);
-									var $a = $checkbox.closest('label').prev('a');
-									$a.toggle($checkbox.prop('checked'));
-								}
-								function selectClick(){
+								function tmplClick(){
 									var reqParam = {};
 									var stmplId = $group.attr('stmpl-id'); 
 									if(!stmplId){
@@ -277,15 +276,71 @@ define(function(require, exports, module){
 												}
 											});
 								}
+								function toselectClick(){
+									var reqParam = {};
+									var stmplId = $group.attr('stmpl-id'); 
+									var existCodes = []; 
+									var $this = $(this);
+									var $table = $this.closest('.field-group').find('table');
+									$table.find('>tbody>tr').each(function(){
+										var entityCode = $(this).attr('data-code');
+										if(entityCode){
+											existCodes.push(entityCode);
+										}
+									});
+									
+									require('dialog').openDialog('admin/tmpl/atmpl/open_selection/' + stmplId, 
+											undefined, undefined, {
+										reqParam	: {
+											exists	: existCodes.join()
+										},
+										width		: 1000,
+										height		: 400,
+										onSubmit	: function(entitiesLoader){
+											var fieldNames = [];
+											var fields = [];
+											$('>thead>tr>th', $table).each(function(){
+												var originField = $(this).data('originField');
+												if(originField){
+													fieldNames.push(originField.name);
+													fields.push(originField);
+												}
+											});
+											entitiesLoader(fieldNames).done(function(entities){
+												console.log(entities);
+												function _(i){
+													if(entitiesLoader.codes.length > i){
+														var entity = entities[entitiesLoader.codes[i]];
+														var fieldMap = {};
+														$.each(fields, function(){
+															fieldMap['f_' + this.id] = {
+																value	: entity[this.name]
+															}
+														});
+														$createArrayControl.trigger('click', {
+															entityCode	: entitiesLoader.codes[i],
+															fieldMap	: fieldMap
+														});
+														if(entitiesLoader.codes.length > i + 1){
+															_(i + 1);
+														}else{
+															//refreshRowTable();
+														}
+													}
+												}
+												_(0);
+											});
+										}
+									});
+								}
 								
 								if($arrayitemControl.data('bindedClickEvent')){
-									$arrayitemControl.find(':checkbox').off('change', $arrayitemControl.data('bindedClickEvent').checkboxChange)
-									$arrayitemControl.find('a.btn-select').off('click', $arrayitemControl.data('bindedClickEvent').selectClick)
+									$arrayitemControl.find('a.btn-tmpl').off('click', $arrayitemControl.data('bindedClickEvent').tmplClick)
+									$arrayitemControl.find('a.btn-toselect').off('click', $arrayitemControl.data('bindedClickEvent').toselectClick)
 								}
-								$arrayitemControl.find(':checkbox').on('change', checkboxChange);
-								$arrayitemControl.find('a.btn-select').on('click', selectClick);
-								$arrayitemControl.data('bindedClickEvent', {checkboxChange: checkboxChange, selectClick:selectClick}).show();
-								$arrayitemControl.find(':checkbox.selectable').prop('checked', !!$group.attr('stmpl-id')).trigger('change');
+								$arrayitemControl.find('a.btn-tmpl').on('click', tmplClick);
+								$arrayitemControl.find('a.btn-toselect').on('click', toselectClick);
+								$arrayitemControl.data('bindedClickEvent', {tmplClick:tmplClick, toselectClick:toselectClick}).show();
 							}else{
 								$arrayitemControl.remove();
 							}
@@ -404,10 +459,7 @@ define(function(require, exports, module){
 					saveData.groups.push(group);
 					if(isArray){
 						group.entities = [];
-						var $selectable = $group.find('.selectable:checkbox');
-						if($selectable.prop('checked')){
-							group.selectionTemplateId = $group.attr('stmpl-id');
-						}
+						group.selectionTemplateId = $group.attr('stmpl-id');
 						group.compositeId = $group.attr('composite-id');
 						group.unallowedCreate = $group.find('.create-arrayitem-control :checkbox').prop('checked')? 1 : 0;
 						$arrayTable.find('.title-row>th[field-id]').each(function(){
@@ -436,7 +488,7 @@ define(function(require, exports, module){
 							});
 							group.entities.push({
 								id					: $row.attr('data-id'),
-								setRelationLabel	: $row.find('select.tmpl-relation-labels').val(),
+								relationLabel		: $row.find('select.tmpl-relation-labels').val(),
 								relationEntityCode	: $row.attr('data-code'),
 								fieldMap			: fieldMap
 							});
@@ -708,6 +760,7 @@ define(function(require, exports, module){
 								});
 								//创建行
 								$group.find('.create-arrayitem-control').trigger('click', [{
+									entityCode		: entity.relationEntityCode,
 									arrayEntityId	: entity.id,
 									fieldMap		: entityFieldMap
 								}]);

@@ -17,6 +17,12 @@ define(function(require, exports, module){
 							return 'admin/config/user/load_entities/' + uriData.stmplId;
 						}
 					}
+				case 'atmpl':
+					return {
+					load_entity	: function(stmplId){
+						return 'admin/tmpl/atmpl/load_entities/' + uriData.stmplId;
+					}
+				}
 			}
 		}
 	
