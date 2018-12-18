@@ -38,6 +38,7 @@ import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.modules.service.ViewDataService;
 import cn.sowell.dataserver.model.modules.service.impl.SelectionTemplateEntityView;
 import cn.sowell.dataserver.model.modules.service.impl.SelectionTemplateEntityViewCriteria;
+import cn.sowell.dataserver.model.tmpl.pojo.ArrayEntityProxy;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionArrayEntity;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionArrayEntityField;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionField;
@@ -70,6 +71,7 @@ public class AdminActionTemplateController {
 	@RequestMapping("/list/{moduleName}")
 	public String list(Model model, @PathVariable String moduleName) {
 		ModuleMeta moduleMeta = mService.getModule(moduleName);
+		ArrayEntityProxy.setLocalUser(UserUtils.getCurrentUser());
 		List<TemplateActionTemplate> tmplList = tService.queryActionTemplates(moduleName);
 		Map<Long, Set<TemplateGroup>> relatedGroupsMap = tService.getActionTemplateRelatedGroupsMap(CollectionUtils.toSet(tmplList, atmpl->atmpl.getId()));
 		model.addAttribute("modulesJson", configService.getSiblingModulesJson(moduleName));
@@ -89,6 +91,7 @@ public class AdminActionTemplateController {
 	@RequestMapping("/update/{tmplId}")
 	public String update(@PathVariable Long tmplId, Model model){
 		TemplateActionTemplate tmpl = tService.getActionTemplate(tmplId);
+		ArrayEntityProxy.setLocalUser(UserUtils.getCurrentUser());
 		JSONObject tmplJson = (JSONObject) JSON.toJSON(tmpl);
 		ModuleMeta moduleMeta = mService.getModule(tmpl.getModule());
 		model.addAttribute("module", moduleMeta);
@@ -102,6 +105,7 @@ public class AdminActionTemplateController {
 	@RequestMapping("/save")
 	public ResponseJSON save(@RequestBody JsonRequest jReq) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
+		ArrayEntityProxy.setLocalUser(UserUtils.getCurrentUser());
 		TemplateActionTemplate data = parseToTmplData(jReq.getJsonObject());
 		try {
 			tService.mergeTemplate(data);

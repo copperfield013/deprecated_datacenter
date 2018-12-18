@@ -372,7 +372,7 @@ define(function(require, exports, module){
 			for(var j = 0; j < $tds.length - 1; j ++){
 				var nameFormat = $titles.eq(j).attr('fname-format');
 				var inputName = nameFormat.replace('ARRAY_INDEX_REPLACEMENT', i);
-				$tds.eq(j).find(':text,select,textarea,input[type="hidden"]').each(function(){
+				$tds.eq(j).find(':text,select,textarea,input[type="hidden"],input[type="number"]').each(function(){
 					$(this).attr('name', inputName);
 				})
 				.end().find('.cpf-field-input').each(function(){

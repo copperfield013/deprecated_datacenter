@@ -57,6 +57,7 @@ import cn.sowell.dataserver.model.modules.service.impl.ListTemplateEntityView;
 import cn.sowell.dataserver.model.modules.service.impl.ListTemplateEntityViewCriteria;
 import cn.sowell.dataserver.model.modules.service.impl.SelectionTemplateEntityView;
 import cn.sowell.dataserver.model.modules.service.impl.SelectionTemplateEntityViewCriteria;
+import cn.sowell.dataserver.model.tmpl.pojo.ArrayEntityProxy;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
@@ -262,19 +263,21 @@ public class AdminModulesController {
     		RequestParameterMapComposite composite){
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		String moduleName = menu.getTemplateModule();
+		Map<String, Object> entityMap = composite.getMap();
 		if(actionId != null) {
+			ArrayEntityProxy.setLocalUser(UserUtils.getCurrentUser());
 			TemplateGroupAction groupAction = tService.getTempateGroupAction(actionId);
 			validateGroupAction(groupAction, menu, "");
-			actService.coverActionFields(groupAction, composite.getMap());
+			entityMap = actService.coverActionFields(groupAction, entityMap);
 		}
     	 try {
-    		 composite.getMap().remove(AdminConstants.KEY_FUSE_MODE);
-    		 composite.getMap().remove(AdminConstants.KEY_ACTION_ID);
+    		 entityMap.remove(AdminConstants.KEY_FUSE_MODE);
+    		 entityMap.remove(AdminConstants.KEY_ACTION_ID);
     		 UserIdentifier user = UserUtils.getCurrentUser();
     		 if(Boolean.TRUE.equals(fuseMode)) {
-    			 mService.fuseEntity(moduleName, composite.getMap(), user);
+    			 mService.fuseEntity(moduleName, entityMap, user);
     		 }else {
-    			 mService.mergeEntity(moduleName, composite.getMap(), user);
+    			 mService.mergeEntity(moduleName, entityMap, user);
     		 }
              return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("保存成功", "entity_list_" + menuId);
          } catch (Exception e) {
@@ -424,6 +427,7 @@ public class AdminModulesController {
 	@RequestMapping("/do_action/{menuId}/{actionId}")
 	public AjaxPageResponse doAction(@PathVariable Long menuId, @PathVariable Long actionId, @RequestParam(name="codes") String codeStr) {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		ArrayEntityProxy.setLocalUser(UserUtils.getCurrentUser());
 		TemplateGroupAction groupAction = tService.getTempateGroupAction(actionId);
 		Object vRes = validateGroupAction(groupAction, menu, codeStr);
 		if(vRes instanceof AjaxPageResponse) {
