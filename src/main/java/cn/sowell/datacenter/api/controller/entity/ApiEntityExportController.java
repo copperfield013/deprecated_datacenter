@@ -1,11 +1,10 @@
-package cn.sowell.datacenter.admin.controller.modules;
+package cn.sowell.datacenter.api.controller.entity;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -19,14 +18,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import cn.sowell.copframe.common.UserIdentifier;
-import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.PollStatusResponse;
@@ -36,6 +32,8 @@ import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.copframe.web.poll.WorkProgress;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.admin.controller.modules.AdminModulesExportController;
+import cn.sowell.datacenter.common.ApiUser;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
@@ -50,8 +48,8 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
 import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
 @Controller
-@RequestMapping(AdminConstants.URI_MODULES + "/export")
-public class AdminModulesExportController {
+@RequestMapping("/api/entity/export")
+public class ApiEntityExportController {
 	@Resource
 	TemplateService tService;
 	
@@ -73,8 +71,8 @@ public class AdminModulesExportController {
 	@RequestMapping("/start/{menuId}")
 	public ResponseJSON doImport(
 			@PathVariable Long menuId,
-			@RequestBody JsonRequest jReq, HttpSession session){
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+			@RequestBody JsonRequest jReq, ApiUser user){
+		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
 		TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
 		TemplateListTemplate ltmpl = tService.getListTemplate(tmplGroup.getListTemplateId());
 		
@@ -116,8 +114,8 @@ public class AdminModulesExportController {
 				progress.getDataMap().put("exportPageInfo", ePageInfo);
 				progress.getDataMap().put("withDetail", withDetail);
 				TemplateDetailTemplate dtmpl = Boolean.TRUE.equals(withDetail)? tService.getDetailTemplate(tmplGroup.getDetailTemplateId()): null;
-				eService.startWholeExport(progress, ltmpl, dtmpl, new HashSet<NormalCriteria>(vCriteriaMap.values()), ePageInfo, UserUtils.getCurrentUser());
-				session.setAttribute(AdminConstants.EXPORT_ENTITY_STATUS_UUID, progress.getUUID());
+				eService.startWholeExport(progress, ltmpl, dtmpl, new HashSet<NormalCriteria>(vCriteriaMap.values()), ePageInfo, user);
+				user.setCache(AdminConstants.EXPORT_ENTITY_STATUS_UUID, progress.getUUID());
 			}
 		}
 		jRes.put("uuid", progress.getUUID());
@@ -126,8 +124,8 @@ public class AdminModulesExportController {
 	
 
 	@ResponseBody
-	@RequestMapping("/status")
-	public PollStatusResponse statusOfExport(@RequestParam String uuid, Boolean interrupted){
+	@RequestMapping("/status/{uuid}")
+	public PollStatusResponse statusOfExport(@PathVariable String uuid, Boolean interrupted){
 		PollStatusResponse status = new PollStatusResponse();
 		status.setStatus("error");
 		status.put("uuid", uuid);
@@ -181,12 +179,11 @@ public class AdminModulesExportController {
 	public ResponseJSON exportDetail(
 			@PathVariable Long menuId, 
 			@PathVariable String code,
-			Long historyId) {
+			Long historyId, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
 		TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
-		UserIdentifier user = UserUtils.getCurrentUser();
 		
 		String moduleName = tmplGroup.getModule();
 		ModuleEntityPropertyParser entity = null;
@@ -216,7 +213,7 @@ public class AdminModulesExportController {
 	
 	@ResponseBody
 	@RequestMapping("/work/{uuid}")
-	public ResponseJSON loadWork(@PathVariable String uuid) {
+	public ResponseJSON loadWork(@PathVariable String uuid, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		WorkProgress progress = eService.getExportProgress(uuid);
 		if(progress != null) {
@@ -231,5 +228,4 @@ public class AdminModulesExportController {
 		}
 		return jRes;
 	}
-	
 }

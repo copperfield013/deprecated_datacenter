@@ -27,6 +27,8 @@ import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.copframe.web.poll.WorkProgress;
+import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.api.controller.APiDataNotFoundException;
 import cn.sowell.datacenter.common.ApiUser;
 import cn.sowell.datacenter.common.RequestParameterMapComposite;
@@ -39,7 +41,9 @@ import cn.sowell.datacenter.entityResolver.impl.RelationEntityProxy;
 import cn.sowell.datacenter.model.admin.service.AdminUserService;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
+import cn.sowell.datacenter.model.modules.service.ExportService;
 import cn.sowell.dataserver.model.dict.pojo.DictionaryComposite;
+import cn.sowell.dataserver.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
@@ -54,6 +58,7 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailField;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupAction;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListColumn;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
@@ -61,7 +66,7 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionTemplate;
 import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
 @Controller
-@RequestMapping("/api/entity")
+@RequestMapping("/api/entity/curd")
 public class ApiEntityController {
 	
 	@Resource
@@ -79,6 +84,9 @@ public class ApiEntityController {
 	@Resource
 	ModulesService mService;
 	
+	@Resource
+	ExportService eService;
+	
 	static Logger logger = Logger.getLogger(ApiEntityController.class);
 	
 	
@@ -90,6 +98,9 @@ public class ApiEntityController {
 		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
 		String moduleName = menu.getTemplateModule();
 		ModuleMeta module = mService.getModule(moduleName);
+		
+		TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
+		
 		//创建条件对象
 		ListTemplateEntityViewCriteria criteria = new ListTemplateEntityViewCriteria();
 		//设置条件
@@ -103,15 +114,71 @@ public class ApiEntityController {
 		ListTemplateEntityView view = (ListTemplateEntityView) vService.query(criteria);
 		
 		
+		//导出状态获取
+		String uuid = (String) user.getCache(AdminConstants.EXPORT_ENTITY_STATUS_UUID);
+		if(uuid != null){
+			WorkProgress progress = eService.getExportProgress(uuid);
+			if(progress != null && !progress.isBreaked()){
+				res.put("exportProgress", toProgressJson(progress));
+			}
+		}
+		
 		res.put("module", toModule(module));
 		res.put("ltmpl", toListTemplate(view.getListTemplate()));
 		res.put("entities", toEntities(view));
 		res.put("pageInfo", view.getCriteria().getPageInfo());
 		res.put("criterias", toCriterias(view, criteria));
+		res.put("actions", toActions(tmplGroup.getActions()));
+		res.put("buttons", toHideButtons(tmplGroup));
 		return res;
 	}
 	
 	
+	private JSONObject toHideButtons(TemplateGroup tmplGroup) {
+		JSONObject jButton = new JSONObject();
+		jButton.put("hideCreateButton", tmplGroup.getHideCreateButton());
+		jButton.put("hideDeleteButton", tmplGroup.getHideDeleteButton());
+		jButton.put("hideExportButton", tmplGroup.getHideExportButton());
+		jButton.put("hideImportButton", tmplGroup.getHideImportButton());
+		jButton.put("hideQueryButton", tmplGroup.getHideQueryButton());
+		return jButton;
+	}
+
+
+	private JSONArray toActions(List<TemplateGroupAction> actions) {
+		JSONArray aActions = new JSONArray();
+		if(actions != null) {
+			actions.stream()
+				.filter(action->TemplateGroupAction.ACTION_FACE_LIST.equals(action.getFace()))
+				.forEach(action->{
+					JSONObject jAction = new JSONObject();
+					jAction.put("id", action.getId());
+					jAction.put("title", action.getTitle());
+					jAction.put("order", action.getOrder());
+					jAction.put("multiple", action.getMultiple());
+					aActions.add(jAction);
+				}
+			);
+		}
+		return aActions;
+	}
+
+
+	private JSONObject toProgressJson(WorkProgress progress) {
+		JSONObject jProgress = new JSONObject();
+		jProgress.put("uuid", progress.getUUID());
+		Map<String, Object> dataMap = progress.getDataMap();
+		jProgress.put("withDetail", dataMap.get("withDetail"));
+		ExportDataPageInfo pageInfo = (ExportDataPageInfo) dataMap.get("exportPageInfo");
+		if(pageInfo != null) {
+			jProgress.put("scope", pageInfo.getScope());
+			jProgress.put("rangeStart", pageInfo.getRangeStart());
+			jProgress.put("rangeEnd", pageInfo.getRangeEnd());
+		}
+		return jProgress;
+	}
+
+
 	private JSONObject toModule(ModuleMeta module) {
 		JSONObject jModule = new JSONObject();
 		jModule.put("name", module.getName());

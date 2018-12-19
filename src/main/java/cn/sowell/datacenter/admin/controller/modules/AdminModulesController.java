@@ -128,7 +128,7 @@ public class AdminModulesController {
 		model.addAttribute("view", view);
 		
 		//导出状态获取
-		String uuid = (String) session.getAttribute(AdminConstants.EXPORT_PEOPLE_STATUS_UUID);
+		String uuid = (String) session.getAttribute(AdminConstants.EXPORT_ENTITY_STATUS_UUID);
 		if(uuid != null){
 			WorkProgress progress = eService.getExportProgress(uuid);
 			if(progress != null && !progress.isBreaked()){

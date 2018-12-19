@@ -260,6 +260,7 @@
 		</div>
 	</div>
 </div>
+<!-- 用于标题中的文字在js中的 转义 -->
 <c:set var="menuTitleInScript">
 	${fn:replace(menu.title, '\\', '\\\\')}
 </c:set>

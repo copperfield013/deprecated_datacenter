@@ -25,5 +25,4 @@ public interface ExportService {
 	void startWholeExport(WorkProgress progress, TemplateListTemplate ltmpl, TemplateDetailTemplate dtmpl,
 			Set<NormalCriteria> criteria, ExportDataPageInfo ePageInfo, UserIdentifier user);
 	String exportDetailExcel(ModuleEntityPropertyParser parser, TemplateDetailTemplate dtmpl) throws Exception;
-	
 }

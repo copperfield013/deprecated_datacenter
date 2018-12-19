@@ -18,6 +18,7 @@ import com.abc.auth.service.ServiceFactory;
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.datacenter.common.UserWithToken;
 import cn.sowell.datacenter.entityResolver.UserCodeService;
 import cn.sowell.datacenter.model.admin.dao.AdminUserDao;
 import cn.sowell.datacenter.model.admin.pojo.ABCUser;
@@ -112,7 +113,7 @@ public class AdminUserServiceImpl implements AdminUserService, UserCodeService, 
 				//那么需要在tokenMap里移除已经存在的tokenCode
 			}else {
 			}
-			Token token = new Token(user, 30 * 60 * 1000);
+			Token token = new Token(user.getUserInfo(), 30 * 60 * 1000);
 			usernameTokenMap.put(user.getUsername(), token.getCode());
 			this.tokenMap.put(token.getCode(), token);
 			return token;
@@ -158,14 +159,14 @@ public class AdminUserServiceImpl implements AdminUserService, UserCodeService, 
 	
 	public static class Token{
 		private final String code;
-		private final ABCUser user;
+		private final UserWithToken user;
 		private long deadline;
 		private long timeout;
 		
-		public Token(ABCUser user, long timeout) {
+		public Token(UserInfo user, long timeout) {
 			Assert.notNull(user);
 			this.code = TextUtils.uuid(10, 62);
-			this.user = user;
+			this.user = new UserWithToken(this.code, user);
 			this.deadline = System.currentTimeMillis() + timeout;
 			this.timeout = timeout;
 		}
@@ -194,7 +195,7 @@ public class AdminUserServiceImpl implements AdminUserService, UserCodeService, 
 			this.deadline = deadline;
 		}
 
-		public ABCUser getUser() {
+		public UserWithToken getUser() {
 			return user;
 		}
 
