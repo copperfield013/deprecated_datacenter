@@ -3,7 +3,7 @@
 <title>操作模板（${module.title }）</title>
 <div id="tmpl-atmpl-list-${module.name }" class="detail">
 	<div>
-		<form action="admin/tmpl/dtmpl/list">
+		<form action="admin/tmpl/atmpl/list">
 			
 		</form>
 	</div>
@@ -51,12 +51,12 @@
 									</c:when>
 									<c:otherwise>
 										<a title="查看绑定的所有模板组合" href="admin/tmpl/atmpl/group_list/${tmpl.id }"
-											target="dtmpl_group_list_${tmpl.id }" 
+											target="atmpl_group_list_${tmpl.id }" 
 											class="tab btn btn-success btn-xs">
 											<i class="fa fa-th-list"></i>
 											模板组合
 										</a>
-										<a href="javascript:STATICS.TMPL.switchTemplateGroup('dtmpl', '${module.name }', ${tmpl.id });" 
+										<a href="javascript:STATICS.TMPL.switchTemplateGroup('atmpl', '${module.name }', ${tmpl.id });" 
 											class="btn btn-warning btn-xs "
 											title="为所有已经绑定到当前列表模板的组合重新指定一个列表模板">
 											<i class="fa fa-exchange"></i>
@@ -64,7 +64,7 @@
 										</a>
 									</c:otherwise>
 								</c:choose>
-								<a atmpl-id="${tmpl.id }" atmpl-title="${tmpl.title }" class="btn btn-magenta btn-xs btn-copy-dtmpl">
+								<a atmpl-id="${tmpl.id }" atmpl-title="${tmpl.title }" class="btn btn-magenta btn-xs btn-copy-atmpl">
 									<i class="fa fa-copy"></i>
 									复制到模块
 								</a>
@@ -83,7 +83,7 @@
 		try{
 			modules = $.parseJSON('${modulesJson}');
 		}catch(e){}
-		$('.btn-copy-dtmpl[dtmpl-id]', $page).click(function(){
+		$('.btn-copy-atmpl[atmpl-id]', $page).click(function(){
 			var $btn = $(this);
 			Dialog.promptSelect({
 				data		: modules,
@@ -93,13 +93,13 @@
 				if(selected.title && selected.moduleName){
 					var tmplTitle = $btn.attr('atmpl-title'),
 						tmplId = $btn.attr('atmpl-id');
-					Dialog.confirm('确认复制详情模板[' + tmplTitle + ']到模块[' + selected.title + ']？', function(yes){
+					Dialog.confirm('确认复制操作模板[' + tmplTitle + ']到模块[' + selected.title + ']？', function(yes){
 						if(yes){
-							Ajax.ajax('admin/tmpl/dtmpl/copy/' + tmplId + '/' + selected.moduleName, function(res){
+							Ajax.ajax('admin/tmpl/atmpl/copy/' + tmplId + '/' + selected.moduleName, function(res){
 								if(res.status === 'suc' && res.newTmplId){
-									Dialog.confirm('复制成功，是否打开复制成功的详情模板编辑页？', function(yes){
+									Dialog.confirm('复制成功，是否打开复制成功的操作模板编辑页？', function(yes){
 										if(yes){
-											Tab.openInTab('admin/tmpl/atmpl/update/' + res.newTmplId, 'dtmpl_update_' + res.newTmplId);
+											Tab.openInTab('admin/tmpl/atmpl/update/' + res.newTmplId, 'atmpl_update_' + res.newTmplId);
 										}
 									})
 								}else{

@@ -25,13 +25,13 @@ define(function(require, exports, module){
 		}
 		
 		var methods = {
-			select	: function(test, afterSelect){
+			select	: function(test, afterSelect, data){
 				if(typeof test === 'function'){
 					for(var i in param.list){
 						var item = param.list[i];
 						if(test(item) === true){
 							try{
-								select(item);
+								select(item, data);
 								if(typeof afterSelect === 'function'){
 									afterSelect.apply(this, [item]);
 								}
@@ -41,13 +41,13 @@ define(function(require, exports, module){
 				}
 			}
 		}
-		function select(item){
+		function select(item, data){
 			var $li = $(item.li);
 			param.onSelected.apply(this, [{
 				data	: item,
 				show	: function(){$li.show(); item.cache = {}},
 				hide	: function(){$li.hide(); item.cache = {}}
-			}]);
+			}, data]);
 			
 		}
 		

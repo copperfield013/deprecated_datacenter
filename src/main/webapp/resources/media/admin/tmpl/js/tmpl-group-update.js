@@ -85,27 +85,27 @@ define(function(require, exports, module) {
 
 		var listChooser = $C('#list-action-select', $page).chooser({
 			list : data.atmpls,
-			onSelected : function(item) {
-				appendAction(item, $listActions, true);
+			onSelected : function(item, tmplAction) {
+				appendAction(item, $listActions, tmplAction, true);
 				item.hide();
 			}
 		});
 		
 		var detailChooser = $C('#detail-action-select', $page).chooser({
 			list : data.atmpls,
-			onSelected : function(item) {
-				appendAction(item, $detailActions, false);
+			onSelected : function(item, tmplAction) {
+				appendAction(item, $detailActions, tmplAction, false);
 				item.hide();
 			}
 		});
 		
 		
 		var $tmplAction = $('#tmpl-action', $page);
-		function appendAction(item, $actionsBody, multable) {
+		function appendAction(item, $actionsBody, tmplAction, multable) {
 			var data = item.data;
 			var $row = $tmplAction.tmpl({
 				index : $actionsBody.children('tr').length,
-				title : data.title,
+				title : (tmplAction && tmplAction.title) || data.title,
 				multable : multable || false
 			});
 			$row.data('action-item', item);
@@ -191,7 +191,7 @@ define(function(require, exports, module) {
 				return item.id === tmplAction.atmplId
 			}, function(item){
 				item.cache.dataId = tmplAction.id;
-			}];
+			}, tmplAction];
 		}
 		
 		for(var i = 0; i < data.tmplActions.length; i++){

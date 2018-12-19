@@ -121,9 +121,9 @@ public class ApiEntityImportController {
 	}
 	
 	@ResponseBody
-    @RequestMapping("/status")
+    @RequestMapping("/status/{uuid}")
     public PollStatusResponse statusOfImport(HttpSession session,
-    		@RequestParam String uuid, 
+    		@PathVariable String uuid, 
     		Boolean interrupted, 
     		Integer msgIndex, ApiUser user){
 		PollStatusResponse status = new PollStatusResponse();

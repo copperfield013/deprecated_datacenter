@@ -266,5 +266,22 @@ public class AdminActionTemplateController {
 	}
 	
 	
+	@ResponseBody
+	@RequestMapping("/copy/{atmplId}/{targetModuleName}")
+	public ResponseJSON copy(@PathVariable Long atmplId, @PathVariable String targetModuleName) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		try {
+			ArrayEntityProxy.setLocalUser(UserUtils.getCurrentUser());
+			Long newTmplId = tService.copyActionTemplate(atmplId, targetModuleName);
+			if(newTmplId != null) {
+				jRes.setStatus("suc");
+				jRes.put("newTmplId", newTmplId);
+			}
+		} catch (Exception e) {
+			logger.error("复制操作模板时发生错误", e);
+		}
+		return jRes;
+	}
+	
 	
 }
