@@ -189,5 +189,37 @@ define(function(require, exports, module){
 				}
 			})
 		});
+		
+		var $modulesContainer = $('.mds-container', $page);
+		$('#modules-search', $page).on('input propertychange', function(){
+			$('.searching-matched', $modulesContainer).removeClass('searching-matched');
+			$('.searching-matched-part', $modulesContainer).removeClass('searching-matched-part');
+			var keyword = $(this).val().trim();
+			if(keyword){
+				$modulesContainer.addClass('searching');
+				$modulesContainer.find('li.module-wrapper').each(function(){
+					var $moduleWrapper = $(this);
+					var moduleName = $('>.dd-handle>.module-title', $moduleWrapper).text();
+					if(moduleName.indexOf(keyword) >= 0){
+						$moduleWrapper.addClass('searching-matched');
+					}else{
+						var matchedPart = false;
+						$('>ol.dd-list>li', $moduleWrapper).each(function(){
+							var $tmplGroup = $(this);
+							var tmplGroupTitle = $('.md-group-title>span', $tmplGroup).text();
+							if(tmplGroupTitle.indexOf(keyword) >= 0){
+								$tmplGroup.addClass('searching-matched');
+								matchedPart = true;
+							}
+						});
+						if(matchedPart){
+							$moduleWrapper.addClass('searching-matched-part');
+						}
+					}
+				});
+			}else{
+				$modulesContainer.removeClass('searching');
+			}
+		});
 	}
 });

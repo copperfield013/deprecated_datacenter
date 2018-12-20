@@ -62,6 +62,12 @@
 			<div class="widget radius-bordered mds-container">
 				<div class="widget-header bordered-left bordered-palegreen separated">
 					<span class="widget-caption">模块列表</span>
+					<div class="widget-buttons">
+						<span class="input-icon">
+							<input type="search" class="form-control input-xs" id="modules-search" placeholder="请输入关键字">
+							<i class="glyphicon glyphicon-search blue"></i>
+						</span>
+					</div>
 				</div>
 				<div class="widget-body">
 					<ol class="dd-list">

@@ -110,3 +110,23 @@
 li.dd-item[group-id][data-auths=""]>div>.level-operate>a>i.authority-config {
     color: #ddd;
 }
+
+.sidemenu-main input#modules-search::-webkit-input-placeholder {
+    color: #bbb;
+}
+.sidemenu-main .mds-container.searching li {
+    display: none !important;
+}
+
+.sidemenu-main .mds-container.searching li.module-wrapper.searching-matched,
+.sidemenu-main .mds-container.searching li.module-wrapper.searching-matched-part {
+    display: block !important;
+}
+
+.sidemenu-main .mds-container.searching li.module-wrapper.searching-matched li {
+    display: block !important;
+}
+
+.sidemenu-main .mds-container.searching li.module-wrapper.searching-matched-part li.searching-matched {
+    display: block !important;
+}
