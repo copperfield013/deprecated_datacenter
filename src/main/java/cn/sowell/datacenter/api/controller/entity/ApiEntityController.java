@@ -612,7 +612,7 @@ public class ApiEntityController {
 			@RequestParam(name="codes") String codeStr,
 			ApiUser user) {
 		JSONObjectResponse res = new JSONObjectResponse();
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
 		ArrayEntityProxy.setLocalUser(user);
 		TemplateGroupAction groupAction = tService.getTempateGroupAction(actionId);
 		Object vRes = AdminModulesController.validateGroupAction(groupAction, menu, codeStr);

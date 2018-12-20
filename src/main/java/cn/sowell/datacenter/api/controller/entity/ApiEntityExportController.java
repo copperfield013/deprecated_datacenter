@@ -181,7 +181,7 @@ public class ApiEntityExportController {
 			@PathVariable String code,
 			Long historyId, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
 		TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
 		TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
 		
