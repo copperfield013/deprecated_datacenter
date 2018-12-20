@@ -47,7 +47,6 @@ import cn.sowell.copframe.web.poll.ProgressPollableThread;
 import cn.sowell.copframe.web.poll.ProgressPollableThreadFactory;
 import cn.sowell.copframe.web.poll.WorkProgress;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.entityResolver.ImportCompositeField;
 import cn.sowell.datacenter.entityResolver.impl.RelationEntityProxy;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
@@ -62,7 +61,7 @@ import cn.sowell.dataserver.model.modules.service.ModulesService;
 @Controller
 @RequestMapping(AdminConstants.URI_MODULES + "/import")
 public class AdminModulesImportController {
-	private static final String SESSION_KEY_FIELD_NAMES = "field_names_";
+	public static final String SESSION_KEY_FIELD_NAMES = "field_names_";
 
 	@Resource
 	ModulesImportService impService;
@@ -250,13 +249,11 @@ public class AdminModulesImportController {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		UserIdentifier user = UserUtils.getCurrentUser();
 		ModuleMeta mMeta = mService.getModule(menu.getTemplateModule());
-		Set<ImportCompositeField> fields = impService.getImportCompositeFields(menu.getTemplateModule());
 		ImportTemplateCriteria criteria = new ImportTemplateCriteria();
 		criteria.setModule(menu.getTemplateModule());
 		criteria.setUserId((String) user.getId());
 		List<ModuleImportTemplate> tmpls = impService.getImportTemplates(criteria);
 		model.addAttribute("tmpls", tmpls);
-		model.addAttribute("fields", fields);
 		model.addAttribute("module", mMeta);
 		model.addAttribute("menu", menu);
 		model.addAttribute("relationLabelKey", RelationEntityProxy.LABEL_KEY);
@@ -277,10 +274,10 @@ public class AdminModulesImportController {
 	@RequestMapping("/submit_field_names/{menuId}")
 	public ResponseJSON submitFieldNames(@PathVariable Long menuId, 
 			@RequestBody JsonRequest jReq, HttpSession session) {
-		authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		JSONObject reqJson = jReq.getJsonObject();
-		ModuleImportTemplate tmpl = toImportTemplate(reqJson);
+		ModuleImportTemplate tmpl = toImportTemplate(menu.getTemplateModule(), reqJson);
 		if(tmpl != null) {
 			Long tmplId = impService.saveTemplate(tmpl);
 			String uuid = TextUtils.uuid();
@@ -315,11 +312,11 @@ public class AdminModulesImportController {
 	public ResponseJSON saveTmpl(
 			@PathVariable Long menuId, 
 			@RequestBody JsonRequest jReq) {
-		authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		JSONObject reqJson = jReq.getJsonObject();
 		try {
-			ModuleImportTemplate tmpl = toImportTemplate(reqJson);
+			ModuleImportTemplate tmpl = toImportTemplate(menu.getTemplateModule(), reqJson);
 			Long tmplId = impService.saveTemplate(tmpl);
 			jRes.put("tmplId", tmplId);
 			jRes.put("tmplTitle", tmpl.getTitle());
@@ -331,8 +328,7 @@ public class AdminModulesImportController {
 		return jRes;
 	}
 
-	private ModuleImportTemplate toImportTemplate(JSONObject reqJson) {
-		String module = reqJson.getString("module");
+	public static ModuleImportTemplate toImportTemplate(String module, JSONObject reqJson) {
 		Assert.hasText(module);
 		
 		JSONArray fieldArray = reqJson.getJSONArray("fields");

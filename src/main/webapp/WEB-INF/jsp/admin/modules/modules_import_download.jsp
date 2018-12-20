@@ -52,13 +52,6 @@
 						<i class="glyphicon glyphicon-search blue"></i>
 						<i title="选择字段" class="glyphicon glyphicon-th blue field-picker-button"></i>
 					</div>
-					<%-- <ul class="list-group">
-						<c:forEach var="field" items="${fields }">
-							<li class="list-group-item ${field.isMultipleField? 'multiple-field' : '' }" 
-								relation-key="${field.relationKey }"
-								pattern="${field.fieldNamePattern }">${field.fieldName }</li>
-						</c:forEach>
-					</ul> --%>
 				</div>
 			</div>	
 		</form>

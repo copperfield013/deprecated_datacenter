@@ -29,6 +29,7 @@ import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.web.poll.WorkProgress;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.admin.controller.modules.AdminModulesController;
 import cn.sowell.datacenter.api.controller.APiDataNotFoundException;
 import cn.sowell.datacenter.common.ApiUser;
 import cn.sowell.datacenter.common.RequestParameterMapComposite;
@@ -54,6 +55,8 @@ import cn.sowell.dataserver.model.modules.service.impl.ListTemplateEntityView;
 import cn.sowell.dataserver.model.modules.service.impl.ListTemplateEntityViewCriteria;
 import cn.sowell.dataserver.model.modules.service.impl.SelectionTemplateEntityView;
 import cn.sowell.dataserver.model.modules.service.impl.SelectionTemplateEntityViewCriteria;
+import cn.sowell.dataserver.model.tmpl.pojo.ArrayEntityProxy;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailField;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
@@ -63,6 +66,7 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateListColumn;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionTemplate;
+import cn.sowell.dataserver.model.tmpl.service.ActionTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
 @Controller
@@ -86,6 +90,9 @@ public class ApiEntityController {
 	
 	@Resource
 	ExportService eService;
+	
+	@Resource
+	ActionTemplateService actService;
 	
 	static Logger logger = Logger.getLogger(ApiEntityController.class);
 	
@@ -504,6 +511,33 @@ public class ApiEntityController {
 	}
 	
 	@ResponseBody
+	@RequestMapping("/remove/{menuId}")
+	public ResponseJSON removeEntities(
+			@PathVariable Long menuId,
+			@RequestParam String codes, ApiUser user) {
+		JSONObjectResponse res = new JSONObjectResponse();
+		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
+		try {
+			mService.removeEntities(menu.getTemplateModule(), collectCode(codes), user);
+			res.setStatus("suc");
+		} catch (Exception e) {
+			logger.error("删除失败", e);
+			res.setStatus("error");
+		}
+		return res;
+	}
+	
+	private Set<String> collectCode(String codes) {
+		Set<String> codeSet = new LinkedHashSet<>();
+		for (String code : codes.split(",")) {
+			if(!code.isEmpty()) {
+				codeSet.add(code);
+			}
+		};
+		return codeSet;
+	}
+	
+	@ResponseBody
 	@RequestMapping("/selections/{menuId}/{stmplId}")
 	public ResponseJSON selections(
 			@PathVariable Long menuId, 
@@ -567,6 +601,44 @@ public class ApiEntityController {
 			});
 		}
 		return entities;
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	@ResponseBody
+	@RequestMapping("/do_action/{menuId}/{actionId}")
+	public ResponseJSON doAction(@PathVariable Long menuId, 
+			@PathVariable Long actionId, 
+			@RequestParam(name="codes") String codeStr,
+			ApiUser user) {
+		JSONObjectResponse res = new JSONObjectResponse();
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		ArrayEntityProxy.setLocalUser(user);
+		TemplateGroupAction groupAction = tService.getTempateGroupAction(actionId);
+		Object vRes = AdminModulesController.validateGroupAction(groupAction, menu, codeStr);
+		if(!(vRes instanceof Set)) {
+			res.setStatus("error");
+		}else {
+			Set<String> codes = (Set<String>) vRes;
+			TemplateActionTemplate atmpl = tService.getActionTemplate(groupAction.getAtmplId());
+			if(atmpl != null) {
+				try {
+					int sucs = actService.doAction(atmpl, codes, 
+							TemplateGroupAction.ACTION_MULTIPLE_TRANSACTION.equals(groupAction.getMultiple()), 
+							user);
+					res.setStatus("suc");
+					res.put("msg", "执行结束, 共成功处理" + sucs + "个实体");
+				} catch (Exception e) {
+					logger.error("操作失败", e);
+					res.setStatus("error");
+					res.put("msg", "操作失败");
+				}
+			}else {
+				res.setStatus("action not found");
+			}
+		}
+		return res;
+		
 	}
 	
 	

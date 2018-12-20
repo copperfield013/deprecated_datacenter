@@ -451,7 +451,7 @@ public class AdminModulesController {
 		
 	}
 
-	private Object validateGroupAction(TemplateGroupAction groupAction, SideMenuLevel2Menu menu, String codes) {
+	public static Object validateGroupAction(TemplateGroupAction groupAction, SideMenuLevel2Menu menu, String codes) {
 		if(!groupAction.getGroupId().equals(menu.getTemplateGroupId())) {
 			throw new NonAuthorityException("二级菜单[id=" + menu.getId() + "]对应的模板组合[id=" + menu.getTemplateGroupId() + "]与操作[id=" + groupAction.getId() + "]对应的模板组合[id=" + groupAction.getGroupId() + "]不一致");
 		}
@@ -472,7 +472,7 @@ public class AdminModulesController {
 		
 	}
 
-	private Set<String> collectCode(String codes) {
+	private static Set<String> collectCode(String codes) {
 		Set<String> codeSet = new LinkedHashSet<>();
 		for (String code : codes.split(",")) {
 			if(!code.isEmpty()) {

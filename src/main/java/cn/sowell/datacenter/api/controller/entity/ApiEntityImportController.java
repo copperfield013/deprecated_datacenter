@@ -1,6 +1,7 @@
 package cn.sowell.datacenter.api.controller.entity;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -13,17 +14,27 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
+import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.PollStatusResponse;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.copframe.spring.file.FileUtils;
+import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.web.poll.ProgressPollableThread;
 import cn.sowell.copframe.web.poll.ProgressPollableThreadFactory;
 import cn.sowell.copframe.web.poll.WorkProgress;
@@ -32,6 +43,8 @@ import cn.sowell.datacenter.common.ApiUser;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.modules.exception.ImportBreakException;
+import cn.sowell.datacenter.model.modules.pojo.ImportTemplateCriteria;
+import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplate;
 import cn.sowell.datacenter.model.modules.service.ModulesImportService;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
@@ -155,4 +168,67 @@ public class ApiEntityImportController {
         }
         return status;
     }
+	
+	@ResponseBody
+	@RequestMapping("/tmpls/{menuId}")
+	public ResponseJSON getImportTemplates(@PathVariable Long menuId, ApiUser user) {
+		JSONObjectResponse res = new JSONObjectResponse();
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		ImportTemplateCriteria criteria = new ImportTemplateCriteria();
+		criteria.setModule(menu.getTemplateModule());
+		criteria.setUserId((String) user.getId());
+		List<ModuleImportTemplate> tmpls = impService.getImportTemplates(criteria);
+		res.put("tmpls", JSON.toJSON(tmpls));
+		return res;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/tmpl/{menuId}/{tmplId}")
+	public ResponseJSON getImportTemplate(@PathVariable Long menuId, @PathVariable Long tmplId, ApiUser user) {
+		JSONObjectResponse res = new JSONObjectResponse();
+		authService.vaidateL2MenuAccessable(menuId);
+		ModuleImportTemplate tmpl = impService.getImportTempalte(tmplId);
+		res.put("tmpl", JSON.toJSON(tmpl));
+		return res;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/save_tmpl/{menuId}")
+	public ResponseJSON saveTemplate(@PathVariable Long menuId, 
+			@RequestBody JsonRequest jReq, ApiUser user) {
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		JSONObject reqJson = jReq.getJsonObject();
+		ModuleImportTemplate tmpl = AdminModulesImportController.toImportTemplate(menu.getTemplateModule(), reqJson);
+		if(tmpl != null) {
+			Long tmplId = impService.saveTemplate(tmpl);
+			String uuid = TextUtils.uuid();
+			user.setCache(AdminModulesImportController.SESSION_KEY_FIELD_NAMES + uuid, tmplId);
+			jRes.put("uuid", uuid);
+			jRes.put("tmplId", tmplId);
+		}
+		return jRes;
+	}
+	
+	@RequestMapping("/download_tmpl/{uuid}")
+	public ResponseEntity<byte[]> download(
+			@PathVariable String uuid, ApiUser user){
+		Long tmplId = (Long) user.getCache(AdminModulesImportController.SESSION_KEY_FIELD_NAMES + uuid);
+		ModuleImportTemplate tmpl = impService.getImportTempalte(tmplId);
+		if(tmpl != null) {
+			try {
+				byte[] tmplInputStream = impService.createImportTempalteBytes(tmpl);
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentDispositionFormData("attachment", new String(
+						(tmpl.getTitle() + ".xlsx").getBytes("UTF-8"),
+						"iso-8859-1"));
+				headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+				return new ResponseEntity<byte[]>(tmplInputStream, headers, HttpStatus.CREATED);
+			} catch (Exception e) {
+				logger.error("下载导出文件时发生错误", e);
+			}
+		}
+		return null;
+	}
+	
 }
