@@ -125,7 +125,7 @@ define(function(require, exports, module){
 		 * 动态加载内容的方法
 		 * @param url 页面的链接或者页面的dom对象
 		 */
-		this.loadContent = function(content, _title, _formData){
+		this.loadContent = function(content, _title, _formData, _contentType){
 			if(typeof content === 'string'){
 				var dUrl = content;
 				formData = _formData;
@@ -144,8 +144,12 @@ define(function(require, exports, module){
 					}
 				});
 			}else if(content instanceof $){
-				//直接加载content
-				$wrapper.html(content.html());
+				if(_contentType === 'dom'){
+					$wrapper.append(content);
+				}else{
+					//直接加载content
+					$wrapper.html(content.html());
+				}
 				var $title = $wrapper.children('title').first();
 				if($title.length > 0 && !_title){
 					$title.remove();
@@ -340,7 +344,7 @@ define(function(require, exports, module){
 			}, param));
 			dialog.getDom().data(param.domData);
 			//直接加载弹出框
-			dialog.loadContent(url, param.title, param.reqParam)
+			dialog.loadContent(url, param.title, param.reqParam, param.contentType)
 				.show();
 			return dialog;
 		},

@@ -289,7 +289,7 @@ define(function(require, exports, module){
 							$select.append($option);
 						}
 					}
-					if($.fn.select2){
+					if(tags !== null && $.fn.select2){
 						var tagsParam = {
 							tags			: true,
 							closeOnSelect	: false
@@ -365,7 +365,7 @@ define(function(require, exports, module){
 				return this['select'](false, true);
 			},
 			'select-without-empty'	: function(){
-				return this['select'](true);
+				return this['select'](true, null);
 			},
 			'date'			: function(){
 				var $text = this['text']();

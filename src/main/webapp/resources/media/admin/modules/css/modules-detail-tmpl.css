@@ -680,3 +680,19 @@ div#action-list>a>i {
 div#action-list>a:hover{
     background-color: #efefef;
 }
+
+
+.entity-actions.float-operate-area {
+    max-height: 5em;
+    width: 2.7em;
+    padding: 0;
+    right: 0.5em;
+}
+
+.entity-actions.float-operate-area>a {
+    display: inline-block;
+    text-align: center;
+    width: 1.1em;
+    height: 1.2em;
+    padding: 0;
+}

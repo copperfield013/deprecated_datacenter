@@ -161,6 +161,8 @@ public class ApiEntityController {
 					JSONObject jAction = new JSONObject();
 					jAction.put("id", action.getId());
 					jAction.put("title", action.getTitle());
+					jAction.put("iconClass", action.getIconClass());
+					jAction.put("outgoing", action.getOutgoing());
 					jAction.put("order", action.getOrder());
 					jAction.put("multiple", action.getMultiple());
 					aActions.add(jAction);

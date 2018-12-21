@@ -101,20 +101,25 @@ define(function(require, exports, module) {
 		
 		
 		var $tmplAction = $('#tmpl-action', $page);
-		function appendAction(item, $actionsBody, tmplAction, multable) {
+		function appendAction(item, $actionsBody, tmplAction, multiple) {
 			var data = item.data;
 			var $row = $tmplAction.tmpl({
 				index : $actionsBody.children('tr').length,
 				title : (tmplAction && tmplAction.title) || data.title,
-				multable : multable || false
+				multiple : multiple || false,
+				iconClass: (tmplAction && tmplAction.iconClass) || ''
 			});
 			$row.data('action-item', item);
 			var $multiCheckbox = $row.find('label.multi-checkbox :checkbox'), $multiTransaction = $row
 					.find('label.multi-transactional');
+			var $outgoing = $row.find(':checkbox.outgoing');
 			$multiCheckbox.change(function() {
 				var checked = $(this).prop('checked');
 				$multiTransaction.toggleClass('show', checked);
 			});
+			if(tmplAction && tmplAction.outgoing === 1){
+				$outgoing.prop('checked', true);
+			}
 			$row.find('a.delete').click(function() {
 				$row.remove();
 				item.show();
@@ -128,6 +133,27 @@ define(function(require, exports, module) {
 			});
 		}
 
+		var IconSelector = require('common/icon/icon-selector');
+		var selector = new IconSelector();
+		$page.on('click', '.btn-icon-selector', function(){
+			var $btn = $(this);
+			selector.openSelector().done(function(clazz){
+				$btn.empty().append('<i class="' + clazz + '">')
+			});
+		});
+		
+		$detailActions.on('change', ':checkbox.outgoing', function(){
+			var toChecked = $(this).prop('checked');
+			var maxActionCount = 3;
+			if(toChecked){
+				var checkedCount = $detailActions.find(':checkbox.outgoing:checked').length;
+				if(checkedCount > maxActionCount){
+					$(this).prop('checked', false);
+					require('dialog').notice('最多只能勾选' + maxActionCount +'个按钮的外部显示', 'error');
+				}
+			}
+		});
+		
 		var $form = $('form', $page);
 		$('.btn-save', $page).click(function(){
 			require('dialog').confirm('确认提交？', function(yes){
@@ -148,6 +174,8 @@ define(function(require, exports, module) {
 					formData.append('hideQueryButton', $('#showQueryButton',
 							$page).prop('checked') ? '' : 1);
 					formData.append('hideDeleteButton', $('#showDeleteButton',
+							$page).prop('checked') ? '' : 1);
+					formData.append('hideSaveButton', $('#showSaveButton',
 							$page).prop('checked') ? '' : 1);
 					$('.field-item', $page).each(
 							function(index) {
@@ -172,11 +200,15 @@ define(function(require, exports, module) {
 							var atmplId = data.id;
 
 							var multiple = $row.find('select.multiple').val() || 0;
+							var iconClass = $row.find('.btn-icon-selector>i').attr('class') || '';
+							var outgoing = $row.find(':checkbox.outgoing').prop('checked')? 1: 0;
 							
 							var actionName = 'actions[' + (indexStart + index) + ']';
 							formData.append(actionName + '.id', id);
 							formData.append(actionName + '.title', title);
 							formData.append(actionName + '.multiple', multiple);
+							formData.append(actionName + '.iconClass', iconClass);
+							formData.append(actionName + '.outgoing', outgoing);
 							formData.append(actionName + '.atmplId', atmplId);
 							formData.append(actionName + '.order', index);
 							formData.append(actionName + '.face', face);

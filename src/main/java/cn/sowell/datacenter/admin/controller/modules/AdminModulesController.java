@@ -1,5 +1,6 @@
 package cn.sowell.datacenter.admin.controller.modules;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -218,8 +219,21 @@ public class AdminModulesController {
 		FusionContextConfig config = fFactory.getModuleConfig(moduleName);
 		model.addAttribute("menu", menu);
 		model.addAttribute("dtmpl", dtmpl);
+		model.addAttribute("tmplGroup", tmplGroup);
 		model.addAttribute("groupPremises", tmplGroup.getPremises());
 		model.addAttribute("groupPremisesMap", CollectionUtils.toMap(tmplGroup.getPremises(), premise->premise.getFieldName()));
+		List<TemplateGroupAction> groupActions = tmplGroup.getActions().stream().filter(action->TemplateGroupAction.ACTION_FACE_DETAIL.equals(action.getFace())).collect(Collectors.toList());
+		List<TemplateGroupAction> outgoingGroupActions = new ArrayList<>(),
+								normalGroupActions = new ArrayList<>();
+		for (TemplateGroupAction action : groupActions) {
+			if(TextUtils.hasText(action.getIconClass()) && Integer.valueOf(1).equals(action.getOutgoing())) {
+				outgoingGroupActions.add(action);
+			}else {
+				normalGroupActions.add(action);
+			}
+		}
+		model.addAttribute("outgoingGroupActions", outgoingGroupActions);
+		model.addAttribute("normalGroupActions", normalGroupActions);
 		model.addAttribute("module", mMeta);
 		model.addAttribute("config", config);
 		model.addAttribute("fieldDescMap", new FieldDescCacheMap(config.getConfigResolver()));
@@ -244,8 +258,20 @@ public class AdminModulesController {
 		model.addAttribute("entity", entity);
 		model.addAttribute("module", mMeta);
 		model.addAttribute("dtmpl", dtmpl);
+		model.addAttribute("tmplGroup", tmplGroup);
 		model.addAttribute("groupPremises", tmplGroup.getPremises());
-		model.addAttribute("groupActions", tmplGroup.getActions().stream().filter(action->TemplateGroupAction.ACTION_FACE_DETAIL.equals(action.getFace())).collect(Collectors.toList()));
+		List<TemplateGroupAction> groupActions = tmplGroup.getActions().stream().filter(action->TemplateGroupAction.ACTION_FACE_DETAIL.equals(action.getFace())).collect(Collectors.toList());
+		List<TemplateGroupAction> outgoingGroupActions = new ArrayList<>(),
+								normalGroupActions = new ArrayList<>();
+		for (TemplateGroupAction action : groupActions) {
+			if(TextUtils.hasText(action.getIconClass()) && Integer.valueOf(1).equals(action.getOutgoing())) {
+				outgoingGroupActions.add(action);
+			}else {
+				normalGroupActions.add(action);
+			}
+		}
+		model.addAttribute("outgoingGroupActions", outgoingGroupActions);
+		model.addAttribute("normalGroupActions", normalGroupActions);
 		model.addAttribute("config", config);
 		model.addAttribute("fieldDescMap", new FieldDescCacheMap(config.getConfigResolver()));
 		return AdminConstants.JSP_MODULES + "/modules_update_tmpl.jsp";

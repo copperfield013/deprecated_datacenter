@@ -140,7 +140,12 @@
 						<button class="btn btn-azure shiny action-button" 
 						data-id="${action.id }" data-multiple="${action.multiple }"
 						title="${action.title }"
-						disabled="disabled">${action.title }</button>
+						disabled="disabled">
+							<c:if test="${!empty action.iconClass }">
+								<i class="${action.iconClass }"></i>
+							</c:if>
+							${action.title }
+						</button>
 					</c:if>
 				</c:forEach>
 			</div>

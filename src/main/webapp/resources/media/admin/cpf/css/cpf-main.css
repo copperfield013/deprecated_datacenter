@@ -1110,3 +1110,11 @@ table.table.row-selectable input[type=checkbox].partly:checked+.text:before {
     font-family: "iconfont" !important;
     font-style:normal;
 }
+
+.row.center {
+    text-align: center;
+}
+
+.row.center>div {
+    display: inline-block;
+}

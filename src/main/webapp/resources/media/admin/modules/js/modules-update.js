@@ -246,7 +246,7 @@ define(function(require, exports, module){
 		$actionsBtn.click(function(){
 			toggleActionBtn();
 		});
-		$actionList.children('a').click(function(){
+		$('.btn-action-outgoing[data-id]', $page).add($actionList.children('a')).click(function(){
 			var $action = $(this);
 			var actionId = $action.attr('data-id');
 			if(actionId){

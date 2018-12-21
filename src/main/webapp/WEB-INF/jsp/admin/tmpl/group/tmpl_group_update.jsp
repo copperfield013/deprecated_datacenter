@@ -24,7 +24,7 @@
 		<tr>
 			<td>\${index + 1 }</td>
 			<td><input class="action-title" type="text" value="\${title }" /></td>
-			{{if multable}}
+			{{if multiple}}
 				<td>
 					<select class="multiple">
 						<option value="2">事务型多选</option>
@@ -32,7 +32,21 @@
 						<option value="0">单选</option>
 					</select>
 				</td>
+			{{else}}
+				<td>
+					<label>
+                        <input class="outgoing" type="checkbox" class="colored-blue">
+                        <span class="text"></span>
+                    </label>
+				</td>
 			{{/if}}
+			<td>
+				<div class="btn-icon-selector" data-icon="">
+					{{if iconClass !== ''}}
+						<i class="\${iconClass}"></i>
+					{{/if}}
+				</div>
+			</td>
 			<td>
 				<a class="btn btn-danger btn-xs delete">
 					<i class="fa fa-trash-o"></i>
@@ -72,8 +86,8 @@
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group"> 
-												<label class="col-lg-3 control-label" for="name">名称</label>
-												<div class="col-lg-9">
+												<label class="col-lg-4 control-label" for="name">名称</label>
+												<div class="col-lg-8">
 													<input type="text"
 													data-bv-notempty="true"
 													data-bv-notempty-message="模板组合名称必填"
@@ -81,20 +95,12 @@
 												</div>
 											</div>
 										</div>
-										<div class="col-lg-6">
-											<div class="form-group"> 
-												<label class="col-lg-3 control-label" for="name">模板Key</label>
-												<div class="col-lg-9">
-													<input type="text" ${group == null? '': 'disabled="disabled"' } placeholder="不填写时自动生成5位随机码" class="form-control"  name="key" value="${group.key }" />
-												</div>
-											</div>
-										</div>
 									</div>
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group"> 
-												<label class="col-lg-3 control-label" for="name">列表模板</label>
-												<div class="col-lg-9">
+												<label class="col-lg-4 control-label" for="name">列表模板</label>
+												<div class="col-lg-8">
 													<a 
 														class="form-control"
 														href="admin/tmpl/ltmpl/choose/${module.name }" 
@@ -108,8 +114,8 @@
 										</div>
 										<div class="col-lg-6">
 											<div class="form-group"> 
-												<label class="col-lg-3 control-label" for="name">详情模板</label>
-												<div class="col-lg-9">
+												<label class="col-lg-4 control-label" for="name">详情模板</label>
+												<div class="col-lg-8">
 													<a 
 														class="form-control"
 														href="admin/tmpl/dtmpl/choose/${module.name }" 
@@ -120,12 +126,12 @@
 												</div>
 											</div>
 										</div>
-									</div>
+									</div> 
 									<div class="row">
 										<div class="form-group"> 
-											<div class="col-lg-9">
-												<label class="col-lg-2 control-label" for="name">功能按钮</label>
-												<div class="col-lg-9">
+											<div class="col-lg-12"> 
+												<label class="col-lg-2 control-label" for="name">列表功能按钮</label>
+												<div class="col-lg-10">
 													<label class="col-lg-4 col-xs-3 form-control-static">
 														<input id="showCreateButton" 
 															type="checkbox" 
@@ -154,9 +160,9 @@
 									</div>
 									<div class="row">
 										<div class="form-group"> 
-											<div class="col-lg-9">
-												<label class="col-lg-2 control-label" for="name">操作按钮</label>
-												<div class="col-lg-9">
+											<div class="col-lg-12">
+												<label class="col-lg-2 control-label" for="name">列表操作按钮</label>
+												<div class="col-lg-10">
 													<label class="col-lg-4 col-xs-3 form-control-static">
 														<input id="showQueryButton" 
 															type="checkbox" 
@@ -171,6 +177,23 @@
 															${moduleWritable? '': 'disabled="disabled"' } 
 															${group.hideDeleteButton == 1? '': 'checked="checked"' }>
 														<span class="text">删除按钮</span>
+													</label>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="form-group"> 
+											<div class="col-lg-12">
+												<label class="col-lg-2 control-label" for="name">详情修改按钮</label>
+												<div class="col-lg-10">
+													<label class="col-lg-4 col-xs-3 form-control-static">
+														<input id="showSaveButton" 
+															type="checkbox" 
+															class="checkbox-slider colored-success" 
+															${moduleWritable? '': 'disabled="disabled"' } 
+															${group.hideSaveButton == 1? '': 'checked="checked"' }>
+														<span class="text">保存</span>
 													</label>
 												</div>
 											</div>
@@ -198,6 +221,7 @@
 														title="“事务型多选”指在选中多个实体进行操作时，只有全部都处理成功才算成功，中间任一实体处理失败都会放弃其他实体的处理"
 														class="badge badge-darkorange badge-helper"></span>	
 												</th>
+												<th>图标</th>
 												<th>操作</th>
 											</tr>
 										</thead>
@@ -220,6 +244,8 @@
 											<tr>
 												<th>#</th>
 												<th>按钮文字</th>
+												<th>外部显示</th>
+												<th>图标</th>
 												<th>操作</th>
 											</tr>
 										</thead>

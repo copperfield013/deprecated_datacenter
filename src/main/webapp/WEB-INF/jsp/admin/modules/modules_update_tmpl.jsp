@@ -9,22 +9,29 @@
 </c:set>
 <title>${title }</title>
 <div class="entity-detail-tmpl entity-update-page" id="${module.name }-update-tmpl-${entity.code }-${RES_STAMP}">
-	<div class="float-operate-area">
+	<div class="float-operate-area entity-actions">
 		<div class="operate-area-cover"></div>
-		<c:if test="${!empty groupActions }">
+		<c:if test="${!empty normalGroupActions }">
 			<a id="actions" title="操作"><i class="fa fa-toggle-left"></i></a>
 			<div id="actions-container" class="init">
 				<div id="action-list">
-					<c:forEach var="action" items="${groupActions }">
+					<c:forEach var="action" items="${normalGroupActions }">
 						<a class="btn btn-azure shiny" href="javascript:;" title="${action.title }" data-id="${action.id }">
-							<i class="iconfont icon-action"></i>
+							<c:if test="${!empty action.iconClass }">
+								<i class="${action.iconClass }"></i>
+							</c:if>
 							${action.title }
 						</a>
 					</c:forEach>
 				</div>
 			</div>
 		</c:if>
-		<a id="save" title="保存"><i class="fa fa-check-square"></i></a>
+		<c:forEach var="action" items="${outgoingGroupActions }">
+			<a class="btn-action-outgoing" data-id="${action.id }" href="javascript:;" title="${action.title }"><i class="${action.iconClass }"></i></a>
+		</c:forEach>
+		<c:if test="${tmplGroup.hideSaveButton == null }">
+			<a id="save" title="保存"><i class="fa fa-check-square"></i></a>
+		</c:if>
 	</div>
 	<div class="detail field-input-container">
 		<div class="page-header">
