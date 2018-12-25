@@ -29,7 +29,7 @@ import com.abc.panel.Discoverer;
 import com.abc.panel.PanelFactory;
 import com.abc.rrc.query.criteria.CommonSymbol;
 import com.abc.rrc.query.criteria.EntityCriteriaFactory;
-import com.abc.rrc.query.entity.impl.EntitySortedPagedQuery;
+import com.abc.rrc.query.entity.EntitySortedPagedQuery;
 import com.abc.rrc.query.queryrecord.criteria.Criteria;
 import com.abc.service.RelationTreeServiceFactory;
 import com.abc.vo.RelationVO;
@@ -242,12 +242,12 @@ public class AdminRelationTreeViewController {
 		ABCNode abcNode = relationTreeViewService.getABCNode(mappingName);
 		List<AttributeNode> attributesNameCollection = abcNode.getOrderAttributes();
 		
-		System.out.println("nodeAttrCount: " + nodeAttrCount + "mappingName: " + mappingName);
+		/*System.out.println("nodeAttrCount: " + nodeAttrCount + "mappingName: " + mappingName);
 		for (int i = 0; i < attributesNameCollection.size(); i++) {
 			AttributeNode attrNode = attributesNameCollection.get(i);
 			
 			System.out.println("序号："+ i +",order："+attrNode.getOrder()+",name:"+attrNode.getTitle()+",fullTitle:"+attrNode.getFullTitle());
-		}
+		}*/
 		
 		List<AttributeNode> attributesNameList = new ArrayList<>();
 		if(nodeAttrCount != null && nodeAttrCount>0) {
