@@ -277,7 +277,7 @@ public class AdminModulesImportController {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		JSONObject reqJson = jReq.getJsonObject();
-		ModuleImportTemplate tmpl = toImportTemplate(menu.getTemplateModule(), reqJson);
+		ModuleImportTemplate tmpl = toImportTemplate(menu.getTemplateModule(), reqJson, UserUtils.getCurrentUser());
 		if(tmpl != null) {
 			Long tmplId = impService.saveTemplate(tmpl);
 			String uuid = TextUtils.uuid();
@@ -316,7 +316,7 @@ public class AdminModulesImportController {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		JSONObject reqJson = jReq.getJsonObject();
 		try {
-			ModuleImportTemplate tmpl = toImportTemplate(menu.getTemplateModule(), reqJson);
+			ModuleImportTemplate tmpl = toImportTemplate(menu.getTemplateModule(), reqJson, UserUtils.getCurrentUser());
 			Long tmplId = impService.saveTemplate(tmpl);
 			jRes.put("tmplId", tmplId);
 			jRes.put("tmplTitle", tmpl.getTitle());
@@ -328,12 +328,11 @@ public class AdminModulesImportController {
 		return jRes;
 	}
 
-	public static ModuleImportTemplate toImportTemplate(String module, JSONObject reqJson) {
+	public static ModuleImportTemplate toImportTemplate(String module, JSONObject reqJson, UserIdentifier user) {
 		Assert.hasText(module);
 		
 		JSONArray fieldArray = reqJson.getJSONArray("fields");
 		if(fieldArray != null && !fieldArray.isEmpty()) {
-			UserIdentifier user = UserUtils.getCurrentUser();
 			Set<ModuleImportTemplateField> fields = new LinkedHashSet<ModuleImportTemplateField>();
 			CollectionUtils.appendTo(fieldArray, fields, item->{
 				JSONObject fieldItem = (JSONObject) item; 

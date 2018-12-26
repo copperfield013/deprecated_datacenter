@@ -40,6 +40,9 @@ import cn.sowell.copframe.web.poll.ProgressPollableThreadFactory;
 import cn.sowell.copframe.web.poll.WorkProgress;
 import cn.sowell.datacenter.admin.controller.modules.AdminModulesImportController;
 import cn.sowell.datacenter.common.ApiUser;
+import cn.sowell.datacenter.common.UserWithToken;
+import cn.sowell.datacenter.model.admin.service.AdminUserService;
+import cn.sowell.datacenter.model.admin.service.impl.AdminUserServiceImpl.Token;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.modules.exception.ImportBreakException;
@@ -64,6 +67,9 @@ public class ApiEntityImportController {
 	
 	@Resource
 	AuthorityService authService;
+	
+	@Resource
+	AdminUserService uService; 
 	
 	Logger logger = Logger.getLogger(AdminModulesImportController.class);
 	
@@ -199,7 +205,7 @@ public class ApiEntityImportController {
 		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		JSONObject reqJson = jReq.getJsonObject();
-		ModuleImportTemplate tmpl = AdminModulesImportController.toImportTemplate(menu.getTemplateModule(), reqJson);
+		ModuleImportTemplate tmpl = AdminModulesImportController.toImportTemplate(menu.getTemplateModule(), reqJson, user);
 		if(tmpl != null) {
 			Long tmplId = impService.saveTemplate(tmpl);
 			String uuid = TextUtils.uuid();
@@ -210,9 +216,12 @@ public class ApiEntityImportController {
 		return jRes;
 	}
 	
-	@RequestMapping("/download_tmpl/{uuid}")
+	@RequestMapping("/download_tmpl/{tokenCode}/{uuid}")
 	public ResponseEntity<byte[]> download(
-			@PathVariable String uuid, ApiUser user){
+			@PathVariable String uuid, @PathVariable String tokenCode){
+		Token token = uService.validateToken(tokenCode);
+		token.refreshDeadline();
+		UserWithToken user = token.getUser();
 		Long tmplId = (Long) user.getCache(AdminModulesImportController.SESSION_KEY_FIELD_NAMES + uuid);
 		ModuleImportTemplate tmpl = impService.getImportTempalte(tmplId);
 		if(tmpl != null) {
