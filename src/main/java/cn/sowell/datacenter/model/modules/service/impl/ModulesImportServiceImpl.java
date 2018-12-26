@@ -129,6 +129,10 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 			progress.startItemTimer().appendMessage("导入第" + progress.getCurrent() + "条数据");
 			try {
 				Map<String, Object> map = createImportData(headerRow, row);
+				if(map == null) {
+					progress.endItemTimer().getLogger().error("第" + progress.getCurrent() + "条数据的所有字段均为空，跳过导入");
+					continue;
+				}
 				progress.appendMessage("解析数据：\r\n" + displayRow(map));
 				EntityComponent entityC = config.getConfigResolver().createEntityIgnoreUnsupportedElement(map);
 				Assert.isTrue(entityC != null && entityC.getEntity() != null, "创建的实体为null");
@@ -212,11 +216,20 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 	private Map<String, Object> createImportData(Row headerRow, Row row){
 		Map<String, Object> map = new LinkedHashMap<String, Object>();
 		int length = headerRow.getPhysicalNumberOfCells();
-		for (int i = 0; i < length; i++) {
+		boolean allEmpty = true;
+		for (int i = 1; i < length; i++) {
 			Cell cell = row.getCell(i);
-			map.put(getStringWithBlank(headerRow.getCell(i)), FormatUtils.coalesceWhole(getStringWithBlank(cell), ""));
+			Object value = getStringWithBlank(cell);
+			if(value != null) {
+				if(allEmpty && value instanceof String && !((String) value).isEmpty()) {
+					allEmpty = false;
+				}
+			}else {
+				value = "";
+			}
+			map.put(getStringWithBlank(headerRow.getCell(i)), value);
 		}
-		return map;
+		return allEmpty? null: map;
 	}
 	
 	@Override
