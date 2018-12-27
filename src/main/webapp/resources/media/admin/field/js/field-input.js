@@ -139,8 +139,10 @@ define(function(require, exports, module){
 			if(param.id){
 				$dom.attr('id', param.id);
 			}
-			$dom.change(function(){
-				_this.__triggerValueChanged();
+			$dom.change(function(e, ignoredTrigger){
+				if(ignoredTrigger !== true){
+					_this.__triggerValueChanged();
+				}
 			});
 		};
 		
@@ -333,10 +335,13 @@ define(function(require, exports, module){
 						$select.val(param.value).trigger('change');
 					}
 				}
-				$span.val = function(){
-					var result = $select.val.apply($select, arguments);
-					$select.trigger('change');
-					return result;
+				$span.val = function(value, ignoredChange){
+					if(arguments.length > 0){
+						$select.val(value);
+						$select.trigger('change', [ignoredChange]);
+					}else{
+						return $select.val();
+					}
 				};
 				$span.funcMap = {
 					setReadonly	: function(toReadonly){
@@ -1038,7 +1043,7 @@ define(function(require, exports, module){
 			switch(param.type){
 				case 'select':
 				default: 
-					this.getDom().val(val);
+					this.getDom().val(val, ignoreTrigger);
 			}
 			if(!ignoreTrigger){
 				this.__triggerValueChanged();
