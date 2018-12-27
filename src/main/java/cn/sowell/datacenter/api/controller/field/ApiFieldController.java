@@ -17,9 +17,11 @@ import com.alibaba.fastjson.JSONObject;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.datacenter.common.ApiUser;
+import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.dataserver.model.dict.pojo.DictionaryOption;
 import cn.sowell.dataserver.model.dict.pojo.OptionItem;
 import cn.sowell.dataserver.model.dict.service.DictionaryService;
+import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 
 @Controller
 @RequestMapping("/api/field")
@@ -27,6 +29,12 @@ public class ApiFieldController {
 	
 	@Resource
 	DictionaryService dictService;
+	
+	@Resource
+	TemplateService tService;
+	
+	@Resource
+	AuthorityService authService;
 	
 	@ResponseBody
 	@RequestMapping("/options")

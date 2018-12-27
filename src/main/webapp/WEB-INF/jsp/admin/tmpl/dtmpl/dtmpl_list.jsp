@@ -25,7 +25,7 @@
 			<table class="table">
 				<thead>
 					<tr>
-						<th>#</th>
+						<th>序号</th>
 						<th>模板名</th>
 						<th>更新时间</th>
 						<th>操作</th>

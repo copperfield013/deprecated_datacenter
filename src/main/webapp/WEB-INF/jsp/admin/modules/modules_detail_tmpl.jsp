@@ -84,7 +84,7 @@
 										<table class="table table-striped table-bordered table-hover">
 											<thead>
 												<tr class="title-row">
-													<th>#</th>
+													<th>序号</th>
 													<c:if test="${tmplGroup.relationSubdomain != null }">
 														<th class="sorting">关系</th>
 													</c:if>

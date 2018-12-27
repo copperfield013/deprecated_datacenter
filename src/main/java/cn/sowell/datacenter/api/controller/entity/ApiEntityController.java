@@ -498,19 +498,6 @@ public class ApiEntityController {
 		return jRes;
 	}
 	
-	@ResponseBody
-	@RequestMapping("/remove/{menuId}/{code}")
-	public ResponseJSON remove(@PathVariable Long menuId, @PathVariable String code, ApiUser user) {
-		JSONObjectResponse jRes = new JSONObjectResponse();
-		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
-		try {
-			mService.deleteEntity(menu.getTemplateModule(), code, user);
-			jRes.setStatus("suc");
-		} catch (Exception e) {
-			jRes.setStatus("error");
-		}
-		return jRes;
-	}
 	
 	@ResponseBody
 	@RequestMapping("/remove/{menuId}")

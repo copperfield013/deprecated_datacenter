@@ -28,7 +28,7 @@
 			<table class="table">
 				<thead>
 					<tr>
-						<th>#</th>
+						<th>序号</th>
 						<th>组合名称</th>
 						<th>列表模板</th>
 						<th>详情模板</th>

@@ -122,7 +122,7 @@
 														<th
 															fname-format="${tmplGroup.composite.name }[ARRAY_INDEX_REPLACEMENT].唯一编码"
 														>
-															#
+															序号
 															<input type="hidden" name="${tmplGroup.composite.name }.$$flag$$" value="true" />
 														</th>
 														<c:if test="${tmplGroup.relationSubdomain != null }">

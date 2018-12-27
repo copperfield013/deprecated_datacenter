@@ -213,7 +213,7 @@
 									<table class="table table-condensed">
 										<thead>
 											<tr>
-												<th>#</th>
+												<th>序号</th>
 												<th>按钮文字</th>
 												<th>
 													多选选项
@@ -242,7 +242,7 @@
 									<table class="table table-condensed">
 										<thead>
 											<tr>
-												<th>#</th>
+												<th>序号</th>
 												<th>按钮文字</th>
 												<th>外部显示</th>
 												<th>图标</th>

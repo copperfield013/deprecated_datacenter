@@ -52,7 +52,7 @@
 			<table class="table table-striped table-bordered table-hover">
 				<thead>
 					<tr class="title-row">
-						<th class="number-col">#</th>
+						<th class="number-col">序号</th>
 					</tr>
 				</thead>
 				<tbody>
