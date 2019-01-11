@@ -202,7 +202,7 @@ public class SideMenuServiceImpl implements SideMenuService, InitializingBean{
 	public Map<Long, String[]> getMenuAuthNameMap(Set<Long> menuIds, Function<Long, Set<String>> authGetter) {
 		Map<Long, String[]> map = new HashMap<>();
 		if(menuIds != null) {
-			Collection<AuthorityVO> auths = ServiceFactory.getRoleAuthorityService().getFunctionAuth(((ABCUser) UserUtils.getCurrentUser()).getUserInfo());
+			Collection<? extends AuthorityVO> auths =  ServiceFactory.getRoleAuthorityService().getFunctionAuth(((ABCUser) UserUtils.getCurrentUser()).getUserInfo());
 			menuIds.forEach(menuId->{
 				Set<String> authorities = authGetter.apply(menuId);
 				if(authorities != null) {
