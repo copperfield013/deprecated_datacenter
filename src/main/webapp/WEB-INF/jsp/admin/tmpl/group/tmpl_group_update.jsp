@@ -285,6 +285,7 @@
 		var premisesJson = [];
 		var actions = [];
 		var tmplActions = [];
+		var atmpls = [];
 		try{
 			premisesJson = $.parseJSON('${premisesJson}');
 			tmplActions = $.parseJSON('${tmplActions}');
