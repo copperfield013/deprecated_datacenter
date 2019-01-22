@@ -1231,7 +1231,7 @@ define(function(require, exports, module){
 				if($numberCol.length == 0){
 					$colRowTmpl.tmpl({
 						id				: 'row-number',
-						cname			: '#',
+						cname			: '序号',
 						withoutOpr		: true,
 						c_name			: '',
 						fieldAvailable	: true
