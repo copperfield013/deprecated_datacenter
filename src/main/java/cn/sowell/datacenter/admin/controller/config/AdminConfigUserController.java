@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +46,8 @@ import cn.sowell.dataserver.model.modules.service.impl.SelectionTemplateEntityVi
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionTemplate;
-import cn.sowell.dataserver.model.tmpl.service.TemplateService;
+import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.SelectionTemplateService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_CONFIG + "/user")
@@ -57,7 +57,10 @@ public class AdminConfigUserController {
 	ConfigUserService userService;
 	
 	@Resource
-	TemplateService tService;
+	DetailTemplateService dtmplService;
+	
+	@Resource
+	SelectionTemplateService stmplService;
 	
 	@Resource
 	ViewDataService vService;
@@ -88,7 +91,7 @@ public class AdminConfigUserController {
 				EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, code, user);
 				if(historyId != null) {
 					if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
-						entity = mService.getHistoryEntityParser(moduleName, code, historyId, user);
+						mService.getHistoryEntityParser(moduleName, code, historyId, user);
 					}
 		        }
 		        if(entity == null) {
@@ -103,7 +106,7 @@ public class AdminConfigUserController {
 				model.addAttribute("user", user);
 				model.addAttribute("entity", entity);
 				
-				List<TemplateDetailTemplate> dtmpls = tService.queryDetailTemplates(dtmpl.getModule());
+				List<TemplateDetailTemplate> dtmpls = dtmplService.queryAll(dtmpl.getModule());
 				model.addAttribute("dtmpls", dtmpls);
 				
 			}
@@ -127,7 +130,7 @@ public class AdminConfigUserController {
 				model.addAttribute("fieldDescMap", new FieldDescCacheMap(config.getConfigResolver()));
 				
 				
-				List<TemplateDetailTemplate> dtmpls = tService.queryDetailTemplates(dtmpl.getModule());
+				List<TemplateDetailTemplate> dtmpls = dtmplService.queryAll(dtmpl.getModule());
 				model.addAttribute("dtmpls", dtmpls);
 				
 				return AdminConstants.JSP_CONFIG_USER + "/user_update.jsp";
@@ -160,7 +163,7 @@ public class AdminConfigUserController {
 			PageInfo pageInfo,
 			HttpServletRequest request, 
 			Model model) {
-		TemplateSelectionTemplate stmpl = tService.getSelectionTemplate(stmplId);
+		TemplateSelectionTemplate stmpl = stmplService.getTemplate(stmplId);
 		userService.validateUserAuthentication(stmpl.getModule());
 		//创建条件对象
 		Map<Long, String> criteriaMap = exractTemplateCriteriaMap(request);
@@ -174,7 +177,7 @@ public class AdminConfigUserController {
 		model.addAttribute("view", view);
 		
 		//隐藏条件拼接成文件用于提示
-		Set<TemplateSelectionCriteria> tCriterias = view.getSelectionTemplate().getCriterias();
+		List<TemplateSelectionCriteria> tCriterias = view.getSelectionTemplate().getCriterias();
 		StringBuffer hidenCriteriaDesc = new StringBuffer();
 		if(tCriterias != null){
 			for (TemplateSelectionCriteria tCriteria : tCriterias) {
@@ -208,7 +211,7 @@ public class AdminConfigUserController {
 			@RequestParam String codes, 
 			@RequestParam String fields) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
-		TemplateSelectionTemplate stmpl = tService.getSelectionTemplate(stmplId);
+		TemplateSelectionTemplate stmpl = stmplService.getTemplate(stmplId);
 		userService.validateUserAuthentication(stmpl.getModule());
 		Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(
 				stmpl.getModule(), 

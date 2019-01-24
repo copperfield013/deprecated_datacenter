@@ -271,6 +271,92 @@
 								</div>
 								<div class="widget-body field-container"></div>
 							</div>
+							<div class="widget">
+								<div class="widget-header">
+									<span class="widget-caption">导入字段过滤
+									</span>
+								</div>
+								<div class="widget-body">
+									<input type="hidden" name="importDictionaryFilter.id" value="${group.importDictionaryFilter.id }" />
+									<div class="row">
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label class="col-lg-4 control-label" >基础字段</label>
+												<div class="base-fields col-lg-8">
+													<label>
+														<input name="importDictionaryFilter.withModule" type="checkbox" ${group.importDictionaryFilter.withModule == 1? 'checked="checked"': '' } value="1" />
+														<span class="text">模块</span>
+													</label>
+													<label>
+														<input name="importDictionaryFilter.withDetailTemplate" type="checkbox" class="colored-blue" ${group == null || group.importDictionaryFilter.withDetailTemplate == 1? 'checked="checked"': '' } value="1" />
+														<span class="text">详情</span>
+													</label>
+													<label>
+														<input name="importDictionaryFilter.withListTemplate" type="checkbox" class="colored-success" ${group == null || group.importDictionaryFilter.withListTemplate == 1? 'checked="checked"': '' } value="1" />
+														<span class="text">列表</span>
+													</label>
+												</div>
+											</div>
+											<div class="form-group"> 
+												<label class="col-lg-4 control-label">过滤器</label>
+												<div class="col-lg-8">
+													<a 
+														class="form-control"
+														href="admin/tmpl/dictfilter/choose/${module.name }" 
+														title="选择字段过滤器"
+														choose-key="choose-difilter-i" 
+														crn-choose-difilter-i="title" 
+														>${group.importDictionaryFilter.filter != null? group.importDictionaryFilter.filter.title: '选择字段过滤器' }</a>
+													<input type="hidden" crn-choose-difilter-i="id" name="importDictionaryFilter.filterId" value="${group.importDictionaryFilter.filter.id }" />
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="widget">
+								<div class="widget-header">
+									<span class="widget-caption">导出字段过滤
+									</span>
+								</div>
+								<div class="widget-body">
+									<input type="hidden" name="exportDictionaryFilter.id" value="${group.exportDictionaryFilter.id }" />
+									<div class="row">
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label class="col-lg-4 control-label" for="name">基础字段</label>
+												<div class="base-fields col-lg-8">
+													<label>
+														<input name="exportDictionaryFilter.withModule" type="checkbox" ${group.exportDictionaryFilter.withModule == 1? 'checked="checked"': '' } value="1" />
+														<span class="text">模块</span>
+													</label>
+													<label>
+														<input name="exportDictionaryFilter.withDetailTemplate" type="checkbox" class="colored-blue" ${group == null || group.exportDictionaryFilter.withDetailTemplate == 1? 'checked="checked"': '' } value="1" />
+														<span class="text">详情</span>
+													</label>
+													<label>
+														<input name="exportDictionaryFilter.withListTemplate" type="checkbox" class="colored-success" ${group == null || group.exportDictionaryFilter.withListTemplate == 1? 'checked="checked"': '' } value="1" />
+														<span class="text">列表</span>
+													</label>
+												</div>
+											</div>
+											<div class="form-group"> 
+												<label class="col-lg-4 control-label" for="name">过滤器</label>
+												<div class="col-lg-8">
+													<a 
+														class="form-control"
+														href="admin/tmpl/dictfilter/choose/${module.name }" 
+														title="选择列表模板"
+														choose-key="choose-difilter-e" 
+														crn-choose-difilter-e="title" 
+														>${group.exportDictionaryFilter.filter != null? group.exportDictionaryFilter.filter.title: '选择字段过滤器' }</a>
+													<input type="hidden" crn-choose-difilter-e="id" name="exportDictionaryFilter.filterId" value="${group.exportDictionaryFilter.filter.id }" />
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
 						</form>
 					</div>
 				</div>
@@ -279,7 +365,7 @@
 	</div>
 </div>
 <script>
-	seajs.use(['tmpl/js/tmpl-group-update'], function(TmplGroupUpdate){
+	seajs.use(['tmpl/js/tmpl-group-update', 'utils'], function(TmplGroupUpdate, Utils){
 		var $page = $('#tmpl-group-update-${group.id }');
 		console.log($page);
 		var premisesJson = [];
@@ -287,11 +373,10 @@
 		var tmplActions = [];
 		var atmpls = [];
 		try{
-			premisesJson = $.parseJSON('${premisesJson}');
-			tmplActions = $.parseJSON('${tmplActions}');
-			atmpls = $.parseJSON('${atmpls}');
-		}catch(e){}
-		console.log(actions);
+			premisesJson = Utils.parseJSON('${premisesJson}') || [];
+			tmplActions = Utils.parseJSON('${tmplActions}') || [];
+			atmpls = Utils.parseJSON('${atmpls}') || [];
+		}catch(e){console.log(e)}
 		TmplGroupUpdate.init($page, '${module.name}', premisesJson, {
 			tmplActions	: tmplActions,
 			atmpls		: atmpls

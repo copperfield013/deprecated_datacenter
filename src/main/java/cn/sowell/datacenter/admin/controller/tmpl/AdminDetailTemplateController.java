@@ -38,16 +38,15 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailField;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
-import cn.sowell.dataserver.model.tmpl.service.TemplateService;
+import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_TMPL + "/dtmpl")
 @PreAuthorize("hasAuthority(@confAuthenService.getAdminConfigAuthen())")
 public class AdminDetailTemplateController {
 
-
 	@Resource
-	TemplateService tService;
+	DetailTemplateService dtmplService;
 	
 	Logger logger = Logger.getLogger(AdminDetailTemplateController.class);
 
@@ -70,8 +69,8 @@ public class AdminDetailTemplateController {
 	@RequestMapping("/list/{moduleName}")
 	public String list(Model model, @PathVariable String moduleName){
 		ModuleMeta moduleMeta = mService.getModule(moduleName);
-		List<TemplateDetailTemplate> tmplList = tService.queryDetailTemplates(moduleName);
-		Map<Long, Set<TemplateGroup>> relatedGroupsMap = tService.getDetailTemplateRelatedGroupsMap(CollectionUtils.toSet(tmplList, dtmpl->dtmpl.getId()));
+		List<TemplateDetailTemplate> tmplList = dtmplService.queryAll(moduleName);
+		Map<Long, List<TemplateGroup>> relatedGroupsMap = dtmplService.getRelatedGroupsMap(CollectionUtils.toSet(tmplList, dtmpl->dtmpl.getId()));
 		model.addAttribute("modulesJson", configService.getSiblingModulesJson(moduleName));
 		model.addAttribute("tmplList", tmplList);
 		model.addAttribute("module", moduleMeta);
@@ -81,21 +80,21 @@ public class AdminDetailTemplateController {
 	
 
 	@RequestMapping("/choose/{module}")
-	public String dialogList(@PathVariable String module, String except, Model model) {
-		List<TemplateDetailTemplate> tmplList = tService.queryDetailTemplates(module);
+	public String choose(@PathVariable String module, String except, Model model) {
+		List<TemplateDetailTemplate> tmplList = dtmplService.queryAll(module);
 		if(TextUtils.hasText(except)) {
 			Set<Long> excepts = TextUtils.split(except, ",", HashSet::new, FormatUtils::toLong);
 			tmplList = tmplList.stream().filter(tmpl->!excepts.contains(tmpl.getId())).collect(Collectors.toList());
 		}
 		ChooseTablePage<TemplateDetailTemplate> tpage = new ChooseTablePage<TemplateDetailTemplate>(
-				"ltmpl-choose-list", "ltmpl_");
+				"dtmpl-choose-list", "dtmpl_");
 		tpage
 			.setPageInfo(null)
 			.setAction(AdminConstants.URI_TMPL + "/dtmpl/choose/" + module)
 			.setIsMulti(false)
 			.setTableData(tmplList, handler->{
 				handler
-					.setDataKeyGetter(data->"ltmpl_" + data.getId())
+					.setDataKeyGetter(data->"dtmpl_" + data.getId())
 					.addColumn("模板名", (cell, data)->cell.setText(data.getTitle()))
 					.addColumn("创建时间", (cell, data)->cell.setText(dateFormat.formatDateTime(data.getCreateTime())))
 					;
@@ -110,11 +109,11 @@ public class AdminDetailTemplateController {
 	@RequestMapping("/switch_groups/{dtmplId}/{targetDtmplId}")
 	public AjaxPageResponse switchGroups(@PathVariable Long dtmplId, @PathVariable Long targetDtmplId) {
 		try {
-			TemplateDetailTemplate dtmpl = tService.getDetailTemplate(dtmplId),
-									targerTemplate = tService.getDetailTemplate(targetDtmplId);
+			TemplateDetailTemplate dtmpl = dtmplService.getTemplate(dtmplId),
+									targerTemplate = dtmplService.getTemplate(targetDtmplId);
 			if(dtmpl != null) {
 				if(targerTemplate != null) {
-					tService.switchAllGroupsDetailTemplate(dtmplId, targetDtmplId);
+					dtmplService.switchAllRelatedGroups(dtmplId, targetDtmplId);
 					return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("切换成功", dtmpl.getModule() + "_dtmpl_list");
 				}else {
 					throw new Exception("切换详情模板的列表模板[id=" + targetDtmplId + "]不存在");
@@ -134,7 +133,7 @@ public class AdminDetailTemplateController {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		TemplateDetailTemplate data = parseToTmplData(jReq.getJsonObject());
 		try {
-			tService.mergeTemplate(data);
+			dtmplService.merge(data);
 			jRes.setStatus("suc");
 		} catch (Exception e) {
 			logger.error("保存模板时发生错误", e);
@@ -145,7 +144,7 @@ public class AdminDetailTemplateController {
 	
 	@RequestMapping("/update/{tmplId}")
 	public String update(@PathVariable Long tmplId, Model model){
-		TemplateDetailTemplate tmpl = tService.getDetailTemplate(tmplId);
+		TemplateDetailTemplate tmpl = dtmplService.getTemplate(tmplId);
 		JSONObject tmplJson = (JSONObject) JSON.toJSON(tmpl);
 		ModuleMeta moduleMeta = mService.getModule(tmpl.getModule());
 		model.addAttribute("module", moduleMeta);
@@ -158,7 +157,7 @@ public class AdminDetailTemplateController {
 	@RequestMapping("/remove/{tmplId}")
 	public AjaxPageResponse remove(@PathVariable Long tmplId){
 		try {
-			tService.removeDetailTemplate(tmplId);
+			dtmplService.remove(tmplId);
 			return AjaxPageResponse.REFRESH_LOCAL("删除成功");
 		} catch (Exception e) {
 			logger.error("删除失败", e);
@@ -168,8 +167,8 @@ public class AdminDetailTemplateController {
 	
 	@RequestMapping("/group_list/{dtmplId}")
 	public String groupList(@PathVariable Long dtmplId, Model model) {
-		TemplateDetailTemplate dtmpl = tService.getDetailTemplate(dtmplId);
-		Set<TemplateGroup> tmplGroups = tService.getDetailTemplateRelatedGroups(dtmplId);
+		TemplateDetailTemplate dtmpl = dtmplService.getTemplate(dtmplId);
+		List<TemplateGroup> tmplGroups = dtmplService.getRelatedGroups(dtmplId);
 		model.addAttribute("tmplGroups", tmplGroups);
 		model.addAttribute("tmplType", "detail");
 		model.addAttribute("tmplId", dtmplId);
@@ -233,7 +232,7 @@ public class AdminDetailTemplateController {
 	public ResponseJSON copy(@PathVariable Long dtmplId, @PathVariable String targetModuleName) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		try {
-			Long newTmplId = tService.copyDetailTemplate(dtmplId, targetModuleName);
+			Long newTmplId = dtmplService.copy(dtmplId, targetModuleName);
 			if(newTmplId != null) {
 				jRes.setStatus("suc");
 				jRes.put("newTmplId", newTmplId);

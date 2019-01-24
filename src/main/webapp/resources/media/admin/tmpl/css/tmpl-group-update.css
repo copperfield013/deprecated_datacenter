@@ -102,6 +102,11 @@
 label.multi-transactional{
 	display: none;
 }
-label.multi-transactional.show{
+
+.tmpl-group-update label.multi-transactional.show{
 	display: inline-block !important;
+}
+
+.base-fields>label {
+    margin: 0 15px;
 }

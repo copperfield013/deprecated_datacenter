@@ -45,13 +45,21 @@ import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
-import cn.sowell.dataserver.model.tmpl.service.TemplateService;
+import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.ListTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
 
 @Controller
 @RequestMapping("/api/entity/export")
 public class ApiEntityExportController {
 	@Resource
-	TemplateService tService;
+	TemplateGroupService tmplGroupService;
+	
+	@Resource
+	ListTemplateService ltmplService;
+	
+	@Resource
+	DetailTemplateService dtmplService;
 	
 	@Resource
 	ModulesService mService;
@@ -73,8 +81,8 @@ public class ApiEntityExportController {
 			@PathVariable Long menuId,
 			@RequestBody JsonRequest jReq, ApiUser user){
 		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
-		TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
-		TemplateListTemplate ltmpl = tService.getListTemplate(tmplGroup.getListTemplateId());
+		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+		TemplateListTemplate ltmpl = ltmplService.getTemplate(tmplGroup.getListTemplateId());
 		
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		JSONObject json = jReq.getJsonObject();
@@ -113,7 +121,7 @@ public class ApiEntityExportController {
 				Map<Long, NormalCriteria> vCriteriaMap = mService.getCriteriasFromRequest(pvs, CollectionUtils.toMap(ltmpl.getCriterias(), c->c.getId()));
 				progress.getDataMap().put("exportPageInfo", ePageInfo);
 				progress.getDataMap().put("withDetail", withDetail);
-				TemplateDetailTemplate dtmpl = Boolean.TRUE.equals(withDetail)? tService.getDetailTemplate(tmplGroup.getDetailTemplateId()): null;
+				TemplateDetailTemplate dtmpl = Boolean.TRUE.equals(withDetail)? dtmplService.getTemplate(tmplGroup.getDetailTemplateId()): null;
 				eService.startWholeExport(progress, ltmpl, dtmpl, new HashSet<NormalCriteria>(vCriteriaMap.values()), ePageInfo, user);
 				user.setCache(AdminConstants.EXPORT_ENTITY_STATUS_UUID, progress.getUUID());
 			}
@@ -182,8 +190,8 @@ public class ApiEntityExportController {
 			Long historyId, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
-		TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
-		TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
+		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+		TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
 		
 		String moduleName = tmplGroup.getModule();
 		ModuleEntityPropertyParser entity = null;

@@ -21,6 +21,7 @@
 	<import resource="spring-dao.xml"/>
 
 	<context:component-scan base-package="com.abc" />
+	<context:component-scan base-package="com.zhsq" />
 
 	<!-- dao自动扫描 -->
 	<context:component-scan base-package="cn.sowell.datacenter.model.*.dao.impl" />
@@ -32,18 +33,15 @@
 	<context:component-scan base-package="cn.sowell.dataserver.model.*.dao.impl" />
 	<!-- serivce自动扫描 -->
 	<context:component-scan base-package="cn.sowell.dataserver.model.*.service.impl" />
+	
+	
+	<context:component-scan base-package="cn.sowell.dataserver.model.tmpl.manager.impl" />
+	
+	<context:component-scan base-package="cn.sowell.dataserver.model.tmpl.duplicator.impl" />
+	
 
 	<!-- 默认访问权限的获取service -->
 	<bean id="confAuthenService" class="cn.sowell.datacenter.model.config.service.impl.ConfigAuthencationServiceImpl" />
-
-	<bean class="cn.sowell.dataserver.model.tmpl.strategy.TemplateUpdateStrategyFactory">
-		<constructor-arg>
-			<map>
-				<entry key="cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplate" 
-				value="cn.sowell.datacenter.model.tmpl.strategy.ModuleImportTemplateStrategy" />
-			</map>
-		</constructor-arg>
-	</bean>
 
 	<bean id="dBFusionConfigContextFactory" class="cn.sowell.datacenter.entityResolver.config.DBFusionConfigContextFactory">
 		<property name="sessionFactory" ref="sessionFactory" />
@@ -67,8 +65,19 @@
 		</property>
 	</bean>
 
+	<bean
+		class="cn.sowell.copframe.spring.propTranslator.PropertyValueTranslatorSet">
+		<property name="translatorSet">
+			<set>
+				<bean
+					class="cn.sowell.copframe.spring.propTranslator.translator.DatePropertyValueTranlator" />
+			</set>
+		</property>
+	</bean>
+
 	<bean class="cn.sowell.copframe.dao.utils.NormalOperateDaoImpl" />
 
+	<bean class="cn.sowell.dataserver.model.dict.validator.ModuleCachableMetaSupportorImpl" />
 
 	<task:annotation-driven /> <!-- 定时器开关 -->
 	<bean class="cn.sowell.datacenter.model.modules.bean.PeopleExportHandlerTask" />

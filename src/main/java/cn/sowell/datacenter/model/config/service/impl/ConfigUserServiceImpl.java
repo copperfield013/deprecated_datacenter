@@ -15,7 +15,7 @@ import cn.sowell.datacenter.model.config.service.ConfigUserService;
 import cn.sowell.datacenter.model.config.service.NonAuthorityException;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
-import cn.sowell.dataserver.model.tmpl.service.TemplateService;
+import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
 
 @Service
 public class ConfigUserServiceImpl implements ConfigUserService {
@@ -27,7 +27,7 @@ public class ConfigUserServiceImpl implements ConfigUserService {
 	ModulesService mService;
 	
 	@Resource
-	TemplateService tService;
+	DetailTemplateService dtmplService;
 	
 	@Override
 	public String getUserModuleName() {
@@ -47,7 +47,7 @@ public class ConfigUserServiceImpl implements ConfigUserService {
 		if(tmplId == null) {
 			tmplId = Long.valueOf(PropertyPlaceholder.getProperty("default_user_dtmpl_id"));
 		}
-		TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplId);
+		TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplId);
 		Assert.state(userModuleName.equals(dtmpl.getModule()), "详情模板[id=" + tmplId + ", moduleName=" + dtmpl.getModule() + "]不是用户信息详情模板[moduleName=" + userModuleName + "]");
 		return dtmpl;
 		

@@ -85,6 +85,7 @@
 						if(yes){
 							Ajax.ajax('admin/tmpl/group/copy/' + tmplId + '/' + selected.moduleName, function(res){
 								if(res.status === 'suc' && res.newTmplId){
+									$page.getLocatePage().refresh();
 									Dialog.confirm('复制成功，是否打开复制成功的模板组合编辑页？', function(yes){
 										if(yes){
 											Tab.openInTab('admin/tmpl/group/update/' + res.newTmplId, 'tmpl_group_update_' + res.newTmplId);

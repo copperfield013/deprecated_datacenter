@@ -2,7 +2,6 @@ package cn.sowell.datacenter.admin.controller.tmpl;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +22,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
@@ -43,18 +41,18 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListColumn;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
-import cn.sowell.dataserver.model.tmpl.service.TemplateService;
+import cn.sowell.dataserver.model.tmpl.service.ListTemplateService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_TMPL + "/ltmpl")
 @PreAuthorize("hasAuthority(@confAuthenService.getAdminConfigAuthen())")
 public class AdminListTemplateController {
 	
-	@Resource
-	TemplateService tService;
-	
 	Logger logger = Logger.getLogger(AdminListTemplateController.class);
 
+	@Resource
+	ListTemplateService ltmplService;
+	
 	@Resource
 	FrameDateFormat dateFormat;
 	
@@ -69,10 +67,9 @@ public class AdminListTemplateController {
 	
 	@RequestMapping("/list/{moduleName}")
 	public String list(Model model, @PathVariable String moduleName){
-		UserIdentifier user = UserUtils.getCurrentUser();
 		ModuleMeta moduleMeta = mService.getModule(moduleName);
-		List<TemplateListTemplate> ltmplList = tService.queryListTemplateList(moduleName, user);
-		Map<Long, Set<TemplateGroup>> relatedGroupsMap = tService.getListTemplateRelatedGroupsMap(CollectionUtils.toSet(ltmplList, ltmpl->ltmpl.getId()));
+		List<TemplateListTemplate> ltmplList = ltmplService.queryAll(moduleName);
+		Map<Long, List<TemplateGroup>> relatedGroupsMap = ltmplService.getRelatedGroupsMap(CollectionUtils.toSet(ltmplList, ltmpl->ltmpl.getId()));
 		model.addAttribute("modulesJson", configService.getSiblingModulesJson(moduleName));
 		model.addAttribute("ltmplList", ltmplList);
 		model.addAttribute("module", moduleMeta);
@@ -82,8 +79,7 @@ public class AdminListTemplateController {
 	
 	@RequestMapping("/choose/{module}")
 	public String dialogList(@PathVariable String module, String except, Model model) {
-		UserIdentifier user = UserUtils.getCurrentUser();
-		List<TemplateListTemplate> list = tService.queryListTemplateList(module, user);
+		List<TemplateListTemplate> list = ltmplService.queryAll(module);
 		if(TextUtils.hasText(except)) {
 			Set<Long> excepts = TextUtils.split(except, ",", HashSet::new, FormatUtils::toLong);
 			list = list.stream().filter(tmpl->!excepts.contains(tmpl.getId())).collect(Collectors.toList());
@@ -111,11 +107,11 @@ public class AdminListTemplateController {
 	@RequestMapping("/switch_groups/{ltmplId}/{targetLtmplId}")
 	public AjaxPageResponse switchGroups(@PathVariable Long ltmplId, @PathVariable Long targetLtmplId) {
 		try {
-			TemplateListTemplate ltmpl = tService.getListTemplate(ltmplId),
-									targerTemplate = tService.getListTemplate(targetLtmplId);
+			TemplateListTemplate ltmpl = ltmplService.getTemplate(ltmplId),
+									targerTemplate = ltmplService.getTemplate(targetLtmplId);
 			if(ltmpl != null) {
 				if(targerTemplate != null) {
-					tService.switchAllGroupsListTemplate(ltmplId, targetLtmplId);
+					ltmplService.switchAllRelatedGroups(ltmplId, targetLtmplId);
 					return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("切换成功", ltmpl.getModule() + "_dtmpl_list");
 				}else {
 					throw new Exception("切换详情模板的列表模板[id=" + targetLtmplId + "]不存在");
@@ -140,7 +136,7 @@ public class AdminListTemplateController {
 	
 	@RequestMapping("/update/{ltmplId}")
 	public String update(@PathVariable Long ltmplId, Model model){
-		TemplateListTemplate ltmpl = tService.getListTemplate(ltmplId);
+		TemplateListTemplate ltmpl = ltmplService.getTemplate(ltmplId);
 		JSONArray columnDataJSON = toColumnData(ltmpl.getColumns());
 		JSONObject tmplDataJSON = toLtmplData(ltmpl);
 		JSONArray criteriaDataJSON = toCriteriaData(ltmpl.getCriterias());
@@ -156,8 +152,8 @@ public class AdminListTemplateController {
 	
 	@RequestMapping("/group_list/{ltmplId}")
 	public String groupList(@PathVariable Long ltmplId, Model model) {
-		TemplateListTemplate ltmpl = tService.getListTemplate(ltmplId);
-		Set<TemplateGroup> tmplGroups = tService.getListTemplateRelatedGroups(ltmplId);
+		TemplateListTemplate ltmpl = ltmplService.getTemplate(ltmplId);
+		List<TemplateGroup> tmplGroups = ltmplService.getRelatedGroups(ltmplId);
 		model.addAttribute("tmplGroups", tmplGroups);
 		model.addAttribute("tmplType", "list");
 		model.addAttribute("tmplId", ltmplId);
@@ -166,9 +162,9 @@ public class AdminListTemplateController {
 	}
 	
 	
-	private JSONArray toCriteriaData(Set<TemplateListCriteria> criterias) {
+	private JSONArray toCriteriaData(List<TemplateListCriteria> list) {
 		JSONArray array = new JSONArray();
-		for (TemplateListCriteria criteria : criterias) {
+		for (TemplateListCriteria criteria : list) {
 			Object item = JSON.toJSON(criteria);
 			array.add(item);
 		}
@@ -179,7 +175,7 @@ public class AdminListTemplateController {
 	@RequestMapping("/remove/{ltmplId}")
 	public AjaxPageResponse remove(@PathVariable Long ltmplId){
 		try {
-			tService.removeListTemplate(ltmplId);
+			ltmplService.remove(ltmplId);
 			return AjaxPageResponse.REFRESH_LOCAL("删除成功");
 		} catch (Exception e) {
 			logger.error("删除模板时发生错误", e);
@@ -228,7 +224,7 @@ public class AdminListTemplateController {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		TemplateListTemplate tmpl = generateLtmplData(jReq);
 		try {
-			tService.mergeTemplate(tmpl);
+			ltmplService.merge(tmpl);
 			//ltService.saveListTemplate(tmpl);
 			jRes.setStatus("suc");
 		} catch (Exception e) {
@@ -273,7 +269,7 @@ public class AdminListTemplateController {
 			
 			JSONArray criteriaData = json.getJSONArray("criteriaData");
 			if(criteriaData != null){
-				Set<TemplateListCriteria> criterias = new LinkedHashSet<TemplateListCriteria>();
+				List<TemplateListCriteria> criterias = new ArrayList<TemplateListCriteria>();
 				int order = 0;
 				for (Object e : criteriaData) {
 					JSONObject item = (JSONObject) e;
@@ -312,7 +308,7 @@ public class AdminListTemplateController {
 	public ResponseJSON copy(@PathVariable Long ltmplId, @PathVariable String targetModuleName) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		try {
-			Long newTmplId = tService.copyListTemplate(ltmplId, targetModuleName);
+			Long newTmplId = ltmplService.copy(ltmplId, targetModuleName);
 			if(newTmplId != null) {
 				jRes.setStatus("suc");
 				jRes.put("newTmplId", newTmplId);

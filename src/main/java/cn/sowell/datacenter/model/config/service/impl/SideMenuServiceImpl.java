@@ -34,7 +34,7 @@ import cn.sowell.datacenter.model.config.service.SideMenuService;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
-import cn.sowell.dataserver.model.tmpl.service.TemplateService;
+import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
 
 @Service
 public class SideMenuServiceImpl implements SideMenuService, InitializingBean{
@@ -46,13 +46,13 @@ public class SideMenuServiceImpl implements SideMenuService, InitializingBean{
 	NormalOperateDao nDao;
 	
 	@Resource
-	TemplateService tService;
-	
-	@Resource
 	ModulesService mService;
 	
 	@Resource
 	AuthorityService authService;
+	
+	@Resource
+	TemplateGroupService tmplGroupService;
 	
 	Map<Long, SideMenuLevel1Menu> l1MenuMap;
 	
@@ -66,7 +66,7 @@ public class SideMenuServiceImpl implements SideMenuService, InitializingBean{
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		tService.bindTemplateGroupReloadEvent(tmplGroup->{
+		tmplGroupService.bindTemplateGroupReloadEvent(tmplGroup->{
 			l2MenuMap.values().stream()
 				.filter(l2->tmplGroup.getId().equals(l2.getTemplateGroupId()))
 				.forEach(l2->{
@@ -100,7 +100,7 @@ public class SideMenuServiceImpl implements SideMenuService, InitializingBean{
 					Iterator<SideMenuLevel2Menu> itr = level2s.iterator();
 					while(itr.hasNext()) {
 						SideMenuLevel2Menu l2 = itr.next();
-						TemplateGroup tmplGroup = tService.getTemplateGroup(l2.getTemplateGroupId());
+						TemplateGroup tmplGroup = tmplGroupService.getTemplate(l2.getTemplateGroupId());
 						if(tmplGroup != null) {
 							ModuleMeta module = mService.getModule(tmplGroup.getModule());
 							if(module != null) {

@@ -68,7 +68,10 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionTemplate;
 import cn.sowell.dataserver.model.tmpl.service.ActionTemplateService;
-import cn.sowell.dataserver.model.tmpl.service.TemplateService;
+import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.ListTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.SelectionTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_MODULES + "/curd")
@@ -83,10 +86,21 @@ public class AdminModulesController {
 	@Resource
 	DictionaryService dictService;
 	
+	@Resource
+	TemplateGroupService tmplGroupService;
 	
 	@Resource
-	TemplateService tService;
-
+	DetailTemplateService dtmplService;
+	
+	@Resource
+	ListTemplateService ltmplService;
+	
+	@Resource
+	SelectionTemplateService stmplService;
+	
+	@Resource
+	ActionTemplateService atmplService;
+	
 	@Resource
 	FrameDateFormat dateFormat;
 	
@@ -101,9 +115,6 @@ public class AdminModulesController {
 	
 	@Resource
 	AuthorityService authService;
-	
-	@Resource
-	ActionTemplateService actService;
 	
 	
 	Logger logger = Logger.getLogger(AdminModulesController.class);
@@ -137,7 +148,7 @@ public class AdminModulesController {
 			}
 		}
 		//隐藏条件拼接成文件用于提示
-		Set<TemplateListCriteria> tCriterias = view.getListTemplate().getCriterias();
+		List<TemplateListCriteria> tCriterias = view.getListTemplate().getCriterias();
 		StringBuffer hidenCriteriaDesc = new StringBuffer();
 		if(tCriterias != null){
 			for (TemplateListCriteria tCriteria : tCriterias) {
@@ -146,7 +157,7 @@ public class AdminModulesController {
 				}
 			}
 		}
-		TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
+		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
 		if(tmplGroup.getPremises() != null) {
 			for (TemplateGroupPremise premise : tmplGroup.getPremises()) {
 				hidenCriteriaDesc.append(premise.getFieldTitle() + ":" + premise.getFieldValue() + "&#10;");
@@ -182,8 +193,8 @@ public class AdminModulesController {
 		String moduleName = menu.getTemplateModule();
 		
 		ModuleMeta moduleMeta = mService.getModule(moduleName);
-        TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
-        TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
+        TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+        TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
         
         ModuleEntityPropertyParser entity = null;
         UserIdentifier user = UserUtils.getCurrentUser();
@@ -214,8 +225,8 @@ public class AdminModulesController {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		String moduleName = menu.getTemplateModule();
 		ModuleMeta mMeta = mService.getModule(moduleName);
-		TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
-		TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
+		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+		TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
 		FusionContextConfig config = fFactory.getModuleConfig(moduleName);
 		model.addAttribute("menu", menu);
 		model.addAttribute("dtmpl", dtmpl);
@@ -250,10 +261,10 @@ public class AdminModulesController {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		String moduleName = menu.getTemplateModule();
 		ModuleMeta mMeta = mService.getModule(moduleName);
-		TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
+		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
 		FusionContextConfig config = fFactory.getModuleConfig(moduleName);
 		ModuleEntityPropertyParser entity = mService.getEntity(moduleName, code, null, UserUtils.getCurrentUser());
-		TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
+		TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
 		model.addAttribute("menu", menu);
 		model.addAttribute("entity", entity);
 		model.addAttribute("module", mMeta);
@@ -292,9 +303,9 @@ public class AdminModulesController {
 		Map<String, Object> entityMap = composite.getMap();
 		if(actionId != null) {
 			ArrayEntityProxy.setLocalUser(UserUtils.getCurrentUser());
-			TemplateGroupAction groupAction = tService.getTempateGroupAction(actionId);
+			TemplateGroupAction groupAction = tmplGroupService.getTempateGroupAction(actionId);
 			validateGroupAction(groupAction, menu, "");
-			entityMap = actService.coverActionFields(groupAction, entityMap);
+			entityMap = atmplService.coverActionFields(groupAction, entityMap);
 		}
     	 try {
     		 entityMap.remove(AdminConstants.KEY_FUSE_MODE);
@@ -378,7 +389,7 @@ public class AdminModulesController {
 			HttpServletRequest request,
 			Model model) {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
-		TemplateSelectionTemplate stmpl = tService.getSelectionTemplate(stmplId);
+		TemplateSelectionTemplate stmpl = stmplService.getTemplate(stmplId);
 		
 		//创建条件对象
 		Map<Long, String> criteriaMap = exractTemplateCriteriaMap(request);
@@ -392,7 +403,7 @@ public class AdminModulesController {
 		model.addAttribute("view", view);
 		
 		//隐藏条件拼接成文件用于提示
-		Set<TemplateSelectionCriteria> tCriterias = view.getSelectionTemplate().getCriterias();
+		List<TemplateSelectionCriteria> tCriterias = view.getSelectionTemplate().getCriterias();
 		StringBuffer hidenCriteriaDesc = new StringBuffer();
 		if(tCriterias != null){
 			for (TemplateSelectionCriteria tCriteria : tCriterias) {
@@ -418,7 +429,7 @@ public class AdminModulesController {
 			@RequestParam String fields) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		authService.vaidateL2MenuAccessable(menuId);
-		TemplateSelectionTemplate stmpl = tService.getSelectionTemplate(stmplId);
+		TemplateSelectionTemplate stmpl = stmplService.getTemplate(stmplId);
 		Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(
 				stmpl.getModule(), 
 				stmpl.getRelationName(), 
@@ -454,16 +465,16 @@ public class AdminModulesController {
 	public AjaxPageResponse doAction(@PathVariable Long menuId, @PathVariable Long actionId, @RequestParam(name="codes") String codeStr) {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		ArrayEntityProxy.setLocalUser(UserUtils.getCurrentUser());
-		TemplateGroupAction groupAction = tService.getTempateGroupAction(actionId);
+		TemplateGroupAction groupAction = tmplGroupService.getTempateGroupAction(actionId);
 		Object vRes = validateGroupAction(groupAction, menu, codeStr);
 		if(vRes instanceof AjaxPageResponse) {
 			return (AjaxPageResponse) vRes;
 		}
 		Set<String> codes = (Set<String>) vRes;
-		TemplateActionTemplate atmpl = tService.getActionTemplate(groupAction.getAtmplId());
+		TemplateActionTemplate atmpl = atmplService.getTemplate(groupAction.getAtmplId());
 		if(atmpl != null) {
 			try {
-				int sucs = actService.doAction(atmpl, codes, 
+				int sucs = atmplService.doAction(atmpl, codes, 
 						TemplateGroupAction.ACTION_MULTIPLE_TRANSACTION.equals(groupAction.getMultiple()), 
 						UserUtils.getCurrentUser());
 				return AjaxPageResponse.REFRESH_LOCAL("执行结束, 共成功处理" + sucs + "个实体");

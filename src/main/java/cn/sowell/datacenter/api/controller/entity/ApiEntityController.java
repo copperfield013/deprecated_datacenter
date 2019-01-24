@@ -67,7 +67,9 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionTemplate;
 import cn.sowell.dataserver.model.tmpl.service.ActionTemplateService;
-import cn.sowell.dataserver.model.tmpl.service.TemplateService;
+import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.SelectionTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
 
 @Controller
 @RequestMapping("/api/entity/curd")
@@ -80,7 +82,16 @@ public class ApiEntityController {
 	AuthorityService authService;
 	
 	@Resource
-	TemplateService tService;
+	TemplateGroupService tmplGroupService;
+	
+	@Resource
+	DetailTemplateService dtmplService;
+	
+	@Resource
+	SelectionTemplateService stmplService;
+	
+	@Resource
+	ActionTemplateService atmplService;
 	
 	@Resource
 	ViewDataService vService;
@@ -106,7 +117,7 @@ public class ApiEntityController {
 		String moduleName = menu.getTemplateModule();
 		ModuleMeta module = mService.getModule(moduleName);
 		
-		TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
+		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
 		
 		//创建条件对象
 		ListTemplateEntityViewCriteria criteria = new ListTemplateEntityViewCriteria();
@@ -239,7 +250,7 @@ public class ApiEntityController {
 	private JSONArray toCriterias(ListTemplateEntityView view, ListTemplateEntityViewCriteria lcriteria) {
 		JSONArray aCriterias = new JSONArray();
 		TemplateListTemplate ltmpl = view.getListTemplate();
-		Set<TemplateListCriteria> criterias = ltmpl.getCriterias();
+		List<TemplateListCriteria> criterias = ltmpl.getCriterias();
 		if(criterias != null && !criterias.isEmpty()) {
 			for (TemplateListCriteria criteria : criterias) {
 				if(criteria.getQueryShow() != null) {
@@ -298,8 +309,8 @@ public class ApiEntityController {
 		String moduleName = menu.getTemplateModule();
 		
 		ModuleMeta moduleMeta = mService.getModule(moduleName);
-        TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
-        TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
+        TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+        TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
     	
     	JSONObject jEntity = toEntityJson(null, dtmpl);
     	
@@ -317,8 +328,8 @@ public class ApiEntityController {
 		String moduleName = menu.getTemplateModule();
 		
 		ModuleMeta moduleMeta = mService.getModule(moduleName);
-        TemplateGroup tmplGroup = tService.getTemplateGroup(menu.getTemplateGroupId());
-        TemplateDetailTemplate dtmpl = tService.getDetailTemplate(tmplGroup.getDetailTemplateId());
+        TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+        TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
         
         ModuleEntityPropertyParser entity = null;
         
@@ -535,7 +546,7 @@ public class ApiEntityController {
 			PageInfo pageInfo, 
 			HttpServletRequest request, ApiUser user) {
 		authService.vaidateUserL2MenuAccessable(user, menuId);
-		TemplateSelectionTemplate stmpl = tService.getSelectionTemplate(stmplId);
+		TemplateSelectionTemplate stmpl = stmplService.getTemplate(stmplId);
 		
 
 		//创建条件对象
@@ -565,7 +576,7 @@ public class ApiEntityController {
 			ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		authService.vaidateUserL2MenuAccessable(user, menuId);
-		TemplateSelectionTemplate stmpl = tService.getSelectionTemplate(stmplId);
+		TemplateSelectionTemplate stmpl = stmplService.getTemplate(stmplId);
 		Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(
 				stmpl.getModule(), 
 				stmpl.getRelationName(), 
@@ -603,13 +614,13 @@ public class ApiEntityController {
 		JSONObjectResponse res = new JSONObjectResponse();
 		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
 		ArrayEntityProxy.setLocalUser(user);
-		TemplateGroupAction groupAction = tService.getTempateGroupAction(actionId);
+		TemplateGroupAction groupAction = tmplGroupService.getTempateGroupAction(actionId);
 		Object vRes = AdminModulesController.validateGroupAction(groupAction, menu, codeStr);
 		if(!(vRes instanceof Set)) {
 			res.setStatus("error");
 		}else {
 			Set<String> codes = (Set<String>) vRes;
-			TemplateActionTemplate atmpl = tService.getActionTemplate(groupAction.getAtmplId());
+			TemplateActionTemplate atmpl = atmplService.getTemplate(groupAction.getAtmplId());
 			if(atmpl != null) {
 				try {
 					int sucs = actService.doAction(atmpl, codes, 

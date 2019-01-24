@@ -23,7 +23,7 @@ import cn.sowell.datacenter.entityResolver.config.param.QueryModuleCriteria;
 import cn.sowell.datacenter.model.config.dao.ConfigureDao;
 import cn.sowell.datacenter.model.config.service.ConfigureService;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
-import cn.sowell.dataserver.model.tmpl.service.TemplateService;
+import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
 
 @Service
 public class ConfigureServiceImpl implements ConfigureService{
@@ -38,7 +38,7 @@ public class ConfigureServiceImpl implements ConfigureService{
 	ModuleConfigureMediator moduleConfigMediator;
 	
 	@Resource
-	TemplateService tService;
+	TemplateGroupService tmplGroupService;
 	
 	@Resource
 	FusionContextConfigFactory fFactory;
@@ -85,7 +85,7 @@ public class ConfigureServiceImpl implements ConfigureService{
 		QueryModuleCriteria criteria = new QueryModuleCriteria();
 		criteria.setFilterDisabled(true);
 		List<Module> modules = moduleConfigMediator.queryModules(criteria);
-		Map<String, List<TemplateGroup>> moduleGroupsMap = tService.queryTemplateGroups(CollectionUtils.toSet(modules, module->module.getName()));
+		Map<String, List<TemplateGroup>> moduleGroupsMap = tmplGroupService.queryModuleGroups(CollectionUtils.toSet(modules, module->module.getName()));
 		modules.forEach(module->{
 			JSONObject jModule = new JSONObject();
 			jModule.put("name", module.getName());

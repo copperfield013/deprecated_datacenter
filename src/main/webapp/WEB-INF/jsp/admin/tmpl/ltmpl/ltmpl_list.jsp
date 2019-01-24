@@ -98,6 +98,7 @@
 						if(yes){
 							Ajax.ajax('admin/tmpl/ltmpl/copy/' + tmplId + '/' + selected.moduleName, function(res){
 								if(res.status === 'suc' && res.newTmplId){
+									$page.getLocatePage().refresh();
 									Dialog.confirm('复制成功，是否打开复制成功的列表模板编辑页？', function(yes){
 										if(yes){
 											Tab.openInTab('admin/tmpl/ltmpl/update/' + res.newTmplId, 'viewtmpl_update_' + res.newTmplId);

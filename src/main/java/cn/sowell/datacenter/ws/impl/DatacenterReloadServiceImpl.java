@@ -11,7 +11,7 @@ import cn.sowell.datacenter.entityResolver.config.DBFusionConfigContextFactory;
 import cn.sowell.datacenter.entityResolver.config.ModuleConfigureMediator;
 import cn.sowell.datacenter.model.config.service.SideMenuService;
 import cn.sowell.datacenter.ws.DatacenterReloadService;
-import cn.sowell.dataserver.model.tmpl.service.TemplateService;
+import cn.sowell.dataserver.model.tmpl.service.CachableTemplateService;
 
 @WebService(endpointInterface="cn.sowell.datacenter.ws.DatacenterReloadService")
 public class DatacenterReloadServiceImpl implements DatacenterReloadService, InitializingBean{
@@ -25,11 +25,10 @@ public class DatacenterReloadServiceImpl implements DatacenterReloadService, Ini
 	FieldService fService;
 	
 	@Resource
-	TemplateService tService;
-	
-	@Resource
 	SideMenuService menuService;
 	
+	@Resource
+	CachableTemplateService tService;
 	
 	Logger logger = Logger.getLogger(DatacenterReloadServiceImpl.class);
 	
@@ -58,13 +57,13 @@ public class DatacenterReloadServiceImpl implements DatacenterReloadService, Ini
 	@Override
 	public String syncCache() {
 		syncModule();
-		tService.loadCache();
+		tService.reloadCache();
 		return "同步成功";
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		tService.loadCache();
+		tService.reloadCache();
 	}
 	
 }

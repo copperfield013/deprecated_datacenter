@@ -37,14 +37,18 @@
 	<!-- 默认访问权限的获取service -->
 	<bean id="confAuthenService" class="cn.sowell.datacenter.model.config.service.impl.ConfigAuthencationServiceImpl" />
 
-	<bean class="cn.sowell.dataserver.model.tmpl.strategy.TemplateUpdateStrategyFactory">
+	<context:component-scan base-package="cn.sowell.dataserver.model.tmpl.manager.impl" />
+	
+	<context:component-scan base-package="cn.sowell.dataserver.model.tmpl.duplicator.impl" />
+
+	<!-- <bean class="cn.sowell.dataserver.model.tmpl.strategy.TemplateUpdateStrategyFactory">
 		<constructor-arg>
 			<map>
 				<entry key="cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplate" 
 				value="cn.sowell.datacenter.model.tmpl.strategy.ModuleImportTemplateStrategy" />
 			</map>
 		</constructor-arg>
-	</bean>
+	</bean> -->
 
 	<bean id="dBFusionConfigContextFactory" class="cn.sowell.datacenter.entityResolver.config.DBFusionConfigContextFactory">
 		<property name="sessionFactory" ref="sessionFactory" />
@@ -75,7 +79,8 @@
 	</bean>
 
 	<bean class="cn.sowell.copframe.dao.utils.NormalOperateDaoImpl" />
-
+	
+	<bean class="cn.sowell.dataserver.model.dict.validator.ModuleCachableMetaSupportorImpl" />
 
 	<task:annotation-driven /> <!-- 定时器开关 -->
 	<bean class="cn.sowell.datacenter.model.modules.bean.PeopleExportHandlerTask" />

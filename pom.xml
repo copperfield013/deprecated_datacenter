@@ -10,8 +10,8 @@
 	
 	<properties>
 		<version.kie>7.10.0.Final</version.kie>
-		<version.abcitem>4.1.57.alphal</version.abcitem>
-		<version.dataserver>0.56</version.dataserver>
+		<version.abcitem>4.1.58.alphal</version.abcitem>
+		<version.dataserver>1.0</version.dataserver>
 		<version.cpfweb>0.2.12</version.cpfweb>
 		<version.abcbizz>2.1.15</version.abcbizz>
 		<version.authbiz>0.0.21</version.authbiz>
@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>cn.sowell.copframe</groupId>
 			<artifactId>cpf-spring</artifactId>
-			<version>0.3.15</version>
+			<version>0.3.16</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.sowell.copframe</groupId>
@@ -103,11 +103,6 @@
 			</exclusions>
 		</dependency> -->
 		<!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-redis -->
-		<dependency>
-		    <groupId>org.springframework.data</groupId>
-		    <artifactId>spring-data-redis</artifactId>
-		    <version>1.8.6.RELEASE</version>
-		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -224,16 +219,6 @@
 			<version>1.1.6</version>
 		</dependency>
 		
-		<dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>transport</artifactId>
-            <version>5.4.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch</artifactId>
-            <version>5.4.2</version>
-        </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>

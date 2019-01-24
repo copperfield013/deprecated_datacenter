@@ -7,6 +7,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -67,7 +68,7 @@ import cn.sowell.datacenter.model.modules.service.ModulesImportService;
 import cn.sowell.dataserver.model.dict.pojo.DictionaryComposite;
 import cn.sowell.dataserver.model.dict.pojo.DictionaryField;
 import cn.sowell.dataserver.model.dict.service.DictionaryService;
-import cn.sowell.dataserver.model.tmpl.service.TemplateService;
+import cn.sowell.dataserver.model.tmpl.strategy.NormalDaoSetUpdateStrategy;
 
 @Service
 public class ModulesImportServiceImpl implements ModulesImportService {
@@ -80,9 +81,6 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 	
 	@Resource
 	ModulesImportDao impDao;
-	
-	@Resource
-	TemplateService tService;
 	
 	@Resource
 	DictionaryService dService;
@@ -348,11 +346,52 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 	
 	@Override
 	public Long saveTemplate(ModuleImportTemplate tmpl) {
-		return tService.mergeTemplate(tmpl);
+		if(tmpl.getId() == null) {
+			return createTemplate(tmpl);
+		}else {
+			updateTemplate(tmpl);
+			return tmpl.getId();
+		}
 	}
 	
-	
+	private void updateTemplate(ModuleImportTemplate template) {
+		ModuleImportTemplate origin = getImportTempalte(template.getId());
+		if(origin != null){
+			origin.setTitle(template.getTitle());
+			
+			Date now = new Date();
+			
+			NormalDaoSetUpdateStrategy.build(
+					ModuleImportTemplateField.class, nDao,
+					field->field.getId(),
+					(oField, field)->{
+						oField.setFieldIndex(field.getFieldIndex());
+						oField.setOrder(field.getOrder());
+						oField.setUpdateTime(now);
+					},field->{
+						field.setUpdateTime(now);
+						field.setTemplateId(origin.getId());
+					})
+				.doUpdate(origin.getFields(), template.getFields());
+		}else{
+			throw new RuntimeException("列表模板[id=" + template.getId() + "]不存在");
+		}
+	}
 
+	private Long createTemplate(ModuleImportTemplate template) {
+		Date now = new Date();
+		template.setCreateTime(now);
+		template.setUpdateTime(now);
+		Long tmplId = nDao.save(template);
+		if(template.getFields() != null) {
+			for (ModuleImportTemplateField field : template.getFields()) {
+				field.setTemplateId(tmplId);
+				field.setUpdateTime(now);
+				nDao.save(field);
+			}
+		}
+		return tmplId;
+	}
 
 	@Override
 	public List<ModuleImportTemplate> getImportTemplates(ImportTemplateCriteria criteria) {
@@ -387,13 +426,6 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 		}
 		tmpl.setFields(fields);
 		return tmpl;
-	}
-	
-	@Override
-	public Set<ImportCompositeField> getImportCompositeFields(String module) {
-		FusionContextConfig config = fFactory.getModuleConfig(module);
-		return config.getAllImportFields();
-
 	}
 	
 	

@@ -42,7 +42,7 @@ import cn.sowell.datacenter.model.config.service.SideMenuService;
 import cn.sowell.datacenter.ws.DatacenterReloadService;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
-import cn.sowell.dataserver.model.tmpl.service.TemplateService;
+import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_CONFIG + "/sidemenu")
@@ -56,10 +56,10 @@ public class AdminConfigSidemenuController {
 	SideMenuService menuService;
 	
 	@Resource
-	ModulesService mService;
+	TemplateGroupService tmplGroupService;
 	
 	@Resource
-	TemplateService tService;
+	ModulesService mService;
 	
 	@Resource
 	AuthorityService authService;
@@ -72,7 +72,7 @@ public class AdminConfigSidemenuController {
 		UserIdentifier user = UserUtils.getCurrentUser();
 		List<SideMenuLevel1Menu> menus = menuService.getSideMenuLevelMenus(user);
 		List<Module> modules = configService.getEnabledModules();
-		Map<String, List<TemplateGroup>> tmplGroupsMap = tService.queryTemplateGroups(CollectionUtils.toSet(modules, module->module.getName()));
+		Map<String, List<TemplateGroup>> tmplGroupsMap = tmplGroupService.queryModuleGroups(CollectionUtils.toSet(modules, module->module.getName()));
 		Map<Long, String[]> level1AuthorityDescriptionMap = menuService.getMenu1AuthNameMap(CollectionUtils.toSet(menus, menu->menu.getId()));
 		
 		Set<SideMenuLevel2Menu> l2MenuSet = new HashSet<SideMenuLevel2Menu>();

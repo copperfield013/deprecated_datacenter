@@ -107,6 +107,11 @@
     border: 1px solid #aaa;
 }
 
+ol#level1-list>li.dd-item[data-auths=""]
+>.dd-handle>.level-operate>a>.authority-config{
+	color: #aaa;
+}
+
 li.dd-item[group-id][data-auths=""]>div>.level-operate>a>i.authority-config {
     color: #ddd;
 }

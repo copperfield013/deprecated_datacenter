@@ -17,6 +17,7 @@
 	}
 </style>
 <div id="${tpage.pageId }" class="cpf-choose-table">
+	<script type="text/json" id="data-json">${tpage.dataJson}</script>
 	<div>
 		<nav>
 			<form action="${tpage.action }">
@@ -75,7 +76,7 @@
 			});
 			var dataJson = {};
 			try{
-				dataJson = $.parseJSON('${tpage.dataJson}');
+				dataJson = $.parseJSON($('#data-json', $page).text());
 			}catch(e){}
 			
 			page.bind('footer-submit', function(data){

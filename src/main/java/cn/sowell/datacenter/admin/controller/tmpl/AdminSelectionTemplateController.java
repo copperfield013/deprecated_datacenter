@@ -1,9 +1,7 @@
 package cn.sowell.datacenter.admin.controller.tmpl;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -34,7 +32,7 @@ import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionColumn;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionTemplate;
-import cn.sowell.dataserver.model.tmpl.service.TemplateService;
+import cn.sowell.dataserver.model.tmpl.service.SelectionTemplateService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_TMPL + "/stmpl")
@@ -48,8 +46,7 @@ public class AdminSelectionTemplateController {
 	ModulesService mService;
 
 	@Resource
-	TemplateService tService;
-	
+	SelectionTemplateService stmplService;
 	
 	static Logger logger = Logger.getLogger(AdminSelectionTemplateController.class);
 	
@@ -68,7 +65,7 @@ public class AdminSelectionTemplateController {
 	
 	@RequestMapping("/update/{stmplId}")
 	public String showSeletionTemplate(@PathVariable Long stmplId, Model model) {
-		TemplateSelectionTemplate stmpl = tService.getSelectionTemplate(stmplId);
+		TemplateSelectionTemplate stmpl = stmplService.getTemplate(stmplId);
 		Assert.notNull(stmpl, "选项模板[" + stmplId + "]不存在");
 		JSONArray columnDataJSON = toColumnData(stmpl.getColumns());
 		JSONObject tmplDataJSON = toLtmplData(stmpl);
@@ -106,9 +103,9 @@ public class AdminSelectionTemplateController {
 		return json;
 	}
 	
-	private JSONArray toCriteriaData(Set<TemplateSelectionCriteria> criterias) {
+	private JSONArray toCriteriaData(List<TemplateSelectionCriteria> list) {
 		JSONArray array = new JSONArray();
-		for (TemplateSelectionCriteria criteria : criterias) {
+		for (TemplateSelectionCriteria criteria : list) {
 			Object item = JSON.toJSON(criteria);
 			array.add(item);
 		}
@@ -135,7 +132,7 @@ public class AdminSelectionTemplateController {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		TemplateSelectionTemplate tmpl = generateStmplData(jReq);
 		try {
-			Long stmplId = tService.mergeTemplate(tmpl);
+			Long stmplId = stmplService.merge(tmpl);
 			jRes.put("stmplId", stmplId);
 		} catch (Exception e) {
 			logger.error("保存列表模板时发生错误", e);
@@ -182,7 +179,7 @@ public class AdminSelectionTemplateController {
 			
 			JSONArray criteriaData = json.getJSONArray("criteriaData");
 			if(criteriaData != null){
-				Set<TemplateSelectionCriteria> criterias = new LinkedHashSet<TemplateSelectionCriteria>();
+				List<TemplateSelectionCriteria> criterias = new ArrayList<TemplateSelectionCriteria>();
 				int order = 0;
 				for (Object e : criteriaData) {
 					JSONObject item = (JSONObject) e;

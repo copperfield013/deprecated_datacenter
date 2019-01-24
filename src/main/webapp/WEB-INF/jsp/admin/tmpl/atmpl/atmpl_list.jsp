@@ -97,6 +97,7 @@
 						if(yes){
 							Ajax.ajax('admin/tmpl/atmpl/copy/' + tmplId + '/' + selected.moduleName, function(res){
 								if(res.status === 'suc' && res.newTmplId){
+									$page.getLocatePage().refresh();
 									Dialog.confirm('复制成功，是否打开复制成功的操作模板编辑页？', function(yes){
 										if(yes){
 											Tab.openInTab('admin/tmpl/atmpl/update/' + res.newTmplId, 'atmpl_update_' + res.newTmplId);

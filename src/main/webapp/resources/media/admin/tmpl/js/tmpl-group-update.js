@@ -153,6 +153,30 @@ define(function(require, exports, module) {
 				}
 			}
 		});
+		(function(prefixs){
+			$.each(prefixs, function(i, prefix){
+				var $baseFieldsModule = $('[name="' + prefix + '.withModule"]', $page);
+				var $baseFieldsDetail = $('[name="' + prefix + '.withDetailTemplate"]', $page);
+				var $baseFieldsList = $('[name="' + prefix + '.withListTemplate"]', $page);
+				var $baseFieldTemp = $baseFieldsDetail.add($baseFieldsList);
+				
+				$baseFieldsModule.change(function(){
+					if($(this).prop('checked')){
+						$baseFieldTemp.prop('checked', false);
+					}
+				});
+				
+				$baseFieldTemp.change(function(){
+					if($(this).prop('checked')){
+						$baseFieldsModule.prop('checked', false);
+					}
+				});
+			})
+			
+		})(['importDictionaryFilter', 'exportDictionaryFilter']);
+		
+		
+		
 		
 		var $form = $('form', $page);
 		$('.btn-save', $page).click(function(){
@@ -216,6 +240,7 @@ define(function(require, exports, module) {
 					}
 					var lactionsCount = $listActions.children('tr').each(appendActions('list', 0)).length;
 					$detailActions.children('tr').each(appendActions('detail', lactionsCount));
+					
 				});
 		
 		function initChooserSelect(tmplAction){

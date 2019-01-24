@@ -26,9 +26,11 @@ import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.model.config.service.ConfigureService;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
+import cn.sowell.dataserver.model.tmpl.pojo.ArrayEntityProxy;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
-import cn.sowell.dataserver.model.tmpl.service.TemplateService;
+import cn.sowell.dataserver.model.tmpl.service.ActionTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_TMPL + "/group")
@@ -36,7 +38,10 @@ import cn.sowell.dataserver.model.tmpl.service.TemplateService;
 public class AdminTemplateGroupController {
 	
 	@Resource
-	TemplateService tService;
+	TemplateGroupService tmplGroupService;
+	
+	@Resource
+	ActionTemplateService atmplService;
 	
 	@Resource
 	ModulesService  mService;
@@ -50,7 +55,7 @@ public class AdminTemplateGroupController {
 	public String list(@PathVariable String module, Model model) {
 		ModuleMeta moduleMeta = mService.getModule(module);
 		if(module != null) {
-			List<TemplateGroup> tmplGroups = tService.queryTemplateGroups(module);
+			List<TemplateGroup> tmplGroups = tmplGroupService.queryAll(module);
 			model.addAttribute("module", moduleMeta);
 			model.addAttribute("tmplGroups", tmplGroups);
 			model.addAttribute("modulesJson", configService.getSiblingModulesJson(module));
@@ -64,6 +69,7 @@ public class AdminTemplateGroupController {
 		ModuleMeta moduleMeta = mService.getModule(moduleName);
 		if(moduleName != null) {
 			model.addAttribute("module", moduleMeta);
+			model.addAttribute("atmpls", toActionListJson(atmplService.queryAll(moduleName)));
 			model.addAttribute("moduleWritable", mService.getModuleEntityWritable(moduleName));
 			return AdminConstants.JSP_TMPL_GROUP + "/tmpl_group_update.jsp";
 		}
@@ -72,14 +78,14 @@ public class AdminTemplateGroupController {
 	
 	@RequestMapping("/update/{groupId}")
 	public String toUpdate(@PathVariable Long groupId, Model model) {
-		TemplateGroup group = tService.getTemplateGroup(groupId);
+		TemplateGroup group = tmplGroupService.getTemplate(groupId);
 		if(group != null) {
 			ModuleMeta module = mService.getModule(group.getModule());
 			model.addAttribute("module", module);
 			model.addAttribute("group", group);
 			model.addAttribute("premisesJson", JSON.toJSON(group.getPremises()));
 			model.addAttribute("tmplActions", JSON.toJSON(group.getActions()));
-			model.addAttribute("atmpls", toActionListJson(tService.getModuleActionTemplates(group.getModule())));
+			model.addAttribute("atmpls", toActionListJson(atmplService.queryAll(group.getModule())));
 			model.addAttribute("moduleWritable", mService.getModuleEntityWritable(group.getModule()));
 			return AdminConstants.JSP_TMPL_GROUP + "/tmpl_group_update.jsp";
 		}
@@ -104,7 +110,7 @@ public class AdminTemplateGroupController {
 	public AjaxPageResponse save(TemplateGroup group) {
 		Assert.hasText(group.getModule());
 		try {
-			tService.saveGroup(group, UserUtils.getCurrentUser());
+			tmplGroupService.merge(group);
 			return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("保存成功", group.getModule() + "_tmpl_group_list");
 		}catch (Exception e) {
 			logger.error("保存失败", e);
@@ -122,7 +128,7 @@ public class AdminTemplateGroupController {
 	@RequestMapping("/remove/{groupId}")
 	public AjaxPageResponse remove(@PathVariable Long groupId) {
 		try {
-			tService.removeTemplateGroup(groupId);
+			tmplGroupService.remove(groupId);
 			return AjaxPageResponse.REFRESH_LOCAL("删除成功");
 		} catch (Exception e) {
 			logger.error("删除失败", e);
@@ -136,7 +142,8 @@ public class AdminTemplateGroupController {
 	public ResponseJSON copy(@PathVariable Long tmplGroupId, @PathVariable String targetModuleName) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		try {
-			Long newTmplId = tService.copyTemplateGroup(tmplGroupId, targetModuleName, UserUtils.getCurrentUser());
+			ArrayEntityProxy.setLocalUser(UserUtils.getCurrentUser());
+			Long newTmplId = tmplGroupService.copy(tmplGroupId, targetModuleName);
 			if(newTmplId != null) {
 				jRes.setStatus("suc");
 				jRes.put("newTmplId", newTmplId);

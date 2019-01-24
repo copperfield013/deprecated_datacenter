@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <link type="text/css" rel="stylesheet" href="media/admin/modules/css/modules-detail-tmpl.css" />
 <title>用户详情</title>
-<div class="detail entity-detail-tmpl entity-detail-page" id="user-detail-${entity.code }-${RES_STAMP}">
+<div class="entity-detail-tmpl entity-detail-page" id="user-detail-${entity.code }-${RES_STAMP}">
 	<div class="page-header">
 		<div class="header-title">
 			<h1>用户详情</h1>
