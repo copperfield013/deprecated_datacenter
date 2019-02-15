@@ -23,17 +23,22 @@ define(function(require, exports, module){
 				receive	: function(e, ui){
 					var $g = $(ui.sender),
 						$moduleWrapper = $g.closest('.module-wrapper');
-					var groupTitle = $g.text().trim();
+					var viewTitle = $g.text().trim();
 					var data = {
-						level2Title		: groupTitle,
+						level2Title		: viewTitle,
 						tmplGroupId		: $g.attr('group-id'),
+						statvtmplId		: $g.attr('statvtmpl-id'),
 						moduleTitle		: $moduleWrapper.find('.module-title').text().trim(),
-						tmplGroupTitle	: groupTitle,
+						vtmplTitle		: viewTitle,
 						moduleName		: $moduleWrapper.attr('module-name')
 					};
 					var $level2 = $('#level2-item-tmpl', $page).tmpl(data);
 					$(newItem).replaceWith($level2);
-					$level2.closest('li').attr('group-id', data.tmplGroupId);
+					if(data.tmplGroupId){
+						$level2.closest('li').attr('group-id', data.tmplGroupId);
+					}else{
+						$level2.closest('li').attr('statvtmpl-id', data.statvtmplId);
+					}
 					toggleSaveButton(false);
 					toggleAddLevel1Button(false);
 					$level2.find(':text')
@@ -118,14 +123,15 @@ define(function(require, exports, module){
 					groups		: []
 				};
 				submitData.modules.push(module);
-				$level1Li.find('ol li[group-id]').each(function(j){
+				$level1Li.find('ol li[group-id],ol li[statvtmpl-id]').each(function(j){
 					var $level2Li = $(this);
 					var group = {
 							id			: $level2Li.attr('data-id'),
 							title		: $level2Li.find('.level2-title').text(),
 							order		: j,
 							authorities	: $level2Li.attr('data-auths'),
-							tmplGroupId	: $level2Li.attr('group-id')
+							tmplGroupId	: $level2Li.attr('group-id'),
+							statvmplId	: $level2Li.attr('statvtmpl-id')
 					}
 					module.groups.push(group);
 				});

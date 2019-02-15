@@ -135,3 +135,7 @@ li.dd-item[group-id][data-auths=""]>div>.level-operate>a>i.authority-config {
 .sidemenu-main .mds-container.searching li.module-wrapper.searching-matched-part li.searching-matched {
     display: block !important;
 }
+
+.sidemenu-main li.dd-item.module-wrapper.stat-module>.dd-handle {
+    background-color: #2dc3e8;
+}

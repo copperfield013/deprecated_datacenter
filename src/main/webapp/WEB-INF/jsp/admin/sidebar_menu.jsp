@@ -28,10 +28,20 @@
 				<c:forEach var="level2" items="${menu.level2s }">
 					<c:if test="${l2disables[level2.id] != true}">
 						<li>
-							<a class="tab" href="admin/modules/curd/list/${level2.id }" 
-					   			target="entity_list_${level2.id }" title="${level2.title }">
-					   			<span class="menu-text">${level2.title }</span>
-					   		</a>
+							<c:choose>
+								<c:when test="${level2.templateGroupId != null }">
+									<a class="tab" href="admin/modules/curd/list/${level2.id }" 
+							   			target="entity_list_${level2.id }" title="${level2.title }">
+							   			<span class="menu-text">${level2.title }</span>
+							   		</a>
+								</c:when>
+								<c:when test="${level2.statViewId != null}">
+									<a class="tab" href="admin/stat/view/index/${level2.id }" 
+							   			target="stat_view_${level2.statViewId }" title="${level2.title }">
+							   			<span class="menu-text">${level2.title }</span>
+							   		</a>
+								</c:when>
+							</c:choose>
 					   	</li>
 					</c:if>
 				</c:forEach>

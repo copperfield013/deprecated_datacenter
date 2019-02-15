@@ -1,6 +1,5 @@
 package cn.sowell.datacenter.admin.controller.tmpl;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
@@ -32,6 +30,7 @@ import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.admin.controller.tmpl.ListTemplateFormater.Handlers;
 import cn.sowell.datacenter.common.choose.ChooseTablePage;
 import cn.sowell.datacenter.model.config.service.ConfigureService;
 import cn.sowell.dataserver.model.dict.service.DictionaryService;
@@ -137,9 +136,9 @@ public class AdminListTemplateController {
 	@RequestMapping("/update/{ltmplId}")
 	public String update(@PathVariable Long ltmplId, Model model){
 		TemplateListTemplate ltmpl = ltmplService.getTemplate(ltmplId);
-		JSONArray columnDataJSON = toColumnData(ltmpl.getColumns());
-		JSONObject tmplDataJSON = toLtmplData(ltmpl);
-		JSONArray criteriaDataJSON = toCriteriaData(ltmpl.getCriterias());
+		JSONArray columnDataJSON = ListTemplateFormater.toColumnData(ltmpl.getColumns());
+		JSONObject tmplDataJSON = ListTemplateFormater.toLtmplData(ltmpl);
+		JSONArray criteriaDataJSON = ListTemplateFormater.toCriteriaData(ltmpl.getCriterias());
 		ModuleMeta moduleMeta = mService.getModule(ltmpl.getModule());
 		model.addAttribute("module", moduleMeta);
 		model.addAttribute("ltmpl", ltmpl);
@@ -162,14 +161,7 @@ public class AdminListTemplateController {
 	}
 	
 	
-	private JSONArray toCriteriaData(List<TemplateListCriteria> list) {
-		JSONArray array = new JSONArray();
-		for (TemplateListCriteria criteria : list) {
-			Object item = JSON.toJSON(criteria);
-			array.add(item);
-		}
-		return array;
-	}
+	
 
 	@ResponseBody
 	@RequestMapping("/remove/{ltmplId}")
@@ -183,46 +175,24 @@ public class AdminListTemplateController {
 		}
 	}
 	
-	
-	private JSONObject toLtmplData(TemplateListTemplate ltmpl) {
-		JSONObject json = new JSONObject();
-		json.put("title", ltmpl.getTitle());
-		json.put("unmodifiable", ltmpl.getUnmodifiable());
-		json.put("defaultOrderFieldId", ltmpl.getDefaultOrderFieldId());
-		json.put("defaultOrderDirection", ltmpl.getDefaultOrderDirection());
-		json.put("defaultPageSize", ltmpl.getDefaultPageSize());
-		json.put("id", ltmpl.getId());
-		return json;
-	}
-
-	private JSONArray toColumnData(List<TemplateListColumn> columns) {
-		JSONArray json = new JSONArray();
-		for (TemplateListColumn column : columns) {
-			JSONObject col = new JSONObject();
-			col.put("id", column.getId());
-			col.put("fieldId", column.getFieldId());
-			String compositeName = "",
-					fieldName = column.getFieldKey();
-			if(fieldName != null && fieldName.contains("\\.")){
-				int dotIndex = fieldName.lastIndexOf("\\.");
-				compositeName = fieldName.substring(0, dotIndex);
-				fieldName = fieldName.substring(dotIndex + 1, fieldName.length());
-			}
-			col.put("fieldAvailable", column.getFieldAvailable());
-			col.put("compositeName", compositeName);
-			col.put("fieldName", fieldName);
-			col.put("title", column.getTitle());
-			col.put("specialField", column.getSpecialField());
-			json.add(col);
-		}
-		return json;
-	}
 
 	@ResponseBody
 	@RequestMapping("/save")
 	public ResponseJSON save(@RequestBody JsonRequest jReq){
 		JSONObjectResponse jRes = new JSONObjectResponse();
-		TemplateListTemplate tmpl = generateLtmplData(jReq);
+		Handlers<TemplateListTemplate, TemplateListColumn, TemplateListCriteria> handler = new Handlers<>();
+		handler.setCriteriaConsumer((criteria, item)->{
+			if(criteria.getFieldAvailable()) {
+				criteria.setCompositeId(item.getLong("compositeId"));
+			}
+		});
+		TemplateListTemplate tmpl = ListTemplateFormater.generateLtmplData(
+				jReq
+				,TemplateListTemplate::new,
+				TemplateListColumn::new,
+				TemplateListCriteria::new,
+				handler 
+				);
 		try {
 			ltmplService.merge(tmpl);
 			//ltService.saveListTemplate(tmpl);
@@ -234,74 +204,6 @@ public class AdminListTemplateController {
 		return jRes;
 	}
 
-	private TemplateListTemplate generateLtmplData(JsonRequest jReq) {
-		TemplateListTemplate tmpl = null;
-		if(jReq != null && jReq.getJsonObject() != null){
-			JSONObject json = jReq.getJsonObject();
-			tmpl = new TemplateListTemplate();
-			tmpl.setId(json.getLong("tmplId"));
-			tmpl.setTitle(json.getString("title"));
-			tmpl.setDefaultPageSize(json.getInteger("defPageSize"));
-			tmpl.setDefaultOrderFieldId(json.getLong("defOrderFieldId"));
-			tmpl.setDefaultOrderDirection(json.getString("defOrderDir"));
-			tmpl.setCreateUserCode((String) UserUtils.getCurrentUser().getId());
-			tmpl.setUnmodifiable(null);
-			tmpl.setModule(json.getString("module"));
-			JSONArray columnData = json.getJSONArray("columnData");
-			if(columnData != null){
-				List<TemplateListColumn> columns = new ArrayList<TemplateListColumn>();
-				int i = 0;
-				for (Object c : columnData) {
-					JSONObject src = (JSONObject) c;
-					TemplateListColumn column = new TemplateListColumn();
-					column.setTitle(src.getString("title"));
-					column.setOrderable(src.getInteger("orderable"));
-					if(src.getString("specField") != null){
-						column.setSpecialField(src.getString("specField"));
-					}else{
-						column.setFieldId(src.getLong("fieldId"));
-					}
-					column.setOrder(i++);
-					columns.add(column);
-				}
-				tmpl.setColumns(columns);
-			}
-			
-			JSONArray criteriaData = json.getJSONArray("criteriaData");
-			if(criteriaData != null){
-				List<TemplateListCriteria> criterias = new ArrayList<TemplateListCriteria>();
-				int order = 0;
-				for (Object e : criteriaData) {
-					JSONObject item = (JSONObject) e;
-					TemplateListCriteria criteria = new TemplateListCriteria();
-					criteria.setRelation("and");
-					criteria.setId(item.getLong("id"));
-					criteria.setTitle(item.getString("title"));
-					criteria.setOrder(order++);
-					if(item.getBooleanValue("fieldAvailable")) {
-						criteria.setFieldId(item.getLong("fieldId"));
-						criteria.setCompositeId(item.getLong("compositeId"));
-						criteria.setRelationLabel(item.getString("relationLabel"));
-						//条件需要显示
-						criteria.setComparator(item.getString("comparator"));
-						criteria.setInputType(item.getString("inputType"));
-						criteria.setDefaultValue(item.getString("defVal"));
-						Boolean queryShow = item.getBoolean("queryShow");
-						if(queryShow != null && queryShow){
-							criteria.setQueryShow(1);
-							criteria.setPlaceholder(item.getString("placeholder"));
-						}
-					}else {
-						criteria.setFieldUnavailable();
-					}
-					criterias.add(criteria);
-				}
-				tmpl.setCriterias(criterias);
-			}
-			
-		}
-		return tmpl;
-	}
 	
 	@ResponseBody
 	@RequestMapping("/copy/{ltmplId}/{targetModuleName}")

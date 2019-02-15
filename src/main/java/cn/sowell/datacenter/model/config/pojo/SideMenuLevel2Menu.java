@@ -44,6 +44,11 @@ public class SideMenuLevel2Menu {
 	@Column(name="tmplgroup_key")
 	private String templateGroupKey;
 	
+	@Column(name="stat_view_id")
+	private Long statViewId;
+	
+	@Transient
+	private String statViewTitle;
 	
 	@Transient
 	@Column(name="tmpl_module")
@@ -168,6 +173,23 @@ public class SideMenuLevel2Menu {
 	public void setAuthoritySet(Set<String> authoritySet) {
 		this.authoritySet = authoritySet;
 	}
+
+	public Long getStatViewId() {
+		return statViewId;
+	}
+
+	public void setStatViewId(Long statViewId) {
+		this.statViewId = statViewId;
+	}
+
+	public String getStatViewTitle() {
+		return statViewTitle;
+	}
+
+	public void setStatViewTitle(String statViewTitle) {
+		this.statViewTitle = statViewTitle;
+	}
+
 
 
 }

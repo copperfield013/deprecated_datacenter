@@ -611,13 +611,21 @@ div.detail-toggle-sublist span.detail-toggle-sublist-item-date {
 
 .page-header .header-buttons a.export:before {
     background-color: #ed4e2a;
-}
+}	
 
 .page-header .header-buttons a.export:hover, 
 .page-header .header-buttons a.export.active {
     color: #ed4e2a;
 }
 
+.page-header .header-buttons a.hbtn-purple:before {
+    background-color: #9932CC;
+}
+
+.page-header .header-buttons a.hbtn-purple:hover, 
+.page-header .header-buttons a.hbtn-purple.active {
+    color: #9932CC;
+}
 
 span.ccheckbox {
     display: inline-block;

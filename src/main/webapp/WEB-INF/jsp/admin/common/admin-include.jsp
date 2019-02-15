@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
 
-<link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_546680_ug6uppriwk.css">
+<link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_546680_9x2jpoouc8u.css">
 
 <!--Basic Styles-->
 <!-- <link href="media/admin/plugins/typeahead/dist/examples.css" rel="stylesheet" /> -->
@@ -24,6 +24,8 @@
 <link href="media/admin/field/css/field-search.css" rel="stylesheet" type="text/css" />
 
 <link type="text/css" rel="stylesheet" href="media/admin/modules/css/modules-detail-tmpl.css" />
+<link type="text/css" rel="stylesheet" href="media/admin/modules/css/modules-list-tmpl.css" />
+<link type="text/css" rel="stylesheet" href="media/admin/statview/css/statview-list.css" />
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/dtmpl-update.css" />
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/ltmpl-update.css" />
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/index-area.css" />

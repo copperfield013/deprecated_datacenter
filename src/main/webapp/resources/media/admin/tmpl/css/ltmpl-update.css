@@ -545,3 +545,10 @@
     -moz-osx-font-smoothing: grayscale;
     color: #FFff00;
 }
+
+.ltmpl-update .hide-when-no-field select {
+    padding: 3px 10px;
+}
+.ltmpl-update .hide-when-no-field input[type="text"]{
+    padding: 3px;
+}

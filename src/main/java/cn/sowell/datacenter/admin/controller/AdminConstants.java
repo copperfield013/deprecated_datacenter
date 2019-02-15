@@ -33,6 +33,12 @@ public interface AdminConstants {
 	final String URI_MODULES = URI_BASE + "/modules";
 	
 	/**
+	 * 统计数据
+	 */
+	final String URI_STAT = URI_BASE + "/stat";
+	
+	
+	/**
 	 * 管理端jsp资源的基本路径
 	 */
 	final String JSP_BASE = "/admin";
@@ -88,7 +94,13 @@ public interface AdminConstants {
 	
 	final String JSP_TMPL_DICTFILTER = JSP_TMPL + "/dictfilter";
 	
+	final String JSP_TMPL_STATLIST = JSP_TMPL + "/stat_ltmpl";
+	
+	final String JSP_TMPL_STATVIEW = JSP_TMPL + "/stat_vtmpl";
+	
 	final String JSP_MODULES = JSP_BASE + "/modules";
+	
+	final String JSP_STATVIEW = JSP_BASE + "/statview";
 	
 	/**
 	 * 默认的系统id
@@ -122,6 +134,12 @@ public interface AdminConstants {
 	final String KEY_FUSE_MODE = "%fuseMode%";
 
 	final String KEY_ACTION_ID = "%actionId%";
+
+	
+
+	
+
+	
 
 	
 

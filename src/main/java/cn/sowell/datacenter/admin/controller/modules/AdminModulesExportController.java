@@ -48,6 +48,7 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
 import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.ListCriteriaFactory;
 import cn.sowell.dataserver.model.tmpl.service.ListTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
 
@@ -75,6 +76,9 @@ public class AdminModulesExportController {
 	
 	@Resource
 	AuthorityService authService;
+	
+	@Resource
+	ListCriteriaFactory lcriteriaFactory;
 	
 	Logger logger = Logger.getLogger(AdminModulesExportController.class);
 	
@@ -121,7 +125,7 @@ public class AdminModulesExportController {
 				ePageInfo.setRangeEnd(json.getInteger("rangeEnd"));
 				pageInfo.setPageNo(parameters.getInteger("pageNo"));
 				pageInfo.setPageSize(parameters.getInteger("pageSize"));
-				Map<Long, NormalCriteria> vCriteriaMap = mService.getCriteriasFromRequest(pvs, CollectionUtils.toMap(ltmpl.getCriterias(), c->c.getId()));
+				Map<Long, NormalCriteria> vCriteriaMap = lcriteriaFactory.getCriteriasFromRequest(pvs, CollectionUtils.toMap(ltmpl.getCriterias(), c->c.getId()));
 				progress.getDataMap().put("exportPageInfo", ePageInfo);
 				progress.getDataMap().put("withDetail", withDetail);
 				TemplateDetailTemplate dtmpl = Boolean.TRUE.equals(withDetail)? dtmplService.getTemplate(tmplGroup.getDetailTemplateId()): null;

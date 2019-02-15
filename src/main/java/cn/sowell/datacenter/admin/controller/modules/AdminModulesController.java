@@ -1,7 +1,6 @@
 package cn.sowell.datacenter.admin.controller.modules;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -16,7 +15,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.ServletRequestParameterPropertyValues;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,7 +30,6 @@ import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.CollectionUtils;
-import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.copframe.web.poll.WorkProgress;
@@ -54,10 +51,10 @@ import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.modules.service.ViewDataService;
-import cn.sowell.dataserver.model.modules.service.impl.ListTemplateEntityView;
-import cn.sowell.dataserver.model.modules.service.impl.ListTemplateEntityViewCriteria;
-import cn.sowell.dataserver.model.modules.service.impl.SelectionTemplateEntityView;
-import cn.sowell.dataserver.model.modules.service.impl.SelectionTemplateEntityViewCriteria;
+import cn.sowell.dataserver.model.modules.service.view.ListTemplateEntityView;
+import cn.sowell.dataserver.model.modules.service.view.ListTemplateEntityViewCriteria;
+import cn.sowell.dataserver.model.modules.service.view.SelectionTemplateEntityView;
+import cn.sowell.dataserver.model.modules.service.view.SelectionTemplateEntityViewCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.ArrayEntityProxy;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
@@ -69,6 +66,7 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionTemplate;
 import cn.sowell.dataserver.model.tmpl.service.ActionTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.ListCriteriaFactory;
 import cn.sowell.dataserver.model.tmpl.service.ListTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.SelectionTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
@@ -116,6 +114,9 @@ public class AdminModulesController {
 	@Resource
 	AuthorityService authService;
 	
+	@Resource
+	ListCriteriaFactory lcriteriFacrory;
+	
 	
 	Logger logger = Logger.getLogger(AdminModulesController.class);
 
@@ -131,7 +132,7 @@ public class AdminModulesController {
 		//设置条件
 		criteria.setModule(moduleName);
 		criteria.setTemplateGroupId(menu.getTemplateGroupId());
-		Map<Long, String> criteriaMap = exractTemplateCriteriaMap(request);
+		Map<Long, String> criteriaMap = lcriteriFacrory.exractTemplateCriteriaMap(request);
 		criteria.setListTemplateCriteria(criteriaMap);
 		criteria.setPageInfo(pageInfo);
 		criteria.setUser(UserUtils.getCurrentUser());
@@ -172,17 +173,6 @@ public class AdminModulesController {
 		return AdminConstants.JSP_MODULES + "/modules_list_tmpl.jsp";
 	}
 	
-	public static Map<Long, String> exractTemplateCriteriaMap(HttpServletRequest request) {
-		ServletRequestParameterPropertyValues pvs = new ServletRequestParameterPropertyValues(request, "criteria", "_");
-		Map<Long, String> criteriaMap = new HashMap<Long, String>();
-		pvs.getPropertyValueList().forEach(pv->{
-			 Long criteriaId = FormatUtils.toLong(pv.getName());
-			 if(criteriaId != null){
-				 criteriaMap.put(criteriaId, FormatUtils.toString(pv.getValue()));
-			 }
-		 });
-		return criteriaMap;
-	}
 
 	@RequestMapping("/detail/{menuId}/{code}")
 	public String detail(@PathVariable String code, 
@@ -392,7 +382,7 @@ public class AdminModulesController {
 		TemplateSelectionTemplate stmpl = stmplService.getTemplate(stmplId);
 		
 		//创建条件对象
-		Map<Long, String> criteriaMap = exractTemplateCriteriaMap(request);
+		Map<Long, String> criteriaMap = lcriteriFacrory.exractTemplateCriteriaMap(request);
 		SelectionTemplateEntityViewCriteria criteria = new SelectionTemplateEntityViewCriteria(stmpl, criteriaMap);
 		//设置条件
 		criteria.setExistCodes(TextUtils.split(exists, ",", HashSet<String>::new, e->e));

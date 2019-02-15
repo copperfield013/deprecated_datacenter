@@ -16,6 +16,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import cn.sowell.copframe.dao.utils.NormalOperateDao;
 import cn.sowell.copframe.utils.CollectionUtils;
+import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.config.ModuleConfigureMediator;
 import cn.sowell.datacenter.entityResolver.config.abst.Module;
@@ -86,10 +87,15 @@ public class ConfigureServiceImpl implements ConfigureService{
 		criteria.setFilterDisabled(true);
 		List<Module> modules = moduleConfigMediator.queryModules(criteria);
 		Map<String, List<TemplateGroup>> moduleGroupsMap = tmplGroupService.queryModuleGroups(CollectionUtils.toSet(modules, module->module.getName()));
+		Map<String, FusionContextConfig> configMap = CollectionUtils.toMap(fFactory.getAllConfigs(), FusionContextConfig::getModule);
 		modules.forEach(module->{
 			JSONObject jModule = new JSONObject();
 			jModule.put("name", module.getName());
 			jModule.put("title", module.getTitle());
+			FusionContextConfig config = configMap.get(module.getName());
+			if(config != null && config.isStatistic()) {
+				jModule.put("isStat", true);
+			}
 			JSONArray jGroups = new JSONArray();
 			List<TemplateGroup> groups = moduleGroupsMap.get(module.getName());
 			if(groups != null) {

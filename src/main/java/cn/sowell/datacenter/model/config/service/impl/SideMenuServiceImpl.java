@@ -33,7 +33,9 @@ import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.config.service.SideMenuService;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
+import cn.sowell.dataserver.model.statview.service.StatViewService;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateStatView;
 import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
 
 @Service
@@ -53,6 +55,9 @@ public class SideMenuServiceImpl implements SideMenuService, InitializingBean{
 	
 	@Resource
 	TemplateGroupService tmplGroupService;
+	
+	@Resource
+	StatViewService statViewService;
 	
 	Map<Long, SideMenuLevel1Menu> l1MenuMap;
 	
@@ -100,12 +105,24 @@ public class SideMenuServiceImpl implements SideMenuService, InitializingBean{
 					Iterator<SideMenuLevel2Menu> itr = level2s.iterator();
 					while(itr.hasNext()) {
 						SideMenuLevel2Menu l2 = itr.next();
-						TemplateGroup tmplGroup = tmplGroupService.getTemplate(l2.getTemplateGroupId());
-						if(tmplGroup != null) {
-							ModuleMeta module = mService.getModule(tmplGroup.getModule());
-							if(module != null) {
+						String moduleName = null;
+						if(l2.getTemplateGroupId() != null) {
+							TemplateGroup tmplGroup = tmplGroupService.getTemplate(l2.getTemplateGroupId());
+							if(tmplGroup != null) {
 								l2.setTemplateGroupTitle(tmplGroup.getTitle());
 								l2.setTemplateGroupKey(tmplGroup.getKey());
+								moduleName = tmplGroup.getModule();
+							}
+						}else if(l2.getStatViewId() != null) {
+							TemplateStatView statView = statViewService.getTemplate(l2.getStatViewId());
+							if(statView != null) {
+								l2.setStatViewTitle(statView.getTitle());
+								moduleName = statView.getModule();
+							}
+						}
+						if(moduleName != null) {
+							ModuleMeta module = mService.getModule(moduleName);
+							if(module != null) {
 								l2.setTemplateModuleTitle(module.getTitle());
 								l2.setTemplateModule(module.getName());
 								l2.setLevel1Menu(level1);
@@ -119,7 +136,6 @@ public class SideMenuServiceImpl implements SideMenuService, InitializingBean{
 											l2.getAuthoritySet().add(auth);
 									}
 								}
-								
 								continue ;
 							}
 						}
