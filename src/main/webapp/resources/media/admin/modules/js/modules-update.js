@@ -9,9 +9,19 @@ define(function(require, exports, module){
 		uriGeneratorFactory = function(entityCode, uriData){
 			switch(uriData.type){
 				case 'entity': 
+					var menuId = uriData.menuId;
+					if(uriData.rdtmplId){
+						menuId = uriData.mainMenuId;
+					}
 					return {
 						stmpl	: function(stmplId){
-							return 'admin/modules/curd/open_selection/' + uriData.menuId + '/' + stmplId;
+							return 'admin/modules/curd/open_selection/' + menuId + '/' + stmplId;
+						},
+						rdtmpl	: function(fieldGroupId){
+							return 'admin/modules/curd/rabc_create/' + menuId + '/' + fieldGroupId;
+						},
+						load_rabc_entities	: function(relationCompositeId){
+							return 'admin/modules/curd/load_rabc_entities/' + menuId + '/' + uriData.relationCompositeId;
 						}
 					}
 				case 'user':
@@ -81,6 +91,31 @@ define(function(require, exports, module){
 			if(typeof fuseMode === 'boolean'){
 				formData.append('%fuseMode%', fuseMode);
 			}
+		}).on('cpf-submited', function(e, data){
+			if(data.entityCode){
+				var page = $page.getLocatePage();
+				var afterSave = page.getPageObj().getEventCallbacks('afterSave');
+				if(typeof afterSave == 'function'){
+					var entitiesLoader = function(fields){
+						var deferred = $.Deferred();
+						if($.isArray(fields) && fields.length > 0){
+							Ajax.ajax(uriGenerator.load_rabc_entities(), {
+								codes	: data.entityCode,
+								fields	: fields.join()
+							}, function(data){
+								if(data.status === 'suc'){
+									deferred.resolve(data.entities);
+								}else{
+									$.error('获取数据错误');
+								}
+							});
+						}
+						return deferred.promise();
+					};
+					entitiesLoader.codes = [data.entityCode];
+					afterSave.apply(page, [entitiesLoader]);
+				}
+			}
 		});
 		function bindEmptyMultipleSelectValue(form, formData){
 			$('select[multiple],select[multiple="multiple"]', form).each(function(){
@@ -117,6 +152,31 @@ define(function(require, exports, module){
 				}
 			});
 		});
+		function appendEntityToArrayTable(entitiesLoader, $table){
+			var fields = [];
+			$table.find('thead .th-field-title[fname-full]').each(function(){
+				var fieldName = $(this).attr('fname-full');
+				fields.push(fieldName);
+			});
+			entitiesLoader(fields).done(function(entities){
+				console.log(entities);
+				function _(i){
+					if(entitiesLoader.codes.length > i){
+						addRow($table, true).done(function(initInput, refreshRowTable, $row, $doms){
+							setFieldValue(entities[entitiesLoader.codes[i]], $row, $doms);
+							initInput();
+							if(entitiesLoader.codes.length > i + 1){
+								_(i + 1);
+							}else{
+								refreshRowTable();
+							}
+						});
+					}
+				}
+				_(0);
+			});
+		}
+		
 		$('.open-select-dialog[stmpl-id]', $page).click(function(){
 			var $this = $(this);
 			var stmplId = $this.attr('stmpl-id');
@@ -136,28 +196,7 @@ define(function(require, exports, module){
 				width		: 1000,
 				height		: 400,
 				onSubmit	: function(entitiesLoader){
-					var fields = [];
-					$this.closest('table').find('thead .th-field-title[fname-full]').each(function(){
-						var fieldName = $(this).attr('fname-full');
-						fields.push(fieldName);
-					});
-					entitiesLoader(fields).done(function(entities){
-						console.log(entities);
-						function _(i){
-							if(entitiesLoader.codes.length > i){
-								addRow($this.closest('table'), true).done(function(initInput, refreshRowTable, $row, $doms){
-									setFieldValue(entities[entitiesLoader.codes[i]], $row, $doms);
-									initInput();
-									if(entitiesLoader.codes.length > i + 1){
-										_(i + 1);
-									}else{
-										refreshRowTable();
-									}
-								});
-							}
-						}
-						_(0);
-					});
+					appendEntityToArrayTable(entitiesLoader, $this.closest('table'));
 				}
 			});
 			
@@ -184,6 +223,25 @@ define(function(require, exports, module){
 				initInput();
 				refreshRowTable();
 			});
+		});
+		
+		$('.rabd-add', $page).click(function(){
+			var $this = $(this);
+			var fieldGroupId = $this.attr('field-group-id');
+			if(fieldGroupId){
+				require('dialog').openDialog(uriGenerator.rdtmpl(fieldGroupId), 
+						undefined, undefined, {
+					reqParam	: {},
+					width		: 1000,
+					height		: 500,
+					events:	{
+						afterSave	: function(entitiesLoader){
+							appendEntityToArrayTable(entitiesLoader, $this.closest('table'));
+							this.close();
+						}
+					}
+				});
+			}
 		});
 		
 		function addRow($table, withData){

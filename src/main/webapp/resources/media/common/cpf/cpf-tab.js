@@ -136,7 +136,7 @@ define(function(require, exports, module){
 		/**
 		 * 异步加载内容到当前标签页中
 		 */
-		this.loadContent = function(content, _title, _formData){
+		this.loadContent = function(content, _title, _formData, _contentType, _whenLoaded){
 			var free = this.isFree();
 			var stop = false;
 			var e = {
@@ -162,6 +162,9 @@ define(function(require, exports, module){
 							url = dUrl;
 							formData = dFormData;
 							_this.loadContent($('<div>').html(data));
+						}
+						if(typeof _whenLoaded === 'function'){
+							_whenLoaded.apply(_this, [data, dataType]);
 						}
 					},
 					afterLoad	: function(){

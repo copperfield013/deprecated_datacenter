@@ -46,6 +46,7 @@ import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.config.service.NonAuthorityException;
 import cn.sowell.datacenter.model.config.service.SideMenuService;
 import cn.sowell.datacenter.model.modules.service.ExportService;
+import cn.sowell.dataserver.model.dict.pojo.DictionaryComposite;
 import cn.sowell.dataserver.model.dict.service.DictionaryService;
 import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
@@ -57,6 +58,7 @@ import cn.sowell.dataserver.model.modules.service.view.SelectionTemplateEntityVi
 import cn.sowell.dataserver.model.modules.service.view.SelectionTemplateEntityViewCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.ArrayEntityProxy;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionTemplate;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupAction;
@@ -409,6 +411,68 @@ public class AdminModulesController {
 		return AdminConstants.JSP_MODULES + "/modules_selection.jsp";
 	}
 	
+	@RequestMapping("/rabc_create/{mainMenuId}/{fieldGroupId}")
+	public String rabcCreate(@PathVariable Long mainMenuId, 
+			@PathVariable Long fieldGroupId, Model model) {
+		SideMenuLevel2Menu mainMenu = authService.vaidateL2MenuAccessable(mainMenuId);
+		TemplateGroup mainTmplGroup = tmplGroupService.getTemplate(mainMenu.getTemplateGroupId());
+		if(mainTmplGroup != null) {
+			TemplateDetailTemplate mainDtmpl = dtmplService.getTemplate(mainTmplGroup.getDetailTemplateId());
+			if(mainDtmpl != null) {
+				TemplateDetailFieldGroup fieldGroup = mainDtmpl.getGroups().stream().filter(fg->fieldGroupId.equals(fg.getId())).findFirst().get();
+				
+				Long relationDetailTemplateId = fieldGroup.getRelationDetailTemplateId();
+				TemplateDetailTemplate dtmpl = dtmplService.getTemplate(relationDetailTemplateId);
+				String moduleName = dtmpl.getModule(); 
+				ModuleMeta mMeta = mService.getModule(moduleName);
+				FusionContextConfig config = fFactory.getModuleConfig(moduleName);
+				model.addAttribute("mainMenu", mainMenu);
+				model.addAttribute("dtmpl", dtmpl);
+				model.addAttribute("module", mMeta);
+				model.addAttribute("config", config);
+				model.addAttribute("relationDetailTemplate", dtmpl);
+				model.addAttribute("relationCompositeId", fieldGroup.getCompositeId());
+				model.addAttribute("fieldDescMap", new FieldDescCacheMap(config.getConfigResolver()));
+				return AdminConstants.JSP_MODULES + "/modules_update_tmpl.jsp";
+			}
+		}
+		return null;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/rabc_save/{mainMenuId}/{relationDetailTemplateId}")
+	public ResponseJSON rabcSave(@PathVariable Long mainMenuId, 
+			@PathVariable Long relationDetailTemplateId,
+			@RequestParam(value=AdminConstants.KEY_FUSE_MODE, required=false) Boolean fuseMode,
+    		RequestParameterMapComposite composite){
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		authService.vaidateL2MenuAccessable(mainMenuId);
+		TemplateDetailTemplate dtmpl = dtmplService.getTemplate(relationDetailTemplateId);
+		String moduleName = dtmpl.getModule();
+		Map<String, Object> entityMap = composite.getMap();
+    	try {
+    		 entityMap.remove(AdminConstants.KEY_FUSE_MODE);
+    		 UserIdentifier user = UserUtils.getCurrentUser();
+    		 String entityCode = null;
+    		 if(Boolean.TRUE.equals(fuseMode)) {
+    			 entityCode = mService.fuseEntity(moduleName, entityMap, user);
+    		 }else {
+    			 entityCode = mService.mergeEntity(moduleName, entityMap, user);
+    		 }
+    		 if(TextUtils.hasText(entityCode)) {
+    			 jRes.put("entityCode", entityCode);
+    			 jRes.setStatus("suc");
+    		 }else {
+    			 jRes.setStatus("unknow-entity-code");
+    		 }
+         } catch (Exception e) {
+             logger.error("保存时发生错误", e);
+             jRes.setStatus("error");
+         }
+		return jRes;
+	}
+	
+	
 	
 	@ResponseBody
 	@RequestMapping("/load_entities/{menuId}/{stmplId}")
@@ -429,6 +493,25 @@ public class AdminModulesController {
 		jRes.put("entities", entities);
 		jRes.setStatus("suc");
 		return jRes;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/load_rabc_entities/{menuId}/{relationCompositeId}")
+	public ResponseJSON loadRabcEntities(@PathVariable Long menuId, @PathVariable Long relationCompositeId, 
+			String codes, String fields) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		DictionaryComposite composite = dictService.getComposite(menu.getTemplateModule(), relationCompositeId);
+		Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(
+				composite.getModule(), 
+				composite.getName(), 
+				TextUtils.split(codes, ",", HashSet<String>::new, c->c), UserUtils.getCurrentUser())
+				;
+		JSONObject entities = toEntitiesJson(parsers, TextUtils.split(fields, ",", HashSet<String>::new, f->f));
+		jRes.put("entities", entities);
+		jRes.setStatus("suc");
+		return jRes;
+		
 	}
 
 	public static JSONObject toEntitiesJson(Map<String, CEntityPropertyParser> parsers, Set<String> fieldNames) {

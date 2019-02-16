@@ -125,7 +125,7 @@ define(function(require, exports, module){
 		 * 动态加载内容的方法
 		 * @param url 页面的链接或者页面的dom对象
 		 */
-		this.loadContent = function(content, _title, _formData, _contentType){
+		this.loadContent = function(content, _title, _formData, _contentType, _whenLoaded){
 			if(typeof content === 'string'){
 				var dUrl = content;
 				formData = _formData;
@@ -137,6 +137,9 @@ define(function(require, exports, module){
 						if(dataType === 'html'){
 							url = dUrl;
 							_this.loadContent($('<div>').html(data), _title);
+						}
+						if(typeof _whenLoaded === 'function'){
+							_whenLoaded.apply(_this, [data, dataType]);
 						}
 					},
 					afterLoad: function(){

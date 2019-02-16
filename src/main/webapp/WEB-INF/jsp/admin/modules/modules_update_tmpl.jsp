@@ -49,7 +49,13 @@
 		</div>
 		<div class="page-body">
 			<div class="col-lg-offset-1 col-lg-10">
-				<form class="form-horizontal group-container" action="admin/modules/curd/save/${menu.id }/${module.name }">
+				<c:set var="saveURI">
+					<c:choose>
+						<c:when test="${relationDetailTemplate != null }">admin/modules/curd/rabc_save/${mainMenu.id }/${relationDetailTemplate.id }</c:when>
+						<c:otherwise>admin/modules/curd/save/${menu.id }/${module.name }</c:otherwise>
+					</c:choose>
+				</c:set>
+				<form class="form-horizontal group-container" action="${saveURI }">
 					<input type="hidden" name="${config.codeAttributeName }" value="${entity.code }" />
 					<c:if test="${!empty groupPremises }">
 						<div class="widget field-group">
@@ -74,17 +80,17 @@
 						</div>
 					</c:if>
 					
-					<c:forEach var="tmplGroup" items="${dtmpl.groups }">
+					<c:forEach var="fieldGroup" items="${dtmpl.groups }">
 						<div class="widget field-group">
 							<div class="widget-header">
 								<span class="widget-caption">
-									<span class="group-title">${tmplGroup.title }</span>
+									<span class="group-title">${fieldGroup.title }</span>
 								</span>
 							</div>
 							<div class="widget-body field-container">
 								<c:choose>
-									<c:when test="${tmplGroup.isArray != 1 }">
-										<c:forEach var="tmplField" items="${tmplGroup.fields }">
+									<c:when test="${fieldGroup.isArray != 1 }">
+										<c:forEach var="tmplField" items="${fieldGroup.fields }">
 											<c:set var="premise" value="${groupPremisesMap[tmplField.fieldName] }" />
 											<div class="form-group field-item ${tmplField.fieldAvailable? '': 'field-unavailable' } ${tmplField.colNum == 2? 'dbcol': '' }"
 												title="${tmplField.fieldAvailable? '': '无效字段' }"
@@ -120,23 +126,23 @@
 												<thead>
 													<tr class="title-row">
 														<th
-															fname-format="${tmplGroup.composite.name }[ARRAY_INDEX_REPLACEMENT].唯一编码"
+															fname-format="${fieldGroup.composite.name }[ARRAY_INDEX_REPLACEMENT].唯一编码"
 														>
 															序号
-															<c:if test="${!empty tmplGroup.composite.name }">
-																<input type="hidden" name="${tmplGroup.composite.name }.$$flag$$" value="true" />
+															<c:if test="${!empty fieldGroup.composite.name }">
+																<input type="hidden" name="${fieldGroup.composite.name }.$$flag$$" value="true" />
 															</c:if>
 														</th>
-														<c:if test="${tmplGroup.relationSubdomain != null }">
+														<c:if test="${fieldGroup.relationSubdomain != null }">
 															<th
 																class="th-field-title relation-label"
-																fname-format="${tmplGroup.composite.name }[ARRAY_INDEX_REPLACEMENT].$$label$$"
+																fname-format="${fieldGroup.composite.name }[ARRAY_INDEX_REPLACEMENT].$$label$$"
 																fInp-type="select-without-empty"
-																fInp-optset="${tmplGroup.relationSubdomain }"
-																fInp-access="${tmplGroup.additionRelationLabelAccess }"
+																fInp-optset="${fieldGroup.relationSubdomain }"
+																fInp-access="${fieldGroup.additionRelationLabelAccess }"
 																>关系</th>
 														</c:if>
-														<c:forEach var="field" items="${tmplGroup.fields }">
+														<c:forEach var="field" items="${fieldGroup.fields }">
 															<th 
 																class="th-field-title ${field.fieldAvailable? '': 'field-unavailable'}"
 																title="${field.fieldAvailable? '': '无效字段' }"
@@ -149,34 +155,37 @@
 																>${field.title }</th>
 														</c:forEach>
 														<th width="20px">
-															<c:if test="${!(tmplGroup.composite.access == '读' || tmplGroup.composite.access == '补' && fn:length(entity.arrayMap[tmplGroup.composite.name]) > 0 ) }">
-																<c:if test="${tmplGroup.selectionTemplateId != null}">
-																	<a title="选择" stmpl-id="${tmplGroup.selectionTemplateId }" href="javascript:;" class="open-select-dialog fa fa-link"></a>
+															<c:if test="${!(fieldGroup.composite.access == '读' || fieldGroup.composite.access == '补' && fn:length(entity.arrayMap[fieldGroup.composite.name]) > 0 ) }">
+																<c:if test="${fieldGroup.selectionTemplateId != null}">
+																	<a title="选择" stmpl-id="${fieldGroup.selectionTemplateId }" href="javascript:;" class="open-select-dialog fa fa-link"></a>
 																</c:if>
-																<c:if test="${tmplGroup.unallowedCreate != 1 }">
+																<c:if test="${fieldGroup.unallowedCreate != 1 }">
 																	<span class="array-item-add" title="添加一行">+</span>
+																</c:if>
+																<c:if test="${fieldGroup.relationDetailTemplateId != null }">
+																	<span field-group-id="${fieldGroup.id }" class="iconfont icon-add-3 rabd-add"></span>
 																</c:if>
 															</c:if>
 														</th>
 													</tr>
 												</thead>
 												<tbody>
-													<c:forEach var="entityItem" varStatus="i" items="${entity.arrayMap[tmplGroup.composite.name] }">
+													<c:forEach var="entityItem" varStatus="i" items="${entity.arrayMap[fieldGroup.composite.name] }">
 														<tr class="value-row">
 															<td>
 																<span>${i.index + 1 }</span>
 																<input class="entity-code" type="hidden" name="${entityItem.codeName }" value="${entityItem.code }" />
 															</td>
-															<c:if test="${tmplGroup.relationSubdomain != null }">
-																<c:set var="relationName" value="${tmplGroup.composite.name }[${i.index }].$$label$$" />
+															<c:if test="${fieldGroup.relationSubdomain != null }">
+																<c:set var="relationName" value="${fieldGroup.composite.name }[${i.index }].$$label$$" />
 																<td>
 																	<span class="field-value">
 																		<span class="field-input" 
 																			fInp-type="select-without-empty"
 																			fInp-name="${relationName }"
 																			fInp-value="${entityItem.smap[relationName] }"
-																			fInp-optset="${tmplGroup.relationSubdomain }"
-																			fInp-readonly="${tmplGroup.relationLabelAccess == '读' }"
+																			fInp-optset="${fieldGroup.relationSubdomain }"
+																			fInp-readonly="${fieldGroup.relationLabelAccess == '读' }"
 																		>
 																			<span class="dtmpl-field-validates">
 																				<i validate-name="required"></i>
@@ -185,7 +194,7 @@
 																	</span>
 																</td>
 															</c:if>
-															<c:forEach var="tmplField" items="${tmplGroup.fields }">
+															<c:forEach var="tmplField" items="${fieldGroup.fields }">
 																<c:set var="fieldValue" value="${entityItem.smap[tmplField.fieldName] }" />
 																<c:set var="fieldReadonly" 
 																		value="${tmplField.fieldAccess == '读'? 'true'
@@ -212,7 +221,7 @@
 																</td>
 															</c:forEach>
 															<td>
-																<c:if test="${tmplGroup.composite.access == '写' }">
+																<c:if test="${fieldGroup.composite.access == '写' }">
 																	<span class="array-item-remove" title="移除当前行">×</span>
 																</c:if>
 															</td>
@@ -237,7 +246,10 @@
 		ModulesUpdate.init(
 				$page, 
 				'${entity.code}',
-				{type: 'entity', menuId: '${menu.id }'}
+				{type: 'entity', menuId: '${menu.id }'
+					, rdtmplId: '${relationDetailTemplate.id}'
+					, relationCompositeId	: '${relationCompositeId}'
+					, mainMenuId	: '${mainMenu.id}'}
 				);
 	});
 </script>

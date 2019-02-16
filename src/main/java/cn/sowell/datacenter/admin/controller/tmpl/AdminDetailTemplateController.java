@@ -133,7 +133,8 @@ public class AdminDetailTemplateController {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		TemplateDetailTemplate data = parseToTmplData(jReq.getJsonObject());
 		try {
-			dtmplService.merge(data);
+			Long dtmplId = dtmplService.merge(data);
+			jRes.put("dtmplId", dtmplId);
 			jRes.setStatus("suc");
 		} catch (Exception e) {
 			logger.error("保存模板时发生错误", e);
@@ -152,6 +153,29 @@ public class AdminDetailTemplateController {
 		model.addAttribute("tmplJson", tmplJson);
 		return AdminConstants.JSP_TMPL_DETAIL + "/dtmpl_update.jsp";
 	}
+	
+	@RequestMapping("/relation_dtmpl/{moduleName}/{relationCompositeId}")
+	public String citeRelationDtmpl(
+			@PathVariable String moduleName, 
+			@PathVariable Long relationCompositeId,
+			Long dtmplId,
+			Model model) {
+		ModuleMeta relationCompositeModule = mService.getCompositeRelatedModule(moduleName, relationCompositeId);
+		if(relationCompositeModule != null) {
+			model.addAttribute("module", relationCompositeModule);
+			if(dtmplId != null) {
+				TemplateDetailTemplate dtmpl = dtmplService.getTemplate(dtmplId);
+				model.addAttribute("tmpl", dtmpl);
+				model.addAttribute("tmplJson", JSON.toJSON(dtmpl));
+			}
+			ModuleMeta mainModule = mService.getModule(moduleName);
+			model.addAttribute("mainModule", mainModule);
+			model.addAttribute("relationCompositeId", relationCompositeId);
+			return AdminConstants.JSP_TMPL_DETAIL + "/dtmpl_update.jsp";
+		}
+		return null; 
+	}
+	
 	
 	@ResponseBody
 	@RequestMapping("/remove/{tmplId}")
@@ -180,7 +204,10 @@ public class AdminDetailTemplateController {
 	private TemplateDetailTemplate parseToTmplData(JSONObject jo) {
 		if(jo != null){
 			TemplateDetailTemplate data = new TemplateDetailTemplate();
-			data.setId(jo.getLong("tmplId"));
+			if(!"new".equals(jo.getString("saveMethod"))) {
+				data.setId(jo.getLong("tmplId"));
+			}
+			data.setRange(jo.getInteger("range"));
 			data.setTitle(jo.getString("title"));
 			data.setModule(jo.getString("module"));
 			JSONArray jGroups = jo.getJSONArray("groups");
@@ -194,6 +221,7 @@ public class AdminDetailTemplateController {
 						group.setTitle(jGroup.getString("title"));
 						group.setIsArray(jGroup.getBoolean("isArray")?1:null);
 						group.setCompositeId(jGroup.getLong("compositeId"));
+						group.setRelationDetailTemplateId(jGroup.getLong("relationDetailTemplateId"));
 						group.setSelectionTemplateId(jGroup.getLong("selectionTemplateId"));
 						group.setUnallowedCreate(Integer.valueOf(1).equals(jGroup.getInteger("unallowedCreate"))? 1: null);
 						group.setOrder(i++);
@@ -239,6 +267,34 @@ public class AdminDetailTemplateController {
 			}
 		} catch (Exception e) {
 			logger.error("复制详情模板时发生错误", e);
+		}
+		return jRes;
+	}
+	
+	
+	@ResponseBody
+	@RequestMapping("/load_dtmpls/{moduleName}")
+	public ResponseJSON loadDetailTemplates(
+			@PathVariable String moduleName, 
+			Long dtmplId) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		try {
+			List<TemplateDetailTemplate> tmplList = dtmplService.queryAll(moduleName);
+			if(tmplList != null) {
+				JSONArray jDtmpls = new JSONArray();
+				tmplList.forEach((tmpl)->{
+					JSONObject jDtmpl = new JSONObject();
+					jDtmpl.put("id", tmpl.getId());
+					jDtmpl.put("title", tmpl.getTitle());
+					jDtmpls.add(jDtmpl);
+				});
+				jRes.put("dtmpls", jDtmpls);
+				jRes.setStatus("suc");
+			}
+			
+		} catch (Exception e) {
+			logger.error("加载详情模板列表时发生错误[moduleName=" + moduleName + "]", e);
+			jRes.setStatus("error");
 		}
 		return jRes;
 	}

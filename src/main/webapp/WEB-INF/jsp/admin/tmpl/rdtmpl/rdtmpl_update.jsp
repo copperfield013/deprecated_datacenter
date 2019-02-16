@@ -1,17 +1,10 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
-<c:set var="title">
-	<c:choose>
-		<c:when test="${tmpl != null }">修改${module.title }详情模板-${tmpl.title }</c:when>
-		<c:otherwise>创建${module.title }详情模板</c:otherwise>
-	</c:choose>
-</c:set>
 
 
-<title>${title }</title>
-<div id="dtmpl-update-${module.name}-${tmpl.id }-${RES_STAMP}" class="dtmpl-update">
+<div id="rdtmpl-update-${module.name}-${tmpl.id }" class="dtmpl-update">
 	<script type="jquery/tmpl" id="tmpl-field-group">
-		<div class="widget field-group" data-id="\${id}" stmpl-id="\${selectionTemplateId}" rdtmpl-id="\${relationDetailTemplateId}">
+		<div class="widget field-group" data-id="\${id}" stmpl-id="\${selectionTemplateId}">
 			<div class="widget-header">
 				<span class="widget-caption">
 					<span class="group-title">\${title}</span>
@@ -22,22 +15,6 @@
 						<span class="text">禁止创建</span>
 					</label>
              	</div>
-				<c:if test="${mainModule == null}">
-					<div class="widget-buttons dialog-item-control buttons-bordered">
-						<a class="btn btn-info btn-xs btn-dialog-dtmpl">
-							<i class="fa fa-edit"></i>
-							编辑
-						</a>
-	          	         <label title="是否显示弹出添加按钮">
-	         	            <input type="checkbox" class="allow-dialog-create-item colored-blue">
-	         	            <span class="text"></span>
-	         	         </label>
-						<label title="是否显示弹出编辑按钮">
-	         	            <input type="checkbox" class="allow-dialog-update-item colored-blue">
-	         	            <span class="text"></span>
-	         	         </label>
-	             	</div>
-				</c:if>
 				<div class="widget-buttons select-arrayitem-control" style="display:none">
 					<a class="btn btn-info btn-xs btn-select">
 						<i class="fa fa-link"></i>
@@ -123,17 +100,12 @@
 		
 	<div class="page-header">
 		<div class="header-title">
-			<h1>${title }</h1>
+			<h1>关系详情模板</h1>
 		</div>
 		<div class="header-buttons">
 			<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">
 				<i class="glyphicon glyphicon-refresh"></i>
 			</a>
-			<c:if test="${mainModule != null }">
-				<a id="load-dtmpl" title="加载已有模板" href="#">
-					<i class="glyphicon glyphicon-hand-down"></i>
-				</a>
-			</c:if>
 		</div>
 	</div>
 	<div class="page-body">
@@ -142,12 +114,6 @@
 			<a id="add-group" title="添加字段组"><i class="fa fa-plus-square"></i></a>
 			<a id="save" title="保存"><i class="fa fa-check-square"></i></a>
 		</div>
-		<div class="row header-row">
-			<div class="col-lg-10 col-lg-offset-1">
-				<input type="hidden" name="tmplId" value="" />
-				<input type="text" class="form-control" id="tmplName" placeholder="请输入模板名称" value="${tmpl.title }">
-			</div>
-		</div>
 		<div class="row">
 			<div class="col-lg-offset-1 col-sm-offset-1 col-xs-offset-1 col-lg-10 col-sm-10 col-xs-10" id="group-container">
 				<form class="form-horizontal group-container">
@@ -155,67 +121,18 @@
 			</div>
 		</div>
 	</div>
-	<c:if test="${mainModule != null }">
-		<script id="dtmpl-listitem-tmpl" type="jquery/tmpl">
-			<div data-id="\${id}">
-				<i></i>
-				<div>\${title}</div>
-			</div>
-		</script>
-		<div id="dtmpl-list-container" 
-				class="detail-toggle-sublist" 
-				title="点击加载对应详情模板"
-				style="display: none;">
-			<div id="dtmpl-list-wrapper"></div>
-		</div>
-		<script id="dialog-dtmpl-save-options"  type="jquery/tmpl">
-			<div class="">
-				<div class="row">
-					<label class="col-lg-3">域</label>
-					<div class="col-lg-9">
-						<label>
-							<input class="colored-blue" name="range" type="radio" checked="checked" value="0" />
-							<span class="text">公有</span>
-						</label>
-						<label>
-							<input class="colored-blue" name="range" type="radio" value="1" /> 
-							<span class="text">私有</span>
-						</label>
-					</div>
-				</div>
-				<div class="row">
-					<label class="col-lg-3">保存方式</label>
-					<div class="col-lg-9">
-						<label>
-							<input class="colored-success" name="save-method" type="radio" checked="checked" value="update" /> 
-							<span class="text">修改原模板</span>
-						</label>
-						<label>
-							<input class="colored-success" name="save-method" type="radio" value="new" />
-							<span class="text">创建新模板</span>
-						</label>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-primary">确定</button>
-				</div>
-			</div>
-		</script>
-	</c:if>
 </div>
 <script>
 	console.log(1);
-	seajs.use([ 'tmpl/js/dtmpl-update.js' ], function(ViewTmpl) {
-		var $page = $('#dtmpl-update-${module.name}-${tmpl.id }-${RES_STAMP}');
+	seajs.use(['tmpl/js/dtmpl-update.js'], function(ViewTmpl){
+		var $page = $('#rdtmpl-update-${module.name}-${tmpl.id }');
 		console.log($page);
 		var updateMode = '${tmplJson != null}' == 'true';
 		ViewTmpl.init($page, {
-			tmplId : '${tmpl.id}',
-			tmplData : updateMode && $.parseJSON('${tmplJson}'),
-			mode : updateMode ? 'update' : 'create',
-			module : '${module.name}',
-			mainModule : '${mainModule.name}',
-			relationCompositeId : '${relationCompositeId}'
+			tmplId		: '${tmpl.id}',
+			tmplData	: updateMode && $.parseJSON('${tmplJson}'),
+			mode		: updateMode? 'update': 'create',
+			module		: '${relationModule.name}'
 		});
 	});
 </script>

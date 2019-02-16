@@ -93,7 +93,9 @@ define(function(require, exports, module){
 					}
 					try{
 						if(!canceled){
-							page.loadContent(url, undefined, formData);
+							page.loadContent(url, undefined, formData, undefined, function(data, dataType){
+								$this.trigger('cpf-submited', [data, dataType]);
+							});
 							$this.trigger('cpf-submitting', [formData, $this, page]);
 						}
 					}catch(e){

@@ -192,41 +192,66 @@ define(function(require, exports, module){
 							});
 							var $createArrayControl = $group.find('.create-arrayitem-control');
 							
+							var $dialogItemControl = $group.find('.dialog-item-control');
+							
 							var $arrayitemControl = $group.find('.select-arrayitem-control');
 							if(field.composite.addType == 5){
 								$createArrayControl.show();
 								$arrayitemControl
-								.find(':checkbox').change(function(){
-									//勾选是否显示选择按钮
-									var $checkbox = $(this);
-									var $a = $checkbox.closest('label').prev('a');
-									$a.toggle($checkbox.prop('checked'));
-								})
-								.end().find('a.btn-select').click(function(){
+									.find(':checkbox').change(function(){
+										//勾选是否显示选择按钮
+										var $checkbox = $(this);
+										var $a = $checkbox.closest('label').prev('a');
+										$a.toggle($checkbox.prop('checked'));
+									})
+									.end().find('a.btn-select').click(function(){
+										var reqParam = {};
+										var stmplId = $group.attr('stmpl-id'); 
+										if(!stmplId){
+											reqParam.moduleName = param.module;
+											reqParam.compositeId = field.c_id;
+										}
+										require('dialog').openDialog(
+												'admin/tmpl/stmpl/' + (stmplId? ('update/' + stmplId) : 'create')
+												, '编辑选择模板' + field.c_title, undefined, {
+													reqParam	: reqParam,
+													width		: 1000,
+													height		: 500,
+													events		: {
+														afterSave	: function(stmplId){
+															if(stmplId){
+																console.log(stmplId);
+																$group.attr('stmpl-id', stmplId);
+															}
+														}
+													}
+												});
+									})
+									.end().show();
+								$arrayitemControl.find(':checkbox.selectable').prop('checked', !!$group.attr('stmpl-id')).trigger('change');
+								
+								$dialogItemControl.find('a.btn-dialog-dtmpl').click(function(){
 									var reqParam = {};
-									var stmplId = $group.attr('stmpl-id'); 
-									if(!stmplId){
-										reqParam.moduleName = param.module;
-										reqParam.compositeId = field.c_id;
+									var rdtmplId = $group.attr('rdtmpl-id'); 
+									if(rdtmplId){
+										reqParam.dtmplId = rdtmplId;
 									}
-									require('dialog').openDialog(
-											'admin/tmpl/stmpl/' + (stmplId? ('update/' + stmplId) : 'create')
-											, '编辑选择模板' + field.c_title, undefined, {
+									require('dialog').openDialog('admin/tmpl/dtmpl/relation_dtmpl/' + param.module + '/' + field.c_id
+											, '编辑关系详情模板（' + field.c_title + '）', undefined, {
 												reqParam	: reqParam,
 												width		: 1000,
 												height		: 500,
 												events		: {
-													afterSave	: function(stmplId){
-														if(stmplId){
-															console.log(stmplId);
-															$group.attr('stmpl-id', stmplId);
+													afterSave	: function(rdtmplId){
+														if(rdtmplId){
+															console.log(rdtmplId);
+															$group.attr('rdtmpl-id', rdtmplId);
 														}
 													}
 												}
 											});
 								})
-								.end().show();
-								$arrayitemControl.find(':checkbox.selectable').prop('checked', !!$group.attr('stmpl-id')).trigger('change');
+								
 							}else{
 								$createArrayControl.remove();
 								$arrayitemControl.remove();
@@ -333,6 +358,7 @@ define(function(require, exports, module){
 							group.selectionTemplateId = $group.attr('stmpl-id');
 						}
 						group.compositeId = $group.attr('composite-id');
+						group.relationDetailTemplateId = $group.attr('rdtmpl-id');
 						group.unallowedCreate = $group.find('.create-arrayitem-control :checkbox').prop('checked')? 1 : 0;
 						$arrayTable.find('.title-row>th[field-id]').each(function(){
 							var $th = $(this);
@@ -425,22 +451,96 @@ define(function(require, exports, module){
 				}
 			});
 			
+			function doSave(saveData, saveOptions){
+				var defer = $.Deferred();
+				var submitData = $.extend({}, saveData, saveOptions);
+				require('ajax').postJson('admin/tmpl/dtmpl/save', submitData, function(data){
+					if(data.status === 'suc'){
+						require('dialog').notice('保存成功', 'success');
+						$page.getLocatePage().close();
+						defer.resolve(data.dtmplId);
+					}else{
+						require('dialog').notice('保存失败', 'error');
+					}
+				});
+				return defer.promise();
+			}
+			
 			//绑定点击保存按钮时的回调
 			$('#save', $page).click(function(){
+				var Dialog = require('dialog');
 				checkSaveData(function(saveData){
-					require('ajax').postJson('admin/tmpl/dtmpl/save', saveData, function(data){
-						if(data.status === 'suc'){
-							require('dialog').notice('保存成功', 'success');
-							$page.getLocatePage().close();
+					if(param.mainModule){
+						var page = $page.getLocatePage();
+						if(page.getPageObj() instanceof Dialog){
+							var $content = $('#dialog-dtmpl-save-options', $page).tmpl({});
+							Dialog.openDialog($content, '保存参数', undefined, {
+								domData	: {},
+								width	: 350,
+								height	: 150,
+								top		: 100,
+								afterLoad	: function(){
+									var optionsPage = this;
+									var $optionsContent = optionsPage.getPage().getContent();
+									this.getFooter().find('button').click(function(){
+										var saveOptions = {
+											range		: $('[name="range"]:checked', $optionsContent).attr('value'),
+											saveMethod	: $('[name="save-method"]:checked', $optionsContent).attr('value')
+										}
+										doSave(saveData, saveOptions).done(function(dtmplId){
+											optionsPage.close();
+											var afterSave = page.getPageObj().getEventCallbacks('afterSave');
+											if(typeof afterSave == 'function'){
+												afterSave.apply(page, [dtmplId]);
+											}
+										});
+									});
+								}
+							});
+						}
+					}else{
+						doSave(saveData).done(function(){
 							var tpage = require('page').getPage(param.module + '_dtmpl_list');
 							if(tpage){
 								tpage.refresh();
 							}
-						}else{
-							require('dialog').notice('保存失败', 'error');
+						});
+					}
+				});
+			});
+			
+			var dtmplListLoadProgress = 0;
+			$('#load-dtmpl', $page).click(function(){
+				var $dtmplListContainer = $('#dtmpl-list-container', $page);
+				if(dtmplListLoadProgress === 0){
+					//ajax加载
+					require('ajax').ajax('admin/tmpl/dtmpl/load_dtmpls/' + param.module, {
+						excludeDtmplId	: param.tmplId
+					}, function(data){
+						if(data.status === 'suc'){
+							if(data.dtmpls){
+								var $dtmplListWrapper = $('#dtmpl-list-wrapper', $page);
+								var $dtmplListItemTmpl = $('#dtmpl-listitem-tmpl', $page);
+								for(var i in data.dtmpls){
+									var dtmplData = data.dtmpls[i];
+									var $dtmplListItem = $dtmplListItemTmpl.tmpl(dtmplData).click(function(){
+										var dtmplId = $(this).attr('data-id');
+										var page = $page.getLocatePage();
+										page.loadContent('admin/tmpl/dtmpl/relation_dtmpl/' + param.mainModule + '/' + param.relationCompositeId, undefined, {
+											dtmplId	: dtmplId
+										});
+									});
+									$dtmplListWrapper.append($dtmplListItem);
+								}
+								$dtmplListContainer.show();
+								dtmplListLoadProgress = 2;
+							}
 						}
 					});
-				});
+					dtmplListLoadProgress = 1;
+				}else if(dtmplListLoadProgress == 2){
+					$dtmplListContainer.toggle();
+				}
 			});
 			
 			//绑定模板名称回车时，添加一个字段组

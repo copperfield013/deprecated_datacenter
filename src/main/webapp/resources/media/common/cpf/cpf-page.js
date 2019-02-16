@@ -253,9 +253,9 @@ define(function(require, exports, module){
 				pageObj.refresh();
 			}
 		};
-		this.loadContent = function(url, _title, formData, afterLoadFunc){
+		this.loadContent = function(url, _title, formData, _contentType, _whenLoaded){
 			if(typeof pageObj.loadContent === 'function'){
-				pageObj.loadContent(url, _title, formData, afterLoadFunc);
+				pageObj.loadContent(url, _title, formData, _contentType, _whenLoaded);
 			}
 		};
 		this.close = function(){

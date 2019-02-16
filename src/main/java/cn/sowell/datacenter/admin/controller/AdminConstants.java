@@ -90,6 +90,8 @@ public interface AdminConstants {
 	
 	final String JSP_TMPL_SELECTION = JSP_TMPL + "/stmpl";
 	
+	final String JSP_TMPL_RELATIONDETAIL = JSP_TMPL + "/rdtmpl";
+	
 	final String JSP_TMPL_ACTION = JSP_TMPL + "/atmpl";
 	
 	final String JSP_TMPL_DICTFILTER = JSP_TMPL + "/dictfilter";
@@ -134,6 +136,8 @@ public interface AdminConstants {
 	final String KEY_FUSE_MODE = "%fuseMode%";
 
 	final String KEY_ACTION_ID = "%actionId%";
+
+	
 
 	
 

@@ -696,3 +696,11 @@ div#action-list>a:hover{
     height: 1.2em;
     padding: 0;
 }
+
+.entity-update-page .rabd-add{
+	cursor: pointer;
+}
+
+.entity-update-page .rabd-add:hover{
+	color: #999;
+}

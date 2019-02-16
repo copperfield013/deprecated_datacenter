@@ -377,3 +377,28 @@ th.field-unavailable:before {
 .dtmpl-update .field-group[stmpl-id] .btn-toselect{
 	display: inline-block;
 }
+
+.dtmpl-update div#dtmpl-list-container {
+    height: 150px;
+    width: 300px;
+    top: 55px;
+    font-size: 14px;
+}
+
+
+.dtmpl-update div#dtmpl-list-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.dtmpl-update div#dtmpl-list-wrapper>div {
+    display: block;
+    width: 100%;
+    height: 40px;
+    background-color: #62cdb5;
+    line-height: 40px;
+    padding: 3px;
+    cursor: pointer;
+    margin: 5px 0;
+    padding: 0 10px;
+}
