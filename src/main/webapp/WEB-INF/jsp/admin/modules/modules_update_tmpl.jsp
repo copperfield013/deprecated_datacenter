@@ -51,7 +51,7 @@
 			<div class="col-lg-offset-1 col-lg-10">
 				<c:set var="saveURI">
 					<c:choose>
-						<c:when test="${relationDetailTemplate != null }">admin/modules/curd/rabc_save/${mainMenu.id }/${relationDetailTemplate.id }</c:when>
+						<c:when test="${rabcTemplateGroup != null }">admin/modules/curd/rabc_save/${mainMenu.id }/${rabcTemplateGroup.id }</c:when>
 						<c:otherwise>admin/modules/curd/save/${menu.id }/${module.name }</c:otherwise>
 					</c:choose>
 				</c:set>
@@ -81,7 +81,7 @@
 					</c:if>
 					
 					<c:forEach var="fieldGroup" items="${dtmpl.groups }">
-						<div class="widget field-group">
+						<div class="widget field-group" field-group-id="${fieldGroup.id }" rabc-unupdatable="${fieldGroup.rabcUnupdatable == 1 }">
 							<div class="widget-header">
 								<span class="widget-caption">
 									<span class="group-title">${fieldGroup.title }</span>
@@ -134,12 +134,19 @@
 															</c:if>
 														</th>
 														<c:if test="${fieldGroup.relationSubdomain != null }">
+															<c:set var="relationDefaultLabel" value="" />
+															<c:if test="${fn:length(fieldGroup.relationSubdomain) == 1}">
+																<c:forEach var="relationLabel" items="${fieldGroup.relationSubdomain }">
+																	<c:set var="relationDefaultLabel" value='fInp-value="${relationLabel }"'  />
+																</c:forEach>
+															</c:if>
 															<th
 																class="th-field-title relation-label"
 																fname-format="${fieldGroup.composite.name }[ARRAY_INDEX_REPLACEMENT].$$label$$"
 																fInp-type="select-without-empty"
 																fInp-optset="${fieldGroup.relationSubdomain }"
 																fInp-access="${fieldGroup.additionRelationLabelAccess }"
+																${relationDefaultLabel }
 																>关系</th>
 														</c:if>
 														<c:forEach var="field" items="${fieldGroup.fields }">
@@ -162,8 +169,8 @@
 																<c:if test="${fieldGroup.unallowedCreate != 1 }">
 																	<span class="array-item-add" title="添加一行">+</span>
 																</c:if>
-																<c:if test="${fieldGroup.relationDetailTemplateId != null }">
-																	<span field-group-id="${fieldGroup.id }" class="iconfont icon-add-3 rabd-add"></span>
+																<c:if test="${fieldGroup.rabcUncreatable != 1 && mainMenu == null && fieldGroup.rabcTemplateGroupId != null }">
+																	<span class="iconfont icon-add-3 rabd-add"></span>
 																</c:if>
 															</c:if>
 														</th>
@@ -222,6 +229,9 @@
 															</c:forEach>
 															<td>
 																<c:if test="${fieldGroup.composite.access == '写' }">
+																	<c:if test="${fieldGroup.rabcUnupdatable != 1 }">
+																		<span class="array-item-update fa fa-edit" title="编辑当前行"></span>
+																	</c:if>
 																	<span class="array-item-remove" title="移除当前行">×</span>
 																</c:if>
 															</td>
@@ -247,7 +257,7 @@
 				$page, 
 				'${entity.code}',
 				{type: 'entity', menuId: '${menu.id }'
-					, rdtmplId: '${relationDetailTemplate.id}'
+					, rabcTmplGroupId		: '${rabcTemplateGroup.id}'
 					, relationCompositeId	: '${relationCompositeId}'
 					, mainMenuId	: '${mainMenu.id}'}
 				);

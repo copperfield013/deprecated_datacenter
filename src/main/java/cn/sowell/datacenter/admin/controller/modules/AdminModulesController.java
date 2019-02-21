@@ -212,6 +212,7 @@ public class AdminModulesController {
 		
 	}
 	
+	
 	@RequestMapping("/add/{menuId}")
 	public String add(@PathVariable Long menuId, Model model) {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
@@ -413,13 +414,53 @@ public class AdminModulesController {
 	
 	@RequestMapping("/rabc_create/{mainMenuId}/{fieldGroupId}")
 	public String rabcCreate(@PathVariable Long mainMenuId, 
-			@PathVariable Long fieldGroupId, Model model) {
+			@PathVariable Long fieldGroupId, String entityCode, Model model) {
 		SideMenuLevel2Menu mainMenu = authService.vaidateL2MenuAccessable(mainMenuId);
+		model.addAttribute("mainMenu", mainMenu);
 		TemplateGroup mainTmplGroup = tmplGroupService.getTemplate(mainMenu.getTemplateGroupId());
 		if(mainTmplGroup != null) {
 			TemplateDetailTemplate mainDtmpl = dtmplService.getTemplate(mainTmplGroup.getDetailTemplateId());
 			if(mainDtmpl != null) {
 				TemplateDetailFieldGroup fieldGroup = mainDtmpl.getGroups().stream().filter(fg->fieldGroupId.equals(fg.getId())).findFirst().get();
+				
+				Long relationTemplateGroupId = fieldGroup.getRabcTemplateGroupId();
+				
+				if(relationTemplateGroupId != null) {
+					TemplateGroup tmplGroup = tmplGroupService.getTemplate(relationTemplateGroupId);
+					
+					String rabcModuleName = tmplGroup.getModule();
+					
+					ModuleMeta mMeta = mService.getModule(rabcModuleName);
+					
+					FusionContextConfig config = fFactory.getModuleConfig(rabcModuleName);
+					if(TextUtils.hasText(entityCode)) {
+						ModuleEntityPropertyParser entity = mService.getEntity(rabcModuleName, entityCode, null, UserUtils.getCurrentUser());
+						model.addAttribute("entity", entity);
+					}
+					TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
+					model.addAttribute("module", mMeta);
+					model.addAttribute("dtmpl", dtmpl);
+					model.addAttribute("tmplGroup", tmplGroup);
+					model.addAttribute("groupPremises", tmplGroup.getPremises());
+					List<TemplateGroupAction> groupActions = tmplGroup.getActions().stream().filter(action->TemplateGroupAction.ACTION_FACE_DETAIL.equals(action.getFace())).collect(Collectors.toList());
+					List<TemplateGroupAction> outgoingGroupActions = new ArrayList<>(),
+											normalGroupActions = new ArrayList<>();
+					for (TemplateGroupAction action : groupActions) {
+						if(TextUtils.hasText(action.getIconClass()) && Integer.valueOf(1).equals(action.getOutgoing())) {
+							outgoingGroupActions.add(action);
+						}else {
+							normalGroupActions.add(action);
+						}
+					}
+					model.addAttribute("rabcTemplateGroup", tmplGroup);
+					model.addAttribute("outgoingGroupActions", outgoingGroupActions);
+					model.addAttribute("normalGroupActions", normalGroupActions);
+					model.addAttribute("config", config);
+					model.addAttribute("fieldDescMap", new FieldDescCacheMap(config.getConfigResolver()));
+					model.addAttribute("relationCompositeId", fieldGroup.getCompositeId());
+					return AdminConstants.JSP_MODULES + "/modules_update_tmpl.jsp";
+				}
+				/*
 				
 				Long relationDetailTemplateId = fieldGroup.getRelationDetailTemplateId();
 				TemplateDetailTemplate dtmpl = dtmplService.getTemplate(relationDetailTemplateId);
@@ -433,22 +474,22 @@ public class AdminModulesController {
 				model.addAttribute("relationDetailTemplate", dtmpl);
 				model.addAttribute("relationCompositeId", fieldGroup.getCompositeId());
 				model.addAttribute("fieldDescMap", new FieldDescCacheMap(config.getConfigResolver()));
-				return AdminConstants.JSP_MODULES + "/modules_update_tmpl.jsp";
+				return AdminConstants.JSP_MODULES + "/modules_update_tmpl.jsp";*/
 			}
 		}
 		return null;
 	}
 	
 	@ResponseBody
-	@RequestMapping("/rabc_save/{mainMenuId}/{relationDetailTemplateId}")
+	@RequestMapping("/rabc_save/{mainMenuId}/{rabcTemplateGroupId}")
 	public ResponseJSON rabcSave(@PathVariable Long mainMenuId, 
-			@PathVariable Long relationDetailTemplateId,
+			@PathVariable Long rabcTemplateGroupId,
 			@RequestParam(value=AdminConstants.KEY_FUSE_MODE, required=false) Boolean fuseMode,
     		RequestParameterMapComposite composite){
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		authService.vaidateL2MenuAccessable(mainMenuId);
-		TemplateDetailTemplate dtmpl = dtmplService.getTemplate(relationDetailTemplateId);
-		String moduleName = dtmpl.getModule();
+		TemplateGroup rabcTmplGroup = tmplGroupService.getTemplate(rabcTemplateGroupId);
+		String moduleName = rabcTmplGroup.getModule();
 		Map<String, Object> entityMap = composite.getMap();
     	try {
     		 entityMap.remove(AdminConstants.KEY_FUSE_MODE);

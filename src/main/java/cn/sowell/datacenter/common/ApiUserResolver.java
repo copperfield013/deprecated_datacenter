@@ -10,6 +10,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.datacenter.entityResolver.UserCodeService;
 import cn.sowell.datacenter.model.admin.service.AdminUserService;
 import cn.sowell.datacenter.model.admin.service.impl.AdminUserServiceImpl.Token;
 import cn.sowell.datacenter.model.config.service.NonAuthorityException;
@@ -18,6 +19,9 @@ public class ApiUserResolver implements HandlerMethodArgumentResolver{
 
 	@Resource
 	AdminUserService uService;
+	
+	@Resource
+	UserCodeService userCodeService;
 	
 	static Logger logger = Logger.getLogger(ApiUserResolver.class);
 	
@@ -39,7 +43,11 @@ public class ApiUserResolver implements HandlerMethodArgumentResolver{
 			try {
 				Token token = uService.validateToken(tokenCode);
 				token.refreshDeadline();
-				return token.getUser();
+				UserWithToken user = token.getUser();
+				if(user != null) {
+					userCodeService.setUserCode(user.getCode());
+				}
+				return user;
 			} catch (Exception e) {
 				logger.error("验证用户token时发生异常", e);
 			}

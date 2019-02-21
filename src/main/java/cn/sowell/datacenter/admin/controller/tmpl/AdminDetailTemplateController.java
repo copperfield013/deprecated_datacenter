@@ -222,6 +222,9 @@ public class AdminDetailTemplateController {
 						group.setIsArray(jGroup.getBoolean("isArray")?1:null);
 						group.setCompositeId(jGroup.getLong("compositeId"));
 						group.setRelationDetailTemplateId(jGroup.getLong("relationDetailTemplateId"));
+						group.setRabcTemplateGroupId(jGroup.getLong("rabcTemplateGroupId"));
+						group.setRabcUncreatable(jGroup.getInteger("rabcUncreatable"));
+						group.setRabcUnupdatable(jGroup.getInteger("rabcUnupdatable"));
 						group.setSelectionTemplateId(jGroup.getLong("selectionTemplateId"));
 						group.setUnallowedCreate(Integer.valueOf(1).equals(jGroup.getInteger("unallowedCreate"))? 1: null);
 						group.setOrder(i++);

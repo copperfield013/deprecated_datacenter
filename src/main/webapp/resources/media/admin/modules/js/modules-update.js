@@ -10,7 +10,7 @@ define(function(require, exports, module){
 			switch(uriData.type){
 				case 'entity': 
 					var menuId = uriData.menuId;
-					if(uriData.rdtmplId){
+					if(uriData.rabcTmplGroupId){
 						menuId = uriData.mainMenuId;
 					}
 					return {
@@ -22,6 +22,9 @@ define(function(require, exports, module){
 						},
 						load_rabc_entities	: function(relationCompositeId){
 							return 'admin/modules/curd/load_rabc_entities/' + menuId + '/' + uriData.relationCompositeId;
+						},
+						entityDetail		: function(fieldGroupId, entityCode){
+							return 'admin/modules/curd/rabc_detail/' +menuId + '/' + fieldGroupId + '/' + entityCode;
 						}
 					}
 				case 'user':
@@ -141,6 +144,11 @@ define(function(require, exports, module){
 			});
 		}
 		
+		$page.on('click', '.array-item-detail', function(){
+			var entityCode = $(this).closest('tr').find('.entity-code').val();
+			require('tab').openInTab(uriGenerator.entityDetail(entityCode), 
+					'module_detail_' + entityCode);
+		});
 		
 		$page.on('click', '.array-item-remove', function(){
 			var $row = $(this).closest('tr');
@@ -149,6 +157,23 @@ define(function(require, exports, module){
 					var $table = $row.closest('table');
 					$row.remove();
 					refreshTable($table);
+				}
+			});
+		});
+		$page.on('click', '.array-item-update', function(){
+			var $row = $(this).closest('tr');
+			var entityCode = $row.find('.entity-code').val();
+			var fieldGroupId = $row.closest('.field-group').attr('field-group-id');
+			require('dialog').openDialog(uriGenerator.rdtmpl(fieldGroupId), 
+					undefined, undefined, {
+				reqParam	: {entityCode: entityCode},
+				width		: 1000,
+				height		: 500,
+				events:	{
+					afterSave	: function(entitiesLoader){
+						updateEntityToArray(entitiesLoader, $row);
+						this.close();
+					}
 				}
 			});
 		});
@@ -174,6 +199,27 @@ define(function(require, exports, module){
 					}
 				}
 				_(0);
+			});
+		}
+		function updateEntityToArray(entitiesLoader, $row){
+			var fields = [];
+			var $fieldInputs = $row.find('.field-input[fname-full]');
+			$fieldInputs.each(function(){
+				var fieldName = $(this).attr('fname-full');
+				fields.push(fieldName);
+			});
+			entitiesLoader(fields).done(function(entities){
+				if(entitiesLoader.codes.length > 0){
+					$fieldInputs.each(function(){
+						var $fieldInput = $(this);
+						var fieldInput = $fieldInput.data('field-input');
+						var fieldName = $fieldInput.attr('fname-full');
+						if(fieldInput){
+							var fieldValue = entities[entitiesLoader.codes[0]][fieldName];
+							fieldInput.setValue(fieldValue || '');
+						}
+					});
+				}
 			});
 		}
 		
@@ -227,7 +273,7 @@ define(function(require, exports, module){
 		
 		$('.rabd-add', $page).click(function(){
 			var $this = $(this);
-			var fieldGroupId = $this.attr('field-group-id');
+			var fieldGroupId = $this.closest('.field-group').attr('field-group-id');
 			if(fieldGroupId){
 				require('dialog').openDialog(uriGenerator.rdtmpl(fieldGroupId), 
 						undefined, undefined, {
@@ -243,6 +289,7 @@ define(function(require, exports, module){
 				});
 			}
 		});
+		
 		
 		function addRow($table, withData){
 			var $tbody = $table.children('tbody');
@@ -266,6 +313,7 @@ define(function(require, exports, module){
 						.attr('fInp-optkey', $title.attr('fInp-optkey'))
 						.attr('fInp-fieldkey', $title.attr('fInp-fieldkey'))
 						.attr('fname-full', $title.attr('fname-full'))
+						.attr('fInp-value', $title.attr('fInp-value'))
 						.attr('fInp-readonly', readonly)
 						.appendTo($('<span class="field-value"></span>').appendTo($td));
 					if($title.attr('fInp-optset')){
@@ -277,7 +325,12 @@ define(function(require, exports, module){
 				}
 				$dataRow.append($td);
 			});
-			$dataRow.append('<td><span class="array-item-remove" title="移除当前行">×</span></td>');
+			var $rowOperator = $('<td>');
+			if(withData && $table.closest('.field-group').attr('rabc-unupdatable') !== 'true'){
+				$rowOperator.append('<span class="array-item-update fa fa-edit" title="编辑当前行"></span>');
+			}
+			$rowOperator.append('<span class="array-item-remove" title="移除当前行">×</span>');
+			$dataRow.append($rowOperator);
 			$dataRow.appendTo($tbody);
 			var deferred = $.Deferred();
 			appendTo($page, $dataRow.find('.field-input')).done(function(initInput, refreshRowTable, $doms){
@@ -318,9 +371,16 @@ define(function(require, exports, module){
 			}
 		});
 		setTimeout(function(){
-			var Indexer = require('indexer')
+			var Indexer = require('indexer');
+			var pageType = $page.getLocatePage().getType();
+			var $scrollTarget = null;
+			if(pageType === 'tab'){
+				var $scrollTarget = $page.closest('.main-tab-content')[0];
+			}else if(pageType === 'dialog'){
+				$scrollTarget = $page.closest('.modal-body-wrapper')[0];
+			}
 			var indexer = new Indexer({
-				scrollTarget: $page.closest('.main-tab-content')[0],
+				scrollTarget: $scrollTarget,
 				elements	: $('.group-container>.field-group', $page),
 				titleGetter	: function(ele){
 					return $(this).find('.group-title').text();

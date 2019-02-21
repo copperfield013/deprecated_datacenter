@@ -1126,3 +1126,13 @@ table.table.row-selectable input[type=checkbox].partly:checked+.text:before {
 .row.center>div {
     display: inline-block;
 }
+
+
+.modal-dialog{
+	max-width: 80vw;
+}
+
+input[type="checkbox"].checked-false:checked+*.text:before {
+    content: "×";
+    font-family: unset;
+}

@@ -1,6 +1,5 @@
 package cn.sowell.datacenter.api.controller.entity;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -13,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.ServletRequestParameterPropertyValues;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,7 +23,6 @@ import com.alibaba.fastjson.JSONObject;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.copframe.dto.page.PageInfo;
-import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.web.poll.WorkProgress;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
@@ -36,6 +33,7 @@ import cn.sowell.datacenter.common.RequestParameterMapComposite;
 import cn.sowell.datacenter.entityResolver.CEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.FieldParserDescription;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
+import cn.sowell.datacenter.entityResolver.UserCodeService;
 import cn.sowell.datacenter.entityResolver.impl.ABCNodeProxy;
 import cn.sowell.datacenter.entityResolver.impl.ArrayItemPropertyParser;
 import cn.sowell.datacenter.entityResolver.impl.RelationEntityProxy;
@@ -68,6 +66,7 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionTemplate;
 import cn.sowell.dataserver.model.tmpl.service.ActionTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.ListCriteriaFactory;
 import cn.sowell.dataserver.model.tmpl.service.SelectionTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
 
@@ -105,6 +104,12 @@ public class ApiEntityController {
 	@Resource
 	ActionTemplateService actService;
 	
+	@Resource
+	ListCriteriaFactory lCriteriaFactory;
+	
+	@Resource
+	UserCodeService userCodeService;
+	
 	static Logger logger = Logger.getLogger(ApiEntityController.class);
 	
 	
@@ -124,7 +129,7 @@ public class ApiEntityController {
 		//设置条件
 		criteria.setModule(moduleName);
 		criteria.setTemplateGroupId(menu.getTemplateGroupId());
-		Map<Long, String> criteriaMap = exractTemplateCriteriaMap(request);
+		Map<Long, String> criteriaMap = lCriteriaFactory.exractTemplateCriteriaMap(request);
 		criteria.setListTemplateCriteria(criteriaMap);
 		criteria.setPageInfo(pageInfo);
 		criteria.setUser(user);
@@ -288,18 +293,6 @@ public class ApiEntityController {
 		return arrayEntities;
 	}
 
-	private Map<Long, String> exractTemplateCriteriaMap(HttpServletRequest request) {
-		ServletRequestParameterPropertyValues pvs = new ServletRequestParameterPropertyValues(request, "criteria", "_");
-		Map<Long, String> criteriaMap = new HashMap<Long, String>();
-		pvs.getPropertyValueList().forEach(pv->{
-			 Long criteriaId = FormatUtils.toLong(pv.getName());
-			 if(criteriaId != null){
-				 criteriaMap.put(criteriaId, FormatUtils.toString(pv.getValue()));
-			 }
-		 });
-		return criteriaMap;
-	}
-	
 	@ResponseBody
 	@RequestMapping("/dtmpl/{menuId}")
 	public ResponseJSON dtmpl(@PathVariable Long menuId, ApiUser user) {
@@ -550,7 +543,7 @@ public class ApiEntityController {
 		
 
 		//创建条件对象
-		Map<Long, String> criteriaMap = exractTemplateCriteriaMap(request);
+		Map<Long, String> criteriaMap = lCriteriaFactory.exractTemplateCriteriaMap(request);
 		SelectionTemplateEntityViewCriteria criteria = new SelectionTemplateEntityViewCriteria(stmpl, criteriaMap);
 		//设置条件
 		criteria.setExistCodes(TextUtils.split(excepts, ",", HashSet<String>::new, e->e));

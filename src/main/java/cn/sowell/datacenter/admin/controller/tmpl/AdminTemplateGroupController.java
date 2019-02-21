@@ -22,7 +22,9 @@ import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
+import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.common.choose.ChooseTablePage;
 import cn.sowell.datacenter.model.config.service.ConfigureService;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
@@ -48,6 +50,9 @@ public class AdminTemplateGroupController {
 	
 	@Resource
 	ConfigureService configService;
+	
+	@Resource
+	FrameDateFormat dateFormat;
 	
 	Logger logger = Logger.getLogger(AdminTemplateGroupController.class);
 	
@@ -154,6 +159,37 @@ public class AdminTemplateGroupController {
 		return jRes;
 	}
 	
+	@RequestMapping("/rabc_relate/{moduleName}/{relationCompositeId}")
+	public String rabcRelate(@PathVariable String moduleName, 
+			@PathVariable Long relationCompositeId,
+			Long rabcTemplateGroupId,
+			Model model) {
+		ModuleMeta relationCompositeModule = mService.getCompositeRelatedModule(moduleName, relationCompositeId);
+		if(relationCompositeModule != null) {
+			List<TemplateGroup> tmplGroups = tmplGroupService.queryAll(relationCompositeModule.getName());
+			ChooseTablePage<TemplateGroup> tpage = new ChooseTablePage<TemplateGroup>(
+					"tmplgroup-choose-list", "tmpl_group_");
+			tpage.setPageInfo(null)
+					.setAction(AdminConstants.URI_TMPL + "/rabc_relate/" + moduleName + '/' + relationCompositeId)
+					.setIsMulti(false)
+					.setSelectedPredicate(group->group.getId().equals(rabcTemplateGroupId))
+					.setTableData(tmplGroups, handler->{
+						handler
+							.setDataJsonGetter(tmplGroup->{
+								JSONObject json = new JSONObject();
+								json.put("id", tmplGroup.getId());
+								return json;
+							}).setDataKeyGetter(data->"tmpl_group_" + data.getId())
+							.addColumn("模板名", (cell, data)->cell.setText(data.getTitle()))
+							.addColumn("创建时间", (cell, data)->cell.setText(dateFormat.formatDateTime(data.getCreateTime())))
+							;
+						
+					});
+			model.addAttribute("tpage", tpage);
+			
+		}
+		return AdminConstants.PATH_CHOOSE_TABLE;
+	}
 	
 	
 }

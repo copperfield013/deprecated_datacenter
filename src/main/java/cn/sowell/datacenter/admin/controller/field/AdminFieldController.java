@@ -20,8 +20,10 @@ import com.alibaba.fastjson.JSONObject;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonArrayResponse;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
+import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.datacenter.entityResolver.Label;
 import cn.sowell.dataserver.model.dict.pojo.DictionaryComposite;
+import cn.sowell.dataserver.model.dict.pojo.DictionaryCompositeExpand;
 import cn.sowell.dataserver.model.dict.pojo.DictionaryOption;
 import cn.sowell.dataserver.model.dict.service.DictionaryService;
 
@@ -40,10 +42,15 @@ public class AdminFieldController {
 				@PathVariable String module, 
 				@RequestParam(name="withCompositeFields", required=false) Boolean withCompositeFields){
 		List<DictionaryComposite> infoList = dService.getAllComposites(module);
+		Map<Long, DictionaryCompositeExpand> compositeExpandMap = dService.getCompositeExpandMap(module, CollectionUtils.toSet(infoList, DictionaryComposite::getId));
 		JsonArrayResponse jRes = new JsonArrayResponse();
 		for (DictionaryComposite info : infoList) {
 			JSONObject jComposite = (JSONObject) JSON.toJSON(info);
-			jComposite.put("dataClasses", dService.getCompositeClasses(module, info.getId()));
+			DictionaryCompositeExpand expand = compositeExpandMap.get(info.getId());
+			if(expand != null) {
+				jComposite.put("dataClasses", expand.getDataClasses());
+				jComposite.put("expand", expand);
+			}
 			jRes.add(jComposite);
 		}
 		return jRes;

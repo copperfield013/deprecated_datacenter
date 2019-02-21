@@ -11,7 +11,7 @@
 <title>${title }</title>
 <div id="dtmpl-update-${module.name}-${tmpl.id }-${RES_STAMP}" class="dtmpl-update">
 	<script type="jquery/tmpl" id="tmpl-field-group">
-		<div class="widget field-group" data-id="\${id}" stmpl-id="\${selectionTemplateId}" rdtmpl-id="\${relationDetailTemplateId}">
+		<div class="widget field-group" data-id="\${id}" stmpl-id="\${selectionTemplateId}" rdtmpl-id="\${relationDetailTemplateId}" rabc-tmpl-group-id="\${rabcTemplateGroupId}">
 			<div class="widget-header">
 				<span class="widget-caption">
 					<span class="group-title">\${title}</span>
@@ -23,17 +23,17 @@
 					</label>
              	</div>
 				<c:if test="${mainModule == null}">
-					<div class="widget-buttons dialog-item-control buttons-bordered">
-						<a class="btn btn-info btn-xs btn-dialog-dtmpl">
+					<div class="widget-buttons dialog-item-control buttons-bordered" style="display:none;">
+						<a class="btn btn-info btn-xs btn-dialog-rabc-tmplgroup">
 							<i class="fa fa-edit"></i>
 							编辑
 						</a>
 	          	         <label title="是否显示弹出添加按钮">
-	         	            <input type="checkbox" class="allow-dialog-create-item colored-blue">
+	         	            <input type="checkbox" class="rabc-uncreatable colored-blue checked-false" \${rabcUncreatable==1?'checked="checked"':''}>
 	         	            <span class="text"></span>
 	         	         </label>
 						<label title="是否显示弹出编辑按钮">
-	         	            <input type="checkbox" class="allow-dialog-update-item colored-blue">
+	         	            <input type="checkbox" class="rabc-unupdatable colored-blue checked-false" \${rabcUnupdatable==1?'checked="checked"':''}>
 	         	            <span class="text"></span>
 	         	         </label>
 	             	</div>

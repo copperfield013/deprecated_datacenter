@@ -856,17 +856,18 @@ define(function(require, exports, module){
 						inputFile = fileData.file;
 						$operates.find('.fa-download').hide();
 						fileChanged = true;
-					}else if(fileData.src){
-						var index = fileData.src.lastIndexOf('/');
+					}else if(fileData.src || fileData.url){
+						var src = fileData.src || fileData.url;
+						var index = src.lastIndexOf('/');
 						if(index >= 0){
-							var fileName = fileData.src.substring(index + 1, fileData.src.length);
+							var fileName = src.substring(index + 1, src.length);
 							if(require('utils').isPhoto(fileName)){
 								//图片文件
-								showPicFile(fileName, fileData.src, false);
+								showPicFile(fileName, src, false);
 							}else{
 								showUnpicFile(fileName, false);
 							}
-							originFileURL = fileData.src;
+							originFileURL = src;
 						}
 					}
 				}

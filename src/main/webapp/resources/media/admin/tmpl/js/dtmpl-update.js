@@ -230,27 +230,47 @@ define(function(require, exports, module){
 									.end().show();
 								$arrayitemControl.find(':checkbox.selectable').prop('checked', !!$group.attr('stmpl-id')).trigger('change');
 								
-								$dialogItemControl.find('a.btn-dialog-dtmpl').click(function(){
-									var reqParam = {};
-									var rdtmplId = $group.attr('rdtmpl-id'); 
-									if(rdtmplId){
-										reqParam.dtmplId = rdtmplId;
-									}
-									require('dialog').openDialog('admin/tmpl/dtmpl/relation_dtmpl/' + param.module + '/' + field.c_id
-											, '编辑关系详情模板（' + field.c_title + '）', undefined, {
-												reqParam	: reqParam,
-												width		: 1000,
-												height		: 500,
-												events		: {
-													afterSave	: function(rdtmplId){
-														if(rdtmplId){
-															console.log(rdtmplId);
-															$group.attr('rdtmpl-id', rdtmplId);
-														}
+								if(field.composite.expand && field.composite.expand.rabcModule){
+									$dialogItemControl.show().find('a.btn-dialog-rabc-tmplgroup').click(function(){
+										var reqParam = {};
+										var rabcTemplateGroupId = $group.attr('rabc-tmpl-group-id'); 
+										if(rabcTemplateGroupId){
+											reqParam.rabcTemplateGroupId = rabcTemplateGroupId;
+										}
+											
+										
+										require('dialog').openDialog('admin/tmpl/group/rabc_relate/' + param.module + '/' + field.c_id
+												, '选择关联模板组合', undefined, {
+											reqParam	: reqParam,
+											onSubmit	: function(data){
+												if(data && data[0]){
+													$group.attr('rabc-tmpl-group-id', data[0].id);
+												}
+											}
+										});
+									});
+									/*$dialogItemControl.show().find('a.btn-dialog-dtmpl').click(function(){
+										var reqParam = {};
+										var rdtmplId = $group.attr('rdtmpl-id'); 
+										if(rdtmplId){
+											reqParam.dtmplId = rdtmplId;
+										}
+										require('dialog').openDialog('admin/tmpl/dtmpl/relation_dtmpl/' + param.module + '/' + field.c_id
+												, '编辑关系详情模板（' + field.c_title + '）', undefined, {
+											reqParam	: reqParam,
+											width		: 1000,
+											height		: 500,
+											events		: {
+												afterSave	: function(rdtmplId){
+													if(rdtmplId){
+														console.log(rdtmplId);
+														$group.attr('rdtmpl-id', rdtmplId);
 													}
 												}
-											});
-								})
+											}
+										});
+									});*/
+								}
 								
 							}else{
 								$createArrayControl.remove();
@@ -359,6 +379,10 @@ define(function(require, exports, module){
 						}
 						group.compositeId = $group.attr('composite-id');
 						group.relationDetailTemplateId = $group.attr('rdtmpl-id');
+						group.rabcTemplateGroupId = $group.attr('rabc-tmpl-group-id');
+						group.rabcUncreatable = $group.find('.rabc-uncreatable').prop('checked')? 1: null;
+						group.rabcUnupdatable = $group.find('.rabc-unupdatable').prop('checked')? 1: null;
+						
 						group.unallowedCreate = $group.find('.create-arrayitem-control :checkbox').prop('checked')? 1 : 0;
 						$arrayTable.find('.title-row>th[field-id]').each(function(){
 							var $th = $(this);
@@ -436,7 +460,9 @@ define(function(require, exports, module){
 			$('#add-group', $page).click(function(){
 				var $group = $tmplFieldGroup.tmpl({
 					title			: '新字段组',
-					unallowedCreate	: null
+					unallowedCreate	: null,
+					rabcUncreatable	: null,
+					rabcUnupdatable	: null
 				}).appendTo($groupContainer);
 				//绑定字段组内字段的拖动动作
 				bindGroupFieldsDraggable(getFieldContainer($group));
@@ -728,7 +754,11 @@ define(function(require, exports, module){
 					var group = tmplData.groups[i];
 					var $group = 
 						$tmplFieldGroup
-						.tmpl($.extend({}, {unallowedCreate	: null}, group))
+						.tmpl($.extend({}, {
+							unallowedCreate	: null,
+							rabcUncreatable	: null,
+							rabcUnupdatable	: null
+							}, group))
 						.appendTo($groupContainer);
 					if(!group.isArray){
 						//绑定字段组内字段的拖动动作
