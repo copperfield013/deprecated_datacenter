@@ -67,7 +67,7 @@ public class RelationTreeViewServiceImpl implements RelationTreeViewService {
 			BizFusionContext context = new BizFusionContext();
 			context.setMappingName(mappingName);
 			context.setSource(FusionContext.SOURCE_COMMON);
-			context.setUserCode("e10adc3949ba59abbe56e057f28888u5");
+			context.setUserCode("e10adc3949ba59abbe56e057f28888d5");
 			Discoverer discoverer = PanelFactory.getDiscoverer(context);
 			Entity result = discoverer.discover(code);
 			if(result != null) {
@@ -87,7 +87,7 @@ public class RelationTreeViewServiceImpl implements RelationTreeViewService {
 			BizFusionContext context = new BizFusionContext();
 			context.setMappingName(mappingName);
 			context.setSource(FusionContext.SOURCE_COMMON);
-			context.setUserCode("e10adc3949ba59abbe56e057f28888u5");
+			context.setUserCode("e10adc3949ba59abbe56e057f28888d5");
 			Discoverer discoverer = PanelFactory.getDiscoverer(context);
 			Entity result = discoverer.discover(code);
 			return result;
