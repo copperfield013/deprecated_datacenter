@@ -1,6 +1,5 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
-<link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/stmpl-update.css" />
 <div class="stmpl-update detail" id="stmpl-update-${RES_STAMP }">
 	<script type="jquery/tmpl" id="col-row-tmpl">
 		<div class="row \${fieldAvailable? '': 'col-field-unavailable'}" column-id="\${columnId}" field-id="\${id}" field-key="\${name}">

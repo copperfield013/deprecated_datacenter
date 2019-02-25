@@ -194,6 +194,7 @@ define(function(require, exports, module){
 							
 							var $dialogItemControl = $group.find('.dialog-item-control');
 							
+							var $filterItemControl = $group.find('.filter-arrayitem-control');
 							var $arrayitemControl = $group.find('.select-arrayitem-control');
 							if(field.composite.addType == 5){
 								$createArrayControl.show();
@@ -229,7 +230,23 @@ define(function(require, exports, module){
 									})
 									.end().show();
 								$arrayitemControl.find(':checkbox.selectable').prop('checked', !!$group.attr('stmpl-id')).trigger('change');
-								
+								$filterItemControl.show().find('.btn-filter').click(function(){
+									var filterId = $group.attr('array-item-filter-id');
+									var reqParam = {filterId};
+									require('dialog').openDialog(
+											'admin/tmpl/dtmpl/arrayitem_filter/' + param.module + '/'  + field.c_id,
+											'编辑过滤器', undefined, {
+												reqParam 	: reqParam,
+												width		: 1000,
+												height		: 500,
+												events		: {
+													afterSave	: function(filterId){
+														$group.attr('array-item-filter-id', filterId);
+													}
+												}
+											}
+										);
+								});
 								if(field.composite.expand && field.composite.expand.rabcModule){
 									$dialogItemControl.show().find('a.btn-dialog-rabc-tmplgroup').click(function(){
 										var reqParam = {};
@@ -382,7 +399,7 @@ define(function(require, exports, module){
 						group.rabcTemplateGroupId = $group.attr('rabc-tmpl-group-id');
 						group.rabcUncreatable = $group.find('.rabc-uncreatable').prop('checked')? 1: null;
 						group.rabcUnupdatable = $group.find('.rabc-unupdatable').prop('checked')? 1: null;
-						
+						group.arrayItemFilterId = $group.attr('array-item-filter-id');
 						group.unallowedCreate = $group.find('.create-arrayitem-control :checkbox').prop('checked')? 1 : 0;
 						$arrayTable.find('.title-row>th[field-id]').each(function(){
 							var $th = $(this);

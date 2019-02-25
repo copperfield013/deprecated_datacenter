@@ -28,6 +28,7 @@
 <link type="text/css" rel="stylesheet" href="media/admin/statview/css/statview-list.css" />
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/dtmpl-update.css" />
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/ltmpl-update.css" />
+<link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/stmpl-update.css" />
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/index-area.css" />
 <link type="text/css" rel="stylesheet" href="media/admin/common/chooser/chooser.css" />
 <link type="text/css" rel="stylesheet" href="media/admin/common/icon/icon-selector.css" />

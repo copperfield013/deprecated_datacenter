@@ -291,11 +291,12 @@ public class AdminModulesController {
     		@RequestParam(value=AdminConstants.KEY_FUSE_MODE, required=false) Boolean fuseMode,
     		@RequestParam(value=AdminConstants.KEY_ACTION_ID, required=false) Long actionId,
     		RequestParameterMapComposite composite){
+		UserIdentifier user = UserUtils.getCurrentUser();
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		String moduleName = menu.getTemplateModule();
 		Map<String, Object> entityMap = composite.getMap();
 		if(actionId != null) {
-			ArrayEntityProxy.setLocalUser(UserUtils.getCurrentUser());
+			ArrayEntityProxy.setLocalUser(user);
 			TemplateGroupAction groupAction = tmplGroupService.getTempateGroupAction(actionId);
 			validateGroupAction(groupAction, menu, "");
 			entityMap = atmplService.coverActionFields(groupAction, entityMap);
@@ -303,7 +304,6 @@ public class AdminModulesController {
     	 try {
     		 entityMap.remove(AdminConstants.KEY_FUSE_MODE);
     		 entityMap.remove(AdminConstants.KEY_ACTION_ID);
-    		 UserIdentifier user = UserUtils.getCurrentUser();
     		 if(Boolean.TRUE.equals(fuseMode)) {
     			 mService.fuseEntity(moduleName, entityMap, user);
     		 }else {

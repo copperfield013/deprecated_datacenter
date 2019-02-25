@@ -34,10 +34,13 @@ import cn.sowell.datacenter.common.choose.ChooseTablePage;
 import cn.sowell.datacenter.model.config.service.ConfigureService;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailArrayItemCriteria;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailArrayItemFilter;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailField;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
+import cn.sowell.dataserver.model.tmpl.service.ArrayItemFilterService;
 import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
 
 @Controller
@@ -58,6 +61,9 @@ public class AdminDetailTemplateController {
 	
 	@Resource
 	ConfigureService configService;
+	
+	@Resource
+	ArrayItemFilterService arrayItemFilterService;
 	
 	@RequestMapping("/to_create/{module}")
 	public String toCreate(@PathVariable String module, Model model){
@@ -225,6 +231,7 @@ public class AdminDetailTemplateController {
 						group.setRabcTemplateGroupId(jGroup.getLong("rabcTemplateGroupId"));
 						group.setRabcUncreatable(jGroup.getInteger("rabcUncreatable"));
 						group.setRabcUnupdatable(jGroup.getInteger("rabcUnupdatable"));
+						group.setArrayItemFilterId(jGroup.getLong("arrayItemFilterId"));
 						group.setSelectionTemplateId(jGroup.getLong("selectionTemplateId"));
 						group.setUnallowedCreate(Integer.valueOf(1).equals(jGroup.getInteger("unallowedCreate"))? 1: null);
 						group.setOrder(i++);
@@ -298,6 +305,44 @@ public class AdminDetailTemplateController {
 		} catch (Exception e) {
 			logger.error("加载详情模板列表时发生错误[moduleName=" + moduleName + "]", e);
 			jRes.setStatus("error");
+		}
+		return jRes;
+	}
+	
+	@RequestMapping("/arrayitem_filter/{moduleName}/{compositeId}")
+	public String arrayItemFilter(@PathVariable String moduleName,
+			@PathVariable Long compositeId, Long filterId, Model model) {
+		ModuleMeta module = mService.getModule(moduleName);
+		if(filterId != null) {
+			TemplateDetailArrayItemFilter filter = arrayItemFilterService.getTemplate(filterId);
+			model.addAttribute("filter", filter);
+			JSONArray criteriaDataJSON = ListTemplateFormater.toCriteriaData(filter.getCriterias());
+			model.addAttribute("criteriaDataJSON", criteriaDataJSON);
+		}
+		
+		model.addAttribute("module", module);
+		model.addAttribute("compositeId", compositeId);
+		return AdminConstants.JSP_TMPL_DETAIL + "/dtmpl_arrayitem_filter_update.jsp";
+	}
+	
+	@ResponseBody
+	@RequestMapping("/arrayitem_filter_save/{moduleName}/{compositeId}")
+	public ResponseJSON arrayItemFilterSave(@RequestBody JsonRequest jReq) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		Long filterId = jReq.getJsonObject().getLong("filterId");
+		TemplateDetailArrayItemFilter filter = new TemplateDetailArrayItemFilter();
+		if(filterId != null) {
+			filter.setId(filterId);
+		}
+		JSONArray jCriterias = jReq.getJsonObject().getJSONArray("criteriaData");
+		List<TemplateDetailArrayItemCriteria> criterias = ListTemplateFormater.getCriterias(jCriterias, TemplateDetailArrayItemCriteria::new, null);
+		if(criterias != null) {
+			filter.setCriterias(criterias);
+			filterId = arrayItemFilterService.merge(filter);
+			if(filterId != null) {
+				jRes.put("filterId", filterId);
+				jRes.setStatus("suc");
+			}
 		}
 		return jRes;
 	}

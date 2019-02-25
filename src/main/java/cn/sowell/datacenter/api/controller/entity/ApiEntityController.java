@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -151,7 +153,7 @@ public class ApiEntityController {
 		res.put("entities", toEntities(view));
 		res.put("pageInfo", view.getCriteria().getPageInfo());
 		res.put("criterias", toCriterias(view, criteria));
-		res.put("actions", toActions(tmplGroup.getActions()));
+		res.put("actions", toActions(tmplGroup.getActions(), TemplateGroupAction.ACTION_FACE_LIST));
 		res.put("buttons", toHideButtons(tmplGroup));
 		return res;
 	}
@@ -168,11 +170,14 @@ public class ApiEntityController {
 	}
 
 
-	private JSONArray toActions(List<TemplateGroupAction> actions) {
+	private JSONArray toActions(List<TemplateGroupAction> actions, String actionFace) {
 		JSONArray aActions = new JSONArray();
 		if(actions != null) {
-			actions.stream()
-				.filter(action->TemplateGroupAction.ACTION_FACE_LIST.equals(action.getFace()))
+			Stream<TemplateGroupAction> stream = actions.stream();;
+			if(actionFace != null) {
+				stream = actions.stream().filter(action->actionFace.equals(action.getFace()));
+			}
+			stream
 				.forEach(action->{
 					JSONObject jAction = new JSONObject();
 					jAction.put("id", action.getId());
@@ -305,6 +310,10 @@ public class ApiEntityController {
         TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
         TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
     	
+        List<TemplateGroupAction> actions = tmplGroup.getActions();
+        res.put("actions", toActions(actions, TemplateGroupAction.ACTION_FACE_DETAIL));
+    	res.put("premises", JSON.toJSON(tmplGroup.getPremises()));
+        
     	JSONObject jEntity = toEntityJson(null, dtmpl);
     	
     	res.put("module", toModule(moduleMeta));
@@ -335,11 +344,16 @@ public class ApiEntityController {
         if(entity == null) {
         	entity = mService.getEntity(moduleName, code, null, user);
         }
-    	
+        List<TemplateGroupAction> actions = tmplGroup.getActions();
+        res.put("actions", toActions(actions, TemplateGroupAction.ACTION_FACE_DETAIL));
+    	res.put("premises", JSON.toJSON(tmplGroup.getPremises()));
+        
+        
         if(entity != null) {
         	JSONObject jEntity = toEntityJson(entity, dtmpl);
         	
         	List<EntityHistoryItem> historyItems = mService.queryHistory(menu.getTemplateModule(), code, 1, 100, user);
+        	
         	
         	res.put("module", toModule(moduleMeta));
         	res.put("entity", jEntity);
@@ -352,6 +366,8 @@ public class ApiEntityController {
 	}
 	
 	
+
+
 	private JSONArray toHistoryItems(List<EntityHistoryItem> historyItems, Long currentId) {
 		JSONArray aHistoryItems = new JSONArray();
 		if(historyItems != null) {
@@ -478,13 +494,22 @@ public class ApiEntityController {
 	@RequestMapping("/update/{menuId}")
 	public ResponseJSON update(
 			@PathVariable Long menuId,
-			@RequestParam(value=KEY_FUSE_MODE, required=false) Boolean fuseMode,
+			@RequestParam(value=AdminConstants.KEY_FUSE_MODE, required=false) Boolean fuseMode,
+			@RequestParam(value=AdminConstants.KEY_ACTION_ID, required=false) Long actionId,
     		RequestParameterMapComposite composite, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
 		String moduleName = menu.getTemplateModule();
+		Map<String, Object> entityMap = composite.getMap();
+		if(actionId != null) {
+			ArrayEntityProxy.setLocalUser(user);
+			TemplateGroupAction groupAction = tmplGroupService.getTempateGroupAction(actionId);
+			AdminModulesController.validateGroupAction(groupAction, menu, "");
+			entityMap = atmplService.coverActionFields(groupAction, entityMap);
+		}
     	 try {
-    		 composite.getMap().remove(KEY_FUSE_MODE);
+    		 entityMap.remove(AdminConstants.KEY_FUSE_MODE);
+    		 entityMap.remove(AdminConstants.KEY_ACTION_ID);
     		 String code = null;
     		 if(Boolean.TRUE.equals(fuseMode)) {
     			 code = mService.fuseEntity(moduleName, composite.getMap(), user);

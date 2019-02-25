@@ -11,7 +11,7 @@
 <title>${title }</title>
 <div id="dtmpl-update-${module.name}-${tmpl.id }-${RES_STAMP}" class="dtmpl-update">
 	<script type="jquery/tmpl" id="tmpl-field-group">
-		<div class="widget field-group" data-id="\${id}" stmpl-id="\${selectionTemplateId}" rdtmpl-id="\${relationDetailTemplateId}" rabc-tmpl-group-id="\${rabcTemplateGroupId}">
+		<div class="widget field-group" data-id="\${id}" stmpl-id="\${selectionTemplateId}" rdtmpl-id="\${relationDetailTemplateId}" rabc-tmpl-group-id="\${rabcTemplateGroupId}" array-item-filter-id="\${arrayItemFilterId}">
 			<div class="widget-header">
 				<span class="widget-caption">
 					<span class="group-title">\${title}</span>
@@ -38,7 +38,13 @@
 	         	         </label>
 	             	</div>
 				</c:if>
-				<div class="widget-buttons select-arrayitem-control" style="display:none">
+				<div class="widget-buttons filter-arrayitem-control buttons-bordered" style="display:none" >
+					<a class="btn btn-info btn-xs btn-filter">
+						<i class="fa fa-link"></i>
+						筛选
+					</a>
+             	</div>
+				<div class="widget-buttons select-arrayitem-control  buttons-bordered" style="display:none">
 					<a class="btn btn-info btn-xs btn-select">
 						<i class="fa fa-link"></i>
 						选择

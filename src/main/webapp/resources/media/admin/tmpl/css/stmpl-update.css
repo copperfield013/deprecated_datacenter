@@ -545,7 +545,8 @@
     color: #FFff00;
 }
 
-.stmpl-update .ltmpl-criterias .field-search div.fieldpicker-container{
+.stmpl-update .ltmpl-criterias .field-search div.fieldpicker-container,
+.dtmpl-arrayitem-filter .ltmpl-criterias .field-search div.fieldpicker-container{
 	width: 400px;
 }
 

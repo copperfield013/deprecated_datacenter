@@ -114,41 +114,52 @@ public class ListTemplateFormater {
 				tmpl.setColumns(columns);
 			}
 			
-			JSONArray criteriaData = json.getJSONArray("criteriaData");
-			if(criteriaData != null){
-				List<CRI> criterias = new ArrayList<CRI>();
-				int order = 0;
-				for (Object e : criteriaData) {
-					JSONObject item = (JSONObject) e;
-					CRI criteria = criSupplier.get();
-					criteria.setRelation("and");
-					criteria.setId(item.getLong("id"));
-					criteria.setTitle(item.getString("title"));
-					criteria.setOrder(order++);
-					if(item.getBooleanValue("fieldAvailable")) {
-						criteria.setFieldId(item.getLong("fieldId"));
-						criteria.setRelationLabel(item.getString("relationLabel"));
-						//条件需要显示
-						criteria.setComparator(item.getString("comparator"));
-						criteria.setInputType(item.getString("inputType"));
-						criteria.setDefaultValue(item.getString("defVal"));
-						Boolean queryShow = item.getBoolean("queryShow");
-						if(queryShow != null && queryShow){
-							criteria.setQueryShow(1);
-							criteria.setPlaceholder(item.getString("placeholder"));
-						}
-					}else {
-						criteria.setFieldUnavailable();
-					}
-					if(handlers != null && handlers.getCriteriaConsumer() != null) {
-						handlers.getCriteriaConsumer().accept(criteria, item);
-					}
-					criterias.add(criteria);
-				}
+			List<CRI> criterias = getCriterias(json.getJSONArray("criteriaData"), criSupplier, handlers);
+			if(criterias != null) {
 				tmpl.setCriterias(criterias);
 			}
 			
 		}
 		return tmpl;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static 
+				<CRI extends AbstractListCriteria> 
+			List<CRI> getCriterias(JSONArray criteriaData, Supplier<CRI> criSupplier,
+					Handlers handlers) {
+		if(criteriaData != null){
+			List<CRI> criterias = new ArrayList<CRI>();
+			int order = 0;
+			for (Object e : criteriaData) {
+				JSONObject item = (JSONObject) e;
+				CRI criteria = criSupplier.get();
+				criteria.setRelation("and");
+				criteria.setId(item.getLong("id"));
+				criteria.setTitle(item.getString("title"));
+				criteria.setOrder(order++);
+				if(item.getBooleanValue("fieldAvailable")) {
+					criteria.setFieldId(item.getLong("fieldId"));
+					criteria.setRelationLabel(item.getString("relationLabel"));
+					//条件需要显示
+					criteria.setComparator(item.getString("comparator"));
+					criteria.setInputType(item.getString("inputType"));
+					criteria.setDefaultValue(item.getString("defVal"));
+					Boolean queryShow = item.getBoolean("queryShow");
+					if(queryShow != null && queryShow){
+						criteria.setQueryShow(1);
+						criteria.setPlaceholder(item.getString("placeholder"));
+					}
+				}else {
+					criteria.setFieldUnavailable();
+				}
+				if(handlers != null && handlers.getCriteriaConsumer() != null) {
+					handlers.getCriteriaConsumer().accept(criteria, item);
+				}
+				criterias.add(criteria);
+			}
+			return criterias;
+		}
+		return null;
 	}
 }

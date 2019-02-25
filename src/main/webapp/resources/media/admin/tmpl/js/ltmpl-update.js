@@ -16,18 +16,25 @@ define(function(require, exports, module){
 		}
 		return def.promise();
 	}
-	exports.init = function($page, tmplData, criteriaData, columnData, module){
+	exports.init = function($page, tmplData, criteriaData, columnData, module, fieldInputTypeMap, compositeId){
 		console.log($page);
 		initTmpl($page, tmplData);
-		initCriteria($page, criteriaData, module);
-		initListTable($page, tmplData, columnData, module);
+		initCriteria($page, criteriaData, module, compositeId);
+		if(columnData){
+			initListTable($page, tmplData, columnData, module);
+		}
 		var Dialog = require('dialog');
+		var filterMode = !!compositeId;
 		$('#save', $page).click(function(){
 			var tmplTitle = getTmplTitle();
-			if(tmplTitle){
+			if(filterMode || tmplTitle){
 				var columnData = getColumnData();
 				var criteriaData = getCriteriaData();
-				require('ajax').postJson('admin/tmpl/ltmpl/save', {
+				var saveURI = 'admin/tmpl/ltmpl/save';
+				if(filterMode){
+					saveURI = 'admin/tmpl/dtmpl/arrayitem_filter_save/' + module + '/' + compositeId;
+				}
+				require('ajax').postJson(saveURI, {
 					tmplId		: tmplData? tmplData.id: null,
 					module		: module,
 					title		: tmplTitle,
@@ -40,9 +47,19 @@ define(function(require, exports, module){
 					if(data.status === 'suc'){
 						Dialog.notice('保存成功', 'success');
 						$page.getLocatePage().close();
-						var tpage = require('page').getPage( module + '_ltmpl_list');
-						if(tpage){
-							tpage.refresh();
+						if(!filterMode){
+							var tpage = require('page').getPage( module + '_ltmpl_list');
+							if(tpage){
+								tpage.refresh();
+							}
+						}else{
+							var page = $page.getLocatePage();
+							if(page.getPageObj() instanceof Dialog){
+								var afterSave = page.getPageObj().getEventCallbacks('afterSave');
+								if(typeof afterSave === 'function'){
+									afterSave.apply(page, [data.filterId]);
+								}
+							}
 						}
 					}else{
 						Dialog.notice('保存失败', 'error');
@@ -146,7 +163,7 @@ define(function(require, exports, module){
 		}
 	}
 	
-	function initCriteria($page, criteriaData, module){
+	function initCriteria($page, criteriaData, module, compositeId){
 		
 		var cField = null,
 			cComposite = null;
@@ -168,6 +185,7 @@ define(function(require, exports, module){
 			module			: module,
 			fieldFilters	: ['file'], 
 			fieldModes		: ['field', 'relation'],
+			compositeId		: compositeId,
 			afterChoose		: function(field){
 				enableCurrent();
 				if(field.__type__ == 'field'){
