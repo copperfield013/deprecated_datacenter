@@ -13,6 +13,8 @@ import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.model.admin.pojo.ABCUser;
 import cn.sowell.datacenter.model.config.service.ConfigUserService;
 import cn.sowell.datacenter.model.config.service.NonAuthorityException;
+import cn.sowell.dataserver.model.abc.service.EntityQueryParameter;
+import cn.sowell.dataserver.model.abc.service.ModuleEntityService;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
@@ -28,6 +30,9 @@ public class ConfigUserServiceImpl implements ConfigUserService {
 	
 	@Resource
 	DetailTemplateService dtmplService;
+	
+	@Resource
+	ModuleEntityService entityService;
 	
 	@Override
 	public String getUserModuleName() {
@@ -67,7 +72,9 @@ public class ConfigUserServiceImpl implements ConfigUserService {
 	@Override
 	public void mergeUserEntity(Map<String, Object> map, ABCUser operateUser) {
 		//TODO: 验证操作用户的权限
-		mService.mergeEntity(getUserModuleName(), map, operateUser);
+		EntityQueryParameter param = new EntityQueryParameter(getUserModuleName(), operateUser);
+		entityService.mergeEntity(param, map);
+		//mService.mergeEntity(getUserModuleName(), map, operateUser);
 		
 	}
 

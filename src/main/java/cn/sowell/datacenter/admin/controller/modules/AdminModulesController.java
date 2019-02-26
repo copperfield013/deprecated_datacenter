@@ -41,11 +41,15 @@ import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.impl.ABCNodeProxy;
+import cn.sowell.datacenter.entityResolver.impl.RelationEntityPropertyParser;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.config.service.NonAuthorityException;
 import cn.sowell.datacenter.model.config.service.SideMenuService;
 import cn.sowell.datacenter.model.modules.service.ExportService;
+import cn.sowell.dataserver.model.abc.service.EntitiesQueryParameter;
+import cn.sowell.dataserver.model.abc.service.EntityQueryParameter;
+import cn.sowell.dataserver.model.abc.service.ModuleEntityService;
 import cn.sowell.dataserver.model.dict.pojo.DictionaryComposite;
 import cn.sowell.dataserver.model.dict.service.DictionaryService;
 import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
@@ -67,6 +71,7 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionTemplate;
 import cn.sowell.dataserver.model.tmpl.service.ActionTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.ArrayItemFilterService;
 import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.ListCriteriaFactory;
 import cn.sowell.dataserver.model.tmpl.service.ListTemplateService;
@@ -118,6 +123,13 @@ public class AdminModulesController {
 	
 	@Resource
 	ListCriteriaFactory lcriteriFacrory;
+	
+	@Resource
+	ModuleEntityService entityService;
+	
+	@Resource
+	ArrayItemFilterService arrayItemFilterService;
+	
 	
 	
 	Logger logger = Logger.getLogger(AdminModulesController.class);
@@ -190,14 +202,19 @@ public class AdminModulesController {
         
         ModuleEntityPropertyParser entity = null;
         UserIdentifier user = UserUtils.getCurrentUser();
-        EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, code, user);
+        EntityQueryParameter queryParam = new EntityQueryParameter(moduleName, code, user);
+        queryParam.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(dtmpl.getId(), user));
+        
+        EntityHistoryItem lastHistory = entityService.getLastHistoryItem(queryParam);
 		if(historyId != null) {
 			if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
-				entity = mService.getHistoryEntityParser(moduleName, code, historyId, user);
+				entity = entityService.getHistoryEntityParser(queryParam, historyId, null);
+				//entity = mService.getHistoryEntityParser(moduleName, code, historyId, user);
 			}
         }
         if(entity == null) {
-        	entity = mService.getEntity(moduleName, code, null, user);
+        	entity = entityService.getEntityParser(queryParam);
+        	//entity = mService.getEntity(moduleName, code, null, user);
         }
         if(lastHistory != null) {
         	model.addAttribute("hasHistory", true);
@@ -256,7 +273,11 @@ public class AdminModulesController {
 		ModuleMeta mMeta = mService.getModule(moduleName);
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
 		FusionContextConfig config = fFactory.getModuleConfig(moduleName);
-		ModuleEntityPropertyParser entity = mService.getEntity(moduleName, code, null, UserUtils.getCurrentUser());
+		UserIdentifier user = UserUtils.getCurrentUser();
+		EntityQueryParameter queryParam = new EntityQueryParameter(moduleName, code, user);
+		queryParam.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(tmplGroup.getDetailTemplateId(), user));
+		ModuleEntityPropertyParser entity = entityService.getEntityParser(queryParam);
+		//ModuleEntityPropertyParser entity = mService.getEntity(moduleName, code, null, UserUtils.getCurrentUser());
 		TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
 		model.addAttribute("menu", menu);
 		model.addAttribute("entity", entity);
@@ -268,7 +289,7 @@ public class AdminModulesController {
 		List<TemplateGroupAction> outgoingGroupActions = new ArrayList<>(),
 								normalGroupActions = new ArrayList<>();
 		for (TemplateGroupAction action : groupActions) {
-			if(TextUtils.hasText(action.getIconClass()) && Integer.valueOf(1).equals(action.getOutgoing())) {
+			if(TextUtils.hasText(action.getIconClass()) && 1 == action.getOutgoing()) {
 				outgoingGroupActions.add(action);
 			}else {
 				normalGroupActions.add(action);
@@ -304,10 +325,16 @@ public class AdminModulesController {
     	 try {
     		 entityMap.remove(AdminConstants.KEY_FUSE_MODE);
     		 entityMap.remove(AdminConstants.KEY_ACTION_ID);
+    		 EntityQueryParameter param = new EntityQueryParameter(moduleName, user);
+    		 Long tmplGroupId = menu.getTemplateGroupId();
+    		 TemplateGroup tmplGroup = tmplGroupService.getTemplate(tmplGroupId);
+    		 param.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(tmplGroup.getDetailTemplateId(), user));
     		 if(Boolean.TRUE.equals(fuseMode)) {
-    			 mService.fuseEntity(moduleName, entityMap, user);
+    			 entityService.fuseEntity(param, entityMap);
+    			 //mService.fuseEntity(moduleName, entityMap, user);
     		 }else {
-    			 mService.mergeEntity(moduleName, entityMap, user);
+    			 entityService.mergeEntity(param, entityMap);
+    			 //mService.mergeEntity(moduleName, entityMap, user);
     		 }
              return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("保存成功", "entity_list_" + menuId);
          } catch (Exception e) {
@@ -328,7 +355,8 @@ public class AdminModulesController {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
     	JSONObjectResponse response = new JSONObjectResponse();
     	try {
-			List<EntityHistoryItem> historyItems = mService.queryHistory(menu.getTemplateModule(), code, pageNo, pageSize, UserUtils.getCurrentUser());
+			EntityQueryParameter param = new EntityQueryParameter(menu.getTemplateModule(), code, UserUtils.getCurrentUser());
+			List<EntityHistoryItem> historyItems = entityService.queryHistory(param , pageNo, pageSize);
 			response.put("history", JSON.toJSON(historyItems));
 			response.setStatus("suc");
 			if(historyItems.size() < pageSize){
@@ -349,7 +377,8 @@ public class AdminModulesController {
 			) {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		try {
-			mService.deleteEntity(menu.getTemplateModule(), code, UserUtils.getCurrentUser());
+			EntityQueryParameter param = new EntityQueryParameter(menu.getTemplateModule(), code, UserUtils.getCurrentUser());
+			entityService.delete(param);
 			return AjaxPageResponse.REFRESH_LOCAL("删除成功");
 		} catch (Exception e) {
 			logger.error("删除失败", e);
@@ -364,7 +393,9 @@ public class AdminModulesController {
 			@RequestParam String codes) {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		try {
-			mService.removeEntities(menu.getTemplateModule(), collectCode(codes), UserUtils.getCurrentUser());
+			EntitiesQueryParameter param = new EntitiesQueryParameter(menu.getTemplateModule(), UserUtils.getCurrentUser());
+			param.setEntityCodes(param.getEntityCodes());
+			entityService.remove(param);
 			return AjaxPageResponse.REFRESH_LOCAL("删除成功");
 		} catch (Exception e) {
 			logger.error("删除失败", e);
@@ -434,7 +465,9 @@ public class AdminModulesController {
 					
 					FusionContextConfig config = fFactory.getModuleConfig(rabcModuleName);
 					if(TextUtils.hasText(entityCode)) {
-						ModuleEntityPropertyParser entity = mService.getEntity(rabcModuleName, entityCode, null, UserUtils.getCurrentUser());
+						EntityQueryParameter queryParam = new EntityQueryParameter(rabcModuleName, entityCode, UserUtils.getCurrentUser());
+						ModuleEntityPropertyParser entity = entityService.getEntityParser(queryParam);
+						//ModuleEntityPropertyParser entity = mService.getEntity(rabcModuleName, entityCode, null, UserUtils.getCurrentUser());
 						model.addAttribute("entity", entity);
 					}
 					TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
@@ -495,10 +528,11 @@ public class AdminModulesController {
     		 entityMap.remove(AdminConstants.KEY_FUSE_MODE);
     		 UserIdentifier user = UserUtils.getCurrentUser();
     		 String entityCode = null;
+    		 EntityQueryParameter param = new EntityQueryParameter(moduleName, user);
     		 if(Boolean.TRUE.equals(fuseMode)) {
-    			 entityCode = mService.fuseEntity(moduleName, entityMap, user);
+				entityCode = entityService.fuseEntity(param, entityMap);
     		 }else {
-    			 entityCode = mService.mergeEntity(moduleName, entityMap, user);
+    			 entityCode = entityService.mergeEntity(param, entityMap);
     		 }
     		 if(TextUtils.hasText(entityCode)) {
     			 jRes.put("entityCode", entityCode);
@@ -525,11 +559,15 @@ public class AdminModulesController {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		authService.vaidateL2MenuAccessable(menuId);
 		TemplateSelectionTemplate stmpl = stmplService.getTemplate(stmplId);
-		Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(
+		EntitiesQueryParameter param = new EntitiesQueryParameter(stmpl.getModule(), UserUtils.getCurrentUser());
+		param.setEntityCodes(TextUtils.split(codes, ",", HashSet<String>::new, c->c));
+		Map<String, RelationEntityPropertyParser> parsers = entityService.queryRelationEntityParsers(param, stmpl.getRelationName());
+		
+		/*Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(
 				stmpl.getModule(), 
 				stmpl.getRelationName(), 
 				TextUtils.split(codes, ",", HashSet<String>::new, c->c), UserUtils.getCurrentUser())
-				;
+				;*/
 		JSONObject entities = toEntitiesJson(parsers, TextUtils.split(fields, ",", HashSet<String>::new, f->f));
 		jRes.put("entities", entities);
 		jRes.setStatus("suc");
@@ -543,11 +581,14 @@ public class AdminModulesController {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		DictionaryComposite composite = dictService.getComposite(menu.getTemplateModule(), relationCompositeId);
-		Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(
-				composite.getModule(), 
-				composite.getName(), 
-				TextUtils.split(codes, ",", HashSet<String>::new, c->c), UserUtils.getCurrentUser())
-				;
+		EntitiesQueryParameter param = new EntitiesQueryParameter(composite.getModule(), UserUtils.getCurrentUser());
+		param.setEntityCodes(TextUtils.split(codes, ",", HashSet<String>::new, c->c));
+		Map<String, RelationEntityPropertyParser> parsers = entityService.queryRelationEntityParsers(param , composite.getName());
+//		Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(
+//				composite.getModule(), 
+//				composite.getName(), 
+//				TextUtils.split(codes, ",", HashSet<String>::new, c->c), UserUtils.getCurrentUser())
+//				;
 		JSONObject entities = toEntitiesJson(parsers, TextUtils.split(fields, ",", HashSet<String>::new, f->f));
 		jRes.put("entities", entities);
 		jRes.setStatus("suc");
@@ -555,7 +596,7 @@ public class AdminModulesController {
 		
 	}
 
-	public static JSONObject toEntitiesJson(Map<String, CEntityPropertyParser> parsers, Set<String> fieldNames) {
+	public static JSONObject toEntitiesJson(Map<String, ? extends CEntityPropertyParser> parsers, Set<String> fieldNames) {
 		JSONObject entities = new JSONObject();
 		if(parsers != null && fieldNames != null) {
 			parsers.forEach((code, parser)->{

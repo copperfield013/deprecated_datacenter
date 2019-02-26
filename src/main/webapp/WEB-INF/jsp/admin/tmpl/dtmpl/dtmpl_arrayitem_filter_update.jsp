@@ -137,14 +137,8 @@
 															</div>
 														</div>
 														<div>
-															<label id="default-value-label">默认值</label>
+															<label id="default-value-label">值</label>
 															<div id="criteria-default-value-container">
-															</div>
-														</div>
-														<div id="criteria-placeholder-row">
-															<label>占位文本</label>
-															<div>
-																<input id="criteria-detail-placeholder" type="text">
 															</div>
 														</div>
 													</div>

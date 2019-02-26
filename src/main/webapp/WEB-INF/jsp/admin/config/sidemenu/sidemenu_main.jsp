@@ -100,6 +100,7 @@
 												<a title="详情模板" href="admin/tmpl/dtmpl/list/${module.name }" class="tab" target="${module.name }_dtmpl_list"><i class="iconfont icon-detail"></i></a>
 												<a title="操作模板" href="admin/tmpl/atmpl/list/${module.name }" class="tab" target="${module.name }_atmpl_list"><i class="iconfont icon-action"></i></a>
 												<a title="字段过滤" href="admin/tmpl/dictfilter/list/${module.name }" class="tab" target="${module.name }_dictfilter_list"><i class="iconfont icon-filter"></i></a>
+												<a title="模板组合" href="admin/tmpl/tree/list/${module.name }" class="tab" target="${module.name }_tmpl_tree_list"><i class="iconfont icon-tree"></i></a>
 												<a title="模板组合" href="admin/tmpl/group/list/${module.name }" class="tab" target="${module.name }_tmpl_group_list"><i class="iconfont icon-group"></i></a>
 											</span>
 										</div>

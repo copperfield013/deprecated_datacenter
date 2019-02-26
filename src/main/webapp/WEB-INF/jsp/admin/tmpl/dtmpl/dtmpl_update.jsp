@@ -39,10 +39,14 @@
 	             	</div>
 				</c:if>
 				<div class="widget-buttons filter-arrayitem-control buttons-bordered" style="display:none" >
-					<a class="btn btn-info btn-xs btn-filter">
+					<a class="btn btn-info btn-xs btn-filter" style="\${arrayItemFilterId? '': 'display:none;'}">
 						<i class="fa fa-link"></i>
 						筛选
 					</a>
+					<label title="是否筛选">
+         	            <input type="checkbox" class="filterable colored-blue" \${arrayItemFilterId? 'checked="checked"': ''}>
+         	            <span class="text"></span>
+         	         </label>
              	</div>
 				<div class="widget-buttons select-arrayitem-control  buttons-bordered" style="display:none">
 					<a class="btn btn-info btn-xs btn-select">

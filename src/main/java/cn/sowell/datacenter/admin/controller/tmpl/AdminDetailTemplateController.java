@@ -315,11 +315,12 @@ public class AdminDetailTemplateController {
 		ModuleMeta module = mService.getModule(moduleName);
 		if(filterId != null) {
 			TemplateDetailArrayItemFilter filter = arrayItemFilterService.getTemplate(filterId);
-			model.addAttribute("filter", filter);
-			JSONArray criteriaDataJSON = ListTemplateFormater.toCriteriaData(filter.getCriterias());
-			model.addAttribute("criteriaDataJSON", criteriaDataJSON);
+			if(filter != null) {
+				model.addAttribute("filter", filter);
+				JSONArray criteriaDataJSON = ListTemplateFormater.toCriteriaData(filter.getCriterias());
+				model.addAttribute("criteriaDataJSON", criteriaDataJSON);
+			}
 		}
-		
 		model.addAttribute("module", module);
 		model.addAttribute("compositeId", compositeId);
 		return AdminConstants.JSP_TMPL_DETAIL + "/dtmpl_arrayitem_filter_update.jsp";
@@ -327,10 +328,12 @@ public class AdminDetailTemplateController {
 	
 	@ResponseBody
 	@RequestMapping("/arrayitem_filter_save/{moduleName}/{compositeId}")
-	public ResponseJSON arrayItemFilterSave(@RequestBody JsonRequest jReq) {
+	public ResponseJSON arrayItemFilterSave(@PathVariable String moduleName, @PathVariable Long compositeId, @RequestBody JsonRequest jReq) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		Long filterId = jReq.getJsonObject().getLong("filterId");
 		TemplateDetailArrayItemFilter filter = new TemplateDetailArrayItemFilter();
+		filter.setModule(moduleName);
+		filter.setCompositeId(compositeId);
 		if(filterId != null) {
 			filter.setId(filterId);
 		}

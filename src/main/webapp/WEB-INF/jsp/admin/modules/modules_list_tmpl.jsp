@@ -183,7 +183,7 @@
 										<c:when test="${fn:startsWith(column.specialField, 'operate')}">
 											<c:if test="${fn:contains(column.specialField, '-d') }">
 												<a href="admin/modules/curd/detail/${menu.id}/${parser.code}" 
-													target="module_detail_${parser.code }" 
+													target="module_detail_${menu.id }_${parser.code }" 
 													title="详情-${parser.title }"
 													class="tab btn btn-success btn-xs">
 													<i class="fa fa-book"></i>详情
@@ -191,7 +191,7 @@
 											</c:if>
 											<c:if test="${moduleWritable }">
 												<c:if test="${fn:contains(column.specialField, '-u') }">
-													<a target="module_update_${parser.code }" 
+													<a target="module_update_${menu.id }_${parser.code }" 
 														title="修改-${parser.title }" 
 														href="admin/modules/curd/update/${menu.id }/${parser.code }" 
 														class="tab btn btn-info btn-xs edit">

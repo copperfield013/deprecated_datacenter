@@ -31,13 +31,16 @@ import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.admin.controller.modules.AdminModulesController;
 import cn.sowell.datacenter.common.RequestParameterMapComposite;
-import cn.sowell.datacenter.entityResolver.CEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.FieldDescCacheMap;
 import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
+import cn.sowell.datacenter.entityResolver.impl.RelationEntityPropertyParser;
 import cn.sowell.datacenter.model.admin.pojo.ABCUser;
 import cn.sowell.datacenter.model.config.service.ConfigUserService;
 import cn.sowell.datacenter.model.modules.service.ExportService;
+import cn.sowell.dataserver.model.abc.service.EntitiesQueryParameter;
+import cn.sowell.dataserver.model.abc.service.EntityQueryParameter;
+import cn.sowell.dataserver.model.abc.service.ModuleEntityService;
 import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.modules.service.ViewDataService;
@@ -46,6 +49,7 @@ import cn.sowell.dataserver.model.modules.service.view.SelectionTemplateEntityVi
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionTemplate;
+import cn.sowell.dataserver.model.tmpl.service.ArrayItemFilterService;
 import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.SelectionTemplateService;
 
@@ -71,6 +75,12 @@ public class AdminConfigUserController {
 	@Resource
 	ExportService eService;
 	
+	@Resource
+	ModuleEntityService entityService;
+	
+	@Resource
+	ArrayItemFilterService arrayItemFilterService;
+	
 	
 	static Logger logger = Logger.getLogger(AdminConfigUserController.class);
 	
@@ -88,14 +98,18 @@ public class AdminConfigUserController {
 				
 				
 				ModuleEntityPropertyParser entity = null;
-				EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, code, user);
+				EntityQueryParameter param = new EntityQueryParameter(moduleName, code, user);
+				param.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(dtmpl.getId(), user));
+				EntityHistoryItem lastHistory = entityService.getLastHistoryItem(param );
+				//EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, code, user);
 				if(historyId != null) {
 					if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
-						mService.getHistoryEntityParser(moduleName, code, historyId, user);
+						entity = entityService.getHistoryEntityParser(param, historyId, null);
 					}
 		        }
 		        if(entity == null) {
-		        	entity = mService.getEntity(moduleName, code, null, user);
+		        	entity = entityService.getEntityParser(param);
+		        	//entity = mService.getEntity(moduleName, code, null, user);
 		        }
 				
 		        if(lastHistory != null) {
@@ -120,7 +134,9 @@ public class AdminConfigUserController {
 		if(user != null) {
 			TemplateDetailTemplate dtmpl = userService.getUserDetailTemplate(tmplId);
 			if(dtmpl != null){
-				ModuleEntityPropertyParser entity = mService.getEntity(dtmpl.getModule(), user.getCode(), null, user);
+				EntityQueryParameter queryParam = new EntityQueryParameter(dtmpl.getModule(), user.getCode(), user);
+				ModuleEntityPropertyParser entity = entityService.getEntityParser(queryParam);
+				//ModuleEntityPropertyParser entity = mService.getEntity(dtmpl.getModule(), user.getCode(), null, user);
 				FusionContextConfig config = userService.getUserModuleConfig();
 				model.addAttribute("module", mService.getModule(config.getModule()));
 				model.addAttribute("config", config);
@@ -213,11 +229,19 @@ public class AdminConfigUserController {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		TemplateSelectionTemplate stmpl = stmplService.getTemplate(stmplId);
 		userService.validateUserAuthentication(stmpl.getModule());
-		Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(
+		/*Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(
 				stmpl.getModule(), 
 				stmpl.getRelationName(), 
 				TextUtils.split(codes, ",", HashSet<String>::new, c->c), UserUtils.getCurrentUser())
-				;
+				;*/
+		
+		EntitiesQueryParameter param = new EntitiesQueryParameter(stmpl.getModule(), UserUtils.getCurrentUser());
+		param.setEntityCodes(TextUtils.split(codes, ",", HashSet<String>::new, c->c));
+		
+		Map<String, RelationEntityPropertyParser> parsers = 
+				entityService.queryRelationEntityParsers(param, stmpl.getRelationName());
+		
+		
 		JSONObject entities = AdminModulesController.toEntitiesJson(parsers, TextUtils.split(fields, ",", HashSet<String>::new, f->f));
 		jRes.put("entities", entities);
 		jRes.setStatus("suc");
@@ -232,7 +256,9 @@ public class AdminConfigUserController {
 		ABCUser user = UserUtils.getCurrentUser(ABCUser.class);
     	JSONObjectResponse response = new JSONObjectResponse();
     	try {
-			List<EntityHistoryItem> historyItems = mService.queryHistory(userService.getUserModuleName(), user.getCode(), pageNo, pageSize, user);
+    		EntityQueryParameter param = new EntityQueryParameter(userService.getUserModuleName(), user.getCode(), user);
+    		List<EntityHistoryItem> historyItems = entityService.queryHistory(param , pageNo, pageSize);
+			//List<EntityHistoryItem> historyItems = mService.queryHistory(userService.getUserModuleName(), user.getCode(), pageNo, pageSize, user);
 			response.put("history", JSON.toJSON(historyItems));
 			response.setStatus("suc");
 			if(historyItems.size() < pageSize){
@@ -255,14 +281,18 @@ public class AdminConfigUserController {
 		ABCUser user = UserUtils.getCurrentUser(ABCUser.class);
 		String moduleName = dtmpl.getModule();
 		ModuleEntityPropertyParser entity = null;
-		EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, user.getCode(), user);
+		EntityQueryParameter param = new EntityQueryParameter(moduleName, user.getCode(), user);
+		EntityHistoryItem lastHistory = entityService.getLastHistoryItem(param);
+		//EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, user.getCode(), user);
 		if(historyId != null) {
 			if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
-				entity = mService.getHistoryEntityParser(moduleName, user.getCode(), historyId, user);
+				entity = entityService.getHistoryEntityParser(param, historyId, null);
+				//entity = mService.getHistoryEntityParser(moduleName, user.getCode(), historyId, user);
 			}
         }
         if(entity == null) {
-        	entity = mService.getEntity(moduleName, user.getCode(), null, user);
+        	entity = entityService.getEntityParser(param);
+        	//entity = mService.getEntity(moduleName, user.getCode(), null, user);
         }
 		try {
 			String uuid = eService.exportDetailExcel(entity, dtmpl);

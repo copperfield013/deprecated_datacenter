@@ -38,6 +38,8 @@ import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.modules.service.ExportService;
+import cn.sowell.dataserver.model.abc.service.EntityQueryParameter;
+import cn.sowell.dataserver.model.abc.service.ModuleEntityService;
 import cn.sowell.dataserver.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
 import cn.sowell.dataserver.model.modules.pojo.criteria.NormalCriteria;
@@ -76,6 +78,9 @@ public class ApiEntityExportController {
 	
 	@Resource
 	ListCriteriaFactory lcriteriaFactory;
+	
+	@Resource
+	ModuleEntityService entityService;
 	
 	Logger logger = Logger.getLogger(AdminModulesExportController.class);
 	
@@ -199,14 +204,18 @@ public class ApiEntityExportController {
 		
 		String moduleName = tmplGroup.getModule();
 		ModuleEntityPropertyParser entity = null;
-		EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, code, user);
+		EntityQueryParameter param = new EntityQueryParameter(moduleName, code, user);
+		EntityHistoryItem lastHistory = entityService.getLastHistoryItem(param);
+		//EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, code, user);
 		if(historyId != null) {
 			if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
-				entity = mService.getHistoryEntityParser(moduleName, code, historyId, user);
+				entity = entityService.getHistoryEntityParser(param, historyId, null);
+				//entity = mService.getHistoryEntityParser(moduleName, code, historyId, user);
 			}
         }
         if(entity == null) {
-        	entity = mService.getEntity(moduleName, code, null, user);
+        	entity = entityService.getEntityParser(param);
+        	//entity = mService.getEntity(moduleName, code, null, user);
         }
 		
 		try {

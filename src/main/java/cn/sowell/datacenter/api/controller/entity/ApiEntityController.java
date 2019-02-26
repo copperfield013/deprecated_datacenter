@@ -38,11 +38,15 @@ import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.UserCodeService;
 import cn.sowell.datacenter.entityResolver.impl.ABCNodeProxy;
 import cn.sowell.datacenter.entityResolver.impl.ArrayItemPropertyParser;
+import cn.sowell.datacenter.entityResolver.impl.RelationEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.impl.RelationEntityProxy;
 import cn.sowell.datacenter.model.admin.service.AdminUserService;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.modules.service.ExportService;
+import cn.sowell.dataserver.model.abc.service.EntitiesQueryParameter;
+import cn.sowell.dataserver.model.abc.service.EntityQueryParameter;
+import cn.sowell.dataserver.model.abc.service.ModuleEntityService;
 import cn.sowell.dataserver.model.dict.pojo.DictionaryComposite;
 import cn.sowell.dataserver.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
@@ -67,6 +71,7 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionTemplate;
 import cn.sowell.dataserver.model.tmpl.service.ActionTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.ArrayItemFilterService;
 import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.ListCriteriaFactory;
 import cn.sowell.dataserver.model.tmpl.service.SelectionTemplateService;
@@ -111,6 +116,13 @@ public class ApiEntityController {
 	
 	@Resource
 	UserCodeService userCodeService;
+	
+	@Resource
+	ModuleEntityService entityService;
+	
+	@Resource
+	ArrayItemFilterService arrayItemFilterService;
+	
 	
 	static Logger logger = Logger.getLogger(ApiEntityController.class);
 	
@@ -335,14 +347,19 @@ public class ApiEntityController {
         
         ModuleEntityPropertyParser entity = null;
         
-        EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, code, user);
+        EntityQueryParameter param = new EntityQueryParameter(moduleName, code, user);
+        param.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(dtmpl.getId(), user));
+		EntityHistoryItem lastHistory = entityService.getLastHistoryItem(param);
+        //EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, code, user);
 		if(historyId != null) {
 			if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
-				entity = mService.getHistoryEntityParser(moduleName, code, historyId, user);
+				entity = entityService.getHistoryEntityParser(param, historyId, null);
+				//entity = mService.getHistoryEntityParser(moduleName, code, historyId, user);
 			}
         }
         if(entity == null) {
-        	entity = mService.getEntity(moduleName, code, null, user);
+        	entity = entityService.getEntityParser(param);
+        	//entity = mService.getEntity(moduleName, code, null, user);
         }
         List<TemplateGroupAction> actions = tmplGroup.getActions();
         res.put("actions", toActions(actions, TemplateGroupAction.ACTION_FACE_DETAIL));
@@ -352,7 +369,8 @@ public class ApiEntityController {
         if(entity != null) {
         	JSONObject jEntity = toEntityJson(entity, dtmpl);
         	
-        	List<EntityHistoryItem> historyItems = mService.queryHistory(menu.getTemplateModule(), code, 1, 100, user);
+        	List<EntityHistoryItem> historyItems = entityService.queryHistory(param, 1, 100);
+        	//List<EntityHistoryItem> historyItems = mService.queryHistory(menu.getTemplateModule(), code, 1, 100, user);
         	
         	
         	res.put("module", toModule(moduleMeta));
@@ -511,10 +529,16 @@ public class ApiEntityController {
     		 entityMap.remove(AdminConstants.KEY_FUSE_MODE);
     		 entityMap.remove(AdminConstants.KEY_ACTION_ID);
     		 String code = null;
+    		 EntityQueryParameter param = new EntityQueryParameter(moduleName, user);
+    		 Long tmplGroupId = menu.getTemplateGroupId();
+    		 TemplateGroup tmplGroup = tmplGroupService.getTemplate(tmplGroupId);
+    		 param.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(tmplGroup.getDetailTemplateId(), user));
     		 if(Boolean.TRUE.equals(fuseMode)) {
-    			 code = mService.fuseEntity(moduleName, composite.getMap(), user);
+    			 code = entityService.fuseEntity(param, entityMap);
+    			 //code = mService.fuseEntity(moduleName, composite.getMap(), user);
     		 }else {
-    			 code = mService.mergeEntity(moduleName, composite.getMap(), user);
+    			 code = entityService.mergeEntity(param, entityMap);
+    			 //code = mService.mergeEntity(moduleName, composite.getMap(), user);
     		 }
     		 if(code != null) {
     			 jRes.put("code", code);
@@ -536,7 +560,10 @@ public class ApiEntityController {
 		JSONObjectResponse res = new JSONObjectResponse();
 		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
 		try {
-			mService.removeEntities(menu.getTemplateModule(), collectCode(codes), user);
+			EntitiesQueryParameter param = new EntitiesQueryParameter(menu.getTemplateModule(), user);
+			param.setEntityCodes(collectCode(codes));
+			entityService.remove(param);
+			//mService.removeEntities(menu.getTemplateModule(), collectCode(codes), user);
 			res.setStatus("suc");
 		} catch (Exception e) {
 			logger.error("删除失败", e);
@@ -595,18 +622,24 @@ public class ApiEntityController {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		authService.vaidateUserL2MenuAccessable(user, menuId);
 		TemplateSelectionTemplate stmpl = stmplService.getTemplate(stmplId);
-		Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(
+		
+		EntitiesQueryParameter param = new EntitiesQueryParameter(stmpl.getModule(), user);
+		param.setEntityCodes(TextUtils.split(codes, ",", HashSet<String>::new, c->c));
+		Map<String, RelationEntityPropertyParser> parsers = entityService.queryRelationEntityParsers(param, stmpl.getRelationName());
+		
+		
+		/*Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(
 				stmpl.getModule(), 
 				stmpl.getRelationName(), 
 				TextUtils.split(codes, ",", HashSet<String>::new, c->c), user)
-				;
+				;*/
 		JSONObject entities = toEntitiesJson(parsers, TextUtils.split(fields, ",", HashSet<String>::new, f->f));
 		jRes.put("entities", entities);
 		jRes.setStatus("suc");
 		return jRes;
 	}
 
-	private JSONObject toEntitiesJson(Map<String, CEntityPropertyParser> parsers, Set<String> fieldNames) {
+	private JSONObject toEntitiesJson(Map<String, RelationEntityPropertyParser> parsers, Set<String> fieldNames) {
 		JSONObject entities = new JSONObject();
 		if(parsers != null && fieldNames != null) {
 			parsers.forEach((code, parser)->{

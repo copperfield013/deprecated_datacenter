@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -28,6 +29,10 @@ import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 
+import com.abc.application.BizFusionContext;
+import com.abc.rrc.query.criteria.EntityCriteriaFactory;
+import com.abc.rrc.query.queryrecord.criteria.Criteria;
+
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.spring.properties.PropertyPlaceholder;
 import cn.sowell.copframe.utils.Assert;
@@ -36,11 +41,14 @@ import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.web.poll.ConsumerThrowException;
 import cn.sowell.copframe.web.poll.ProgressPollableThreadFactory;
 import cn.sowell.copframe.web.poll.WorkProgress;
+import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.UserCodeService;
 import cn.sowell.datacenter.model.modules.bean.EntityExportWriter;
 import cn.sowell.datacenter.model.modules.exception.ExportBreakException;
 import cn.sowell.datacenter.model.modules.service.ExportService;
+import cn.sowell.dataserver.model.abc.service.EntitiesQueryParameter;
+import cn.sowell.dataserver.model.abc.service.ModuleEntityService;
 import cn.sowell.dataserver.model.modules.bean.EntityPagingIterator;
 import cn.sowell.dataserver.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.dataserver.model.modules.pojo.criteria.NormalCriteria;
@@ -48,6 +56,8 @@ import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListColumn;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
+import cn.sowell.dataserver.model.tmpl.service.ArrayItemFilterService;
+import cn.sowell.dataserver.model.tmpl.service.ListCriteriaFactory;
 
 @Service
 public class ExportServiceImpl implements ExportService {
@@ -68,6 +78,19 @@ public class ExportServiceImpl implements ExportService {
 	
 	@Resource
 	UserCodeService userCodeService;
+	
+	@Resource
+	ModuleEntityService entityService;
+	
+	@Resource
+	FusionContextConfigFactory fFactory;
+	
+	@Resource
+	ListCriteriaFactory lcriteriaFactory;
+	
+	@Resource
+	ArrayItemFilterService arrayItemFilterService;
+	
 	
 	private Long exportCacheTimeout = null;
 	
@@ -182,7 +205,13 @@ public class ExportServiceImpl implements ExportService {
 			}
 			progress.setCurrent(13);
 			progress.appendMessage("开始查询数据...");
-			EntityPagingIterator itr = mService.queryIterator(ltmpl, criteria, ePageInfo, user);
+			
+			List<Criteria> mainCriterias = convertCriterias(ltmpl.getModule(), user, criteria);
+			EntitiesQueryParameter param = new EntitiesQueryParameter(ltmpl.getModule(), user, mainCriterias);
+			param.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(dtmpl.getId(), user));
+			EntityPagingIterator itr = entityService.queryExportIterator(param, ePageInfo);
+			
+			//EntityPagingIterator itr = entityService.queryExportIterator(ltmpl, criteria, ePageInfo, user);
 			progress.getLogger().success("数据查找完成，共有" + itr.getDataCount() + "条数据。开始处理数据...");
 			progress.setCurrent(20);
 			int entityNumber = 1;
@@ -261,6 +290,12 @@ public class ExportServiceImpl implements ExportService {
 		}).start();;
 	}
 	
+	private List<Criteria> convertCriterias(String moduleName, UserIdentifier user, Set<NormalCriteria> criteria) {
+		BizFusionContext context = fFactory.getModuleConfig(moduleName).getCurrentContext(user);
+		EntityCriteriaFactory cf = lcriteriaFactory.appendCriterias(criteria, moduleName, context);
+		return cf.getCriterias();
+	}
+
 	EntityExportWriter entityExportWriter = new EntityExportWriter();
 	
 	@Override

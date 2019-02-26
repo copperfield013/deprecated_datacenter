@@ -40,6 +40,8 @@ import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.modules.service.ExportService;
+import cn.sowell.dataserver.model.abc.service.EntityQueryParameter;
+import cn.sowell.dataserver.model.abc.service.ModuleEntityService;
 import cn.sowell.dataserver.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
 import cn.sowell.dataserver.model.modules.pojo.criteria.NormalCriteria;
@@ -47,6 +49,7 @@ import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
+import cn.sowell.dataserver.model.tmpl.service.ArrayItemFilterService;
 import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.ListCriteriaFactory;
 import cn.sowell.dataserver.model.tmpl.service.ListTemplateService;
@@ -79,6 +82,12 @@ public class AdminModulesExportController {
 	
 	@Resource
 	ListCriteriaFactory lcriteriaFactory;
+	
+	@Resource
+	ModuleEntityService entityService;
+	
+	@Resource
+	ArrayItemFilterService arrayItemFilterService;
 	
 	Logger logger = Logger.getLogger(AdminModulesExportController.class);
 	
@@ -203,14 +212,19 @@ public class AdminModulesExportController {
 		
 		String moduleName = tmplGroup.getModule();
 		ModuleEntityPropertyParser entity = null;
-		EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, code, user);
+		EntityQueryParameter queryParam = new EntityQueryParameter(moduleName, code, user);
+		queryParam.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(dtmpl.getId(), user));
+		
+		EntityHistoryItem lastHistory = entityService.getLastHistoryItem(queryParam);
 		if(historyId != null) {
 			if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
-				entity = mService.getHistoryEntityParser(moduleName, code, historyId, user);
+				entity = entityService.getHistoryEntityParser(queryParam, historyId, null);
+				//entity = mService.getHistoryEntityParser(moduleName, code, historyId, user);
 			}
         }
         if(entity == null) {
-        	entity = mService.getEntity(moduleName, code, null, user);
+        	entity = entityService.getEntityParser(queryParam);
+        	//entity = mService.getEntity(moduleName, code, null, user);
         }
 		
 		try {
