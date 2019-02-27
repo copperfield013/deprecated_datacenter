@@ -394,7 +394,7 @@ public class AdminModulesController {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		try {
 			EntitiesQueryParameter param = new EntitiesQueryParameter(menu.getTemplateModule(), UserUtils.getCurrentUser());
-			param.setEntityCodes(param.getEntityCodes());
+			param.setEntityCodes(collectCode(codes));
 			entityService.remove(param);
 			return AjaxPageResponse.REFRESH_LOCAL("删除成功");
 		} catch (Exception e) {
