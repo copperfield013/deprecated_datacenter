@@ -293,7 +293,7 @@
 			console.log($page);
 			var tmplData = Utils.parseJSON('${tmplDataJSON}'),
 				criteriaData = Utils.parseJSON('${criteriaDataJSON}'),
-				columnData = Utils.parseJSON('${columnDataJSON}'),
+				columnData = Utils.parseJSON('${columnDataJSON}') || [],
 				fieldInputTypeMap = Utils.parseJSON('${fieldInputTypeMap}')
 				;
 			LtmplUpdate.init($page, tmplData, criteriaData, columnData, '${module.name}', fieldInputTypeMap);
