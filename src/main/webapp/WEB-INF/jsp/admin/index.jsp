@@ -7,23 +7,6 @@
 		<link rel="icon" href="favicon.ico" type="image/x-icon" />
 		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
 		<jsp:include page="/WEB-INF/jsp/admin/common/admin-include.jsp"></jsp:include>
-	    <!--Basic Scripts-->
-	    <script src="media/admin/plugins/beyond/js/jquery-ui-1.10.4.custom.js"></script>
-	    <!--Skin Script: Place this script in head to load scripts for skins and rtl support-->
-	    <script src="media/admin/plugins/beyond/js/skins.min.js"></script>
-	    <script src="media/admin/plugins/beyond/js/datetime/bootstrap-datepicker.js"></script>
-	    <script src="media/admin/plugins/beyond/js/datetime/bootstrap-timepicker.js"></script>
-	    <script src="media/admin/plugins/beyond/js/datetime/moment.js"></script>
-	    <script src="media/admin/plugins/beyond/js/datetime/daterangepicker.js"></script>
-	     <script src="media/admin/plugins/beyond/js/fuelux/spinner/fuelux.spinner.min.js"></script>
-	    <script src="media/admin/plugins/bootstrapt-treeview/dist/bootstrap-treeview.js"></script>
-		<!-- <script src="media/admin/plugins/bootstrapt-treeview/dist/bootstrap-treeview.min.js"></script> -->
-	    <script src="media/admin/plugins/beyond/js/validation/bootstrapValidator.js"></script>
-	    <script src="media/admin/plugins/beyond/js/tagsinput/bootstrap-tagsinput.js"></script>
-	    <link href="media/admin/plugins/select2/css/select2.min.css" rel="stylesheet" />
-	    <link href="media/admin/plugins/select2/css/select2-bootstrap.css" rel="stylesheet" />
-	    <!-- <script src="media/admin/plugins/select2/js/select2.full.js"></script>
-	    <script src="media/admin/plugins/select2/js/i18n/zh-CN.js"></script> -->
 	</head>
 	<body>
 		<div class="navbar">

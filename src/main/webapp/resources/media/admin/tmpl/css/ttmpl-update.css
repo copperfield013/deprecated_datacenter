@@ -1,0 +1,87 @@
+@charset "UTF-8";
+
+div#entity-tree-tmpl {
+	webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.cpf-tree ul {
+	margin: 0;
+	list-style: none;
+	margin-block-start: 0;
+	margin-block-end: 0;
+	margin-inline-start: 0;
+	margin-inline-end: 0;
+	padding-inline-start: 0;
+}
+
+.cpf-tree li {
+	margin: 3px 0;
+}
+
+.cpf-tree li>ul {
+	display: none;
+}
+
+.cpf-tree li.node-expanded>ul {
+	display: block;
+}
+
+.cpf-tree li>a {
+	display: block;
+	height: 2.5em;
+	line-height: 2.5em;
+	background-color: cornflowerblue;
+	color: #fff;
+	padding: 0 1em;
+}
+
+.cpf-tree li>ul {
+	margin-left: 1em;
+}
+
+.cpf-tree li>a>i {
+	font-weight: bold;
+	cursor: pointer;
+	font-style: normal;
+}
+
+.cpf-tree li>a>i:before {
+	content: "\e606";
+}
+
+.cpf-tree li>a>i:before {
+	font-family: 'iconfont';
+}
+
+.cpf-tree li.node-expanded>a>i:before {
+	content: "\e605";
+}
+
+.cpf-tree li.node-unexpandable>a>i:before {
+	content: '';
+}
+
+.cpf-tree li>a>label {
+	font-family: 'iconfont';
+	font-size: inherit;
+	margin: 0;
+	padding: 0;
+	cursor: pointer;
+}
+.cpf-tree li>a>span {
+	webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.cpf-tree li>a>label:before {
+	content: "\e603";
+}
+
+.cpf-tree li>a.node-checked>label:before {
+	content: "\e618";
+}

@@ -20,7 +20,7 @@ define(function(require, exports, module){
 		console.log($page);
 		initTmpl($page, tmplData);
 		initCriteria($page, criteriaData, module, compositeId);
-		if(columnData){
+		if(columnData || columnData === null){
 			initListTable($page, tmplData, columnData, module);
 		}
 		var Dialog = require('dialog');

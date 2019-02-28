@@ -561,6 +561,7 @@ public class AdminModulesController {
 		TemplateSelectionTemplate stmpl = stmplService.getTemplate(stmplId);
 		EntitiesQueryParameter param = new EntitiesQueryParameter(stmpl.getModule(), UserUtils.getCurrentUser());
 		param.setEntityCodes(TextUtils.split(codes, ",", HashSet<String>::new, c->c));
+		param.setRelationName(stmpl.getRelationName());
 		Map<String, RelationEntityPropertyParser> parsers = entityService.queryRelationEntityParsers(param, stmpl.getRelationName());
 		
 		/*Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(

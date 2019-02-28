@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
 
-<link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_546680_vda97wzov4o.css">
+<link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_546680_xx0bil072s.css">
 
 <!--Basic Styles-->
 <!-- <link href="media/admin/plugins/typeahead/dist/examples.css" rel="stylesheet" /> -->
@@ -17,6 +17,7 @@
 
 <link href="media/admin/plugins/beyond/js/datetimepicker/css/bootstrap-datetimepicker.css" rel="stylesheet" />  
 <link href="${basePath }media/admin/plugins/timeline/jquery.eeyellow.Timeline.css" rel="stylesheet" type="text/css" />
+<link href="${basePath }media/admin/plugins/bootstrapt-treeview/dist/bootstrap-treeview.css" rel="stylesheet" type="text/css" />
 <!--  -->
 <link href="media/admin/cpf/css/cpf-main.css" rel="stylesheet" type="text/css" />
 <!-- cover beyond styles -->
@@ -30,6 +31,7 @@
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/ltmpl-update.css" />
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/stmpl-update.css" />
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/index-area.css" />
+<link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/ttmpl-update.css" />
 <link type="text/css" rel="stylesheet" href="media/admin/common/chooser/chooser.css" />
 <link type="text/css" rel="stylesheet" href="media/admin/common/icon/icon-selector.css" />
 
@@ -51,3 +53,23 @@
 <script src="${basePath }media/admin/plugins/typeahead/dist/handlebars.js"></script>
 <script src="${basePath }media/admin/plugins/typeahead/dist/typeahead.bundle.js?v=$${cpfVersion}"></script>
 <script src="${basePath }media/admin/plugins/clipboard/clipboard.js?v=$${cpfVersion}"></script>
+
+
+ <!--Basic Scripts-->
+<script src="media/admin/plugins/beyond/js/jquery-ui-1.10.4.custom.js"></script>
+<!--Skin Script: Place this script in head to load scripts for skins and rtl support-->
+<script src="media/admin/plugins/beyond/js/skins.min.js"></script>
+<script src="media/admin/plugins/beyond/js/datetime/bootstrap-datepicker.js"></script>
+<script src="media/admin/plugins/beyond/js/datetime/bootstrap-timepicker.js"></script>
+<script src="media/admin/plugins/beyond/js/datetime/moment.js"></script>
+<script src="media/admin/plugins/beyond/js/datetime/daterangepicker.js"></script>
+<script src="media/admin/plugins/beyond/js/colorpicker/jquery.minicolors.js"></script>
+<script src="media/admin/plugins/beyond/js/fuelux/spinner/fuelux.spinner.min.js"></script>
+<script src="media/admin/plugins/bootstrapt-treeview/dist/bootstrap-treeview.js"></script>
+<!-- <script src="media/admin/plugins/bootstrapt-treeview/dist/bootstrap-treeview.min.js"></script> -->
+<script src="media/admin/plugins/beyond/js/validation/bootstrapValidator.js"></script>
+<script src="media/admin/plugins/beyond/js/tagsinput/bootstrap-tagsinput.js"></script>
+<link href="media/admin/plugins/select2/css/select2.min.css" rel="stylesheet" />
+<link href="media/admin/plugins/select2/css/select2-bootstrap.css" rel="stylesheet" />
+<!-- <script src="media/admin/plugins/select2/js/select2.full.js"></script>
+<script src="media/admin/plugins/select2/js/i18n/zh-CN.js"></script> -->

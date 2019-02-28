@@ -100,6 +100,8 @@ public interface AdminConstants {
 	
 	final String JSP_TMPL_STATVIEW = JSP_TMPL + "/stat_vtmpl";
 	
+	final String JSP_TMPL_TREE = JSP_TMPL + "/tree";
+	
 	final String JSP_MODULES = JSP_BASE + "/modules";
 	
 	final String JSP_STATVIEW = JSP_BASE + "/statview";
@@ -136,6 +138,8 @@ public interface AdminConstants {
 	final String KEY_FUSE_MODE = "%fuseMode%";
 
 	final String KEY_ACTION_ID = "%actionId%";
+
+	
 
 	
 

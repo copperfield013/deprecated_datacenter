@@ -6,6 +6,11 @@ define(function(require, exports){
 	var eventFieldMap = {};
 	var NOOP = function(){};
 	$.extend(exports, {
+		assert		: function(val, msgWhenFalse){
+			if(!val){
+				$.error(msgWhenFalse);
+			}
+		},
 		/**
 		 * 判断一个是否是整数，不包含判断类型
 		 */

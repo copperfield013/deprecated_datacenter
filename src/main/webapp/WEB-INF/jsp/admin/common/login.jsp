@@ -12,7 +12,8 @@
 				location.href = '${basePath }/admin/login';
 			}
 		</script>
-		<jsp:include page="/WEB-INF/jsp/admin/common/admin-include.jsp"></jsp:include>
+		<link href="media/admin/plugins/beyond/css/bootstrap.min.css" rel="stylesheet" />
+		<script src="${basePath }media/jquery-1.11.3.js"></script>
 		<style>
 		@charset "utf-8";
 
