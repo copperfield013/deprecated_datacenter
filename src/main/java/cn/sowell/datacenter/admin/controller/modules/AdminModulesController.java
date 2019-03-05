@@ -147,7 +147,7 @@ public class AdminModulesController {
 		criteria.setModule(moduleName);
 		criteria.setTemplateGroupId(menu.getTemplateGroupId());
 		Map<Long, String> criteriaMap = lcriteriFacrory.exractTemplateCriteriaMap(request);
-		criteria.setListTemplateCriteria(criteriaMap);
+		criteria.setTemplateCriteriaMap(criteriaMap);
 		criteria.setPageInfo(pageInfo);
 		criteria.setUser(UserUtils.getCurrentUser());
 		//执行查询
@@ -427,7 +427,7 @@ public class AdminModulesController {
 		model.addAttribute("view", view);
 		
 		//隐藏条件拼接成文件用于提示
-		List<TemplateSelectionCriteria> tCriterias = view.getSelectionTemplate().getCriterias();
+		List<TemplateSelectionCriteria> tCriterias = view.getListTemplate().getCriterias();
 		StringBuffer hidenCriteriaDesc = new StringBuffer();
 		if(tCriterias != null){
 			for (TemplateSelectionCriteria tCriteria : tCriterias) {

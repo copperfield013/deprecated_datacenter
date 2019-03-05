@@ -164,10 +164,18 @@ define(function(require, exports, module){
 	}
 	
 	function initCriteria($page, criteriaData, module, compositeId){
+		var criteriaParam = {};
+		if($page.$page){
+			criteriaParam = $page;
+			$page = criteriaParam.$page;
+			criteriaData = criteriaParam.criteriaData;
+			module = criteriaParam.moduleName;
+			compositeId = criteriaParam.compositeId;
+		}
 		
 		var cField = null,
 			cComposite = null;
-		var $fieldSearch = $('.criteria-field-search-row .field-search', $page);
+		var $fieldSearch = criteriaParam.$criteriaFieldSearch || $('.criteria-field-search-row .field-search', $page);
 		var $fieldSearchInput = $fieldSearch.find(':text');
 		
 		var $selectedCriteriaItem = null;
@@ -186,6 +194,7 @@ define(function(require, exports, module){
 			fieldFilters	: ['file'], 
 			fieldModes		: ['field', 'relation'],
 			compositeId		: compositeId,
+			$pickerContainer: criteriaParam.$fieldPickerContainer,
 			afterChoose		: function(field){
 				enableCurrent();
 				if(field.__type__ == 'field'){
@@ -215,10 +224,10 @@ define(function(require, exports, module){
 		}
 		
 		
-		var $criteriaContainer = $('.criterias-container', $page);
+		var $criteriaContainer = criteriaParam.$criteriaContainer || $('.criterias-container', $page);
 		
-		var $criteriaItemTmpl = $('#criteria-item-tmpl', $page),
-			$criteriaPartitionTmpl = $('#criteria-partition-tmpl', $page);
+		var $criteriaItemTmpl = criteriaParam.$criteriaItemTmpl || $('#criteria-item-tmpl', $page),
+			$criteriaPartitionTmpl = criteriaParam.$criteriaItemTmpl || $('#criteria-partition-tmpl', $page);
 		
 		var currentCriteria = null;
 		
@@ -239,7 +248,7 @@ define(function(require, exports, module){
 			var criteria = $item.data('criteria-data');
 			currentCriteria = criteria;
 			showCriteria(criteria);
-			var $detailArea = $('.criteria-detail-area', $page);
+			var $detailArea = criteriaParam.$detailArea || $('.criteria-detail-area', $page);
 			$detailArea.show();
 		}
 		
@@ -274,12 +283,13 @@ define(function(require, exports, module){
 		
 		function showCriteria(criteria){
 			enableCurrent();
+			var $criteriaDetailCover = criteriaParam.$criteriaDetailCover || $('#criteria-detail-cover', $page);
 			if(!criteria.isFieldAvailable()){
 				//条件详情遮罩
-				$('#criteria-detail-cover', $page).addClass('cover-active');
+				$criteriaDetailCover.addClass('cover-active');
 				return ;
 			}
-			$('#criteria-detail-cover', $page).removeClass('cover-active');
+			$criteriaDetailCover.removeClass('cover-active');
 			var composite = criteria.getComposite();
 			if(composite && composite.__type__ == 'relation'){
 				criteriaSearcher.changeFieldMode('relation');
@@ -360,7 +370,7 @@ define(function(require, exports, module){
 				checkIsCurrent	: function(){
 					return currentCriteria == this;
 				},
-				$detailArea		: $('.criteria-detail-area', $page),
+				$detailArea		: criteriaParam.$detailArea || $('.criteria-detail-area', $page),
 				module			: module
 			}, $page);
 			$criteria.find('.criteria-property-name span').dblclick(function(){
@@ -490,7 +500,7 @@ define(function(require, exports, module){
 		}
 		
 		//点击条件节点时的回调
-		$criteriaContainer.on('click', '.criteria-item:not(.criteria-selected)', function(){
+		$criteriaContainer.off('click').on('click', '.criteria-item:not(.criteria-selected)', function(){
 			showCriteriaDetail($(this));
 		});
 		$criteriaContainer.on('click', '.btn-remove-criteria', function(){
@@ -519,7 +529,7 @@ define(function(require, exports, module){
 		});
 		
 		//切换条件显示状态
-		$('#toggle-show-criteria', $page).change(function(){
+		$('#toggle-show-criteria', $page).off('change').change(function(){
 			var toShow = $(this).prop('checked');
 			var $defaultValueLabel = $('#default-value-label', $page);
 			var $placeholderRow = $('#criteria-placeholder-row', $page);
@@ -543,7 +553,7 @@ define(function(require, exports, module){
 				this.addPartition();
 			});
 		});
-		$('#criteria-detail-placeholder', $page).change(function(){
+		$('#criteria-detail-placeholder', $page).off('change').change(function(){
 			var placeholder = $(this).val();
 			handleSelectedItem(function(){
 				this.setPlaceholder(placeholder);
@@ -557,7 +567,7 @@ define(function(require, exports, module){
 			});
 		});
 		//切换显示控件
-		$('#field-input-type', $page).change(function(){
+		$('#field-input-type', $page).off('change').change(function(){
 			var inputType = $(this).val();
 			handleSelectedItem(function(){
 				try{
@@ -571,7 +581,7 @@ define(function(require, exports, module){
 				}catch(e){}
 			});
 		});
-		$('#criteria-detail-comparator', $page).change(function(){
+		$('#criteria-detail-comparator', $page).off('change').change(function(){
 			var comparatorName = $(this).val();
 			handleSelectedItem(function(){
 				this.setComparatorName(comparatorName);
@@ -621,7 +631,13 @@ define(function(require, exports, module){
 			update		: function(){
 			}
 		});
+
+		return {
+			addCriteria	: addCriteria
+		}
 	}
+	
+	exports.initCriteria = initCriteria;
 	
 	/**
 	 * 条件类
@@ -1107,6 +1123,7 @@ define(function(require, exports, module){
 			fieldInput.getDom().css('width', '85%');
 		}
 	}
+	
 	
 	function initListTable($page, tmplData, columnData, module){
 		

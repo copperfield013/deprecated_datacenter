@@ -9,6 +9,144 @@
 <title>${title }</title>
 <div class="ttmpl-update" id="ttmpl-update-${RES_STAMP }">
 	<script type="text/json" id="config-structure-json">${configStructureJson}</script>
+	<script type="jquery/tmpl" id="selectable-rel-tmpl">
+		<div mapping-id="\${rabcNodeMappingId}">\${name}</div>
+	</script>
+	
+	<script type="jquery/tmpl" id="node-attr-tmpl">
+		<div>\${name}</div>
+	</script>
+	
+	<script type="jquery/tmpl" id="criteria-item-tmpl">
+		<div class="criteria-item">
+			<div class="criteria-property-name">
+				<span>\${fieldTitle}</span>
+			</div>
+			<div class="criteria-partitions-container"></div>
+			<span class="btn-remove-criteria"></span>
+		</div>
+	</script>
+	
+	<script type="jquery/tmpl" id="criteria-field-search-tmpl">
+		<div class="input-icon field-search criteria-field-search">
+			<span class="search-input-wrapper">
+				<input type="text" class="search-text-input form-control input-xs glyphicon-search-input" autocomplete="off" placeholder="输入添加的字段名">
+			</span>
+			<i class="glyphicon glyphicon-search blue"></i>
+			<i title="选择字段" class="glyphicon glyphicon-th blue field-picker-button"></i>
+		</div>
+	</script>
+	
+	<script type="jquery/text" id="node-config-tmpl" >
+		<div class="widget">
+			<div class="widget-header bordered-bottom bordered-blue">
+				<span class="widget-caption">\${nodeName}</span>
+			</div>
+			<div class="widget-body">
+				<div class="widget-body">
+					<div class="form-group">
+						<label>选择器</label>
+						<div>
+							<input type="text" class="form-control" value="\${selector}">
+						</div>
+					</div>
+					<div class="form-group">
+						<label>节点文本</label>
+						<div>
+							<div class="node-text" contenteditable="true">\${nodeText}</div>
+						</div>
+					</div>
+					{{if rels && rels.length > 0}}
+						<div class="form-group">
+							<label>可选关系</label>
+							<div class="node-relations">
+								<div class="node-relation-list">
+									<div class="seletable-relations">
+										{{each(i, rel) selectableRelations}}
+											<div mapping-id="\${rel.mappingId}">\${rel.name}</div>
+										{{/each}}
+									</div>
+									<div class="node-relation-selector">
+										<i></i>
+										<div class="node-relation-popup">
+											{{each(i, rel) rels}}
+												<div rel-index="\${rel.relIndex}" mapping-id="\${rel.mappingId}">\${rel.name}</div>
+											{{/each}}
+										</div>
+									</div>
+								</div>
+								<div class="relation-config">
+									<div class="tabbable tabs-flat tabs-left">
+			                            <ul class="nav nav-tabs" id="myTab3">
+			                                <li class="tab-sky"><a data-toggle="tab" href="#home3" aria-expanded="false">配置</a></li>
+			                                <li class="tab-red active"><a data-toggle="tab" href="#profile3" aria-expanded="true">筛选</a></li>
+			                            </ul>
+			
+			                            <div class="tab-content">
+			                                <div id="home3" class="tab-pane">
+			                                	<div>
+			                                		
+			                                	</div>
+			                                </div>
+			
+			                                <div id="profile3" class="tab-pane active">
+			                                	<div class="relation-criteria-fields">
+													<div class="relation-criterias">
+														<div>关系字段1</div>
+														<div class="selected">关系字段2</div><div>关系字段2</div><div>关系字段2</div><div>关系字段2</div><div>关系字段2</div><div>关系字段2</div><div>关系字段2</div><div>关系字段2</div>
+													</div>
+													<div class="criteria-opr-area"><i></i></div>
+			                                	</div>
+												<div class="relation-criteria-detail">
+													<div id="relation-label-row">
+														<label>关系名</label>
+														<div id="relation-label-value-wrap">
+															<select class="input-xs">
+																<option>关系名1</option>
+																<option>关系名2</option>
+																<option>关系名3</option>
+															</select>
+														</div>
+													</div>
+													<div id="criteria-detail-field-input-type-row">
+														<label>控件</label>
+														<div>
+															<select id="field-input-type" class="input-xs">
+																<option value="text">文本框</option>
+																<option value="select">单选下拉框</option>
+															</select>
+														</div>
+													</div>
+													<div>
+														<label>关系</label>
+														<div>
+															<select id="criteria-detail-comparator" class="input-xs">
+																<option value="s1">包含</option>
+																<option value="s2">开头为</option>
+																<option value="s3">结尾为</option>
+																<option value="s4">等于</option>
+															</select>
+														</div>
+													</div>
+													<div>
+														<label id="default-value-label">值</label>
+														<div id="criteria-default-value-container">
+														</div>
+													</div>
+												</div>
+											</div>
+			                            </div>
+			                        </div>
+								</div>
+							</div>
+						</div>
+					{{/if}}
+				</div>
+			</div>
+		</div>
+	</script>
+	
+	
 	<div class="float-operate-area">
 		<div class="operate-area-cover"></div>
 		<a id="save" class="btn-save" title="保存"><i class="fa fa-check-square"></i></a>
@@ -31,7 +169,7 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-lg-10 col-lg-offset-1">
+				<div id="configs-area" class="col-lg-10 col-lg-offset-1">
 					<div class="widget">
 						<div class="widget-header bordered-bottom bordered-blue">
 							<span class="widget-caption">全局配置</span>
@@ -52,83 +190,15 @@
 							<span class="widget-caption">节点配置</span>
 							<div class="widget-buttons">
 								<span class="input-icon">
-									<select class="form-control input-xs">
-										<option>人口</option>
-										<option>家庭</option>
+									<select id="add-node-type" class="form-control input-xs">
 									</select>
 								</span>
 							</div>
-						</div>
-						<div class="widget-body">
-							<div class="widget">
-								<div class="widget-header bordered-bottom bordered-blue">
-									<span class="widget-caption">人口</span>
-								</div>
-								<div class="widget-body">
-									<div class="form-group">
-										<label>选择器</label>
-										<div>
-											<input type="text" class="form-control" />
-										</div>
-									</div>
-									<div class="form-group">
-										<label>节点文本</label>
-										<div>
-											<div class="node-text"></div>
-										</div>
-									</div>
-									<div class="form-group">
-										<label>可选关系</label>
-										<div>
-											<div class="seletable-relations">
-												<div>关系1</div>
-												<div>关系2</div>
-											</div>
-											<div class="relation-filter">
-												<div class="relation-fieldsearch"></div>
-												<div class="relation-criterias">
-													<div>关系字段1</div>
-													<div>关系字段2</div>
-												</div>
-												<div class="relation-criteria-detail">
-													<div id="relation-label-row">
-														<label>关系名</label>
-														<div id="relation-label-value-wrap">
-														</div>
-													</div>
-													<div id="criteria-detail-field-input-type-row">
-														<label>控件</label>
-														<div>
-															<select id="field-input-type">
-																<option value="text">文本框</option>
-																<option value="select">单选下拉框</option>
-															</select>
-														</div>
-													</div>
-													<div>
-														<label>关系</label>
-														<div>
-															<select id="criteria-detail-comparator">
-																<option value="s1">包含</option>
-																<option value="s2">开头为</option>
-																<option value="s3">结尾为</option>
-																<option value="s4">等于</option>
-															</select>
-														</div>
-													</div>
-													<div>
-														<label id="default-value-label">值</label>
-														<div id="criteria-default-value-container">
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-		
-								</div>
+							<div class="widget-buttons">
+								<button id="btn-add-node" class="btn btn-default btn-sm">添加</button>
 							</div>
-
+						</div>
+						<div class="widget-body" id="node-configs-container">
 						</div>
 					</div>
 				</div>

@@ -360,6 +360,16 @@ define(function(require, exports, module){
 					if($fieldPicker.closest($container).length == 1){
 						$fieldPicker.toggle(toShow);
 					}else{
+						if(param.$container){
+							if($container[0] !== param.$container[0]){
+								var left = param.$container[0].offsetLeft,
+									top = param.$container[0].offsetTop;
+								$fieldPicker.addClass('appendout').css({
+									left	: left + 'px',
+									top		: (top + 30) + 'px'
+								});
+							}
+						}
 						$container.append($fieldPicker.show());
 					}
 					if($fieldPicker.is(':visible')){
@@ -664,7 +674,7 @@ define(function(require, exports, module){
 			search.bindTypeahead($textInput, param);
 			var $button = $search.find('.field-picker-button');
 			$button.click(function(){
-				search.togglePicker($search);
+				search.togglePicker(param.$pickerContainer || $search);
 			});
 			$($search.getLocatePage().getContent().children()).on('mouseup', function(e){
 				if($(e.target).closest($search).length === 0){

@@ -17,10 +17,10 @@
 							<c:if test="${criteriaItem.fieldAvailable }">
 								<c:choose>
 									<c:when test="${criteriaItem.inputType == 'text' }">
-										<input class="form-control" type="text" name="criteria_${criteriaItem.id }" value="${criteria.selectionTemplateCriteria[criteriaItem.id]}" placeholder="${criteriaItem.placeholder }" />
+										<input class="form-control" type="text" name="criteria_${criteriaItem.id }" value="${criteria.templateCriteriaMap[criteriaItem.id]}" placeholder="${criteriaItem.placeholder }" />
 									</c:when>
 									<c:when test="${criteriaItem.inputType == 'select' }">
-										<select class="form-control" name="criteria_${criteriaItem.id }" data-value="${criteria.selectionTemplateCriteria[criteriaItem.id]}">
+										<select class="form-control" name="criteria_${criteriaItem.id }" data-value="${criteria.templateCriteriaMap[criteriaItem.id]}">
 											<option value="">--请选择--</option>
 											<c:forEach var="option" items="${view.criteriaOptionMap[criteriaItem.fieldId]}">
 												<option value="${option.value }">${option.title}</option>
@@ -28,18 +28,18 @@
 										</select>
 									</c:when>
 									<c:when test="${criteriaItem.inputType == 'multiselect' }">
-										<select class="form-control cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${criteria.selectionTemplateCriteria[criteriaItem.id]}">
+										<select class="form-control cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${criteria.templateCriteriaMap[criteriaItem.id]}">
 											<c:forEach var="option" items="${view.criteriaOptionMap[criteriaItem.fieldId]}">
 												<option value="${option.value }">${option.title}</option>
 											</c:forEach>								
 										</select>
 									</c:when>
 									<c:when test="${criteriaItem.inputType == 'date' }">
-										<input class="form-control datepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.selectionTemplateCriteria[criteriaItem.id]}"  />
+										<input class="form-control datepicker" autocomplete="off" type="text" name="criteria_${criteriaItem.id }" value="${criteria.templateCriteriaMap[criteriaItem.id]}"  />
 									</c:when>
 									<c:when test="${criteriaItem.inputType == 'label' }">
 										<span class="cpf-select2-container">
-											<select class="cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${criteria.selectionTemplateCriteria[criteriaItem.id]}">
+											<select class="cpf-select2 format-submit-value" name="criteria_${criteriaItem.id }" multiple="multiple" data-value="${criteria.templateCriteriaMap[criteriaItem.id]}">
 												<c:forEach var="label" items="${view.criteriaLabelMap[criteriaItem.fieldKey].subdomain}">
 													<option value="${label }">${label}</option>
 												</c:forEach>								
@@ -58,7 +58,7 @@
 									<c:when test="${criteriaItem.inputType == 'daterange' }">
 										<span class="cpf-daterangepicker format-submit-value" 
 											data-name="criteria_${criteriaItem.id }" 
-											data-value="${criteria.selectionTemplateCriteria[criteriaItem.id]}">
+											data-value="${criteria.templateCriteriaMap[criteriaItem.id]}">
 										</span>
 									</c:when>
 									<c:otherwise>

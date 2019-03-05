@@ -193,7 +193,7 @@ public class AdminConfigUserController {
 		model.addAttribute("view", view);
 		
 		//隐藏条件拼接成文件用于提示
-		List<TemplateSelectionCriteria> tCriterias = view.getSelectionTemplate().getCriterias();
+		List<TemplateSelectionCriteria> tCriterias = view.getListTemplate().getCriterias();
 		StringBuffer hidenCriteriaDesc = new StringBuffer();
 		if(tCriterias != null){
 			for (TemplateSelectionCriteria tCriteria : tCriterias) {

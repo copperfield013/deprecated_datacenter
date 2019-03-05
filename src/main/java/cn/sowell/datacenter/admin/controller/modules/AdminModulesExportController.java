@@ -137,8 +137,7 @@ public class AdminModulesExportController {
 				Map<Long, NormalCriteria> vCriteriaMap = lcriteriaFactory.getCriteriasFromRequest(pvs, CollectionUtils.toMap(ltmpl.getCriterias(), c->c.getId()));
 				progress.getDataMap().put("exportPageInfo", ePageInfo);
 				progress.getDataMap().put("withDetail", withDetail);
-				TemplateDetailTemplate dtmpl = Boolean.TRUE.equals(withDetail)? dtmplService.getTemplate(tmplGroup.getDetailTemplateId()): null;
-				eService.startWholeExport(progress, ltmpl, dtmpl, new HashSet<NormalCriteria>(vCriteriaMap.values()), ePageInfo, UserUtils.getCurrentUser());
+				eService.startWholeExport(progress, tmplGroup, Boolean.TRUE.equals(withDetail), new HashSet<NormalCriteria>(vCriteriaMap.values()), ePageInfo, UserUtils.getCurrentUser());
 				session.setAttribute(AdminConstants.EXPORT_ENTITY_STATUS_UUID, progress.getUUID());
 			}
 		}

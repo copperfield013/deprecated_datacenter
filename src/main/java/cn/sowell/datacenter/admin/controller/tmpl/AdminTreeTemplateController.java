@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.entityResolver.ModuleConfigStructure;
+import cn.sowell.datacenter.entityResolver.config.ModuleConfigStructure;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 

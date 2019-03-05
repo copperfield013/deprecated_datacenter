@@ -54,10 +54,14 @@ import cn.sowell.dataserver.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.dataserver.model.modules.pojo.criteria.NormalCriteria;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupPremise;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListColumn;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
 import cn.sowell.dataserver.model.tmpl.service.ArrayItemFilterService;
+import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.ListCriteriaFactory;
+import cn.sowell.dataserver.model.tmpl.service.ListTemplateService;
 
 @Service
 public class ExportServiceImpl implements ExportService {
@@ -91,6 +95,12 @@ public class ExportServiceImpl implements ExportService {
 	@Resource
 	ArrayItemFilterService arrayItemFilterService;
 	
+	@Resource
+	ListTemplateService ltmplService;
+	
+	@Resource
+	DetailTemplateService dtmplService;
+	
 	
 	private Long exportCacheTimeout = null;
 	
@@ -119,11 +129,6 @@ public class ExportServiceImpl implements ExportService {
 				}
 			}
 		}
-	}
-	
-	@Override
-	public void startExport(WorkProgress progress, TemplateListTemplate ltmpl, Set<NormalCriteria> criteria, ExportDataPageInfo ePageInfo, UserIdentifier user) {
-		startWholeExport(progress, ltmpl, null, criteria, ePageInfo, user);
 	}
 	
 	Long exportCheckPollTimeout = null;
@@ -177,11 +182,12 @@ public class ExportServiceImpl implements ExportService {
 	@Override
 	public void startWholeExport(
 			WorkProgress progress, 
-			TemplateListTemplate ltmpl, 
-			TemplateDetailTemplate dtmpl,
+			TemplateGroup tmplGroup, 
+			boolean withDetail,
 			Set<NormalCriteria> criteria, 
 			ExportDataPageInfo ePageInfo, 
 			UserIdentifier user) {
+		TemplateListTemplate ltmpl = ltmplService.getTemplate(tmplGroup.getListTemplateId());
 		progress.setTotal(100);
 		progress.setCurrent(0);
 		XSSFWorkbook workbook = new XSSFWorkbook();
@@ -206,9 +212,11 @@ public class ExportServiceImpl implements ExportService {
 			progress.setCurrent(13);
 			progress.appendMessage("开始查询数据...");
 			
-			List<Criteria> mainCriterias = convertCriterias(ltmpl.getModule(), user, criteria);
+			List<Criteria> mainCriterias = convertCriterias(ltmpl.getModule(), user, criteria, tmplGroup.getPremises());
 			EntitiesQueryParameter param = new EntitiesQueryParameter(ltmpl.getModule(), user, mainCriterias);
-			param.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(dtmpl.getId(), user));
+			if(withDetail) {
+				param.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(tmplGroup.getDetailTemplateId(), user));
+			}
 			EntityPagingIterator itr = entityService.queryExportIterator(param, ePageInfo);
 			
 			//EntityPagingIterator itr = entityService.queryExportIterator(ltmpl, criteria, ePageInfo, user);
@@ -237,7 +245,8 @@ public class ExportServiceImpl implements ExportService {
 						}
 					}
 				}
-				if(dtmpl != null) {
+				if(withDetail) {
+					TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
 					String detailSheetName = "entity_" + entityNumber;
 					
 					XSSFCell linkCell = row.createCell(j);
@@ -290,8 +299,9 @@ public class ExportServiceImpl implements ExportService {
 		}).start();;
 	}
 	
-	private List<Criteria> convertCriterias(String moduleName, UserIdentifier user, Set<NormalCriteria> criteria) {
+	private List<Criteria> convertCriterias(String moduleName, UserIdentifier user, Set<NormalCriteria> criteria, List<TemplateGroupPremise> premises) {
 		BizFusionContext context = fFactory.getModuleConfig(moduleName).getCurrentContext(user);
+		lcriteriaFactory.appendPremiseCriteria(moduleName, premises, criteria);
 		EntityCriteriaFactory cf = lcriteriaFactory.appendCriterias(criteria, moduleName, context);
 		return cf.getCriterias();
 	}

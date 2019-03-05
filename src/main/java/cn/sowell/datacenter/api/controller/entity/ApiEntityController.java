@@ -55,10 +55,13 @@ import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.modules.service.ViewDataService;
 import cn.sowell.dataserver.model.modules.service.view.EntityView;
 import cn.sowell.dataserver.model.modules.service.view.EntityView.EntityColumn;
+import cn.sowell.dataserver.model.modules.service.view.EntityViewCriteria;
 import cn.sowell.dataserver.model.modules.service.view.ListTemplateEntityView;
 import cn.sowell.dataserver.model.modules.service.view.ListTemplateEntityViewCriteria;
 import cn.sowell.dataserver.model.modules.service.view.SelectionTemplateEntityView;
 import cn.sowell.dataserver.model.modules.service.view.SelectionTemplateEntityViewCriteria;
+import cn.sowell.dataserver.model.tmpl.pojo.AbstractListCriteria;
+import cn.sowell.dataserver.model.tmpl.pojo.AbstractListTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.ArrayEntityProxy;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailField;
@@ -67,7 +70,6 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupAction;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListColumn;
-import cn.sowell.dataserver.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionTemplate;
 import cn.sowell.dataserver.model.tmpl.service.ActionTemplateService;
@@ -144,7 +146,7 @@ public class ApiEntityController {
 		criteria.setModule(moduleName);
 		criteria.setTemplateGroupId(menu.getTemplateGroupId());
 		Map<Long, String> criteriaMap = lCriteriaFactory.exractTemplateCriteriaMap(request);
-		criteria.setListTemplateCriteria(criteriaMap);
+		criteria.setTemplateCriteriaMap(criteriaMap);
 		criteria.setPageInfo(pageInfo);
 		criteria.setUser(user);
 		//执行查询
@@ -269,15 +271,17 @@ public class ApiEntityController {
 	}
 
 
-	private JSONArray toCriterias(ListTemplateEntityView view, ListTemplateEntityViewCriteria lcriteria) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private JSONArray toCriterias(EntityView view, 
+			EntityViewCriteria lcriteria) {
 		JSONArray aCriterias = new JSONArray();
-		TemplateListTemplate ltmpl = view.getListTemplate();
-		List<TemplateListCriteria> criterias = ltmpl.getCriterias();
+		AbstractListTemplate ltmpl = view.getListTemplate();
+		List<? extends AbstractListCriteria> criterias = ltmpl.getCriterias();
 		if(criterias != null && !criterias.isEmpty()) {
-			for (TemplateListCriteria criteria : criterias) {
+			for (AbstractListCriteria criteria : criterias) {
 				if(criteria.getQueryShow() != null) {
 					JSONObject jCriteria = (JSONObject) JSONObject.toJSON(criteria);
-					jCriteria.put("value", lcriteria.getListTemplateCriteria().get(criteria.getId()));
+					jCriteria.put("value", lcriteria.getTemplateCriteriaMap().get(criteria.getId()));
 					aCriterias.add(jCriteria);
 				}
 			}
@@ -285,11 +289,13 @@ public class ApiEntityController {
 		return aCriterias;
 		
 	}
-	private JSONArray toEntities(EntityView view) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private <T> JSONArray toEntities(EntityView view) {
 		JSONArray arrayEntities = new JSONArray();
 		int index = view.getCriteria().getPageInfo().getFirstIndex();
 		List<EntityColumn> cols = view.getColumns();
-		for(CEntityPropertyParser parser :view.getParsers()) {
+		List<? extends CEntityPropertyParser> parsers = view.getParsers();
+		for(CEntityPropertyParser parser : parsers) {
 			JSONObject jEntity = new JSONObject();
 			jEntity.put("code", parser.getCode());
 			if(parser instanceof ModuleEntityPropertyParser) {
@@ -607,10 +613,25 @@ public class ApiEntityController {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		jRes.put("entities", toEntities(view));
 		jRes.put("pageInfo", view.getCriteria().getPageInfo());
+		jRes.put("criterias", toCriterias(view, criteria));
+		jRes.put("stmpl", toSelectionTemplate(stmpl));
 		//jRes.put("criterias", toCriterias(view, criteria));
 		return jRes;
 	}
 	
+	private JSONObject toSelectionTemplate(TemplateSelectionTemplate stmpl) {
+		JSONObject jstmpl = new JSONObject();
+		jstmpl.put("relationName", stmpl.getRelationName());
+		jstmpl.put("id", stmpl.getId());
+		jstmpl.put("nonunique", stmpl.getNonunique());
+		jstmpl.put("compositeId", stmpl.getCompositeId());
+		jstmpl.put("module", stmpl.getModule());
+		jstmpl.put("title", stmpl.getTitle());
+		jstmpl.put("columns", stmpl.getColumns());
+		return jstmpl ;
+	}
+
+
 	@ResponseBody
 	@RequestMapping("/load_entities/{menuId}/{stmplId}")
 	public ResponseJSON loadSelectionEntities(

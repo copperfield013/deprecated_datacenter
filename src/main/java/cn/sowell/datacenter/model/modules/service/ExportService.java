@@ -10,19 +10,17 @@ import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.dataserver.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.dataserver.model.modules.pojo.criteria.NormalCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
-import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 
 public interface ExportService {
 
 	void clearExportCache();
 	AbstractResource getDownloadResource(String uuid);
-	void startExport(WorkProgress progress, TemplateListTemplate ltmpl, Set<NormalCriteria> criteria,
-			ExportDataPageInfo ePageInfo, UserIdentifier user);
 	WorkProgress getExportProgress(String uuid);
 	void stopExport(String uuid);
 	void removeExport(String uuid);
 	
-	void startWholeExport(WorkProgress progress, TemplateListTemplate ltmpl, TemplateDetailTemplate dtmpl,
+	void startWholeExport(WorkProgress progress, TemplateGroup tmplGroup, boolean withDetail,
 			Set<NormalCriteria> criteria, ExportDataPageInfo ePageInfo, UserIdentifier user);
 	String exportDetailExcel(ModuleEntityPropertyParser parser, TemplateDetailTemplate dtmpl) throws Exception;
 }
