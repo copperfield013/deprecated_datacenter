@@ -354,7 +354,8 @@ public class ApiEntityController {
         ModuleEntityPropertyParser entity = null;
         
         EntityQueryParameter param = new EntityQueryParameter(moduleName, code, user);
-        param.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(dtmpl.getId(), user));
+        param.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(dtmpl.getId(), user));
+        //param.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(dtmpl.getId(), user));
 		EntityHistoryItem lastHistory = entityService.getLastHistoryItem(param);
         //EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, code, user);
 		if(historyId != null) {
@@ -538,7 +539,8 @@ public class ApiEntityController {
     		 EntityQueryParameter param = new EntityQueryParameter(moduleName, user);
     		 Long tmplGroupId = menu.getTemplateGroupId();
     		 TemplateGroup tmplGroup = tmplGroupService.getTemplate(tmplGroupId);
-    		 param.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(tmplGroup.getDetailTemplateId(), user));
+    		 param.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(tmplGroup.getDetailTemplateId(), user));
+    		 //param.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(tmplGroup.getDetailTemplateId(), user));
     		 if(Boolean.TRUE.equals(fuseMode)) {
     			 code = entityService.fuseEntity(param, entityMap);
     			 //code = mService.fuseEntity(moduleName, composite.getMap(), user);

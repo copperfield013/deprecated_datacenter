@@ -201,6 +201,8 @@ define(function(require, exports, module) {
 							$page).prop('checked') ? '' : 1);
 					formData.append('hideSaveButton', $('#showSaveButton',
 							$page).prop('checked') ? '' : 1);
+					formData.append('hideTreeToggleButton', $('#showTreeToggleButton',
+							$page).prop('checked') ? '' : 1);
 					$('.field-item', $page).each(
 							function(index) {
 								var $this = $(this);

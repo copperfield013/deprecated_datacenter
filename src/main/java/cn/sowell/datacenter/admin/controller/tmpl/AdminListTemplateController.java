@@ -1,10 +1,7 @@
 package cn.sowell.datacenter.admin.controller.tmpl;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -26,12 +23,10 @@ import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.copframe.utils.CollectionUtils;
-import cn.sowell.copframe.utils.FormatUtils;
-import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.admin.controller.tmpl.CommonTemplateActionConsumer.ChooseRequestParam;
 import cn.sowell.datacenter.admin.controller.tmpl.ListTemplateFormater.Handlers;
-import cn.sowell.datacenter.common.choose.ChooseTablePage;
 import cn.sowell.datacenter.model.config.service.ConfigureService;
 import cn.sowell.dataserver.model.dict.service.DictionaryService;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
@@ -64,6 +59,9 @@ public class AdminListTemplateController {
 	@Resource
 	ConfigureService configService;
 	
+	@Resource
+	CommonTemplateActionConsumer actionConsumer;
+	
 	@RequestMapping("/list/{moduleName}")
 	public String list(Model model, @PathVariable String moduleName){
 		ModuleMeta moduleMeta = mService.getModule(moduleName);
@@ -76,9 +74,15 @@ public class AdminListTemplateController {
 		return AdminConstants.JSP_TMPL_LIST + "/ltmpl_list.jsp";
 	}
 	
-	@RequestMapping("/choose/{module}")
-	public String dialogList(@PathVariable String module, String except, Model model) {
-		List<TemplateListTemplate> list = ltmplService.queryAll(module);
+	@RequestMapping("/choose/{moduleName}")
+	public String choose(@PathVariable String moduleName, String except, Model model) {
+		return actionConsumer.choose(
+				ChooseRequestParam.create(moduleName, ltmplService, model)
+					.setExcept(except)
+					.setURI(AdminConstants.URI_TMPL + "/ltmpl/choose/" +moduleName)
+			);
+		
+		/*List<TemplateListTemplate> list = ltmplService.queryAll(moduleName);
 		if(TextUtils.hasText(except)) {
 			Set<Long> excepts = TextUtils.split(except, ",", HashSet::new, FormatUtils::toLong);
 			list = list.stream().filter(tmpl->!excepts.contains(tmpl.getId())).collect(Collectors.toList());
@@ -87,7 +91,7 @@ public class AdminListTemplateController {
 				"ltmpl-choose-list", "ltmpl_");
 		tpage
 			.setPageInfo(null)
-			.setAction(AdminConstants.URI_TMPL + "/ltmpl/choose/" + module)
+			.setAction(AdminConstants.URI_TMPL + "/ltmpl/choose/" + moduleName)
 			.setIsMulti(false)
 			.setTableData(list, handler->{
 				handler
@@ -99,7 +103,7 @@ public class AdminListTemplateController {
 			;
 		
 		model.addAttribute("tpage", tpage);
-		return AdminConstants.PATH_CHOOSE_TABLE;
+		return AdminConstants.PATH_CHOOSE_TABLE;*/
 	}
 	
 	@ResponseBody

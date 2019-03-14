@@ -2,6 +2,21 @@
  * 字段选择器
  */
 define(function(require, exports, module){
+	var cachableFieldJson = {}; 
+	
+	function getCachableFieldJson(reqURL, reqParam){
+		var defer = $.Deferred();
+		var key = reqURL + $.param(reqParam || {});
+		if(cachableFieldJson[key]){
+			defer.resolve(cachableFieldJson[key]);
+		}else{
+			require('ajax').ajax(reqURL, reqParam, function(data){
+				cachableFieldJson[key] = data;
+				defer.resolve(data);
+			});
+		}
+		return defer.promise();
+	}
 	
 	function FieldSearch(_param){
 		var defaultParam = {
@@ -46,11 +61,12 @@ define(function(require, exports, module){
 				var reqParam = $.extend({}, {
 					withCompositeFields	: !param.hideCompositeFields
 				}, param.reqDataParam);
-				require('ajax').ajax(param.reqDataURL, reqParam, function(__compositeData){
+				getCachableFieldJson(param.reqDataURL, reqParam).done(function(__compositeData){
 					var __fieldKeyData = {};
 					var __fieldData = transferInfoToFields(__compositeData, __fieldKeyData);
 					loadFieldDataDeferred.resolve(__fieldData, __compositeData, __fieldKeyData);
 				});
+				
 			}
 			loadFieldDataDeferred.done(callback);
 		}

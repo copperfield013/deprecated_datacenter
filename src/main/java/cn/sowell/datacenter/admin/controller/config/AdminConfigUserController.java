@@ -99,7 +99,7 @@ public class AdminConfigUserController {
 				
 				ModuleEntityPropertyParser entity = null;
 				EntityQueryParameter param = new EntityQueryParameter(moduleName, code, user);
-				param.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(dtmpl.getId(), user));
+				param.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(dtmpl.getId(), user));
 				EntityHistoryItem lastHistory = entityService.getLastHistoryItem(param );
 				//EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, code, user);
 				if(historyId != null) {

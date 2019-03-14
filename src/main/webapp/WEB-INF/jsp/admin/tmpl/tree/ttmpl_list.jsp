@@ -32,39 +32,21 @@
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach items="${ttmplList }" var="ltmpl" varStatus="i" >
+					<c:forEach items="${ttmpls }" var="ttmpl" varStatus="i" >
 						<tr>
 							<td>${i.index + 1 }</td>
-							<td>${ltmpl.title }</td>
-							<td><fmt:formatDate value="${ltmpl.updateTime }" pattern="yyyy-MM-dd HH:mm:ss" /> </td>
+							<td>${ttmpl.title }</td>
+							<td><fmt:formatDate value="${ttmpl.updateTime }" pattern="yyyy-MM-dd HH:mm:ss" /> </td>
 							<td>
-								<a target="viewtmpl_update_${ltmpl.id }" href="admin/tmpl/ltmpl/update/${ltmpl.id }" class="tab btn btn-info btn-xs edit">
+								<a target="ttmpl_update_${ttmpl.id }" href="admin/tmpl/tree/update/${ttmpl.id }" class="tab btn btn-info btn-xs edit">
 									<i class="fa fa-edit"></i>
 									修改
 								</a>
-								<c:choose>
-									<c:when test="${empty relatedGroupsMap[ltmpl.id] }">
-										<a confirm="确认删除模板(${ltmpl.title })?" href="admin/tmpl/ltmpl/remove/${ltmpl.id }" class="btn btn-danger btn-xs delete">
-											<i class="fa fa-trash-o"></i>
-											删除
-										</a>
-									</c:when>
-									<c:otherwise>
-										<a title="查看绑定的所有模板组合" href="admin/tmpl/ltmpl/group_list/${ltmpl.id }"
-											target="dtmpl_group_list_${tmpl.id }" 
-											class="tab btn btn-success btn-xs">
-											<i class="fa fa-th-list"></i>
-											模板组合
-										</a>
-										<a href="javascript:STATICS.TMPL.switchTemplateGroup('ltmpl', '${module.name }', ${ltmpl.id });" 
-											class="btn btn-warning btn-xs "
-											title="为所有已经绑定到当前列表模板的组合重新指定一个列表模板">
-											<i class="fa fa-exchange"></i>
-											解绑
-										</a>
-									</c:otherwise>
-								</c:choose>
-								<a ltmpl-id="${ltmpl.id }" ltmpl-title="${ltmpl.title }" class="btn btn-magenta btn-xs btn-copy-ltmpl">
+								<a confirm="确认删除模板(${ttmpl.title })?" href="admin/tmpl/tree/remove/${ttmpl.id }" class="btn btn-danger btn-xs delete">
+									<i class="fa fa-trash-o"></i>
+									删除
+								</a>
+								<a ttmpl-id="${ttmpl.id }" ttmpl-title="${ttmpl.title }" class="btn btn-magenta btn-xs btn-copy-ltmpl">
 									<i class="fa fa-copy"></i>
 									复制到模块
 								</a>
@@ -79,7 +61,7 @@
 </div>
 <script>
 	seajs.use(['utils', 'ajax', 'dialog', 'tab'], function(Utils, Ajax, Dialog, Tab){
-		var $page = $('#tmpl-ltmpl-list-${module.name }');
+		var $page = $('#tmpl-ttmpl-list-${module.name }');
 		var modules = [];
 		try{
 			modules = $.parseJSON('${modulesJson}');

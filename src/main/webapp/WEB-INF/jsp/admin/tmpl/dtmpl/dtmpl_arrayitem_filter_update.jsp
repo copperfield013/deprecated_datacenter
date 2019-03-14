@@ -163,7 +163,7 @@
 			console.log($page);
 			var tmplData = null,
 				criteriaData = Utils.parseJSON('${criteriaDataJSON}'),
-				columnData = null,
+				columnData = undefined,
 				fieldInputTypeMap = Utils.parseJSON('${fieldInputTypeMap}')
 				;
 			LtmplUpdate.init($page, tmplData, criteriaData, columnData, '${module.name}', fieldInputTypeMap, '${compositeId}');

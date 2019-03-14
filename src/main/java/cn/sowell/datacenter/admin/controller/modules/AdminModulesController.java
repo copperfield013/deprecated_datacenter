@@ -56,6 +56,8 @@ import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.modules.service.ViewDataService;
+import cn.sowell.dataserver.model.modules.service.view.EntityQuery;
+import cn.sowell.dataserver.model.modules.service.view.EntityQueryPool;
 import cn.sowell.dataserver.model.modules.service.view.ListTemplateEntityView;
 import cn.sowell.dataserver.model.modules.service.view.ListTemplateEntityViewCriteria;
 import cn.sowell.dataserver.model.modules.service.view.SelectionTemplateEntityView;
@@ -70,6 +72,7 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupPremise;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionTemplate;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeTemplate;
 import cn.sowell.dataserver.model.tmpl.service.ActionTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.ArrayItemFilterService;
 import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
@@ -77,6 +80,7 @@ import cn.sowell.dataserver.model.tmpl.service.ListCriteriaFactory;
 import cn.sowell.dataserver.model.tmpl.service.ListTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.SelectionTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
+import cn.sowell.dataserver.model.tmpl.service.TreeTemplateService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_MODULES + "/curd")
@@ -105,6 +109,9 @@ public class AdminModulesController {
 	
 	@Resource
 	ActionTemplateService atmplService;
+	
+	@Resource
+	TreeTemplateService treeService;
 	
 	@Resource
 	FrameDateFormat dateFormat;
@@ -140,18 +147,8 @@ public class AdminModulesController {
 			PageInfo pageInfo,
 			HttpServletRequest request, Model model, HttpSession session) {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
-		String moduleName = menu.getTemplateModule();
-		//创建条件对象
-		ListTemplateEntityViewCriteria criteria = new ListTemplateEntityViewCriteria();
-		//设置条件
-		criteria.setModule(moduleName);
-		criteria.setTemplateGroupId(menu.getTemplateGroupId());
-		Map<Long, String> criteriaMap = lcriteriFacrory.exractTemplateCriteriaMap(request);
-		criteria.setTemplateCriteriaMap(criteriaMap);
-		criteria.setPageInfo(pageInfo);
-		criteria.setUser(UserUtils.getCurrentUser());
-		//执行查询
-		ListTemplateEntityView view = (ListTemplateEntityView) vService.query(criteria);
+		//String moduleName = menu.getTemplateModule();
+		ListTemplateEntityView view = queryEntityList(menu, pageInfo, request);
 		model.addAttribute("view", view);
 		
 		//导出状态获取
@@ -181,11 +178,95 @@ public class AdminModulesController {
 		model.addAttribute("tmplGroup", tmplGroup);
 		model.addAttribute("hidenCriteriaDesc", hidenCriteriaDesc);
 		model.addAttribute("menu", menu);
-		model.addAttribute("criteria", criteria);
-		model.addAttribute("moduleWritable", mService.getModuleEntityWritable(moduleName));
+		model.addAttribute("criteria", view.getCriteria());
+		model.addAttribute("moduleWritable", mService.getModuleEntityWritable(menu.getTemplateModule()));
 		
 		return AdminConstants.JSP_MODULES + "/modules_list_tmpl.jsp";
 	}
+	
+	
+
+	@RequestMapping("/list_tree/{menuId}")
+	public String listTree(
+			@PathVariable Long menuId, 
+			String entityCode, 
+			PageInfo pageInfo, 
+			HttpServletRequest request, 
+			Model model) {
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		ListTemplateEntityView view = queryEntityList(menu, pageInfo, request);
+		view.getParsers();
+		model.addAttribute("view", view);
+		model.addAttribute("menu", menu);
+		return AdminConstants.JSP_MODULES + "/modules_list_tree.jsp";
+	}
+	
+	private ListTemplateEntityView queryEntityList(SideMenuLevel2Menu menu, PageInfo pageInfo, HttpServletRequest request) {
+		
+		//创建条件对象
+		ListTemplateEntityViewCriteria criteria = new ListTemplateEntityViewCriteria();
+		//设置条件
+		criteria.setModule(menu.getTemplateModule());
+		criteria.setTemplateGroupId(menu.getTemplateGroupId());
+		Map<Long, String> criteriaMap = lcriteriFacrory.exractTemplateCriteriaMap(request);
+		criteria.setTemplateCriteriaMap(criteriaMap);
+		criteria.setPageInfo(pageInfo);
+		criteria.setUser(UserUtils.getCurrentUser());
+		//执行查询
+		return (ListTemplateEntityView) vService.query(criteria);
+	}
+	
+	@SuppressWarnings("unused")
+	@ResponseBody
+	@RequestMapping("/start_askfor_entity_nodes/{menuId}/{parentEntityCode}/{relationName}/{pageSize}")
+	public ResponseJSON treeNode(@PathVariable Long menuId,
+			@PathVariable String parentEntityCode, 
+			@PathVariable String relationName, 
+			@PathVariable Integer pageSize, HttpSession session) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		
+		//获得查询池
+		EntityQueryPool qPool = getEntityQueryPool(session);
+		//注册一个查询
+		EntityQuery query = qPool.regist();
+		//设置参数
+		query
+			.setModuleName(menu.getTemplateModule())
+			.setParentEntityCode(parentEntityCode)
+			.setRelationName(relationName)
+			.setPageSize(pageSize)
+			;
+		//执行查询
+		List<CEntityPropertyParser> parsers = query.list();
+		
+		
+		//获得树形模板对象
+		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+		TemplateTreeTemplate ttmpl = treeService.getTemplate(tmplGroup.getTreeTemplateId());
+		
+		//根据树形模板将entity转换成node
+		
+		
+		
+		//jRes.put("nodes", nodes);
+		return jRes;
+	}
+	
+	private EntityQueryPool getEntityQueryPool(HttpSession session) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@ResponseBody
+	@RequestMapping("/askfor_entity_nodes/{key}/{pageNo}")
+	public ResponseJSON askForEntityNodes(@PathVariable String key, @PathVariable Integer pageNo) {
+		ResponseJSON json = new JSONObjectResponse();
+		return json;
+	}
+	
 	
 
 	@RequestMapping("/detail/{menuId}/{code}")
@@ -203,7 +284,7 @@ public class AdminModulesController {
         ModuleEntityPropertyParser entity = null;
         UserIdentifier user = UserUtils.getCurrentUser();
         EntityQueryParameter queryParam = new EntityQueryParameter(moduleName, code, user);
-        queryParam.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(dtmpl.getId(), user));
+        queryParam.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(dtmpl.getId(), user));
         
         EntityHistoryItem lastHistory = entityService.getLastHistoryItem(queryParam);
 		if(historyId != null) {
@@ -275,7 +356,7 @@ public class AdminModulesController {
 		FusionContextConfig config = fFactory.getModuleConfig(moduleName);
 		UserIdentifier user = UserUtils.getCurrentUser();
 		EntityQueryParameter queryParam = new EntityQueryParameter(moduleName, code, user);
-		queryParam.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(tmplGroup.getDetailTemplateId(), user));
+		queryParam.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(tmplGroup.getDetailTemplateId(), user));
 		ModuleEntityPropertyParser entity = entityService.getEntityParser(queryParam);
 		//ModuleEntityPropertyParser entity = mService.getEntity(moduleName, code, null, UserUtils.getCurrentUser());
 		TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
@@ -328,7 +409,7 @@ public class AdminModulesController {
     		 EntityQueryParameter param = new EntityQueryParameter(moduleName, user);
     		 Long tmplGroupId = menu.getTemplateGroupId();
     		 TemplateGroup tmplGroup = tmplGroupService.getTemplate(tmplGroupId);
-    		 param.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(tmplGroup.getDetailTemplateId(), user));
+    		 param.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(tmplGroup.getDetailTemplateId(), user));
     		 if(Boolean.TRUE.equals(fuseMode)) {
     			 entityService.fuseEntity(param, entityMap);
     			 //mService.fuseEntity(moduleName, entityMap, user);

@@ -203,6 +203,52 @@
 							</div>
 							<div class="widget">
 								<div class="widget-header">
+									<span class="widget-caption">树形视图配置</span>
+									<div class="widget-buttons">
+									</div>
+								</div>
+								<div class="widget-body">
+									<div class="row">
+										<div class="col-lg-6">
+											<div class="form-group"> 
+												<label class="col-lg-4 control-label" for="name">树形模板</label>
+												<div class="col-lg-8">
+													<a 
+														class="form-control"
+														href="admin/tmpl/tree/choose/${module.name }" 
+														title="选择树形模板"
+														choose-key="choose-ttmpl" 
+														crn-choose-ttmpl="title" 
+														>${group.treeTemplateId != null? group.treeTemplateTitle: '选择树形模板' }</a>
+													<input type="hidden" crn-choose-ttmpl="id" name="treeTemplateId" value="${group.treeTemplateId }" />
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="form-group"> 
+											<div class="col-lg-12">
+												<label class="col-lg-5 col-lg-offset-1 col-xs-3 form-control-static">
+													<input id="showTreeToggleButton" 
+														type="checkbox" 
+														class="checkbox-slider colored-magenta" 
+														${group.hideTreeToggleButton == 1? '': 'checked="checked"' }>
+													<span class="text">切换树形视图按钮</span>
+												</label>
+												<label class="col-lg-5 col-lg-offset-1 col-xs-3 form-control-static">
+													<input id="defaultTreeView" name="defaultTreeView"
+														type="checkbox" class="checkbox-slider colored-danger" 
+														value="1"
+														${group.defaultTreeView == 1? 'checked="checked"': '' }>
+													<span class="text">默认显示树形视图</span>
+												</label>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="widget">
+								<div class="widget-header">
 									<span class="widget-caption">列表操作按钮</span>
 									<div class="widget-buttons">
 										<div id="list-action-select" class="chooser">

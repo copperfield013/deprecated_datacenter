@@ -106,7 +106,7 @@ div#entity-tree-tmpl {
     overflow-y: hidden;
     /* position: relative; */
 }
-.seletable-relations {height: 100%;}
+.selectable-relations {height: 100%;}
 
 .node-relations>div{
     height: 100%;
@@ -144,8 +144,7 @@ div#entity-tree-tmpl {
 
 
 
-div.seletable-relations,
-div.relation-criterias {
+div.selectable-relations, div.relation-criterias {
     /* padding: 5px 0; */
     display: flex;
     flex-direction: column;
@@ -154,33 +153,33 @@ div.relation-criterias {
     overflow-x: hidden;
 }
 
-div.seletable-relations>*, 
+div.selectable-relations>*, 
 .relation-criterias>* {
     font-size: 13px;
     padding: 4px 5px;
     width: 100%;
     display: block;
-    
+    position: relative;
 }
-div.seletable-relations>div:not(:last-child), 
+div.selectable-relations>div:not(:last-child), 
 .relation-criterias>div:not(:last-child) {
 	border-bottom: 1px solid #eee;
 }
 
-div.seletable-relations>*:hover,
+div.selectable-relations>*:hover,
 div.relation-criterias>*:hover {
     background-color: #eee;
     cursor: pointer;
     color: #444;
 }
 
-div.seletable-relations>*.selected, 
+div.selectable-relations>*.selected, 
 .relation-criterias>*.criteria-item.criteria-selected {
     background-color: #5db2ff;
     color: #fff;
 }
 
-div..seletable-relations>*.selected:hover,
+div..selectable-relations>*.selected:hover,
 div.relation-criterias>*.criteria-item.criteria-selected:hover {
 	background-color: #468bcc;
 	color: #fff;
@@ -297,7 +296,7 @@ div.relation-criterias>*.criteria-item.criteria-selected:hover {
     background-color: #fefefe;
     color: #444;
     border: 1px solid #ddd;
-    height: 6em;
+    height: 100px;
     width: 10em;
     overflow-y: auto;
     overflow-x: hidden;
@@ -331,3 +330,29 @@ div.relation-criterias>*.criteria-item.criteria-selected:hover {
 .criteria-opr-area>i:before {
     content: "+";
 }
+
+
+
+.relation-criterias span.btn-remove-criteria,
+.selectable-relations .btn-remove-relation {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 27px;
+    line-height: 27px;
+    width: 20px;
+    text-align: center;
+    display: block;
+    cursor: pointer;
+}
+.relation-criterias span.btn-remove-criteria:hover,
+.selectable-relations .btn-remove-relation:hover{
+    background-color: rgba(200,200,200,0.6);
+}
+.relation-criterias span.btn-remove-criteria:before,
+.selectable-relations .btn-remove-relation:before {
+    content: "×";
+}
+
+
+

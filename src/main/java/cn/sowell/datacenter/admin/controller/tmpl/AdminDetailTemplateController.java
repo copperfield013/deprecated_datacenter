@@ -1,10 +1,7 @@
 package cn.sowell.datacenter.admin.controller.tmpl;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -26,11 +23,9 @@ import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.copframe.utils.CollectionUtils;
-import cn.sowell.copframe.utils.FormatUtils;
-import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.common.choose.ChooseTablePage;
+import cn.sowell.datacenter.admin.controller.tmpl.CommonTemplateActionConsumer.ChooseRequestParam;
 import cn.sowell.datacenter.model.config.service.ConfigureService;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
@@ -65,6 +60,9 @@ public class AdminDetailTemplateController {
 	@Resource
 	ArrayItemFilterService arrayItemFilterService;
 	
+	@Resource
+	CommonTemplateActionConsumer actionConsumer;
+	
 	@RequestMapping("/to_create/{module}")
 	public String toCreate(@PathVariable String module, Model model){
 		ModuleMeta moduleMeta = mService.getModule(module);
@@ -85,8 +83,15 @@ public class AdminDetailTemplateController {
 	}
 	
 
-	@RequestMapping("/choose/{module}")
-	public String choose(@PathVariable String module, String except, Model model) {
+	@RequestMapping("/choose/{moduleName}")
+	public String choose(@PathVariable String moduleName, String except, Model model) {
+		return actionConsumer.choose(
+				ChooseRequestParam.create(moduleName, dtmplService, model)
+					.setExcept(except)
+					.setURI(AdminConstants.URI_TMPL + "/dtmpl/choose/" +moduleName)
+			);
+		
+		/*
 		List<TemplateDetailTemplate> tmplList = dtmplService.queryAll(module);
 		if(TextUtils.hasText(except)) {
 			Set<Long> excepts = TextUtils.split(except, ",", HashSet::new, FormatUtils::toLong);
@@ -108,7 +113,7 @@ public class AdminDetailTemplateController {
 			;
 		
 		model.addAttribute("tpage", tpage);
-		return AdminConstants.PATH_CHOOSE_TABLE;
+		return AdminConstants.PATH_CHOOSE_TABLE;*/
 	}
 	
 	@ResponseBody

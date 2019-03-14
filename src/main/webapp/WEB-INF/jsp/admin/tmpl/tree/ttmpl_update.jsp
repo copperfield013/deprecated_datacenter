@@ -8,11 +8,8 @@
 </c:set>
 <title>${title }</title>
 <div class="ttmpl-update" id="ttmpl-update-${RES_STAMP }">
+	<script type="text/json" id="ttmplJson">${ttmplJson}</script>
 	<script type="text/json" id="config-structure-json">${configStructureJson}</script>
-	<script type="jquery/tmpl" id="selectable-rel-tmpl">
-		<div mapping-id="\${rabcNodeMappingId}">\${name}</div>
-	</script>
-	
 	<script type="jquery/tmpl" id="node-attr-tmpl">
 		<div>\${name}</div>
 	</script>
@@ -37,17 +34,25 @@
 		</div>
 	</script>
 	
+	<script type="jquery/tmpl" id="selectable-relation-tmpl">
+		<div data-id="\${id}" rel-name="\${name}" mapping-id="\${mappingId}">
+			<div class="selectable-relation-title">\${title}</div>
+			<span class="btn-remove-relation"></span>
+		</div>
+	</script>
+	
 	<script type="jquery/text" id="node-config-tmpl" >
-		<div class="widget">
+		<div class="widget node-config" data-id="\${nodeId}">
 			<div class="widget-header bordered-bottom bordered-blue">
 				<span class="widget-caption">\${nodeName}</span>
+				<input type="hidden" class="nodeModule" value="\${nodeModule}" />
 			</div>
 			<div class="widget-body">
 				<div class="widget-body">
 					<div class="form-group">
 						<label>选择器</label>
 						<div>
-							<input type="text" class="form-control" value="\${selector}">
+							<input type="text" class="node-selector form-control" value="\${selector}">
 						</div>
 					</div>
 					<div class="form-group">
@@ -56,14 +61,20 @@
 							<div class="node-text" contenteditable="true">\${nodeText}</div>
 						</div>
 					</div>
+					<div class="form-group">
+						<label>节点颜色</label>
+						<div>
+							<input type="text" class="form-control colorpicker node-color" data-control="wheel" value="\${nodeColor || '#2dc3e8'}">
+						</div>
+					</div>
 					{{if rels && rels.length > 0}}
 						<div class="form-group">
 							<label>可选关系</label>
 							<div class="node-relations">
 								<div class="node-relation-list">
-									<div class="seletable-relations">
+									<div class="selectable-relations">
 										{{each(i, rel) selectableRelations}}
-											<div mapping-id="\${rel.mappingId}">\${rel.name}</div>
+											{{tmpl(rel) '#ttmpl-update-${RES_STAMP } #selectable-relation-tmpl'}}
 										{{/each}}
 									</div>
 									<div class="node-relation-selector">
@@ -92,8 +103,6 @@
 			                                <div id="profile3" class="tab-pane active">
 			                                	<div class="relation-criteria-fields">
 													<div class="relation-criterias">
-														<div>关系字段1</div>
-														<div class="selected">关系字段2</div><div>关系字段2</div><div>关系字段2</div><div>关系字段2</div><div>关系字段2</div><div>关系字段2</div><div>关系字段2</div><div>关系字段2</div>
 													</div>
 													<div class="criteria-opr-area"><i></i></div>
 			                                	</div>
@@ -102,9 +111,6 @@
 														<label>关系名</label>
 														<div id="relation-label-value-wrap">
 															<select class="input-xs">
-																<option>关系名1</option>
-																<option>关系名2</option>
-																<option>关系名3</option>
 															</select>
 														</div>
 													</div>
@@ -151,7 +157,7 @@
 		<div class="operate-area-cover"></div>
 		<a id="save" class="btn-save" title="保存"><i class="fa fa-check-square"></i></a>
 	</div>
-	<div class="detail">
+	<div class="">
 		<div class="page-header">
 			<div class="header-title">
 				<h1>${title }</h1>
@@ -165,7 +171,7 @@
 		<div class="page-body">
 			<div class="row header-row">
 				<div class="col-lg-10 col-lg-offset-1">
-					<input type="text" class="form-control" id="tmplTitle" placeholder="请输入模板名称" value="${tmpl.title }">
+					<input type="text" class="form-control" id="tmplTitle" placeholder="请输入模板名称" value="${ttmpl.title }">
 				</div>
 			</div>
 			<div class="row">
@@ -179,7 +185,13 @@
 							<div class="form-group">
 								<label>默认节点颜色</label>
 								<div>
-									<input type="text" id="wheel-demo" class="form-control colorpicker" data-control="wheel" value="#5db2ff">
+									<input type="text" id="def-node-color" autocomplete="off" class="form-control colorpicker" data-control="wheel" value="${ttmpl.defaultNodeColor }">
+								</div>
+							</div>
+							<div class="form-group">
+								<label>最大深度</label>
+								<div>
+									<input type="number" id="max-deep" class="form-control" value="${ttmpl.maxDeep }">
 								</div>
 							</div>
 
@@ -211,8 +223,16 @@
 		try{
 			var $page = $('#ttmpl-update-${RES_STAMP }');
 			console.log($page);
+			var tmplData = {}, configStructure = {};
+			try{
+				tmplData = $.parseJSON($('#ttmplJson', $page).html());
+			}catch(e1){}
+			configStructure = Utils.parseJSON($('#config-structure-json', $page).html());
 			TreeTmplUpdate.init({
-				$page	: $page
+				$page			: $page,
+				moduleName		: '${module.name}',
+				ttmplData		: tmplData,
+				configStructure	: configStructure
 			});
 		}catch(e){
 			console.error(e);

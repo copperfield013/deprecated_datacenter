@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -29,10 +28,6 @@ import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 
-import com.abc.application.BizFusionContext;
-import com.abc.rrc.query.criteria.EntityCriteriaFactory;
-import com.abc.rrc.query.queryrecord.criteria.Criteria;
-
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.spring.properties.PropertyPlaceholder;
 import cn.sowell.copframe.utils.Assert;
@@ -55,7 +50,6 @@ import cn.sowell.dataserver.model.modules.pojo.criteria.NormalCriteria;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
-import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupPremise;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListColumn;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
 import cn.sowell.dataserver.model.tmpl.service.ArrayItemFilterService;
@@ -184,7 +178,7 @@ public class ExportServiceImpl implements ExportService {
 			WorkProgress progress, 
 			TemplateGroup tmplGroup, 
 			boolean withDetail,
-			Set<NormalCriteria> criteria, 
+			Set<NormalCriteria> nCriteria, 
 			ExportDataPageInfo ePageInfo, 
 			UserIdentifier user) {
 		TemplateListTemplate ltmpl = ltmplService.getTemplate(tmplGroup.getListTemplateId());
@@ -212,10 +206,14 @@ public class ExportServiceImpl implements ExportService {
 			progress.setCurrent(13);
 			progress.appendMessage("开始查询数据...");
 			
-			List<Criteria> mainCriterias = convertCriterias(ltmpl.getModule(), user, criteria, tmplGroup.getPremises());
-			EntitiesQueryParameter param = new EntitiesQueryParameter(ltmpl.getModule(), user, mainCriterias);
+			EntitiesQueryParameter param = new EntitiesQueryParameter(ltmpl.getModule(), user);
+			param.setCriteriaFactoryConsumer((criteriaFactory)->{
+				lcriteriaFactory.appendPremiseCriteria(ltmpl.getModule(), tmplGroup.getPremises(), nCriteria);
+				lcriteriaFactory.appendCriterias(nCriteria, ltmpl.getModule(), criteriaFactory);
+			});
 			if(withDetail) {
-				param.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(tmplGroup.getDetailTemplateId(), user));
+				param.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(tmplGroup.getDetailTemplateId(), user));
+				//param.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(tmplGroup.getDetailTemplateId(), user));
 			}
 			EntityPagingIterator itr = entityService.queryExportIterator(param, ePageInfo);
 			
@@ -299,12 +297,6 @@ public class ExportServiceImpl implements ExportService {
 		}).start();;
 	}
 	
-	private List<Criteria> convertCriterias(String moduleName, UserIdentifier user, Set<NormalCriteria> criteria, List<TemplateGroupPremise> premises) {
-		BizFusionContext context = fFactory.getModuleConfig(moduleName).getCurrentContext(user);
-		lcriteriaFactory.appendPremiseCriteria(moduleName, premises, criteria);
-		EntityCriteriaFactory cf = lcriteriaFactory.appendCriterias(criteria, moduleName, context);
-		return cf.getCriterias();
-	}
 
 	EntityExportWriter entityExportWriter = new EntityExportWriter();
 	

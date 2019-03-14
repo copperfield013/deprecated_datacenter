@@ -105,58 +105,63 @@ define(function(require, exports, module){
 		}
 		
 		function getCriteriaData(){
-			var criteriaData = [];
-			$('.criterias-container', $page).children('.criteria-item').each(function(){
-				var criteria = $(this).data('criteria-data');
-				var itemData = {
-					id				: criteria.getId(),
-					title			: criteria.getTitle(),
-					fieldAvailable	: false
-				};
-				if(criteria.isFieldAvailable()){
-					var composite = criteria.getComposite();
-					if(composite != null){
-						itemData.compositeId = composite.c_id;
-					}else{
-						var field = criteria.getField();
-						if(!field){
-							require('dialog').notice('条件必须选择一个字段', 'error');
-							$.error();
-						}else{
-							itemData.fieldId = field.id;
-							itemData.fieldKey = field.name;
-						}
-					}
-					
-					var relationLabelInput = criteria.getRelationLabelInput();
-					$.extend(itemData, {
-						relation		: 'and',
-						comparator		: criteria.getComparatorName(),
-						inputType		: criteria.getDefaultValueInput().getType(),
-						defVal			: criteria.getDefaultValueInput().getValue(),
-						placeholder		: criteria.getPlaceholder(),
-						partitions		: [],
-						queryShow		: criteria.isQueryShow(),
-						relationLabel 	: relationLabelInput && relationLabelInput.getValue(),
-						fieldAvailable	: true
-					});
-				}
-				var partitions = criteria.getPartitions();
-				for(var i in partitions){
-					var partition = partitions[i];
-					itemData.push({
-						relation	: partition.getRelation(),
-						comparator	: partition.getComparatorName(),
-						val			: partition.getValue()
-					});
-				}
-				criteriaData.push(itemData);
-			});
-			return criteriaData;
+			return getContainerCriteriaData($('.criterias-container', $page))
 		}
 		
 	};
 	
+	function getContainerCriteriaData($container){
+		var criteriaData = [];
+		$container.children('.criteria-item').each(function(index){
+			var criteria = $(this).data('criteria-data');
+			var itemData = {
+				id				: criteria.getId(),
+				title			: criteria.getTitle(),
+				fieldAvailable	: false,
+				order			: index
+			};
+			if(criteria.isFieldAvailable()){
+				var composite = criteria.getComposite();
+				if(composite != null){
+					itemData.compositeId = composite.c_id;
+				}else{
+					var field = criteria.getField();
+					if(!field){
+						require('dialog').notice('条件必须选择一个字段', 'error');
+						$.error();
+					}else{
+						itemData.fieldId = field.id;
+						itemData.fieldKey = field.name;
+					}
+				}
+
+				var relationLabelInput = criteria.getRelationLabelInput();
+				$.extend(itemData, {
+					relation		: 'and',
+					comparator		: criteria.getComparatorName(),
+					inputType		: criteria.getDefaultValueInput().getType(),
+					defVal			: criteria.getDefaultValueInput().getValue(),
+					placeholder		: criteria.getPlaceholder(),
+					partitions		: [],
+					queryShow		: criteria.isQueryShow(),
+					relationLabel 	: relationLabelInput && relationLabelInput.getValue(),
+					fieldAvailable	: true
+				});
+			}
+			var partitions = criteria.getPartitions();
+			for(var i in partitions){
+				var partition = partitions[i];
+				itemData.push({
+					relation	: partition.getRelation(),
+					comparator	: partition.getComparatorName(),
+					val			: partition.getValue()
+				});
+			}
+			criteriaData.push(itemData);
+		});
+		return criteriaData;
+	}
+
 	function initTmpl($page, tmplData){
 		if(tmplData){
 			$('#tmplTitle', $page).val(tmplData.title);
@@ -171,6 +176,7 @@ define(function(require, exports, module){
 			criteriaData = criteriaParam.criteriaData;
 			module = criteriaParam.moduleName;
 			compositeId = criteriaParam.compositeId;
+			criteriaParam.$detailArea.hide();
 		}
 		
 		var cField = null,
@@ -514,7 +520,7 @@ define(function(require, exports, module){
 						}
 						$selectedCriteriaItem = null;
 						currentCriteria = null;
-						$('.criteria-detail-area', $page).hide();
+						(criteriaParam.$detailArea || $('.criteria-detail-area', $page)).hide();
 					}
 				}
 			});
@@ -632,8 +638,13 @@ define(function(require, exports, module){
 			}
 		});
 
+		function getCriteriaData(){
+			return getContainerCriteriaData($criteriaContainer);
+		}
+
 		return {
-			addCriteria	: addCriteria
+			addCriteria	: addCriteria,
+			getCriteriaData
 		}
 	}
 	

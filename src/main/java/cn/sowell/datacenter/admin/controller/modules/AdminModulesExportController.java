@@ -212,7 +212,7 @@ public class AdminModulesExportController {
 		String moduleName = tmplGroup.getModule();
 		ModuleEntityPropertyParser entity = null;
 		EntityQueryParameter queryParam = new EntityQueryParameter(moduleName, code, user);
-		queryParam.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(dtmpl.getId(), user));
+		queryParam.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(dtmpl.getId(), user));
 		
 		EntityHistoryItem lastHistory = entityService.getLastHistoryItem(queryParam);
 		if(historyId != null) {
