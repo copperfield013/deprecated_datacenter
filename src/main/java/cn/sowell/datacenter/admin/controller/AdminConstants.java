@@ -111,10 +111,6 @@ public interface AdminConstants {
 	 */
 	final long SYS_DEF = 1;
 
-	final String EXPORT_ENTITY_STATUS_UUID = "export_entity_status_uuid";
-
-	final String KEY_IMPORT_STATUS = "import_status_";
-
 
 	/**
 	 * 用于弹出框选择的页面。

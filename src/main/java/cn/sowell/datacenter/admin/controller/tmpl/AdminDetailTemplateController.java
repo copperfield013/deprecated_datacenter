@@ -90,30 +90,6 @@ public class AdminDetailTemplateController {
 					.setExcept(except)
 					.setURI(AdminConstants.URI_TMPL + "/dtmpl/choose/" +moduleName)
 			);
-		
-		/*
-		List<TemplateDetailTemplate> tmplList = dtmplService.queryAll(module);
-		if(TextUtils.hasText(except)) {
-			Set<Long> excepts = TextUtils.split(except, ",", HashSet::new, FormatUtils::toLong);
-			tmplList = tmplList.stream().filter(tmpl->!excepts.contains(tmpl.getId())).collect(Collectors.toList());
-		}
-		ChooseTablePage<TemplateDetailTemplate> tpage = new ChooseTablePage<TemplateDetailTemplate>(
-				"dtmpl-choose-list", "dtmpl_");
-		tpage
-			.setPageInfo(null)
-			.setAction(AdminConstants.URI_TMPL + "/dtmpl/choose/" + module)
-			.setIsMulti(false)
-			.setTableData(tmplList, handler->{
-				handler
-					.setDataKeyGetter(data->"dtmpl_" + data.getId())
-					.addColumn("模板名", (cell, data)->cell.setText(data.getTitle()))
-					.addColumn("创建时间", (cell, data)->cell.setText(dateFormat.formatDateTime(data.getCreateTime())))
-					;
-			})
-			;
-		
-		model.addAttribute("tpage", tpage);
-		return AdminConstants.PATH_CHOOSE_TABLE;*/
 	}
 	
 	@ResponseBody

@@ -24,7 +24,7 @@ import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.common.choose.ChooseTablePage;
+import cn.sowell.datacenter.admin.controller.tmpl.CommonTemplateActionConsumer.ChooseRequestParam;
 import cn.sowell.datacenter.model.config.service.ConfigureService;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
@@ -159,6 +159,18 @@ public class AdminTemplateGroupController {
 		return jRes;
 	}
 	
+	@Resource
+	CommonTemplateActionConsumer actionConsumer;
+	
+	@RequestMapping("/choose/{moduleName}")
+	public String choose(@PathVariable String moduleName, String except, Model model) {
+		return actionConsumer.choose(
+				ChooseRequestParam.create(moduleName, tmplGroupService, model)
+					.setExcept(except)
+					.setURI(AdminConstants.URI_TMPL + "/tmpl/group/" + moduleName)
+			);
+	}
+	
 	@RequestMapping("/rabc_relate/{moduleName}/{relationCompositeId}")
 	public String rabcRelate(@PathVariable String moduleName, 
 			@PathVariable Long relationCompositeId,
@@ -166,8 +178,9 @@ public class AdminTemplateGroupController {
 			Model model) {
 		ModuleMeta relationCompositeModule = mService.getCompositeRelatedModule(moduleName, relationCompositeId);
 		if(relationCompositeModule != null) {
-			List<TemplateGroup> tmplGroups = tmplGroupService.queryAll(relationCompositeModule.getName());
-			ChooseTablePage<TemplateGroup> tpage = new ChooseTablePage<TemplateGroup>(
+			return choose(relationCompositeModule.getName(), "", model);
+			//List<TemplateGroup> tmplGroups = tmplGroupService.queryAll(relationCompositeModule.getName());
+			/*ChooseTablePage<TemplateGroup> tpage = new ChooseTablePage<TemplateGroup>(
 					"tmplgroup-choose-list", "tmpl_group_");
 			tpage.setPageInfo(null)
 					.setAction(AdminConstants.URI_TMPL + "/rabc_relate/" + moduleName + '/' + relationCompositeId)
@@ -185,10 +198,9 @@ public class AdminTemplateGroupController {
 							;
 						
 					});
-			model.addAttribute("tpage", tpage);
-			
+			model.addAttribute("tpage", tpage);*/
 		}
-		return AdminConstants.PATH_CHOOSE_TABLE;
+		return null;
 	}
 	
 	

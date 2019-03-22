@@ -696,7 +696,7 @@ define(function(require, exports, module){
 				}else if(data.compositeData){
 					this.setDefaultInputType(this.getRelationLabelInput());
 				}
-				defaultValueInput.setValue(data.defaultValue);
+				defaultValueInput.setValue(data.defaultValue || data.defVal);
 			}else{
 				$.error();
 			}

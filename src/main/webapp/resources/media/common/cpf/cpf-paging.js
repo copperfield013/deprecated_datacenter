@@ -12,6 +12,7 @@ define(function(require, exports, module){
 	$CPF.addDefaultParam({
 		//分页器的class
 		paginatorClass	: 'cpf-paginator',
+		queryPaginatorClass	: 'cpf-query-paginator',
 		//分页器jQuery对象找到对应pageInfo的data key
 		pageInfoKey		: 'PAGE_INFO_KEY',
 		//从分页器的元素获得分页信息的方法
@@ -19,11 +20,13 @@ define(function(require, exports, module){
 			return {
 				pageNo	: Number($target.attr('pageNo')),
 				pageSize: Number($target.attr('pageSize')),
-				count	: Number($target.attr('count'))
+				count	: Number($target.attr('count')),
+				queryKey: $target.attr('query-key')
 			};
 		},
 		//根据分页信息对象构造分页的jQuery对象
-		paginatorBuilder: buildPaginator,
+		paginatorBuilder		: function(page){return buildPaginator(page, goPage)},
+		queryPaginatorBuilder	: function(page){return buildPaginator(page, renderList)},
 		//WARNING: maxPageCount-lastPageCount必须为偶数
 		//如果不是偶数，那么在超过maxPageCount的时候，将显示maxPageCount-1页
 		//分页最多显示的页数，包含省略号前面的页号和后面的页号，至少为5
@@ -42,22 +45,12 @@ define(function(require, exports, module){
 					var action = $form.attr('action');
 					if(action){
 						$form.submit();
-						/*var parameters = $form.serializeArray(),
-							formData = new FormData();
-						
-						for(var i in parameters){
-							formData.append(parameters[i].name, parameters[i].value);
-						}
-						if(pageInfo.pageNo){
-							formData.append('pageNo', pageInfo.pageNo);
-						}
-						if(pageInfo.pageSize){
-							formData.append('pageSize', pageInfo.pageSize);
-						}
-						this.loadContent(action, undefined, formData);*/
 					}
 				}
 			}
+		},
+		paginatorEntityQuery	: function(pageInfo){
+			
 		}
 	});
 	/**
@@ -72,32 +65,49 @@ define(function(require, exports, module){
 	function initPaging($page){
 		var paginatorClass = $CPF.getParam('paginatorClass');
 		$('.' + paginatorClass, $page).each(function(){
-			var pageInfo = $CPF.getParam('pageInfoGetter')($(this));
-			if(Utils.isInteger(pageInfo.pageNo) && Utils.isInteger(pageInfo.pageSize)&& Utils.isInteger(pageInfo.count)){
-				//构造分页
-				var $paginator = $CPF.getParam('paginatorBuilder')(pageInfo);
-				if($paginator){
-					$paginator
-						.data($CPF.getParam('pageInfoKey'), $paginator)
-						.appendTo($(this).empty());
-						;
-					//表单提交时，默认放入分页参数
-					$('form', $page).on('cpf-submit', function(e, formData){
-						if($(this).getLocatePage() == $paginator.getLocatePage()){
-							formData.append('pageNo', pageInfo.pageNo);
-							formData.append('pageSize', pageInfo.pageSize);
-						}
-					});
-				}
-			}else{
-				$.error('pageNo, pageSize, count must be integer');
-			}
+			initPaginator($(this));
 		});
 	}
+	
+	function initPaginator($paginatorContainer){
+		var pageInfo = $CPF.getParam('pageInfoGetter')($paginatorContainer);
+		if(Utils.isInteger(pageInfo.pageNo) && Utils.isInteger(pageInfo.pageSize)&& Utils.isInteger(pageInfo.count)){
+			var queryPaginatorClass = $CPF.getParam('queryPaginatorClass');
+			//构造分页
+			var $paginator = null;
+			if($paginatorContainer.is('.' + queryPaginatorClass)){
+				$paginator = $CPF.getParam('queryPaginatorBuilder')(pageInfo);
+			}else{
+				$paginator = $CPF.getParam('paginatorBuilder')(pageInfo);
+			}
+			if($paginator){
+				$paginator
+					.appendTo($paginatorContainer.empty());
+					;
+				$paginatorContainer.data($CPF.getParam('pageInfoKey'), pageInfo);
+				//表单提交时，默认放入分页参数
+				$('form', $paginatorContainer.getLocatePage().getContent()).on('cpf-submit', function(e, formData){
+					if($paginatorContainer.getLocatePage() == $paginator.getLocatePage()){
+						formData.append('pageNo', pageInfo.pageNo);
+						formData.append('pageSize', pageInfo.pageSize);
+					}
+				});
+			}
+		}else{
+			$.error('pageNo, pageSize, count must be integer');
+		}
+	}
+	
+	function buildQueryPaginator(pageInfo){
+		buildPaginator(pageInfo, function(page){
+			
+		});
+	}
+	
 	/**
 	 * 根据分页信息对象构造分页的jQuery对象
 	 */
-	function buildPaginator(pageInfo){
+	function buildPaginator(pageInfo, _goPage){
 		if(!pageInfo || pageInfo.count == 0){
 			return null;
 		}
@@ -145,25 +155,25 @@ define(function(require, exports, module){
 			var $firstPage = $('<li>').append($('<a href="#">«</a>').click(function(e){
 				e.stopImmediatePropagation();
 				pageInfo.pageNo = 1;
-				goPage($(this).getLocatePage());
+				_goPage.call(this, $(this).getLocatePage());
 				return false;
 			}));
 			ul.append($firstPage);
 		}
 		for(var i= frontShowBegin; i <= frontShowEnd; i++){
-			buildPagingLi(i, pageInfo).appendTo(ul).addClass(i == pageInfo.pageNo? 'active': undefined);
+			buildPagingLi(i, pageInfo, _goPage).appendTo(ul).addClass(i == pageInfo.pageNo? 'active': undefined);
 		}
 		if(endShowBegin){
 			ul.append($('<li><a href="#">...</a></li>'));
 			for(var i = endShowBegin; i <= pageCount; i++){
-				buildPagingLi(i, pageInfo).appendTo(ul);
+				buildPagingLi(i, pageInfo, _goPage).appendTo(ul);
 			}
 		}
 		if(pageInfo.pageNo < pageCount){
 			var $lastPage = $('<li>').append($('<a href="#">»</a>').click(function(e){
 				e.stopImmediatePropagation();
 				pageInfo.pageNo = pageCount;
-				goPage($(this).getLocatePage());
+				_goPage.call(this, $(this).getLocatePage());
 				return false;
 			}));
 			ul.append($lastPage);
@@ -182,7 +192,7 @@ define(function(require, exports, module){
 								//点击按钮时跳转页面
 								var pageNo = $(this).prev('.cpf-paginator-jump-text').val();
 								pageInfo.pageNo = pageNo;
-								goPage($(this).getLocatePage(), pageNo, pageSizeSelect.val());
+								_goPage.call(this, $(this).getLocatePage(), pageNo, pageSizeSelect.val());
 								return false;
 							})
 						)
@@ -205,13 +215,13 @@ define(function(require, exports, module){
 			var pageSize = $(this).val();
 			var pageNo = Number(ul.find('li.active a').text());
 			pageInfo.pageSize = pageSize;
-			goPage($(this).getLocatePage(), pageNo, pageSize);
+			_goPage.call(this, $(this).getLocatePage(), pageNo, pageSize);
 			return false;
 		});
 		return ul
 	}
 	
-	function buildPagingLi(pageNo, pageInfo){
+	function buildPagingLi(pageNo, pageInfo, _goPage){
 		var a = $('<a href="#">' + pageNo + '</a>');
 		a.click(function(e){
 			e.stopImmediatePropagation();
@@ -219,7 +229,7 @@ define(function(require, exports, module){
 			var page = $(this).getLocatePage();
 			var pageSize = a.closest('.' + $CPF.getParam('paginatorClass')).find('select.page-size-select').val();
 			pageInfo.pageNo = goPageNo;
-			goPage(page);
+			_goPage.call(this, page);
 			return false;
 		});
 		var li = $('<li>').append(a);
@@ -232,5 +242,17 @@ define(function(require, exports, module){
 	 */
 	function goPage(page){
 		$CPF.getParam('paginatorGoPage').apply(page, []);
+	}
+	
+	function renderList(page){
+		var $page = page.getContent();
+		var $paginatorContainer = $(this).closest('.' + $CPF.getParam('paginatorClass'));
+		var pageInfo = $paginatorContainer.data($CPF.getParam('pageInfoKey'));
+		console.log(pageInfo);
+		$paginatorContainer.trigger('pageInfoChange', [pageInfo]);
+		$paginatorContainer
+			.attr('pageNo', pageInfo.pageNo)
+			.attr('pageSize', pageInfo.pageSize);
+		initPaginator($paginatorContainer);
 	}
 });

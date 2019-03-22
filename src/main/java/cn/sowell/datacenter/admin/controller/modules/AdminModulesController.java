@@ -1,6 +1,7 @@
 package cn.sowell.datacenter.admin.controller.modules;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,6 +36,7 @@ import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.copframe.web.poll.WorkProgress;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.admin.controller.SessionKey;
 import cn.sowell.datacenter.common.RequestParameterMapComposite;
 import cn.sowell.datacenter.entityResolver.CEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.FieldDescCacheMap;
@@ -41,7 +44,7 @@ import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.impl.ABCNodeProxy;
-import cn.sowell.datacenter.entityResolver.impl.RelationEntityPropertyParser;
+import cn.sowell.datacenter.entityResolver.impl.RelSelectionEntityPropertyParser;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.config.service.NonAuthorityException;
@@ -56,12 +59,14 @@ import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.modules.service.ViewDataService;
+import cn.sowell.dataserver.model.modules.service.view.EntityItem;
 import cn.sowell.dataserver.model.modules.service.view.EntityQuery;
 import cn.sowell.dataserver.model.modules.service.view.EntityQueryPool;
+import cn.sowell.dataserver.model.modules.service.view.EntityViewCriteria;
 import cn.sowell.dataserver.model.modules.service.view.ListTemplateEntityView;
 import cn.sowell.dataserver.model.modules.service.view.ListTemplateEntityViewCriteria;
-import cn.sowell.dataserver.model.modules.service.view.SelectionTemplateEntityView;
-import cn.sowell.dataserver.model.modules.service.view.SelectionTemplateEntityViewCriteria;
+import cn.sowell.dataserver.model.modules.service.view.PagedEntityList;
+import cn.sowell.dataserver.model.modules.service.view.TreeNodeContext;
 import cn.sowell.dataserver.model.tmpl.pojo.ArrayEntityProxy;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
@@ -70,8 +75,9 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupAction;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupPremise;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListCriteria;
-import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionCriteria;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateSelectionTemplate;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeNode;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeTemplate;
 import cn.sowell.dataserver.model.tmpl.service.ActionTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.ArrayItemFilterService;
@@ -81,11 +87,13 @@ import cn.sowell.dataserver.model.tmpl.service.ListTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.SelectionTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
 import cn.sowell.dataserver.model.tmpl.service.TreeTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.impl.TreeTemplateServiceImpl.TreeRelationComposite;
 
 @Controller
 @RequestMapping(AdminConstants.URI_MODULES + "/curd")
 public class AdminModulesController {
 	
+
 	@Resource
 	ModulesService mService;
 	
@@ -141,6 +149,9 @@ public class AdminModulesController {
 	
 	Logger logger = Logger.getLogger(AdminModulesController.class);
 
+	@Resource
+	ApplicationContext applicationContext;
+
 	@RequestMapping("/list/{menuId}")
 	public String list(
 			@PathVariable Long menuId,
@@ -148,11 +159,12 @@ public class AdminModulesController {
 			HttpServletRequest request, Model model, HttpSession session) {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		//String moduleName = menu.getTemplateModule();
-		ListTemplateEntityView view = queryEntityList(menu, pageInfo, request);
+		EntityViewCriteria criteria = getEntityListCriteria(menu, pageInfo, request);
+		ListTemplateEntityView view = (ListTemplateEntityView) vService.query(criteria);
 		model.addAttribute("view", view);
 		
 		//导出状态获取
-		String uuid = (String) session.getAttribute(AdminConstants.EXPORT_ENTITY_STATUS_UUID);
+		String uuid = (String) session.getAttribute(SessionKey.EXPORT_ENTITY_STATUS_UUID);
 		if(uuid != null){
 			WorkProgress progress = eService.getExportProgress(uuid);
 			if(progress != null && !progress.isBreaked()){
@@ -192,16 +204,44 @@ public class AdminModulesController {
 			String entityCode, 
 			PageInfo pageInfo, 
 			HttpServletRequest request, 
-			Model model) {
+			Model model, HttpSession session) {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
-		ListTemplateEntityView view = queryEntityList(menu, pageInfo, request);
-		view.getParsers();
-		model.addAttribute("view", view);
+		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+		TemplateListTemplate ltmpl = ltmplService.getTemplate(tmplGroup.getListTemplateId());
+		ModuleMeta module = mService.getModule(menu.getTemplateModule());
+		//获得查询池
+		UserIdentifier user = UserUtils.getCurrentUser();
+		EntityQueryPool qPool = getEntityQueryPool(session, user);
+		//注册一个查询
+		EntityQuery query = qPool.regist();
+		TemplateTreeTemplate ttmpl = treeService.getTemplate(tmplGroup.getTreeTemplateId());
+		//构造根节点的上下文
+		TreeNodeContext nodeContext = new TreeNodeContext(ttmpl);
+		//根据上下文获得节点模板
+		TemplateTreeNode nodeTemplate = treeService.analyzeNodeTemplate(nodeContext);;
+		//设置参数
+		query
+			.setModuleName(menu.getTemplateModule())
+			.setPageSize(pageInfo.getPageSize())
+			.setTemplateGroupId(tmplGroup.getId())
+			.setNodeTemplate(nodeTemplate)
+			;
+		Map<Long, String> requrestCriteriaMap = lcriteriFacrory.exractTemplateCriteriaMap(request);
+		//根据传入的条件和约束开始初始化查询对象，但还不获取实体数据
+		query.prepare(requrestCriteriaMap, applicationContext);
+		//传递参数到页面
+		model.addAttribute("query", query);
+		model.addAttribute("nodeTmplJson", JSON.toJSON(query.getNodeTemplate()));
+		String nodesCSS = treeService.generateNodesCSS(ttmpl);
+		model.addAttribute("nodesCSS", nodesCSS);
+		model.addAttribute("module", module);
 		model.addAttribute("menu", menu);
+		model.addAttribute("tmplGroup", tmplGroup);
+		model.addAttribute("ltmpl", ltmpl);
 		return AdminConstants.JSP_MODULES + "/modules_list_tree.jsp";
 	}
 	
-	private ListTemplateEntityView queryEntityList(SideMenuLevel2Menu menu, PageInfo pageInfo, HttpServletRequest request) {
+	private ListTemplateEntityViewCriteria getEntityListCriteria(SideMenuLevel2Menu menu, PageInfo pageInfo, HttpServletRequest request) {
 		
 		//创建条件对象
 		ListTemplateEntityViewCriteria criteria = new ListTemplateEntityViewCriteria();
@@ -213,58 +253,93 @@ public class AdminModulesController {
 		criteria.setPageInfo(pageInfo);
 		criteria.setUser(UserUtils.getCurrentUser());
 		//执行查询
-		return (ListTemplateEntityView) vService.query(criteria);
+		return criteria;
 	}
 	
-	@SuppressWarnings("unused")
 	@ResponseBody
-	@RequestMapping("/start_askfor_entity_nodes/{menuId}/{parentEntityCode}/{relationName}/{pageSize}")
+	@RequestMapping("/start_askfor_entity_nodes/{menuId}/{parentEntityCode}/{nodeRelationId}")
 	public ResponseJSON treeNode(@PathVariable Long menuId,
 			@PathVariable String parentEntityCode, 
-			@PathVariable String relationName, 
-			@PathVariable Integer pageSize, HttpSession session) {
-		JSONObjectResponse jRes = new JSONObjectResponse();
+			@PathVariable Long nodeRelationId, 
+			@RequestParam(required=false, defaultValue="10") Integer pageSize, 
+			HttpSession session) {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		JSONObjectResponse jRes = new JSONObjectResponse();
 		
-		//获得查询池
-		EntityQueryPool qPool = getEntityQueryPool(session);
-		//注册一个查询
-		EntityQuery query = qPool.regist();
-		//设置参数
-		query
-			.setModuleName(menu.getTemplateModule())
-			.setParentEntityCode(parentEntityCode)
-			.setRelationName(relationName)
-			.setPageSize(pageSize)
-			;
-		//执行查询
-		List<CEntityPropertyParser> parsers = query.list();
+		String moduleName = menu.getTemplateModule();
 		
-		
-		//获得树形模板对象
-		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
-		TemplateTreeTemplate ttmpl = treeService.getTemplate(tmplGroup.getTreeTemplateId());
-		
-		//根据树形模板将entity转换成node
-		
-		
-		
-		//jRes.put("nodes", nodes);
+		TreeRelationComposite relationComposite = treeService.getNodeRelationTemplate(moduleName, nodeRelationId);
+		if(relationComposite != null) {
+			//TemplateTreeRelation nodeRelationTempalte = relationComposite.getReltionTempalte();
+			//构造查询节点的上下文
+			TreeNodeContext nodeContext = new TreeNodeContext(relationComposite);
+			//设置当前节点路径
+			//nodeContext.setPath(path);
+			//根据上下文获得节点模板
+			TemplateTreeNode itemNodeTemplate = treeService.analyzeNodeTemplate(nodeContext);
+			//获得查询池
+			UserIdentifier user = UserUtils.getCurrentUser();
+			EntityQueryPool qPool = getEntityQueryPool(session, user);
+			//注册一个查询
+			EntityQuery query = qPool.regist();
+			//在模板中匹配查询结果的Node模板
+			//设置参数
+			query
+				.setModuleName(menu.getTemplateModule())
+				.setParentEntityCode(parentEntityCode)
+				.setRelationTemplate(relationComposite.getRelationTempalte())
+				.setPageSize(pageSize)
+				.setNodeTemplate(itemNodeTemplate)
+				;
+			//执行查询
+			Map<Long, String> requrestCriteriaMap = new HashMap<>();
+			query.prepare(requrestCriteriaMap, applicationContext);
+			
+			//根据树形模板将entity转换成node
+			jRes.put("queryKey", query.getKey());
+			jRes.put("nodeTmpl", query.getNodeTemplate());
+		}
 		return jRes;
 	}
 	
-	private EntityQueryPool getEntityQueryPool(HttpSession session) {
-		// TODO Auto-generated method stub
-		return null;
+	private EntityQueryPool getEntityQueryPool(HttpSession session, UserIdentifier user) {
+		EntityQueryPool pool = (EntityQueryPool) session.getAttribute(SessionKey.ENTITY_QUERY_POOL);
+		if(pool == null) {
+			synchronized (SessionKey.ENTITY_QUERY_POOL) {
+				pool = (EntityQueryPool) session.getAttribute(SessionKey.ENTITY_QUERY_POOL);
+				if(pool == null) {
+					pool = new EntityQueryPool(user);
+					session.setAttribute(SessionKey.ENTITY_QUERY_POOL, pool);
+				}
+			}
+		}
+		return pool;
 	}
 
 
 
 	@ResponseBody
-	@RequestMapping("/askfor_entity_nodes/{key}/{pageNo}")
-	public ResponseJSON askForEntityNodes(@PathVariable String key, @PathVariable Integer pageNo) {
-		ResponseJSON json = new JSONObjectResponse();
-		return json;
+	@RequestMapping("/askfor_entities/{key}/{pageNo}")
+	public ResponseJSON askForEntityNodes(@PathVariable String key, @PathVariable Integer pageNo, HttpSession session) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		UserIdentifier user = UserUtils.getCurrentUser();
+		EntityQueryPool pool = getEntityQueryPool(session, user);
+		EntityQuery query = pool.getQuery(key);
+		PagedEntityList el = query.pageList(pageNo);
+		
+		//Long treeTemplateId = query.getTreeTemplateId();
+		
+		//TemplateTreeTemplate ttmpl = treeService.getTemplate(treeTemplateId);
+		//获得模板
+		//TemplateTreeNode nodeTmpl = treeService.analyzeNodeTemplate(ttmpl, el);
+		//TemplateTreeNode nodeTmpl = query.getNodeTemplate();
+		//List<EntityNode> nodes = CollectionUtils.toList(el.getParsers(), parser->entityService.toEntityNode(parser, nodeTmpl));
+		List<EntityItem> entities = entityService.convertEntityItems(el);
+		jRes.put("entities", entities);
+		jRes.put("isEndList", el.getIsEndList());
+		jRes.put("queryKey", query.getKey());
+		jRes.put("pageNo", el.getPageNo());
+		return jRes;
 	}
 	
 	
@@ -275,10 +350,32 @@ public class AdminModulesController {
     		Long historyId,
     		Model model) {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
-		String moduleName = menu.getTemplateModule();
+		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+		model.addAttribute("menu", menu);
+		return toDetail(code, tmplGroup, historyId, model);
+	}
+	
+	@RequestMapping("/node_detail/{menuId}/{nodeId}/{code}")
+	public String nodeDetail(
+			@PathVariable Long menuId,
+			@PathVariable Long nodeId, 
+			@PathVariable String code,
+			Long historyId,
+			Model model) {
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		TemplateTreeNode nodeTemplate = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
+		Long tmplGroupId = nodeTemplate.getTemplateGroupId();
+		TemplateGroup tmplGroup = tmplGroupService.getTemplate(tmplGroupId);
+		model.addAttribute("menu", menu);
+		model.addAttribute("nodeTemplate", nodeTemplate);
+		return toDetail(code, tmplGroup, historyId, model);
+	}
+	
+	
+	private String toDetail(String code, TemplateGroup tmplGroup, Long historyId, Model model) {
 		
-		ModuleMeta moduleMeta = mService.getModule(moduleName);
-        TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+        String moduleName = tmplGroup.getModule();
+        ModuleMeta moduleMeta = mService.getModule(moduleName);
         TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
         
         ModuleEntityPropertyParser entity = null;
@@ -300,16 +397,14 @@ public class AdminModulesController {
         if(lastHistory != null) {
         	model.addAttribute("hasHistory", true);
         }
-        model.addAttribute("menu", menu);
+        
         model.addAttribute("historyId", historyId);
         model.addAttribute("entity", entity);
         model.addAttribute("dtmpl", dtmpl);
         model.addAttribute("groupPremises", tmplGroup.getPremises());
 		model.addAttribute("module", moduleMeta);
 		return AdminConstants.JSP_MODULES + "/modules_detail_tmpl.jsp";
-		
 	}
-	
 	
 	@RequestMapping("/add/{menuId}")
 	public String add(@PathVariable Long menuId, Model model) {
@@ -350,9 +445,29 @@ public class AdminModulesController {
 			Model model
 			) {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
-		String moduleName = menu.getTemplateModule();
-		ModuleMeta mMeta = mService.getModule(moduleName);
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+		model.addAttribute("menu", menu);
+		return aUpdate(tmplGroup, code, model);
+	}
+	
+	@RequestMapping("/node_update/{menuId}/{nodeId}/{code}")
+	public String nodeUpdate(
+			@PathVariable Long menuId,
+			@PathVariable Long nodeId,
+			@PathVariable String code,
+			Model model
+			) {
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		TemplateTreeNode nodeTemplate = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
+		TemplateGroup tmplGroup = tmplGroupService.getTemplate(nodeTemplate.getTemplateGroupId());
+		model.addAttribute("menu", menu);
+		model.addAttribute("nodeTemplate", nodeTemplate);
+		return aUpdate(tmplGroup, code, model);
+	}
+	
+	private String aUpdate(TemplateGroup tmplGroup, String code, Model model) {
+		String moduleName = tmplGroup.getModule();
+		ModuleMeta mMeta = mService.getModule(moduleName);
 		FusionContextConfig config = fFactory.getModuleConfig(moduleName);
 		UserIdentifier user = UserUtils.getCurrentUser();
 		EntityQueryParameter queryParam = new EntityQueryParameter(moduleName, code, user);
@@ -360,7 +475,7 @@ public class AdminModulesController {
 		ModuleEntityPropertyParser entity = entityService.getEntityParser(queryParam);
 		//ModuleEntityPropertyParser entity = mService.getEntity(moduleName, code, null, UserUtils.getCurrentUser());
 		TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
-		model.addAttribute("menu", menu);
+		
 		model.addAttribute("entity", entity);
 		model.addAttribute("module", mMeta);
 		model.addAttribute("dtmpl", dtmpl);
@@ -382,12 +497,11 @@ public class AdminModulesController {
 		model.addAttribute("fieldDescMap", new FieldDescCacheMap(config.getConfigResolver()));
 		return AdminConstants.JSP_MODULES + "/modules_update_tmpl.jsp";
 	}
-	
-	
-	
-	
+
+
+
 	@ResponseBody
-    @RequestMapping({"/save/{menuId}/{module}"})
+    @RequestMapping({"/save/{menuId}"})
     public AjaxPageResponse save(
     		@PathVariable Long menuId,
     		@RequestParam(value=AdminConstants.KEY_FUSE_MODE, required=false) Boolean fuseMode,
@@ -425,6 +539,44 @@ public class AdminModulesController {
     }
 	
 	
+	@ResponseBody
+    @RequestMapping({"/node_save/{menuId}/{nodeId}"})
+    public AjaxPageResponse save(
+    		@PathVariable Long menuId,
+    		@PathVariable Long nodeId,
+    		@RequestParam(value=AdminConstants.KEY_FUSE_MODE, required=false) Boolean fuseMode,
+    		@RequestParam(value=AdminConstants.KEY_ACTION_ID, required=false) Long actionId,
+    		RequestParameterMapComposite composite){
+		UserIdentifier user = UserUtils.getCurrentUser();
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		
+		TemplateTreeNode nodeTemplate = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
+		
+		String moduleName = nodeTemplate.getModuleName();
+		Map<String, Object> entityMap = composite.getMap();
+		if(actionId != null) {
+			ArrayEntityProxy.setLocalUser(user);
+			TemplateGroupAction groupAction = tmplGroupService.getTempateGroupAction(actionId);
+			entityMap = atmplService.coverActionFields(groupAction, entityMap);
+		}
+    	 try {
+    		 entityMap.remove(AdminConstants.KEY_FUSE_MODE);
+    		 entityMap.remove(AdminConstants.KEY_ACTION_ID);
+    		 EntityQueryParameter param = new EntityQueryParameter(moduleName, user);
+    		 TemplateGroup tmplGroup = tmplGroupService.getTemplate(nodeTemplate.getTemplateGroupId());
+    		 param.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(tmplGroup.getDetailTemplateId(), user));
+    		 if(Boolean.TRUE.equals(fuseMode)) {
+    			 entityService.fuseEntity(param, entityMap);
+    		 }else {
+    			 entityService.mergeEntity(param, entityMap);
+    		 }
+             return AjaxPageResponse.CLOSE_AND_REFRESH_PAGE("保存成功", "entity_list_" + menuId);
+         } catch (Exception e) {
+             logger.error("保存时发生错误", e);
+             return AjaxPageResponse.FAILD("保存失败");
+         }
+    }
+	
 	
 	@ResponseBody
     @RequestMapping("/paging_history/{menuId}/{code}")
@@ -434,9 +586,27 @@ public class AdminModulesController {
     		@RequestParam Integer pageNo, 
     		@RequestParam(defaultValue="100") Integer pageSize){
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
-    	JSONObjectResponse response = new JSONObjectResponse();
+		return aPagingHistory(menu.getTemplateModule(), code, pageNo, pageSize);
+    }
+	
+	
+	@ResponseBody
+    @RequestMapping("/node_paging_history/{menuId}/{nodeId}/{code}")
+    public JSONObjectResponse nodePagingHistory(
+    		@PathVariable Long menuId,
+    		@PathVariable Long nodeId,
+    		@PathVariable String code, 
+    		@RequestParam Integer pageNo, 
+    		@RequestParam(defaultValue="100") Integer pageSize){
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		TemplateTreeNode node = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
+    	return aPagingHistory(node.getModuleName(), code, pageSize, pageSize);
+    } 
+	
+	private JSONObjectResponse aPagingHistory(String moduleName, String code, Integer pageNo, Integer pageSize) {
+		JSONObjectResponse response = new JSONObjectResponse();
     	try {
-			EntityQueryParameter param = new EntityQueryParameter(menu.getTemplateModule(), code, UserUtils.getCurrentUser());
+			EntityQueryParameter param = new EntityQueryParameter(moduleName, code, UserUtils.getCurrentUser());
 			List<EntityHistoryItem> historyItems = entityService.queryHistory(param , pageNo, pageSize);
 			response.put("history", JSON.toJSON(historyItems));
 			response.setStatus("suc");
@@ -448,8 +618,10 @@ public class AdminModulesController {
 		}
     	
     	return response;
-    }
-	
+	}
+
+
+
 	@ResponseBody
 	@RequestMapping("/delete/{menuId}/{code}")
 	public AjaxPageResponse delete(
@@ -485,7 +657,69 @@ public class AdminModulesController {
 	}
 	
 	
-	@RequestMapping("/open_selection/{menuId}/{stmplId}")
+	@RequestMapping("/rel_selection/{menuId}/{stmplId}")
+	public String relationSelection(@PathVariable Long menuId, 
+			@PathVariable Long stmplId,
+			String exists,
+			PageInfo pageInfo,
+			HttpServletRequest request,
+			Model model, HttpSession session) {
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		model.addAttribute("menu", menu);
+		return aNodeRelationSelection(menu.getTemplateModule(), stmplId, session, exists, pageInfo, model, request);
+	}
+	
+	@RequestMapping("/node_rel_selection/{menuId}/{nodeId}/{stmplId}")
+	public String nodeRelationSelection(@PathVariable Long menuId, 
+			@PathVariable Long nodeId,
+			@PathVariable Long stmplId,
+			String exists,
+			PageInfo pageInfo,
+			HttpServletRequest request,
+			Model model, HttpSession session) {
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		TemplateTreeNode nodeTemplate = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
+		model.addAttribute("menu", menu);
+		return aNodeRelationSelection(nodeTemplate.getModuleName(), stmplId, session, exists, pageInfo, model, request);
+	}
+	
+	private String aNodeRelationSelection(String moduleName, 
+			Long stmplId, 
+			HttpSession session, 
+			String exists, 
+			PageInfo pageInfo,
+			Model model, HttpServletRequest request) {
+		TemplateSelectionTemplate stmpl = stmplService.getTemplate(stmplId);
+		
+		//获得查询池
+		UserIdentifier user = UserUtils.getCurrentUser();
+		EntityQueryPool qPool = getEntityQueryPool(session, user);
+		//注册一个查询
+		EntityQuery query = qPool.regist();
+		
+		Set<String> excludeCodes = TextUtils.split(exists, ",", HashSet::new, c->c);
+		//设置参数
+		query
+			.setModuleName(moduleName)
+			.setPageSize(pageInfo.getPageSize())
+			.setSelectionTemplate(stmpl)
+			.addExcludeEntityCodes(excludeCodes)
+			;
+		Map<Long, String> requrestCriteriaMap = lcriteriFacrory.exractTemplateCriteriaMap(request);
+		//根据传入的条件和约束开始初始化查询对象，但还不获取实体数据
+		query.prepare(requrestCriteriaMap, applicationContext);
+		
+		
+		model.addAttribute("stmpl", stmpl);
+		model.addAttribute("stmplJson", JSON.toJSON(stmpl));
+		model.addAttribute("query", query);
+		//TODO：优化缓存之后需要移除此处代码
+		pageInfo.setCount(query.getCount());
+		model.addAttribute("pageInfo", query);
+		return AdminConstants.JSP_MODULES + "/modules_rel_selection.jsp";
+	}
+	
+	/*@RequestMapping("/open_selection/{menuId}/{stmplId}")
 	public String openSelection(
 			@PathVariable Long menuId, 
 			@PathVariable Long stmplId,
@@ -522,7 +756,7 @@ public class AdminModulesController {
 		model.addAttribute("stmpl", stmpl);
 		model.addAttribute("criteria", criteria);
 		return AdminConstants.JSP_MODULES + "/modules_selection.jsp";
-	}
+	}*/
 	
 	@RequestMapping("/rabc_create/{mainMenuId}/{fieldGroupId}")
 	public String rabcCreate(@PathVariable Long mainMenuId, 
@@ -530,6 +764,22 @@ public class AdminModulesController {
 		SideMenuLevel2Menu mainMenu = authService.vaidateL2MenuAccessable(mainMenuId);
 		model.addAttribute("mainMenu", mainMenu);
 		TemplateGroup mainTmplGroup = tmplGroupService.getTemplate(mainMenu.getTemplateGroupId());
+		return aRabcCreate(mainTmplGroup, fieldGroupId, entityCode, model);
+	}
+	
+	@RequestMapping("/node_rabc_create/{mainMenuId}/{nodeId}/{fieldGroupId}")
+	public String rabcCreate(@PathVariable Long mainMenuId, 
+			@PathVariable Long fieldGroupId, 
+			@PathVariable Long nodeId,
+			String entityCode, Model model) {
+		SideMenuLevel2Menu mainMenu = authService.vaidateL2MenuAccessable(mainMenuId);
+		model.addAttribute("mainMenu", mainMenu);
+		TemplateTreeNode nodeTemplate = treeService.getNodeTemplate(mainMenu.getTemplateModule(), nodeId);
+		TemplateGroup mainTmplGroup = tmplGroupService.getTemplate(nodeTemplate.getTemplateGroupId());
+		return aRabcCreate(mainTmplGroup, fieldGroupId, entityCode, model);
+	}
+	
+	private String aRabcCreate(TemplateGroup mainTmplGroup, Long fieldGroupId, String entityCode, Model model) {
 		if(mainTmplGroup != null) {
 			TemplateDetailTemplate mainDtmpl = dtmplService.getTemplate(mainTmplGroup.getDetailTemplateId());
 			if(mainDtmpl != null) {
@@ -574,26 +824,13 @@ public class AdminModulesController {
 					model.addAttribute("relationCompositeId", fieldGroup.getCompositeId());
 					return AdminConstants.JSP_MODULES + "/modules_update_tmpl.jsp";
 				}
-				/*
-				
-				Long relationDetailTemplateId = fieldGroup.getRelationDetailTemplateId();
-				TemplateDetailTemplate dtmpl = dtmplService.getTemplate(relationDetailTemplateId);
-				String moduleName = dtmpl.getModule(); 
-				ModuleMeta mMeta = mService.getModule(moduleName);
-				FusionContextConfig config = fFactory.getModuleConfig(moduleName);
-				model.addAttribute("mainMenu", mainMenu);
-				model.addAttribute("dtmpl", dtmpl);
-				model.addAttribute("module", mMeta);
-				model.addAttribute("config", config);
-				model.addAttribute("relationDetailTemplate", dtmpl);
-				model.addAttribute("relationCompositeId", fieldGroup.getCompositeId());
-				model.addAttribute("fieldDescMap", new FieldDescCacheMap(config.getConfigResolver()));
-				return AdminConstants.JSP_MODULES + "/modules_update_tmpl.jsp";*/
 			}
 		}
 		return null;
 	}
-	
+
+
+
 	@ResponseBody
 	@RequestMapping("/rabc_save/{mainMenuId}/{rabcTemplateGroupId}")
 	public ResponseJSON rabcSave(@PathVariable Long mainMenuId, 
@@ -643,7 +880,7 @@ public class AdminModulesController {
 		EntitiesQueryParameter param = new EntitiesQueryParameter(stmpl.getModule(), UserUtils.getCurrentUser());
 		param.setEntityCodes(TextUtils.split(codes, ",", HashSet<String>::new, c->c));
 		param.setRelationName(stmpl.getRelationName());
-		Map<String, RelationEntityPropertyParser> parsers = entityService.queryRelationEntityParsers(param, stmpl.getRelationName());
+		Map<String, RelSelectionEntityPropertyParser> parsers = entityService.queryRelationEntityParsers(param, stmpl.getRelationName());
 		
 		/*Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(
 				stmpl.getModule(), 
@@ -660,23 +897,35 @@ public class AdminModulesController {
 	@RequestMapping("/load_rabc_entities/{menuId}/{relationCompositeId}")
 	public ResponseJSON loadRabcEntities(@PathVariable Long menuId, @PathVariable Long relationCompositeId, 
 			String codes, String fields) {
-		JSONObjectResponse jRes = new JSONObjectResponse();
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
-		DictionaryComposite composite = dictService.getComposite(menu.getTemplateModule(), relationCompositeId);
+		return aLoadRabcEntities(menu.getTemplateModule(), relationCompositeId, fields, fields); 
+	}
+	
+	@ResponseBody
+	@RequestMapping("/node_load_rabc_entities/{menuId}/{nodeId}/{relationCompositeId}")
+	public ResponseJSON nodeLoadRabcEntities(
+			@PathVariable Long menuId,
+			@PathVariable Long nodeId,
+			@PathVariable Long relationCompositeId,
+			String codes, String fields) {
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		TemplateTreeNode nodeTemplate = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
+		return aLoadRabcEntities(nodeTemplate.getModuleName(), relationCompositeId, fields, fields); 
+	}
+
+	private ResponseJSON aLoadRabcEntities(String moduleName, Long relationCompositeId, String codes, String fields) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		DictionaryComposite composite = dictService.getComposite(moduleName, relationCompositeId);
 		EntitiesQueryParameter param = new EntitiesQueryParameter(composite.getModule(), UserUtils.getCurrentUser());
 		param.setEntityCodes(TextUtils.split(codes, ",", HashSet<String>::new, c->c));
-		Map<String, RelationEntityPropertyParser> parsers = entityService.queryRelationEntityParsers(param , composite.getName());
-//		Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(
-//				composite.getModule(), 
-//				composite.getName(), 
-//				TextUtils.split(codes, ",", HashSet<String>::new, c->c), UserUtils.getCurrentUser())
-//				;
+		Map<String, RelSelectionEntityPropertyParser> parsers = entityService.queryRelationEntityParsers(param , composite.getName());
 		JSONObject entities = toEntitiesJson(parsers, TextUtils.split(fields, ",", HashSet<String>::new, f->f));
 		jRes.put("entities", entities);
 		jRes.setStatus("suc");
 		return jRes;
-		
 	}
+
+
 
 	public static JSONObject toEntitiesJson(Map<String, ? extends CEntityPropertyParser> parsers, Set<String> fieldNames) {
 		JSONObject entities = new JSONObject();

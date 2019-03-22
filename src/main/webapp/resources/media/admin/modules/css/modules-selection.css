@@ -50,9 +50,6 @@
 }
 
 
-.modules-selection .list-area tbody>tr{
-	cursor: pointer;
-}
 .modules-selection .list-area tbody>tr.selected{
 	background-color: #87CEEB;
 	color: #fff;

@@ -34,7 +34,7 @@ import cn.sowell.datacenter.common.RequestParameterMapComposite;
 import cn.sowell.datacenter.entityResolver.FieldDescCacheMap;
 import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
-import cn.sowell.datacenter.entityResolver.impl.RelationEntityPropertyParser;
+import cn.sowell.datacenter.entityResolver.impl.RelSelectionEntityPropertyParser;
 import cn.sowell.datacenter.model.admin.pojo.ABCUser;
 import cn.sowell.datacenter.model.config.service.ConfigUserService;
 import cn.sowell.datacenter.model.modules.service.ExportService;
@@ -238,7 +238,7 @@ public class AdminConfigUserController {
 		EntitiesQueryParameter param = new EntitiesQueryParameter(stmpl.getModule(), UserUtils.getCurrentUser());
 		param.setEntityCodes(TextUtils.split(codes, ",", HashSet<String>::new, c->c));
 		
-		Map<String, RelationEntityPropertyParser> parsers = 
+		Map<String, RelSelectionEntityPropertyParser> parsers = 
 				entityService.queryRelationEntityParsers(param, stmpl.getRelationName());
 		
 		

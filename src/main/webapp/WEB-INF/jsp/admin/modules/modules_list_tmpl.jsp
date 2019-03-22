@@ -13,7 +13,7 @@
 				<i class="glyphicon glyphicon-refresh"></i>
 			</a>
 			<c:if test="${tmplGroup.treeTemplateId != null && tmplGroup.hideTreeToggleButton == null }">
-				<a class="" id="btn-toggle-tree" href="admin/modules/curd/list_tree/${menu.id }" >
+				<a class="tab" id="btn-toggle-tree" href="admin/modules/curd/list_tree/${menu.id }" target="modules_list_tree_${menu.id }">
 					<i class="iconfont icon-tree"></i>
 				</a>
 			</c:if>

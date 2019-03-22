@@ -28,6 +28,7 @@ import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.web.poll.WorkProgress;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.admin.controller.SessionKey;
 import cn.sowell.datacenter.admin.controller.modules.AdminModulesController;
 import cn.sowell.datacenter.api.controller.APiDataNotFoundException;
 import cn.sowell.datacenter.common.ApiUser;
@@ -38,7 +39,7 @@ import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.UserCodeService;
 import cn.sowell.datacenter.entityResolver.impl.ABCNodeProxy;
 import cn.sowell.datacenter.entityResolver.impl.ArrayItemPropertyParser;
-import cn.sowell.datacenter.entityResolver.impl.RelationEntityPropertyParser;
+import cn.sowell.datacenter.entityResolver.impl.RelSelectionEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.impl.RelationEntityProxy;
 import cn.sowell.datacenter.model.admin.service.AdminUserService;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
@@ -154,7 +155,7 @@ public class ApiEntityController {
 		
 		
 		//导出状态获取
-		String uuid = (String) user.getCache(AdminConstants.EXPORT_ENTITY_STATUS_UUID);
+		String uuid = (String) user.getCache(SessionKey.EXPORT_ENTITY_STATUS_UUID);
 		if(uuid != null){
 			WorkProgress progress = eService.getExportProgress(uuid);
 			if(progress != null && !progress.isBreaked()){
@@ -648,7 +649,7 @@ public class ApiEntityController {
 		
 		EntitiesQueryParameter param = new EntitiesQueryParameter(stmpl.getModule(), user);
 		param.setEntityCodes(TextUtils.split(codes, ",", HashSet<String>::new, c->c));
-		Map<String, RelationEntityPropertyParser> parsers = entityService.queryRelationEntityParsers(param, stmpl.getRelationName());
+		Map<String, RelSelectionEntityPropertyParser> parsers = entityService.queryRelationEntityParsers(param, stmpl.getRelationName());
 		
 		
 		/*Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(
@@ -662,7 +663,7 @@ public class ApiEntityController {
 		return jRes;
 	}
 
-	private JSONObject toEntitiesJson(Map<String, RelationEntityPropertyParser> parsers, Set<String> fieldNames) {
+	private JSONObject toEntitiesJson(Map<String, RelSelectionEntityPropertyParser> parsers, Set<String> fieldNames) {
 		JSONObject entities = new JSONObject();
 		if(parsers != null && fieldNames != null) {
 			parsers.forEach((code, parser)->{

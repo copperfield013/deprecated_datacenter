@@ -1,7 +1,7 @@
 package cn.sowell.datacenter.admin.controller.modules;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -36,6 +36,7 @@ import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.copframe.web.poll.WorkProgress;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.admin.controller.SessionKey;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
@@ -49,11 +50,13 @@ import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeNode;
 import cn.sowell.dataserver.model.tmpl.service.ArrayItemFilterService;
 import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.ListCriteriaFactory;
 import cn.sowell.dataserver.model.tmpl.service.ListTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
+import cn.sowell.dataserver.model.tmpl.service.TreeTemplateService;
 
 @Controller
 @RequestMapping(AdminConstants.URI_MODULES + "/export")
@@ -88,6 +91,9 @@ public class AdminModulesExportController {
 	
 	@Resource
 	ArrayItemFilterService arrayItemFilterService;
+	
+	@Resource
+	TreeTemplateService treeService;
 	
 	Logger logger = Logger.getLogger(AdminModulesExportController.class);
 	
@@ -137,8 +143,8 @@ public class AdminModulesExportController {
 				Map<Long, NormalCriteria> vCriteriaMap = lcriteriaFactory.getCriteriasFromRequest(pvs, CollectionUtils.toMap(ltmpl.getCriterias(), c->c.getId()));
 				progress.getDataMap().put("exportPageInfo", ePageInfo);
 				progress.getDataMap().put("withDetail", withDetail);
-				eService.startWholeExport(progress, tmplGroup, Boolean.TRUE.equals(withDetail), new HashSet<NormalCriteria>(vCriteriaMap.values()), ePageInfo, UserUtils.getCurrentUser());
-				session.setAttribute(AdminConstants.EXPORT_ENTITY_STATUS_UUID, progress.getUUID());
+				eService.startWholeExport(progress, tmplGroup, Boolean.TRUE.equals(withDetail), new ArrayList<NormalCriteria>(vCriteriaMap.values()), ePageInfo, UserUtils.getCurrentUser());
+				session.setAttribute(SessionKey.EXPORT_ENTITY_STATUS_UUID, progress.getUUID());
 			}
 		}
 		jRes.put("uuid", progress.getUUID());
@@ -203,9 +209,25 @@ public class AdminModulesExportController {
 			@PathVariable Long menuId, 
 			@PathVariable String code,
 			Long historyId) {
-		JSONObjectResponse jRes = new JSONObjectResponse();
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+		return aExportDetail(code, tmplGroup, historyId);
+	}
+	@ResponseBody
+	@RequestMapping("/node_export_detail/{menuId}/{nodeId}/{code}")
+	public ResponseJSON nodeExportDetail(
+			@PathVariable Long menuId, 
+			@PathVariable Long nodeId, 
+			@PathVariable String code,
+			Long historyId) {
+		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		TemplateTreeNode node = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
+		TemplateGroup tmplGroup = tmplGroupService.getTemplate(node.getTemplateGroupId());
+		return aExportDetail(code, tmplGroup, historyId);
+	}
+	
+	private ResponseJSON aExportDetail(String code, TemplateGroup tmplGroup, Long historyId) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
 		TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
 		UserIdentifier user = UserUtils.getCurrentUser();
 		
@@ -218,13 +240,11 @@ public class AdminModulesExportController {
 		if(historyId != null) {
 			if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
 				entity = entityService.getHistoryEntityParser(queryParam, historyId, null);
-				//entity = mService.getHistoryEntityParser(moduleName, code, historyId, user);
 			}
-        }
-        if(entity == null) {
-        	entity = entityService.getEntityParser(queryParam);
-        	//entity = mService.getEntity(moduleName, code, null, user);
-        }
+		}
+		if(entity == null) {
+			entity = entityService.getEntityParser(queryParam);
+		}
 		
 		try {
 			String uuid = eService.exportDetailExcel(entity, dtmpl);
@@ -238,8 +258,8 @@ public class AdminModulesExportController {
 		}
 		return jRes;
 	}
-	
-	
+
+
 	@ResponseBody
 	@RequestMapping("/work/{uuid}")
 	public ResponseJSON loadWork(@PathVariable String uuid) {

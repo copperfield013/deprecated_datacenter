@@ -52,7 +52,8 @@
 				<c:set var="saveURI">
 					<c:choose>
 						<c:when test="${rabcTemplateGroup != null }">admin/modules/curd/rabc_save/${mainMenu.id }/${rabcTemplateGroup.id }</c:when>
-						<c:otherwise>admin/modules/curd/save/${menu.id }/${module.name }</c:otherwise>
+						<c:when test="${nodeTemplate != null }">admin/modules/curd/node_save/${menu.id }/${nodeTemplate.id }</c:when>
+						<c:otherwise>admin/modules/curd/save/${menu.id }</c:otherwise>
 					</c:choose>
 				</c:set>
 				<form class="form-horizontal group-container" action="${saveURI }">
@@ -253,13 +254,15 @@
 <script>
 	seajs.use(['modules/js/modules-update'], function(ModulesUpdate){
 		var $page = $('#${module.name }-update-tmpl-${entity.code }-${RES_STAMP}');
+		var nodeId = '${nodeTemplate.id}';
+		var type = nodeId? 'node': 'entity';
 		ModulesUpdate.init(
 				$page, 
 				'${entity.code}',
-				{type: 'entity', menuId: '${menu.id }'
+				{type, menuId: '${menu.id }'
 					, rabcTmplGroupId		: '${rabcTemplateGroup.id}'
 					, relationCompositeId	: '${relationCompositeId}'
-					, mainMenuId	: '${mainMenu.id}'}
+					, mainMenuId	: '${mainMenu.id}', nodeId} 
 				);
 	});
 </script>

@@ -147,6 +147,9 @@ public class AdminTreeTemplateController {
 					node.setSelector(jNode.getString("selector"));
 					node.setOrder(nodeOrder);
 					node.setText(jNode.getString("text"));
+					node.setHideDetailButton(jNode.getInteger("hideDetailButton"));
+					node.setHideUpdateButton(jNode.getInteger("hideUpdateButton"));
+					node.setTemplateGroupId(jNode.getLong("templateGroupId"));
 					ttmpl.getNodes().add(node);
 					node.setRelations(new ArrayList<>());
 					JSONArray jRels = jNode.getJSONArray("relations");

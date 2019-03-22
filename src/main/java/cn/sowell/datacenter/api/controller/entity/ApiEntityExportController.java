@@ -1,7 +1,7 @@
 package cn.sowell.datacenter.api.controller.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -31,7 +31,7 @@ import cn.sowell.copframe.dto.page.CommonPageInfo;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.copframe.web.poll.WorkProgress;
-import cn.sowell.datacenter.admin.controller.AdminConstants;
+import cn.sowell.datacenter.admin.controller.SessionKey;
 import cn.sowell.datacenter.admin.controller.modules.AdminModulesExportController;
 import cn.sowell.datacenter.common.ApiUser;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
@@ -130,8 +130,8 @@ public class ApiEntityExportController {
 				Map<Long, NormalCriteria> vCriteriaMap = lcriteriaFactory.getCriteriasFromRequest(pvs, CollectionUtils.toMap(ltmpl.getCriterias(), c->c.getId()));
 				progress.getDataMap().put("exportPageInfo", ePageInfo);
 				progress.getDataMap().put("withDetail", withDetail);
-				eService.startWholeExport(progress, tmplGroup, Boolean.TRUE.equals(withDetail), new HashSet<NormalCriteria>(vCriteriaMap.values()), ePageInfo, user);
-				user.setCache(AdminConstants.EXPORT_ENTITY_STATUS_UUID, progress.getUUID());
+				eService.startWholeExport(progress, tmplGroup, Boolean.TRUE.equals(withDetail), new ArrayList<NormalCriteria>(vCriteriaMap.values()), ePageInfo, user);
+				user.setCache(SessionKey.EXPORT_ENTITY_STATUS_UUID, progress.getUUID());
 			}
 		}
 		jRes.put("uuid", progress.getUUID());

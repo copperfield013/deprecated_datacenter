@@ -1,5 +1,7 @@
 package cn.sowell.datacenter.common.choose;
 
+import cn.sowell.copframe.utils.FormatUtils;
+
 public class HTMLText implements HTMLElement{
 
 	private String text;
@@ -10,7 +12,7 @@ public class HTMLText implements HTMLElement{
 	
 	@Override
 	public String getOuterHtml() {
-		return this.text;
+		return FormatUtils.coalesce(this.text, "");
 	}
 
 	@Override

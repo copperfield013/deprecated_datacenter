@@ -1,6 +1,6 @@
 package cn.sowell.datacenter.model.modules.service;
 
-import java.util.Set;
+import java.util.List;
 
 import org.springframework.core.io.AbstractResource;
 
@@ -21,6 +21,6 @@ public interface ExportService {
 	void removeExport(String uuid);
 	
 	void startWholeExport(WorkProgress progress, TemplateGroup tmplGroup, boolean withDetail,
-			Set<NormalCriteria> criteria, ExportDataPageInfo ePageInfo, UserIdentifier user);
+			List<NormalCriteria> criteria, ExportDataPageInfo ePageInfo, UserIdentifier user);
 	String exportDetailExcel(ModuleEntityPropertyParser parser, TemplateDetailTemplate dtmpl) throws Exception;
 }

@@ -71,7 +71,12 @@ define(function(require, exports, module){
 				nodeText	: nodeConfig.nodeText || '',
 				nodeColor	: nodeConfig.nodeColor,
 				rels		: [],
-				selectableRelations	: []
+				selectableRelations	: [],
+				uuid		: Utils.uuid(5, 62),
+				templateGroupId	: nodeConfig.templateGroupId || '',
+				templateGroupTitle	: nodeConfig.templateGroupTitle || '',
+				hideDetailButton	: nodeConfig.hideDetailButton || 0,
+				hideUpdateButton	: nodeConfig.hideUpdateButton || 0
 			};
 			for(var i in abcNode.rels){
 				var rel = abcNode.rels[i];
@@ -249,8 +254,8 @@ define(function(require, exports, module){
 									.prependTo($detailArea.children('.criteria-field-search').remove().end());
 					var criteriaData = this.data('criteriaData');
 					var initRelConfig = this.data('init-rel-config');
-					if(initRelConfig){
-						if(!criteriaData){
+					if(!criteriaData){
+						if(initRelConfig){
 							criteriaData = initRelConfig.criterias;
 						}
 					}
@@ -327,6 +332,9 @@ define(function(require, exports, module){
 					nodeColor		: $('.node-color', $nodeConfig).val(),
 					selector		: $('.node-selector', $nodeConfig).val(),
 					text			: $('.node-text', $nodeConfig).text(),
+					templateGroupId	: $('#templateGroupId', $nodeConfig).val(),
+					hideDetailButton: $('.show-detail-button', $nodeConfig).prop('checked')? '': 1,
+					hideUpdateButton: $('.show-update-button', $nodeConfig).prop('checked')? '': 1,
 					relations		: []
 				};
 				$('.node-relations>.node-relation-list>.selectable-relations>div[rel-name]', $nodeConfig).each(function(){
@@ -337,6 +345,14 @@ define(function(require, exports, module){
 						title		: $rel.find('.selectable-relation-title').text(),
 						criterias	: []
 					};
+					if($selectedRel){
+						if($rel.is($selectedRel)){
+							var selectedCriteriaHandler = $selectedRel.data('criteriaHandler');
+							if(selectedCriteriaHandler){
+								$selectedRel.data('criteriaData', selectedCriteriaHandler.getCriteriaData());
+							}
+						}
+					}
 					var criteriaData = $rel.data('criteriaData');
 					if(criteriaData){
 						rel.criterias = criteriaData;
@@ -377,7 +393,11 @@ define(function(require, exports, module){
 					selector	: node.selector,
 					nodeText	: node.text,
 					relations	: node.relations,
-					nodeColor	: node.nodeColor
+					nodeColor	: node.nodeColor,
+					templateGroupId		: node.templateGroupId,
+					templateGroupTitle	: node.templateGroupTitle,
+					hideDetailButton	: node.hideDetailButton,
+					hideUpdateButton	: node.hideUpdateButton
 				}
 				//添加Node
 				addNode(theNode);

@@ -38,14 +38,15 @@ define(function(require){
 		});
 		$('table.row-selectable', $page).each(function(){
 			var $table = $(this);
-			var $rows = $('>tbody>tr', $table);
 			$table.data('checkedRowGetter', function(){
+				var $rows = $('>tbody>tr', $table);
 				return $rows.filter(function(){
 					return $(this).find('.row-selectable-checkbox').prop('checked');
 				});
 			});
-			$table.find('.row-selectable-checkbox').change(function(){
+			$table.on('change', '.row-selectable-checkbox', function(){
 				var $checkedRows = $table.data('checkedRowGetter')();
+				var $rows = $('>tbody>tr', $table);
 				if($checkedRows.length === 0){
 					$selectAll.prop('checked', false);
 				}else if($checkedRows.length === $rows.length){
@@ -59,7 +60,7 @@ define(function(require){
 				$selectAll.removeClass('partly');
 				var checkAll = $selectAll.prop('checked');
 				$table.children('tbody').find('.row-selectable-checkbox').prop('checked', checkAll);
-				$table.trigger('row-selected-change', [checkAll? $rows: $()]);
+				$table.trigger('row-selected-change', [checkAll? $('>tbody>tr', $table): $()]);
 			});
 		});
 	});

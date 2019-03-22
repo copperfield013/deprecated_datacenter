@@ -19,6 +19,19 @@ define(function(require, exports, module){
 							return 'admin/modules/export/export_detail/' + uriData.menuId + '/' + entityCode
 						}
 					}
+				case 'node':
+					var menuId = uriData.menuId;
+					return {
+						pagingHistory	: function(){
+							return 'admin/modules/curd/node_paging_history/' + uriData.menuId + '/' + uriData.nodeId + '/' + entityCode;
+						},
+						detail			: function(){
+							return 'admin/modules/curd/node_detail/' + uriData.menuId + '/' + uriData.nodeId  + '/' + entityCode;
+						},
+						exportDetail	: function(){
+							return 'admin/modules/export/node_export_detail/' + uriData.menuId+ '/' + uriData.nodeId  + '/' + entityCode
+						}
+					}
 				case 'user':
 					return {
 						pagingHistory	: function(data){

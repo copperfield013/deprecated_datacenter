@@ -67,6 +67,34 @@
 							<input type="text" class="form-control colorpicker node-color" data-control="wheel" value="\${nodeColor || '#2dc3e8'}">
 						</div>
 					</div>
+					<div class="form-group">
+						<label>关联模板组合</label>
+						<div>
+							<a 
+								class="form-control"
+								href="admin/tmpl/group/choose/\${nodeModule }" 
+								title="选择模板组合"
+								choose-key="choose-tmplgroup-\${uuid}" 
+								crn-choose-tmplgroup-\${uuid}="title" 
+								>\${templateGroupId? templateGroupTitle: '选择模板组合' }</a>
+							<input type="hidden" crn-choose-tmplgroup-\${uuid}="id" id="templateGroupId" value="\${templateGroupId }" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label>操作按钮</label>
+						<div class="operate-buttons">
+							<div class="operate-buttons-common">
+								<label class="col-lg-6 col-xs-6 form-control-static">
+									<input type="checkbox" class="checkbox-slider colored-blue show-detail-button" \${hideDetailButton == 1? '': 'checked="checked"'} />
+									<span class="text">详情按钮</span>
+								</label>
+								<label class="col-lg-6 col-xs-6 form-control-static">
+									<input type="checkbox" class="checkbox-slider colored-success show-update-button" \${hideUpdateButton == 1? '': 'checked="checked"'} /> 
+									<span class="text">修改按钮</span>
+								</label>
+							</div>
+						</div>
+					</div>
 					{{if rels && rels.length > 0}}
 						<div class="form-group">
 							<label>可选关系</label>

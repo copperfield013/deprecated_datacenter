@@ -15,7 +15,7 @@ define(function(require, exports, module){
 					}
 					return {
 						stmpl	: function(stmplId){
-							return 'admin/modules/curd/open_selection/' + menuId + '/' + stmplId;
+							return 'admin/modules/curd/rel_selection/' + menuId + '/' + stmplId;
 						},
 						rdtmpl	: function(fieldGroupId){
 							return 'admin/modules/curd/rabc_create/' + menuId + '/' + fieldGroupId;
@@ -25,6 +25,23 @@ define(function(require, exports, module){
 						},
 						entityDetail		: function(fieldGroupId, entityCode){
 							return 'admin/modules/curd/rabc_detail/' +menuId + '/' + fieldGroupId + '/' + entityCode;
+						}
+					}
+				case 'node':
+					var menuId = uriData.menuId;
+					var nodeId = uriData.nodeId;
+					return {
+						stmpl	: function(stmplId){
+							return 'admin/modules/curd/node_rel_selection/' + menuId + '/' + nodeId + '/' + stmplId;
+						},
+						rdtmpl	: function(fieldGroupId){
+							return 'admin/modules/curd/node_rabc_create/' + menuId + '/' + nodeId + '/' + fieldGroupId;
+						},
+						load_rabc_entities	: function(relationCompositeId){
+							return 'admin/modules/curd/node_load_rabc_entities/' + menuId + '/' + nodeId + '/' + uriData.relationCompositeId;
+						},
+						entityDetail		: function(fieldGroupId, entityCode){
+							return 'admin/modules/curd/node_rabc_detail/' + menuId + '/' + nodeId + '/' + fieldGroupId + '/' + entityCode;
 						}
 					}
 				case 'user':

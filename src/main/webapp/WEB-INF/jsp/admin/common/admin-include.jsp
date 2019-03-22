@@ -26,6 +26,7 @@
 
 <link type="text/css" rel="stylesheet" href="media/admin/modules/css/modules-detail-tmpl.css" />
 <link type="text/css" rel="stylesheet" href="media/admin/modules/css/modules-list-tmpl.css" />
+<link type="text/css" rel="stylesheet" href="media/admin/modules/css/modules-list-tree.css" />
 <link type="text/css" rel="stylesheet" href="media/admin/statview/css/statview-list.css" />
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/dtmpl-update.css" />
 <link type="text/css" rel="stylesheet" href="media/admin/tmpl/css/ltmpl-update.css" />

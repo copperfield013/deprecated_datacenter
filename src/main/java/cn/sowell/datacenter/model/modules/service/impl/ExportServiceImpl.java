@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -178,7 +179,7 @@ public class ExportServiceImpl implements ExportService {
 			WorkProgress progress, 
 			TemplateGroup tmplGroup, 
 			boolean withDetail,
-			Set<NormalCriteria> nCriteria, 
+			List<NormalCriteria> nCriteria, 
 			ExportDataPageInfo ePageInfo, 
 			UserIdentifier user) {
 		TemplateListTemplate ltmpl = ltmplService.getTemplate(tmplGroup.getListTemplateId());

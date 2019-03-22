@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
 <link type="text/css" rel="stylesheet" href="media/admin/modules/css/modules-detail-tmpl.css" />
+<title>${module.title}-${entity.title }-详情</title>
 <div class="entity-detail-tmpl entity-detail-page" id="${moduke.key }-detail-tmpl-${entity.code }-${RES_STAMP}">
 	<div class="page-header">
 		<div class="header-title">
@@ -137,10 +138,12 @@
 <script>
 	seajs.use(['modules/js/modules-detail.js'], function(ModulesDetail){
 		var $page = $('#${moduke.key }-detail-tmpl-${entity.code }-${RES_STAMP}');
+		var nodeId = '${nodeTemplate.id}';
+		var type = nodeId? 'node': 'entity';
 		ModulesDetail.init(
 				$page,
 				'${entity.code}',
-				{type: 'entity', menuId: '${menu.id}'},
+				{type, menuId: '${menu.id}', nodeId} ,
 				'${historyId}');
 		
 	});

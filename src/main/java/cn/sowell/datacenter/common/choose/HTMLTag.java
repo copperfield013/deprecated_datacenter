@@ -9,6 +9,7 @@ import java.util.Set;
 import org.springframework.util.Assert;
 
 import cn.sowell.copframe.utils.CollectionUtils;
+import cn.sowell.copframe.utils.FormatUtils;
 
 public class HTMLTag implements HTMLElement{
 	private String tagName;
@@ -17,7 +18,7 @@ public class HTMLTag implements HTMLElement{
 	private HTMLTag parent;
 	private Set<String> className;
 	
-	HTMLTag(String tagName){
+	public HTMLTag(String tagName){
 		Assert.hasText(tagName);
 		this.tagName = tagName;
 		this.inner = new ArrayList<HTMLElement>();
@@ -141,7 +142,7 @@ public class HTMLTag implements HTMLElement{
 			buffer.append(" class=\"" + CollectionUtils.toChain(className, " ") + "\"");
 		}
 		attributes.forEach((name, value)->{
-			buffer.append(" " + name + "=\"" + value + "\"");
+			buffer.append(" " + name + "=\"" + FormatUtils.coalesce(value, "") + "\"");
 		});
 		return buffer.toString();
 	}
