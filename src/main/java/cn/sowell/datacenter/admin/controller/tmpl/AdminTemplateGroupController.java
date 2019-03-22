@@ -1,6 +1,7 @@
 package cn.sowell.datacenter.admin.controller.tmpl;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.annotation.Resource;
 
@@ -164,13 +165,19 @@ public class AdminTemplateGroupController {
 	
 	@RequestMapping("/choose/{moduleName}")
 	public String choose(@PathVariable String moduleName, String except, Model model) {
+		return forChoose(moduleName, except, null, model);
+	}
+	
+	
+	private String forChoose(String moduleName, String except, Predicate<TemplateGroup> selectedPredicate, Model model) {
 		return actionConsumer.choose(
 				ChooseRequestParam.create(moduleName, tmplGroupService, model)
 					.setExcept(except)
+					.setSelectedPredicate(selectedPredicate)
 					.setURI(AdminConstants.URI_TMPL + "/tmpl/group/" + moduleName)
 			);
 	}
-	
+
 	@RequestMapping("/rabc_relate/{moduleName}/{relationCompositeId}")
 	public String rabcRelate(@PathVariable String moduleName, 
 			@PathVariable Long relationCompositeId,
@@ -178,27 +185,7 @@ public class AdminTemplateGroupController {
 			Model model) {
 		ModuleMeta relationCompositeModule = mService.getCompositeRelatedModule(moduleName, relationCompositeId);
 		if(relationCompositeModule != null) {
-			return choose(relationCompositeModule.getName(), "", model);
-			//List<TemplateGroup> tmplGroups = tmplGroupService.queryAll(relationCompositeModule.getName());
-			/*ChooseTablePage<TemplateGroup> tpage = new ChooseTablePage<TemplateGroup>(
-					"tmplgroup-choose-list", "tmpl_group_");
-			tpage.setPageInfo(null)
-					.setAction(AdminConstants.URI_TMPL + "/rabc_relate/" + moduleName + '/' + relationCompositeId)
-					.setIsMulti(false)
-					.setSelectedPredicate(group->group.getId().equals(rabcTemplateGroupId))
-					.setTableData(tmplGroups, handler->{
-						handler
-							.setDataJsonGetter(tmplGroup->{
-								JSONObject json = new JSONObject();
-								json.put("id", tmplGroup.getId());
-								return json;
-							}).setDataKeyGetter(data->"tmpl_group_" + data.getId())
-							.addColumn("模板名", (cell, data)->cell.setText(data.getTitle()))
-							.addColumn("创建时间", (cell, data)->cell.setText(dateFormat.formatDateTime(data.getCreateTime())))
-							;
-						
-					});
-			model.addAttribute("tpage", tpage);*/
+			return forChoose(relationCompositeModule.getName(), "", group->group.getId().equals(rabcTemplateGroupId), model);
 		}
 		return null;
 	}

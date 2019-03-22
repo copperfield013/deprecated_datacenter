@@ -3,6 +3,7 @@ package cn.sowell.datacenter.admin.controller.tmpl;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -33,6 +34,7 @@ public class CommonTemplateActionConsumer {
 		private String keyPrefix;
 		private String URI;
 		private boolean multi;
+		private Predicate<T> selectedPredicate;
 		public static <TAT extends Cachable> ChooseRequestParam<TAT> create(String moduleName, OpenTemplateService<TAT> templateService, Model model){
 			return (new ChooseRequestParam<TAT>())
 					.setModuleName(moduleName)
@@ -94,6 +96,13 @@ public class CommonTemplateActionConsumer {
 		public ChooseRequestParam<T> setMulti(boolean multi) {
 			this.multi = multi;
 			return this;
+		}
+		public ChooseRequestParam<T> setSelectedPredicate(Predicate<T> selectedPredicate) {
+			this.selectedPredicate = selectedPredicate;
+			return this;
+		}
+		public Predicate<T> getSelectedPredicate() {
+			return selectedPredicate;
 		} 
 	}
 	public <T extends Cachable> String choose(ChooseRequestParam<T> crp) {
@@ -110,6 +119,7 @@ public class CommonTemplateActionConsumer {
 			.setPageInfo(null)
 			.setAction(crp.getURI())
 			.setIsMulti(crp.isMulti())
+			.setSelectedPredicate(crp.getSelectedPredicate())
 			.setTableData(tmplList, handler->{
 				handler
 					.setDataKeyGetter(data->keyPrefix + data.getId())

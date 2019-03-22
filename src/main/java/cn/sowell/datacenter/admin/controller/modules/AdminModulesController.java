@@ -880,7 +880,7 @@ public class AdminModulesController {
 		EntitiesQueryParameter param = new EntitiesQueryParameter(stmpl.getModule(), UserUtils.getCurrentUser());
 		param.setEntityCodes(TextUtils.split(codes, ",", HashSet<String>::new, c->c));
 		param.setRelationName(stmpl.getRelationName());
-		Map<String, RelSelectionEntityPropertyParser> parsers = entityService.queryRelationEntityParsers(param, stmpl.getRelationName());
+		Map<String, RelSelectionEntityPropertyParser> parsers = entityService.queryRelationEntityParsers(param);
 		
 		/*Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(
 				stmpl.getModule(), 
@@ -898,7 +898,7 @@ public class AdminModulesController {
 	public ResponseJSON loadRabcEntities(@PathVariable Long menuId, @PathVariable Long relationCompositeId, 
 			String codes, String fields) {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
-		return aLoadRabcEntities(menu.getTemplateModule(), relationCompositeId, fields, fields); 
+		return aLoadRabcEntities(menu.getTemplateModule(), relationCompositeId, codes, fields); 
 	}
 	
 	@ResponseBody
@@ -910,7 +910,7 @@ public class AdminModulesController {
 			String codes, String fields) {
 		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
 		TemplateTreeNode nodeTemplate = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
-		return aLoadRabcEntities(nodeTemplate.getModuleName(), relationCompositeId, fields, fields); 
+		return aLoadRabcEntities(nodeTemplate.getModuleName(), relationCompositeId, codes, fields); 
 	}
 
 	private ResponseJSON aLoadRabcEntities(String moduleName, Long relationCompositeId, String codes, String fields) {
@@ -918,7 +918,8 @@ public class AdminModulesController {
 		DictionaryComposite composite = dictService.getComposite(moduleName, relationCompositeId);
 		EntitiesQueryParameter param = new EntitiesQueryParameter(composite.getModule(), UserUtils.getCurrentUser());
 		param.setEntityCodes(TextUtils.split(codes, ",", HashSet<String>::new, c->c));
-		Map<String, RelSelectionEntityPropertyParser> parsers = entityService.queryRelationEntityParsers(param , composite.getName());
+		param.setRelationName(composite.getName());
+		Map<String, RelSelectionEntityPropertyParser> parsers = entityService.queryRelationEntityParsers(param);
 		JSONObject entities = toEntitiesJson(parsers, TextUtils.split(fields, ",", HashSet<String>::new, f->f));
 		jRes.put("entities", entities);
 		jRes.setStatus("suc");

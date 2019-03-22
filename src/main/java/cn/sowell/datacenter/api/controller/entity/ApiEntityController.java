@@ -649,7 +649,8 @@ public class ApiEntityController {
 		
 		EntitiesQueryParameter param = new EntitiesQueryParameter(stmpl.getModule(), user);
 		param.setEntityCodes(TextUtils.split(codes, ",", HashSet<String>::new, c->c));
-		Map<String, RelSelectionEntityPropertyParser> parsers = entityService.queryRelationEntityParsers(param, stmpl.getRelationName());
+		param.setRelationName(stmpl.getRelationName());
+		Map<String, RelSelectionEntityPropertyParser> parsers = entityService.queryRelationEntityParsers(param);
 		
 		
 		/*Map<String, CEntityPropertyParser> parsers = mService.getEntityParsers(

@@ -213,7 +213,7 @@
 							<div class="form-group">
 								<label>默认节点颜色</label>
 								<div>
-									<input type="text" id="def-node-color" autocomplete="off" class="form-control colorpicker" data-control="wheel" value="${ttmpl.defaultNodeColor }">
+									<input type="text" id="def-node-color" autocomplete="off" class="form-control colorpicker" data-control="wheel" value="${empty ttmpl.defaultNodeColor? '#47a3ff': ttmpl.defaultNodeColor }">
 								</div>
 							</div>
 							<div class="form-group">

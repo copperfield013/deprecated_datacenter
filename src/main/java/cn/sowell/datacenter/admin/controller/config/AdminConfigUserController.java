@@ -237,9 +237,8 @@ public class AdminConfigUserController {
 		
 		EntitiesQueryParameter param = new EntitiesQueryParameter(stmpl.getModule(), UserUtils.getCurrentUser());
 		param.setEntityCodes(TextUtils.split(codes, ",", HashSet<String>::new, c->c));
-		
-		Map<String, RelSelectionEntityPropertyParser> parsers = 
-				entityService.queryRelationEntityParsers(param, stmpl.getRelationName());
+		param.setRelationName(stmpl.getRelationName());
+		Map<String, RelSelectionEntityPropertyParser> parsers = entityService.queryRelationEntityParsers(param);
 		
 		
 		JSONObject entities = AdminModulesController.toEntitiesJson(parsers, TextUtils.split(fields, ",", HashSet<String>::new, f->f));

@@ -15,11 +15,13 @@
 				<span>\${text }</span>
 				<div class="node-operates">
 					<div class="node-operate-icons">
-						{{if nodeTmpl.hideDetailButton != 1}}
-							<i title="打开详情页" class="fa fa-book" action-type="detail"></i>
-						{{/if}}
-						{{if nodeTmpl.hideUpdateButton != 1}}
-							<i title="打开修改页" class="fa fa-edit" action-type="update"></i>
+						{{if nodeTmpl.templateGroupId}}
+							{{if nodeTmpl.hideDetailButton != 1}}
+								<i title="打开详情页" class="fa fa-book" action-type="detail"></i>
+							{{/if}}
+							{{if nodeTmpl.hideUpdateButton != 1}}
+								<i title="打开修改页" class="fa fa-edit" action-type="update"></i>
+							{{/if}}
 						{{/if}}
 					</div>
 				</div>

@@ -223,6 +223,9 @@ define(function(require, exports, module){
 			}
 			var $rel = $selectableRelationTmpl.tmpl(tmplData);
 			$rel.data('data-rel', rel);
+			$('.btn-remove-relation', $rel).click(function(){
+				$rel.remove();
+			});
 			$('.selectable-relations', $nodeConfig).append($rel);
 		}
 		
