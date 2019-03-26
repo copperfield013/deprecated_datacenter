@@ -1,9 +1,15 @@
 @charset "UTF-8";
 
+.ttmpl-update .form-value {
+    /* border: 1px solid #ccc; */
+    /* display: flex; */
+    /* padding: 5px 0; */
+    float: right;
+}
 
 .ttmpl-update .operate-buttons {
     display: flex;
-    border: 1px solid #ccc;
+    /* border: 1px solid #ccc; */
 }
 .ttmpl-update .operate-buttons>.operate-buttons-common{
 	width: 100%;
@@ -19,7 +25,7 @@
 .node-relations {
     display: flex;
     border: 1px solid #ccc;
-    height: 12em;
+    height: 14em;
     overflow-y: hidden;
     /* position: relative; */
 }
@@ -46,7 +52,8 @@
 
 .relation-criteria-detail>div {
     display: flex;
-    height: 2em;
+    height: 2.5em;
+    align-items: center;
 }
 
 .relation-criteria-detail>div>label{
@@ -274,5 +281,30 @@ div.relation-criterias>*.criteria-item.criteria-selected:hover {
 
 
 
+
+
+
+
+#relation-label-value-wrap .select2-container--bootstrap .select2-selection--multiple .select2-search--inline .select2-search__field {
+  height: 24px;
+  line-height: 24px;
+}
+#relation-label-value-wrap .select2-container--bootstrap .select2-selection--multiple {
+  min-height: 24px;
+}
+
+.ttmpl-update label.tooltip-label{
+	display: inline-flex;
+    align-items: center;
+}
+
+.ttmpl-update .badge {
+	width: 14px;
+    height: 14px;
+    line-height: 14px;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}
 
 

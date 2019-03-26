@@ -158,17 +158,17 @@ div.fieldpicker-container {
     padding: 0;
 }
 
-.field-search .fieldpicker-container .nav-tabs.nav-justified>li.active>a{
+.fieldpicker-container .nav-tabs.nav-justified>li.active>a{
 	background-color: #fff;
 	height: 32px;
 }
-.field-search .fieldpicker-container .nav-tabs.nav-justified>li.dropdown>a{
+.fieldpicker-container .nav-tabs.nav-justified>li.dropdown>a{
     width: 90px;
 }
-.field-search .fieldpicker-container a.dropdown-toggle {
+.fieldpicker-container a.dropdown-toggle {
 	text-align: center;
 }
-.field-search .fieldpicker-container a.dropdown-toggle>span {
+ .fieldpicker-container a.dropdown-toggle>span {
     word-break: keep-all;
     max-width: 3em;
     overflow: hidden;
@@ -176,19 +176,19 @@ div.fieldpicker-container {
     text-overflow: ellipsis;
     display: inline-block;
 }
-.field-search .fieldpicker-container a.dropdown-toggle:AFTER{
+.fieldpicker-container a.dropdown-toggle:AFTER{
 	content: "\f0dd";
     vertical-align: top;
     line-height: 25px;
 }
-.field-search .fieldpicker-container li.dropdown ul.dropdown-menu li>a {
+.fieldpicker-container li.dropdown ul.dropdown-menu li>a {
     width: 170px;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
 }
 
-a.fieldpicker-field-item, .field-search a.fieldpicker-composite-item {
+a.fieldpicker-field-item, a.fieldpicker-composite-item {
     border: 1px solid #c2c2c2;
     padding: 2px 9px;
     margin: 0 5px;
@@ -301,7 +301,6 @@ span.fieldpicker-mode>ol>li.selected:before{
 
 .fieldpicker-container.appendout {
     position: absolute;
-    width: 350px;
     height: 200px;
     z-index: 1000;
 }

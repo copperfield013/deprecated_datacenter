@@ -420,6 +420,7 @@ define(function(require, exports, module){
 		 * 弹出确认框
 		 */
 		confirm		: function(msg, callback, _param){
+			var defer = $.Deferred();
 			var defaultParam = {
 				domHandler	: $.noop,
 				width		: '300px',
@@ -452,12 +453,14 @@ define(function(require, exports, module){
 				var isYes = $(this).is('.confirm-btn-yes');
 				var page = dialog.getPage();
 				if(page instanceof Page){
-					var result = callback(isYes, page);
+					var result = (callback || $.noop)(isYes, page);
 					if(result !== false){
+						defer.resolve(page);
 						page.close();
 					}
 				}
 			});
+			return defer.promise();
 		},
 		/**
 		 * 在指定位置弹出下拉菜单展示，并提供点选项后的回调

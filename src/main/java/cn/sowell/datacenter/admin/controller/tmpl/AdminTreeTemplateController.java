@@ -28,7 +28,9 @@ import cn.sowell.datacenter.admin.controller.tmpl.ListTemplateFormater.Handlers;
 import cn.sowell.datacenter.entityResolver.config.ModuleConfigStructure;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
+import cn.sowell.dataserver.model.tmpl.pojo.SuperTemplateListCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeNode;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeNodeCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeRelation;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeRelationCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeTemplate;
@@ -132,7 +134,7 @@ public class AdminTreeTemplateController {
 			ttmpl.setNodes(new ArrayList<>());
 			JSONArray jNodes = jTreeTempalte.getJSONArray("nodes");
 			if(jNodes != null) {
-				Handlers<?, ?, TemplateTreeRelationCriteria> criteriaHandlers = new Handlers<>();
+				Handlers<?, ?, SuperTemplateListCriteria> criteriaHandlers = new Handlers<>();
 				criteriaHandlers.setCriteriaConsumer((criteria, item)->{
 					if(criteria.getFieldAvailable()) {
 						criteria.setCompositeId(item.getLong("compositeId"));
@@ -151,6 +153,15 @@ public class AdminTreeTemplateController {
 					node.setHideUpdateButton(jNode.getInteger("hideUpdateButton"));
 					node.setTemplateGroupId(jNode.getLong("templateGroupId"));
 					ttmpl.getNodes().add(node);
+					node.setIsRootNode(jNode.getInteger("isRootNode"));
+					node.setIsDirect(jNode.getInteger("isDirect"));
+					
+					
+					JSONArray jNodeCriterias = jNode.getJSONArray("criterias");
+					if(jNodeCriterias != null) {
+						node.setCriterias(ListTemplateFormater.getCriterias(jNodeCriterias, TemplateTreeNodeCriteria::new, criteriaHandlers));
+					}
+					
 					node.setRelations(new ArrayList<>());
 					JSONArray jRels = jNode.getJSONArray("relations");
 					

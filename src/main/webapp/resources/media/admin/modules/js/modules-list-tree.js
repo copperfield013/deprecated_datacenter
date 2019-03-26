@@ -62,16 +62,13 @@ define(function(require, exports, module){
 			});
 			//var $ul = $nodesTmpl.tmpl({nodes, hasRelations, isEndList: data.isEndList});
 			
+			var isDirect = rels.length <= 1 && nodeTmpl.isDirect == 1;
+			
 			var bindThisItemsEvent = function($items){
-				bindItemEvent($items).setFirstExpand(function(expandChildren){
-					var $rels = $relsTmpl.tmpl({rels});
-					//绑定点击关系时的展开
-					bindItemEvent($('>li[rel-id]', $rels)).setFirstExpand(function(expandChildren, setLoading){
-						var relId = this.attr('rel-id');
-						var entityCode = this.closest('[entity-code]').attr('entity-code');
-						//TODO：调用接口获得该关系下的所有实体
-						console.log(entityCode + '/' + relId);
-						var $relLi = this;
+				bindItemEvent($items).setFirstExpand(function(expandChildren, setLoading){
+					var entityCode = this.closest('[entity-code]').attr('entity-code');
+					
+					function loadAndAppendRelEntities(relId, $relLi, expandChildren, setLoading){
 						//设置节点的加载标志，防止重复加载
 						setLoading(true);
 						requireRelsQueryKey(entityCode, relId).done(function(queryData){
@@ -92,10 +89,24 @@ define(function(require, exports, module){
 						}).fail(function(){
 							console.error('创建查询失败')
 						});
-						
-					});
-					this.append($rels);
-					expandChildren();
+					}
+					
+					if(isDirect == 1){
+						//直接显示唯一关系的子实体
+						var relId = rels[0].id;
+						loadAndAppendRelEntities(relId, this, expandChildren, setLoading);
+					}else{
+						var $rels = $relsTmpl.tmpl({rels});
+						//绑定点击关系时的展开
+						bindItemEvent($('>li[rel-id]', $rels)).setFirstExpand(function(expandChildren, setLoading){
+							var relId = this.attr('rel-id');
+							//TODO：调用接口获得该关系下的所有实体
+							console.log(entityCode + '/' + relId);
+							loadAndAppendRelEntities(relId, this, expandChildren, setLoading);
+						});
+						this.append($rels);
+						expandChildren();
+					}
 				});
 			}
 			bindThisItemsEvent($lis);

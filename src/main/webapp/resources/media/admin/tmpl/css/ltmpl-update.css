@@ -162,6 +162,7 @@
 	width: 100%;
 	font-size: 15px;
 	height: 350px;
+	display: flex;
 }
 
 .ltmpl-update .criterias-area-title,.ltmpl-update  .criteria-detail-title {

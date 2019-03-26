@@ -76,7 +76,8 @@ define(function(require, exports, module){
 				templateGroupId	: nodeConfig.templateGroupId || '',
 				templateGroupTitle	: nodeConfig.templateGroupTitle || '',
 				hideDetailButton	: nodeConfig.hideDetailButton || 0,
-				hideUpdateButton	: nodeConfig.hideUpdateButton || 0
+				hideUpdateButton	: nodeConfig.hideUpdateButton || 0,
+				isDirect			: nodeConfig.isDirect
 			};
 			for(var i in abcNode.rels){
 				var rel = abcNode.rels[i];
@@ -168,9 +169,20 @@ define(function(require, exports, module){
 			var tmplData = buildNodeConfigTmplData(nodeConfig);
 			//根据数据构造NodeConfig的DOM
 			var $nodeConfig = $nodeConfigTmpl.tmpl(tmplData);
+			//将NodeConfig的DOM放到容器中
+			$nodeConfigContainer.append($nodeConfig);
 			//为NodeConfig的DOM绑定数据和事件
 			bindColorpicker($('.node-color', $nodeConfig));
+			//绑定移除事件
+			bindRemoveEvent($nodeConfig);
+			//绑定根节点配置事件
+			bindRootNodeEvent($nodeConfig, nodeConfig);
 			bindNodeConfigAddRelationEvent($nodeConfig, nodeConfig.abcNode);
+			//绑定提示框控件
+			bindTooltip($nodeConfig);
+			//绑定直接显示子节点的事件
+			bindGapEvent($nodeConfig);
+			
 			//绑定NodeConfig的初始Relation的数据
 			$('.selectable-relations>[data-id]', $nodeConfig).each(function(){
 				var $selectableRel = $(this);
@@ -193,8 +205,7 @@ define(function(require, exports, module){
 			})
 			//关系名可编辑
 			.on('dblclick', '.selectable-relations>div>.selectable-relation-title', function(){require('utils').toEditContent(this)});
-			//将NodeConfig的DOM放到容器中
-			$nodeConfigContainer.append($nodeConfig);
+			return $nodeConfig;
 		}
 		
 		
@@ -214,19 +225,24 @@ define(function(require, exports, module){
 		 * 在Node中添加关系
 		 */
 		function appendSelectableRel(rel, $nodeConfig){
-			var mappingId = rel.mappingId;
-			var tmplData = {
-				mappingId	: rel.rabcNodeMappingId,
-				name		: rel.name,
-				id			: rel.id || '',
-				title		: rel.name
-			}
-			var $rel = $selectableRelationTmpl.tmpl(tmplData);
-			$rel.data('data-rel', rel);
-			$('.btn-remove-relation', $rel).click(function(){
-				$rel.remove();
-			});
-			$('.selectable-relations', $nodeConfig).append($rel);
+			var $selectableRelations = $('.selectable-relations', $nodeConfig);
+			$selectableRelations.trigger('add-selectable-relation', [function(){
+				var mappingId = rel.mappingId;
+				var tmplData = {
+					mappingId	: rel.rabcNodeMappingId,
+					name		: rel.name,
+					id			: rel.id || '',
+					title		: rel.name
+				}
+				var $rel = $selectableRelationTmpl.tmpl(tmplData);
+				$rel.data('data-rel', rel);
+				$('.btn-remove-relation', $rel).click(function(){
+					require('dialog').confirm('确认删除该关系节点？').done(function(){
+						$rel.remove();
+					});
+				});
+				$('.selectable-relations', $nodeConfig).append($rel);
+			}]);
 		}
 		
 		 
@@ -338,8 +354,16 @@ define(function(require, exports, module){
 					templateGroupId	: $('#templateGroupId', $nodeConfig).val(),
 					hideDetailButton: $('.show-detail-button', $nodeConfig).prop('checked')? '': 1,
 					hideUpdateButton: $('.show-update-button', $nodeConfig).prop('checked')? '': 1,
+					isRootNode		: $('.is-root-node', $nodeConfig).prop('checked')? 1: '',
+					isDirect		: $('.is-direct', $nodeConfig).prop('checked')? 1: '',
+					criterias		: [],
 					relations		: []
 				};
+				var nodeCriteriasHandler = $('.ttmpl-root-criterias', $nodeConfig).data('criteriaHandler');
+				if(nodeCriteriasHandler){
+					node.criterias = nodeCriteriasHandler.getCriteriaData();
+				}
+				
 				$('.node-relations>.node-relation-list>.selectable-relations>div[rel-name]', $nodeConfig).each(function(){
 					var $rel = $(this);
 					var rel = {
@@ -385,27 +409,37 @@ define(function(require, exports, module){
 		
 		
 		//根据模板初始数据，初始化页面
-		if(ttmplData && ttmplData.nodes){
-			for(var i in ttmplData.nodes){
-				var node = ttmplData.nodes[i];
-				var abcNode = moduleNodeMap[node.moduleName];
-				//构造方法参数
-				var theNode = {
-					abcNode		: abcNode,
-					id			: node.id,
-					selector	: node.selector,
-					nodeText	: node.text,
-					relations	: node.relations,
-					nodeColor	: node.nodeColor,
-					templateGroupId		: node.templateGroupId,
-					templateGroupTitle	: node.templateGroupTitle,
-					hideDetailButton	: node.hideDetailButton,
-					hideUpdateButton	: node.hideUpdateButton
+		if(ttmplData && ttmplData.id){
+			if(ttmplData.nodes){
+				for(var i in ttmplData.nodes){
+					var node = ttmplData.nodes[i];
+					var abcNode = moduleNodeMap[node.moduleName];
+					//构造方法参数
+					var theNode = {
+							abcNode		: abcNode,
+							id			: node.id,
+							selector	: node.selector,
+							nodeText	: node.text,
+							relations	: node.relations,
+							nodeColor	: node.nodeColor,
+							isRootNode	: node.isRootNode,
+							criterias	: node.criterias,
+							isDirect	: node.isDirect,
+							templateGroupId		: node.templateGroupId,
+							templateGroupTitle	: node.templateGroupTitle,
+							hideDetailButton	: node.hideDetailButton,
+							hideUpdateButton	: node.hideUpdateButton
+					}
+					//添加Node
+					addNode(theNode);
 				}
-				//添加Node
-				addNode(theNode);
 			}
+		}else{
+			//添加默认节点模板
+			var rootNode = abcNodeMap[configStructure.rootNodeMappingId];
+			var $defRootNode = addNode({abcNode:rootNode});
 		}
+		
 		
 	}
 	
@@ -426,4 +460,106 @@ define(function(require, exports, module){
             });
 		});
 	}
+	
+	function bindRemoveEvent($nodeConfig){
+		$('#btn-remove-node', $nodeConfig).click(function(){
+			require('dialog').confirm('确认删除该节点？').done(function(){
+				$nodeConfig.remove();
+			});
+		});
+	}
+	
+	function bindRootNodeEvent($nodeConfig, nodeConfig){
+		$('.is-root-node', $nodeConfig).change(function(e, criterias){
+			var page = $nodeConfig.getLocatePage();
+			//判断当前是否已经有设为根节点的配置，如果已经有了，就alert，并且取消勾选状态
+			var $this = $(this);
+			var checked = $this.prop('checked');
+			var $rootCriteriasContainer = $('.ttmpl-root-criterias', $this.closest('.form-group'));
+			if(checked){
+				var $isRootNode = $nodeConfig.closest('#node-configs-container').children('.is-root-node:checked');
+				var hasChecked = $isRootNode.not($this).length;
+				if(hasChecked){
+					Dialog.notice('存在设置为根的节点配置');
+					$this.prop('checked', false);
+					return;
+				}
+			}else{
+				//取消勾选时，移除筛选配置
+				$('.criterias-area-body', $nodeConfig).remove();
+				$rootCriteriasContainer.removeData('criteriaHandler');
+				return;
+			}
+			//放入筛选定义控件，并且初始化筛选控件
+			var criterias = criterias || [];
+			var criteriaHandler = initNodeMainCriteria($rootCriteriasContainer, nodeConfig.abcNode.moduleName, criterias);
+			$rootCriteriasContainer.data('criteriaHandler', criteriaHandler);
+		}).prop('checked', nodeConfig.isRootNode == 1).trigger('change', [nodeConfig.criterias]);
+	}
+	
+	function initNodeMainCriteria($rootCriteriasContainer, mainModule, criteriaData){
+		var $page = $rootCriteriasContainer.getLocatePage().getContent();
+		var $criteriaArea = $('#node-main-criteria-tmpl', $page).tmpl({
+			
+		});
+		$rootCriteriasContainer.append($criteriaArea);
+		
+		var $criteriaFieldSearch = $('.criteria-field-search-row .field-search', $criteriaArea)
+		var $detailArea = $('.criteria-detail-area', $criteriaArea);
+		var $criteriaContainer = $('.criterias-container', $criteriaArea);
+		var criteriaHandler = require('tmpl/js/ltmpl-update').initCriteria({
+			$page					: $page,	
+			$criteriaFieldSearch	: $criteriaFieldSearch,
+			$fieldPickerContainer	: $('#configs-area', $page),
+			moduleName				: mainModule,
+			$detailArea				,
+			$criteriaContainer		: $criteriaContainer,
+			criteriaData			: criteriaData
+		});
+		return criteriaHandler;
+	}
+	function bindTooltip($container){
+		if($.fn.tooltip){
+			$('[data-toggle="tooltip"]', $container).each(function(){
+				$(this).tooltip();
+			});
+		}
+	}
+	
+	function bindGapEvent($nodeConfig){
+		var $isDirect = $('.is-direct', $nodeConfig);
+		var $selectableRelations = $('.selectable-relations', $nodeConfig);
+		$isDirect.change(function(){
+			var $this = $(this);
+			var checked = $this.prop('checked');
+			if(checked){
+				var $relations = $selectableRelations.children();
+				if($relations.length > 1){
+					require('dialog').notice('可选关系多于1的情况下，无法勾选', 'error');
+					$this.prop('checked', false);
+				}
+			}
+		});
+		$selectableRelations.on('add-selectable-relation', function(e, whenYes, whenNo){
+			whenYes = whenYes || $.noop;
+			whenNo = whenNo || $.noop;
+			var $relations = $selectableRelations.children();
+			if($relations.length > 0){
+				if($isDirect.prop('checked')){
+					require('dialog').confirm('“直接显示关系实体”勾选框被勾选，只能有一个可选关系。点击“是”将取消勾选，并添加可选关系。' +
+							'点击“否”将不添加可选关系。', function(yes){
+						if(yes){
+							$isDirect.prop('checked', false);
+							whenYes();
+						}else{
+							whenNo();
+						}
+					});
+					return;
+				}
+			}
+			whenYes();
+		});
+	}
+	
 });

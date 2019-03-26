@@ -364,29 +364,51 @@ define(function(require, exports, module){
 			}
 		};
 		
+		this.getFieldPicker = function(){
+			var deferred = $.Deferred();
+			fieldpickerHandler(function($fieldPicker, free){
+				deferred.resolve($fieldPicker, free)
+			});
+			return deferred.promise();
+		}
+		
 		/**
 		 * 切换字段选择框的显示状态
 		 */
-		this.togglePicker = function($container, toShow){
+		this.togglePicker = function($pickerContainer, toShow){
 			var deferred = $.Deferred();
 			fieldpickerHandler(function($fieldPicker, free){
-				if($container === false){
+				if($pickerContainer === false){
 					$fieldPicker.hide();
 				}else{
-					if($fieldPicker.closest($container).length == 1){
+					if($fieldPicker.closest($pickerContainer).length == 1){
 						$fieldPicker.toggle(toShow);
 					}else{
 						if(param.$container){
-							if($container[0] !== param.$container[0]){
-								var left = param.$container[0].offsetLeft,
-									top = param.$container[0].offsetTop;
-								$fieldPicker.addClass('appendout').css({
-									left	: left + 'px',
-									top		: (top + 30) + 'px'
-								});
+							if($pickerContainer[0] !== param.$container[0]){
+								var $pickerContainerOffsetParent = $pickerContainer[0].offsetParent;
+								var $n = param.$container[0];
+								//计算当前按钮位置，并在该位置弹出选择框
+								var offsetTop = 0,
+									offsetLeft = 0;
+								while($n && $n.offsetParent !== $pickerContainerOffsetParent){
+									offsetTop += $n.offsetTop;
+									offsetLeft += $n.offsetLeft;
+									$n = $n.offsetParent;
+								}
+								if($n){
+									offsetTop += $n.offsetTop - 55;
+									offsetLeft += $n.offsetLeft - 100;
+									$fieldPicker.addClass('appendout').css({
+										left	: offsetLeft + 'px',
+										top		: (offsetTop) + 'px'
+									});
+								}else{
+									$.error('text不在picker的定位容器内');
+								}
 							}
 						}
-						$container.append($fieldPicker.show());
+						$pickerContainer.append($fieldPicker.show());
 					}
 					if($fieldPicker.is(':visible')){
 						var toActiveIndex = $fieldPicker.find('.fieldpicker-field-item.disabled').closest('.tab-pane').index();
@@ -693,9 +715,12 @@ define(function(require, exports, module){
 				search.togglePicker(param.$pickerContainer || $search);
 			});
 			$($search.getLocatePage().getContent().children()).on('mouseup', function(e){
-				if($(e.target).closest($search).length === 0){
-					search.togglePicker(false);
-				}
+				var $target = $(e.target);
+				search.getFieldPicker().done(function($fieldPicker){
+					if($target.closest($fieldPicker).length === 0 && $target.closest($search).length === 0){
+						search.togglePicker(false);
+					}
+				});
 			});
 			return search;
 		}
