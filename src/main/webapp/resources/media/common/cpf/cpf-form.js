@@ -162,6 +162,9 @@ define(function(require, exports, module){
 				}
 			}
 		});
+		$('form :text.cpf-field-int', $page).on('input',function(){
+			this.value = this.value.replace(/[^\d\-]/g, '').replace(/(\d+)\-+(\d*)/, '$1$2').replace(/\-+/, '-');
+		})
 		
 		require('select2');
 		if($.fn.select2){
