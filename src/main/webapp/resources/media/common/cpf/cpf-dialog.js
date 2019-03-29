@@ -337,6 +337,7 @@ define(function(require, exports, module){
 				return false;
 			});
 		});
+		Dialog.tooltip($('[data-toggle="tooltip"]', $page));
 	}
 	
 	$.extend(Dialog, {
@@ -572,6 +573,17 @@ define(function(require, exports, module){
 					}
 				}
 			});
+		},
+		tooltip	: function($target){
+			if($.fn.tooltip){
+				$($target).each(function(){
+					var $this = $(this);
+					var placement = $this.attr('data-placement') || 'top';
+					$(this).tooltip({
+						placement
+					});
+				});
+			}
 		}
 	});
 	

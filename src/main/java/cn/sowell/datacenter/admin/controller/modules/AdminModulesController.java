@@ -35,8 +35,9 @@ import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.copframe.web.poll.WorkProgress;
+import cn.sowell.datacenter.SessionKey;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.admin.controller.SessionKey;
+import cn.sowell.datacenter.common.EntityQueryPoolUtils;
 import cn.sowell.datacenter.common.RequestParameterMapComposite;
 import cn.sowell.datacenter.entityResolver.CEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.FieldDescCacheMap;
@@ -211,7 +212,7 @@ public class AdminModulesController {
 		ModuleMeta module = mService.getModule(menu.getTemplateModule());
 		//获得查询池
 		UserIdentifier user = UserUtils.getCurrentUser();
-		EntityQueryPool qPool = getEntityQueryPool(session, user);
+		EntityQueryPool qPool = EntityQueryPoolUtils.getEntityQueryPool(session, user);
 		//注册一个查询
 		EntityQuery query = qPool.regist();
 		TemplateTreeTemplate ttmpl = treeService.getTemplate(tmplGroup.getTreeTemplateId());
@@ -279,7 +280,7 @@ public class AdminModulesController {
 			TemplateTreeNode itemNodeTemplate = treeService.analyzeNodeTemplate(nodeContext);
 			//获得查询池
 			UserIdentifier user = UserUtils.getCurrentUser();
-			EntityQueryPool qPool = getEntityQueryPool(session, user);
+			EntityQueryPool qPool = EntityQueryPoolUtils.getEntityQueryPool(session, user);
 			//注册一个查询
 			EntityQuery query = qPool.regist();
 			//在模板中匹配查询结果的Node模板
@@ -301,20 +302,6 @@ public class AdminModulesController {
 		}
 		return jRes;
 	}
-	
-	private EntityQueryPool getEntityQueryPool(HttpSession session, UserIdentifier user) {
-		EntityQueryPool pool = (EntityQueryPool) session.getAttribute(SessionKey.ENTITY_QUERY_POOL);
-		if(pool == null) {
-			synchronized (SessionKey.ENTITY_QUERY_POOL) {
-				pool = (EntityQueryPool) session.getAttribute(SessionKey.ENTITY_QUERY_POOL);
-				if(pool == null) {
-					pool = new EntityQueryPool(user);
-					session.setAttribute(SessionKey.ENTITY_QUERY_POOL, pool);
-				}
-			}
-		}
-		return pool;
-	}
 
 
 
@@ -323,7 +310,7 @@ public class AdminModulesController {
 	public ResponseJSON askForEntityNodes(@PathVariable String key, @PathVariable Integer pageNo, HttpSession session) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		UserIdentifier user = UserUtils.getCurrentUser();
-		EntityQueryPool pool = getEntityQueryPool(session, user);
+		EntityQueryPool pool = EntityQueryPoolUtils.getEntityQueryPool(session, user);
 		EntityQuery query = pool.getQuery(key);
 		PagedEntityList el = query.pageList(pageNo);
 		
@@ -656,6 +643,53 @@ public class AdminModulesController {
 		}
 	}
 	
+	@RequestMapping("/rel_tree/{menuId}/{fieldGroupId}")
+	public String relationTreeSelection(
+			@PathVariable Long menuId, 
+			@PathVariable Long fieldGroupId, 
+			HttpSession session, 
+			PageInfo pageInfo, 
+			HttpServletRequest request, 
+			Model model) {
+		SideMenuLevel2Menu mainMenu = authService.vaidateL2MenuAccessable(menuId);
+		TemplateGroup mainTmplGroup = tmplGroupService.getTemplate(mainMenu.getTemplateGroupId());
+		TemplateDetailTemplate dtmpl = dtmplService.getTemplate(mainTmplGroup.getDetailTemplateId());
+		TemplateDetailFieldGroup fieldGroup = dtmpl.getGroups().stream().filter(group->fieldGroupId.equals(group.getId())).findFirst().get();
+		
+		TemplateTreeTemplate ttmpl = treeService.getTemplate(fieldGroup.getRabcTreeTemplateId());
+		
+		String relModuleName = fieldGroup.getComposite().getRelModuleName();
+		
+		ModuleMeta module = mService.getModule(relModuleName);
+		//获得查询池
+		UserIdentifier user = UserUtils.getCurrentUser();
+		EntityQueryPool qPool = EntityQueryPoolUtils.getEntityQueryPool(session, user);
+		//注册一个查询
+		EntityQuery query = qPool.regist();
+		//构造根节点的上下文
+		TreeNodeContext nodeContext = new TreeNodeContext(ttmpl);
+		//根据上下文获得节点模板
+		TemplateTreeNode nodeTemplate = treeService.analyzeNodeTemplate(nodeContext);;
+		//设置参数
+		query
+			.setModuleName(nodeTemplate.getModuleName())
+			.setPageSize(pageInfo.getPageSize())
+			.setNodeTemplate(nodeTemplate)
+			;
+		Map<Long, String> requrestCriteriaMap = lcriteriFacrory.exractTemplateCriteriaMap(request);
+		//根据传入的条件和约束开始初始化查询对象，但还不获取实体数据
+		query.prepare(requrestCriteriaMap, applicationContext);
+		//传递参数到页面
+		model.addAttribute("query", query);
+		model.addAttribute("nodeTmplJson", JSON.toJSON(query.getNodeTemplate()));
+		String nodesCSS = treeService.generateNodesCSS(ttmpl);
+		model.addAttribute("nodesCSS", nodesCSS);
+		model.addAttribute("module", module);
+		model.addAttribute("fieldGroup", fieldGroup);
+		model.addAttribute("mainMenu", mainMenu);
+		model.addAttribute("treeTemplate", ttmpl);
+		return AdminConstants.JSP_MODULES + "/modules_rel_tree.jsp";
+	}
 	
 	@RequestMapping("/rel_selection/{menuId}/{stmplId}")
 	public String relationSelection(@PathVariable Long menuId, 
@@ -693,7 +727,7 @@ public class AdminModulesController {
 		
 		//获得查询池
 		UserIdentifier user = UserUtils.getCurrentUser();
-		EntityQueryPool qPool = getEntityQueryPool(session, user);
+		EntityQueryPool qPool = EntityQueryPoolUtils.getEntityQueryPool(session, user);
 		//注册一个查询
 		EntityQuery query = qPool.regist();
 		
@@ -925,9 +959,7 @@ public class AdminModulesController {
 		jRes.setStatus("suc");
 		return jRes;
 	}
-
-
-
+	
 	public static JSONObject toEntitiesJson(Map<String, ? extends CEntityPropertyParser> parsers, Set<String> fieldNames) {
 		JSONObject entities = new JSONObject();
 		if(parsers != null && fieldNames != null) {

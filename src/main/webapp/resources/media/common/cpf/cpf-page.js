@@ -76,6 +76,7 @@ define(function(require, exports, module){
 											}else if($ele.is('input[type="text"],input[type="hidden"],textarea,select,input[type="number"]')){
 												$ele.val(data[0][propName]);
 											}
+											$ele.trigger('CpfAfterChoose', [data[0][propName], data[0], data]);
 										}
 									});
 									

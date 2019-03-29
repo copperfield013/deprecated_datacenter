@@ -20,6 +20,9 @@
     padding: 0.5em;
 }
 
+.ttmpl-update label.node-title {
+    min-width: 10px;
+}
 
 
 .node-relations {
@@ -293,18 +296,6 @@ div.relation-criterias>*.criteria-item.criteria-selected:hover {
   min-height: 24px;
 }
 
-.ttmpl-update label.tooltip-label{
-	display: inline-flex;
-    align-items: center;
-}
 
-.ttmpl-update .badge {
-	width: 14px;
-    height: 14px;
-    line-height: 14px;
-    padding: 0;
-    margin: 0;
-    cursor: pointer;
-}
 
 

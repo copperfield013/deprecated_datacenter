@@ -1,21 +1,5 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
-<style>
-	#${tpage.pageId } tbody>tr{
-		cursor: pointer;
-	}
-	#${tpage.pageId } .table-hover tbody>tr.selected{
-		background-color: #87CEEB;
-		color: #fff;
-	}
-	#${tpage.pageId } tbody>tr.selected:HOVER td{
-		color: #000;
-		background-color: #BBFFFF !important;
-	}
-	#${tpage.pageId } table.table{
-		margin-bottom: 10px;
-	}
-</style>
 <div id="${tpage.pageId }" class="cpf-choose-table">
 	<script type="text/json" id="data-json">${tpage.dataJson}</script>
 	<div>

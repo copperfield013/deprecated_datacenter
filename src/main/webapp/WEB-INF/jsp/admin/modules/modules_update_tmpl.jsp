@@ -164,9 +164,18 @@
 														</c:forEach>
 														<th width="20px">
 															<c:if test="${!(fieldGroup.composite.access == '读' || fieldGroup.composite.access == '补' && fn:length(entity.arrayMap[fieldGroup.composite.name]) > 0 ) }">
-																<c:if test="${fieldGroup.selectionTemplateId != null}">
-																	<a title="选择" stmpl-id="${fieldGroup.selectionTemplateId }" href="javascript:;" class="open-select-dialog fa fa-link"></a>
-																</c:if>
+																<c:choose>
+																	<c:when test="${fieldGroup.dialogSelectType == 'stmpl' && fieldGroup.selectionTemplateId != null }">
+																		<a title="选择" stmpl-id="${fieldGroup.selectionTemplateId }" href="javascript:;" class="open-select-dialog fa fa-link"></a>
+																	</c:when>
+																	<c:when test="${fieldGroup.dialogSelectType == 'ttmpl' && fieldGroup.rabcTreeTemplateId != null }">
+																		<a title="选择" ttmpl-id="${fieldGroup.rabcTreeTemplateId }" href="javascript:;" class="open-select-dialog fa fa-link"></a>
+																	</c:when>
+																	<c:when test="${fieldGroup.dialogSelectType == 'ltmpl' && fieldGroup.rabcTemplateGroupId != null }">
+																		<a title="选择" tmplgroup-id="${fieldGroup.rabcTemplateGroupId }" href="javascript:;" class="open-select-dialog fa fa-link"></a>
+																	</c:when>
+																</c:choose>
+															
 																<c:if test="${fieldGroup.unallowedCreate != 1 }">
 																	<span class="array-item-add" title="添加一行">+</span>
 																</c:if>
@@ -230,7 +239,7 @@
 															</c:forEach>
 															<td>
 																<c:if test="${fieldGroup.composite.access == '写' }">
-																	<c:if test="${fieldGroup.rabcUnupdatable != 1 }">
+																	<c:if test="${fieldGroup.rabcTemplateGroupId != null && fieldGroup.rabcUnupdatable != 1 }">
 																		<span class="array-item-update fa fa-edit" title="编辑当前行"></span>
 																	</c:if>
 																	<span class="array-item-remove" title="移除当前行">×</span>

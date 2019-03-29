@@ -9,7 +9,7 @@
 	</div>
 	<div class="page-header">
 		<div class="header-title">
-			<h1>列表模板（${module.title }）</h1>
+			<h1>树形模板（${module.title }）</h1>
 		</div>
 		<div class="header-buttons">
 			<a class="refresh" title="刷新" id="refresh-toggler" href="page:refresh">

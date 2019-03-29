@@ -144,6 +144,7 @@ public class AdminTreeTemplateController {
 					JSONObject jNode = jNodes.getJSONObject(nodeOrder);
 					TemplateTreeNode node = new TemplateTreeNode();
 					node.setId(jNode.getLong("id"));
+					node.setTitle(jNode.getString("title"));
 					node.setModuleName(jNode.getString("moduleName"));
 					node.setNodeColor(jNode.getString("nodeColor"));
 					node.setSelector(jNode.getString("selector"));
@@ -197,6 +198,15 @@ public class AdminTreeTemplateController {
 					.setExcept(except)
 					.setURI(AdminConstants.URI_TMPL + "/tree/choose/" +moduleName)
 			);
+	}
+	
+	@RequestMapping("/choose_with_node_module/{nodeModule}")
+	public String chooseWithNodeModule(@PathVariable String nodeModule, String except, Model model) {
+		return actionConsumer.choose(treeService.queryByNodeModule(nodeModule), 
+				ChooseRequestParam.create(nodeModule, treeService, model)
+					.setExcept(except)
+					.setURI(AdminConstants.URI_TMPL + "/tree/choose_with_node_module/" + nodeModule)
+				);
 	}
 	
 	

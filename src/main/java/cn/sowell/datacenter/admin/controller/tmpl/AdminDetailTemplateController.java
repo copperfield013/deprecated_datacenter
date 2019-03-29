@@ -1,5 +1,6 @@
 package cn.sowell.datacenter.admin.controller.tmpl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +34,7 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailArrayItemCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailArrayItemFilter;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailField;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroupTreeNode;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.service.ArrayItemFilterService;
@@ -208,13 +210,25 @@ public class AdminDetailTemplateController {
 						group.setTitle(jGroup.getString("title"));
 						group.setIsArray(jGroup.getBoolean("isArray")?1:null);
 						group.setCompositeId(jGroup.getLong("compositeId"));
-						group.setRelationDetailTemplateId(jGroup.getLong("relationDetailTemplateId"));
+						group.setDialogSelectType(jGroup.getString("dialogSelectType"));
 						group.setRabcTemplateGroupId(jGroup.getLong("rabcTemplateGroupId"));
 						group.setRabcUncreatable(jGroup.getInteger("rabcUncreatable"));
 						group.setRabcUnupdatable(jGroup.getInteger("rabcUnupdatable"));
 						group.setArrayItemFilterId(jGroup.getLong("arrayItemFilterId"));
 						group.setSelectionTemplateId(jGroup.getLong("selectionTemplateId"));
 						group.setUnallowedCreate(Integer.valueOf(1).equals(jGroup.getInteger("unallowedCreate"))? 1: null);
+						group.setRabcTreeTemplateId(jGroup.getLong("rabcTreeTemplateId"));
+						JSONArray jRabcTreeNodeIds = jGroup.getJSONArray("rabcTreeNodeIds");
+						if(jRabcTreeNodeIds != null) {
+							group.setRabcTreeNodes(new ArrayList<>());
+							for (int j = 0; j < jRabcTreeNodeIds.size(); j++) {
+								Long nodeId = jRabcTreeNodeIds.getLong(j);
+								TemplateDetailFieldGroupTreeNode node = new TemplateDetailFieldGroupTreeNode();
+								node.setNodeTemplateId(nodeId);
+								node.setOrder(j);
+								group.getRabcTreeNodes().add(node);
+							}
+						}
 						group.setOrder(i++);
 						data.getGroups().add(group);
 						JSONArray jFields = jGroup.getJSONArray("fields");

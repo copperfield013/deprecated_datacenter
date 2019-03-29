@@ -19,9 +19,11 @@ public class ListTemplateFormater {
 	
 	public static JSONArray toCriteriaData(List<? extends AbstractListCriteria> list) {
 		JSONArray array = new JSONArray();
-		for (AbstractListCriteria criteria : list) {
-			Object item = JSON.toJSON(criteria);
-			array.add(item);
+		if(list != null) {
+			for (AbstractListCriteria criteria : list) {
+				Object item = JSON.toJSON(criteria);
+				array.add(item);
+			}
 		}
 		return array;
 	}

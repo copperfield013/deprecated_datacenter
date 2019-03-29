@@ -98,6 +98,7 @@ define(function(require, exports, module){
 							//选择的字段是一个数组字段，锁定当前选择器的标签页
 							fieldSearch.lockTab();
 							choosedArrayCompositeIdSet.add(field.composite.c_id.toString());
+							bindFieldGroupConfig($group, field.composite);
 							//TODO: 将字段添加到数组当中
 						}else{
 							fieldSearch.hideArrayComposites();
@@ -323,6 +324,347 @@ define(function(require, exports, module){
 				return true;
 			}
 			
+			function bindFieldGroupConfig($fieldGroup, composite, group){
+				var $fieldGroupConfigButtons = $('.field-group-config-buttons', $fieldGroup);
+				if(composite && $fieldGroupConfigButtons.is(':hidden')){
+					$fieldGroupConfigButtons.show();
+					//获得初始数据（该对象在字段组生命周期内是单例）
+					var fieldGroupData = getFieldGroupConfigData($fieldGroup, composite, group);
+					//绑定点击配置按钮打开弹出框的事件
+					$('.field-group-config', $fieldGroup).click(function(){
+						var groupTitle = $('.group-title', $fieldGroup).text();
+						require('tmpl').load('media/admin/tmpl/tmpl/dtmpl-fieldgroup-config-dialog.tmpl').done(function(tmpl){
+							//创建一个副本对象，用于参数弹出框中的基准
+							var thisFieldGroupConfigData = Object.assign({}, fieldGroupData);
+							//根据参数对象，打开弹出框
+							var $dialog = tmpl.tmpl(thisFieldGroupConfigData);
+							var fieldGroupConfigPage = require('dialog').openDialog($dialog, '字段组参数（' + groupTitle + '）', undefined, {
+								width		: 450,
+								height		: 420,
+								contentType	: 'dom',
+								onSubmit	: function(dataFromPage){
+									//根据bindSelectionDialog方法绑定的事件，返回的对象覆盖到主参数对象中
+									saveFieldGroupConfigData.apply(fieldGroupData, [thisFieldGroupConfigData, dataFromPage]);
+									//根据保存的字段组参数，修改详情模板中的字段组展示
+									renderFieldGroupConfig($fieldGroup, fieldGroupData);
+								}
+							});
+							//绑定编辑模板编辑事件
+							bindSelectionDialog($dialog, thisFieldGroupConfigData, composite);
+							//
+							bindRelTreeTemplate($dialog, thisFieldGroupConfigData);
+							//绑定模板组合事件
+							bindRelTemplateGroup($dialog, thisFieldGroupConfigData);
+							//绑定关系/多值的筛选器事件
+							bindArrayItemFiter($dialog, thisFieldGroupConfigData, composite);
+							//绑定字段组参数保存事件
+							bindReturnDataFromPage(fieldGroupConfigPage, thisFieldGroupConfigData);
+						});
+					});
+				}
+			}
+			
+			function bindRelTreeTemplate($dialog, thisFieldGroupConfigData){
+				var $selectableNodes = $('.selectable-nodes', $dialog);
+				//切换关联模板组合的控件显示状态
+				function toggleTreeNodesControls(toShow){
+					if(toShow){
+						if(thisFieldGroupConfigData.rabcTreeTemplateId){
+							if(thisFieldGroupConfigData.rabcTreeNodeOptions == null){
+								//从后台加载属性模板的node选项
+								loadNodesOptionFromServer();
+							}else{
+								//直接根据已有选项数据初始化控件
+								initTreeNodesSelect2();
+							}
+						}
+					}
+					$selectableNodes.closest('.form-group').toggle(toShow);
+				}
+				/**
+				 * 从后台加载属性模板的node选项
+				 */
+				function loadNodesOptionFromServer(){
+					require('$CPF').showLoading();
+					thisFieldGroupConfigData.rabcTreeNodeOptions = [];
+					require('ajax').ajax('api2/meta/tmpl/tree/ttmpl/' 
+							+ thisFieldGroupConfigData.rabcTreeTemplateId).done(function(data){
+						if(data.ttmpl && data.ttmpl){
+							thisFieldGroupConfigData.rabcTreeNodeOptions = convertFromTreeNodes(data.ttmpl.nodes);
+							initTreeNodesSelect2();
+						}
+					}).always(function(){
+						require('$CPF').closeLoading();
+					});
+				}
+				function convertFromTreeNodes(ttmplNodes){
+					var nodeOptions = [];
+					$.each(ttmplNodes, function(){
+						if(this.moduleName === thisFieldGroupConfigData.rabcModule){
+							nodeOptions.push({
+								id		: this.id,
+								text	: this.title
+							});
+						}
+					});
+					return nodeOptions;
+				}
+				function initTreeNodesSelect2(){
+					try{$selectableNodes.select2('destroy').empty()}catch(e){}
+					$selectableNodes.select2({
+						theme			: "bootstrap",
+						width			: null,
+						allowClear		: true,
+						placeholder		: '',
+						data			: thisFieldGroupConfigData.rabcTreeNodeOptions,
+						multiple		: true
+					}).val(thisFieldGroupConfigData.rabcTreeNodeIds).trigger('change');
+				}
+				//绑定选择模板组合后的回调
+				var $chooseTreeTemplateButton = $('a.choose-ttmpl', $dialog).on('CpfAfterChoose', function(e, ttmplTitle, ttmpl){
+					if(ttmpl){
+						thisFieldGroupConfigData.rabcTreeTemplateId = ttmpl.id;
+						thisFieldGroupConfigData.rabcTreeTemplateTitle = ttmplTitle;
+						thisFieldGroupConfigData.rabcTreeNodeIds = [];
+						thisFieldGroupConfigData.rabcTreeNodeOptions = convertFromTreeNodes(ttmpl.nodes);
+						toggleTreeNodesControls(true);
+					}
+				});
+				
+				//绑定取消关联模板组合的事件
+				$('.unselect-ttmpl', $dialog).click(function(){
+					require('dialog').confirm('确认取消关联树形模板？').done(function(){
+						thisFieldGroupConfigData.rabcTreeTemplateId = null;
+						thisFieldGroupConfigData.rabcTreeTemplateTitle = null;
+						$chooseTreeTemplateButton.text('选择树形模板');
+						toggleTreeNodesControls(false);
+					});
+				});
+				
+				//初始化，当没有关联模板组合的时候，隐藏
+				toggleTreeNodesControls(!!thisFieldGroupConfigData.rabcTreeTemplateId);
+			}
+			
+			function getFieldGroupConfigData($fieldGroup, composite, group){
+				group = group || {};
+				var fieldGroupData = $fieldGroup.data('fieldgroup-config-data');
+				if(!fieldGroupData){
+					fieldGroupData = {
+							uuid					: require('utils').uuid(5,62),
+							isRelation				: composite.addType == 5,
+							isRabc					: !!composite.relModuleName,
+							rabcModule				: composite.relModuleName,
+							unallowedCreate			: group.unallowedCreate,
+							dialogSelectType		: group.dialogSelectType,
+							selectionTemplateId		: group.selectionTemplateId,
+							rabcTreeTemplateId		: group.rabcTreeTemplateId,
+							rabcTreeTemplateTitle	: group.rabcTreeTemplateTitle,
+							rabcTreeNodeIds			: [],
+							rabcTreeNodeOptions		: null,
+							rabcTemplateGroupId		: group.rabcTemplateGroupId,
+							rabcTemplateGroupTitle	: group.rabcTemplateGroupTitle,
+							rabcUncreatable			: group.rabcUncreatable,
+							rabcUnupdatable			: group.rabcUnupdatable,
+							arrayItemFilterId		: group.arrayItemFilterId
+					}
+					if(group.rabcTreeNodes){
+						fieldGroupData.rabcTreeNodeIds = group.rabcTreeNodes.map(function(node){return node.nodeTemplateId})
+					}
+					$fieldGroup.data('fieldgroup-config-data', fieldGroupData);
+				}
+				return fieldGroupData;
+			}
+			
+			
+			/**
+			 * 绑定关联模板组合的相关事件
+			 */
+			function bindRelTemplateGroup($dialog, thisFieldGroupConfigData){
+				var $rabcCreatableCheckbox = $('.rabccreatable-checkbox', $dialog),
+					$rabcUpdatableCheckbox = $('.rabcupdatable-checkbox', $dialog);
+				
+				//切换关联模板组合的控件显示状态
+				function toggleRabcControls(toShow){
+					$rabcCreatableCheckbox.prop('checked', true).closest('.form-group').toggle(toShow);
+					$rabcUpdatableCheckbox.prop('checked', true).closest('.form-group').toggle(toShow);
+				}
+				//绑定选择模板组合后的回调
+				var $chooseTemplateGroupButton = $('a.choose-tmplgroup', $dialog).on('CpfAfterChoose', function(e, tmplGroupTitle, tmplGroup){
+					if(tmplGroup){
+						thisFieldGroupConfigData.rabcTemplateGroupId = tmplGroup.id;
+						thisFieldGroupConfigData.rabcTemplateGroupTitle = tmplGroupTitle;
+						toggleRabcControls(true);
+					}
+				});
+				
+				//绑定取消关联模板组合的事件
+				$('.unselect-tmplgroup', $dialog).click(function(){
+					require('dialog').confirm('确认取消关联模板组合？').done(function(){
+						thisFieldGroupConfigData.rabcTemplateGroupId = null;
+						thisFieldGroupConfigData.rabcTemplateGroupTitle = null;
+						$chooseTemplateGroupButton.text('选择模板组合');
+						toggleRabcControls(false);
+					});
+				});
+				
+				//初始化，当没有关联模板组合的时候，隐藏
+				if(!thisFieldGroupConfigData.rabcTemplateGroupId){
+					toggleRabcControls(false);
+				}
+			}
+			
+			function bindCheckboxLinkGroup(lcgroup){
+				lcgroup.$link.click(function(){
+					var defer = lcgroup.openDialog();
+					if(defer){
+						defer.fail(function(){
+							lcgroup.$checkbox.prop('checked', false).trigger('change');
+						});
+					}
+				});
+				lcgroup.$checkbox.change(function(e, notOpenLink){
+					var checked = $(this).prop('checked');
+					lcgroup.$link.toggle(checked);
+					if(!notOpenLink && checked){
+						lcgroup.$link.trigger('click');
+					}
+				}).trigger('change', [true]);
+			}
+			
+			/**
+			 * 绑定弹出框选择模板的相关事件
+			 */
+			function bindSelectionDialog($dialog, thisFieldGroupConfigData, composite){
+				var $stmplCheckbox = $('.stmpl-checkbox', $dialog),
+					$ttmplCheckbox = $('.ttmpl-checkbox', $dialog),
+					$ltmplCheckbox = $('.ltmpl-checkbox', $dialog);
+				require('utils').mutexCheckbox($('.dialog-select-type :checkbox', $dialog));
+				
+				bindCheckboxLinkGroup({
+					$link		: $('.stmpl-link', $dialog),
+					$checkbox	: $stmplCheckbox,
+					openDialog	: function(){
+						var defer = $.Deferred();
+						var reqParam = {};
+						var stmplId = thisFieldGroupConfigData.selectionTemplateId;
+						if(!stmplId){
+							reqParam.moduleName = param.module;
+							reqParam.compositeId = composite.c_id;
+						}
+						require('dialog').openDialog(
+								'admin/tmpl/stmpl/' + (stmplId? ('update/' + stmplId) : 'create')
+								, '编辑选择模板', undefined, {
+								reqParam	: reqParam,
+								width		: 1000,
+								height		: 500,
+								events		: {
+									afterSave	: function(stmplId){
+										if(stmplId){
+											thisFieldGroupConfigData.selectionTemplateId = stmplId;
+											defer.resolve(stmplId);
+										}
+									}
+								},
+								onClose	: function(){
+									if(!thisFieldGroupConfigData.selectionTemplateId){
+										defer.reject();
+									}
+								}
+						});
+						return defer.promise();
+					}
+				});
+			}
+			
+			/**
+			 * 
+			 */
+			function bindArrayItemFiter($dialog, thisFieldGroupConfigData, composite){
+				bindCheckboxLinkGroup({
+					$link		: $('.arrayitem-fiter-link', $dialog),
+					$checkbox	: $('.arrayitem-fiter-checkbox', $dialog),
+					openDialog	: function(){
+						var defer = $.Deferred();
+						var reqParam = {filterId: thisFieldGroupConfigData.arrayItemFilterId || ''};
+						require('dialog').openDialog(
+							'admin/tmpl/dtmpl/arrayitem_filter/' + param.module + '/'  + composite.c_id,
+							'编辑过滤器', undefined, {
+								reqParam 	: reqParam,
+								width		: 1000,
+								height		: 500,
+								events		: {
+									afterSave	: function(filterId){
+										if(filterId){
+											thisFieldGroupConfigData.arrayItemFilterId = filterId;
+											defer.resolve(filterId);
+										}
+									}
+								},
+								onClose	: function(){
+									if(!thisFieldGroupConfigData.arrayItemFilterId){
+										defer.reject();
+									}
+								}
+							}
+						);
+						return defer.promise();
+					}
+				});
+			}
+			
+			function bindReturnDataFromPage(fieldGroupConfigPage, thisFieldGroupConfigData){
+				fieldGroupConfigPage.getPage().bind('footer-submit', function(){
+					var $dialogPage = this.getContent();
+					return {
+						unallowedCreate	: $('#allow-create', $dialogPage).prop('checked')? null: 1,
+						dialogSelectType: $('.dialog-select-type :checkbox:checked', $dialogPage).val(),
+						rabcTreeNodeIds	: $('.selectable-nodes', $dialogPage).val(),
+						rabcUncreatable	: $('.rabccreatable-checkbox', $dialogPage).prop('checked')? null: 1,
+						rabcUnupdatable	: $('.rabcupdatable-checkbox', $dialogPage).prop('checked')? null: 1,
+					}
+				});
+			}
+			
+			/**
+			 * 将bindFieldGroupSaveEvent绑定的事件中返回的数据，放到this中，this为要修改的fieldGroupData
+			 */
+			function saveFieldGroupConfigData(thisFieldGroupConfigData, dataFromPage){
+				var configData = {
+					selectionTemplateId		: thisFieldGroupConfigData.selectionTemplateId,
+					rabcTreeTemplateId		: thisFieldGroupConfigData.rabcTreeTemplateId,
+					rabcTreeTemplateTitle	: thisFieldGroupConfigData.rabcTreeTemplateTitle,
+					rabcTreeNodeOptions		: thisFieldGroupConfigData.rabcTreeNodeOptions,
+					rabcTemplateGroupId		: thisFieldGroupConfigData.rabcTemplateGroupId,
+					rabcTemplateGroupTitle	: thisFieldGroupConfigData.rabcTemplateGroupTitle,
+					arrayItemFilterId		: thisFieldGroupConfigData.arrayItemFilterId
+				};
+				$.extend(configData, dataFromPage);
+				
+				if(!configData.rabcTemplateGroupId){
+					configData.rabcTemplateGroupTitle = null;
+					configData.rabcUncreatable = null;
+					configData.rabcUnupdatable = null;
+				}
+				validateFieldGroupConfigData(configData);
+				Object.assign(this, configData);
+			}
+			function validateFieldGroupConfigData(configData){
+				if(configData.rabcTreeTemplateId){
+					if(!configData.rabcTreeNodeIds || configData.rabcTreeNodeIds.length == 0){
+						var msg = '当关联了树形模板，必须至少选择一个可选节点';
+						require('dialog').notice(msg, 'error');
+						$.error(msg);
+					}
+				}
+			}
+			
+			/**
+			 * 根据fieldGroupData中的数据修改$fieldGroup的展示
+			 */
+			function renderFieldGroupConfig($fieldGroup, fieldGroupData){
+				console.log(fieldGroupData);
+			}
+			
 			/**
 			 * 绑定双击时，编辑该文本的事件
 			 */
@@ -394,19 +736,28 @@ define(function(require, exports, module){
 					};
 					saveData.groups.push(group);
 					if(isArray){
+						var groupConfigData = getFieldGroupConfigData($group);
+						if(groupConfigData){
+							$.extend(group, {
+								compositeId	: $group.attr('composite-id')
+							}, groupConfigData);
+						}else{
+							$.error('应该调用getFieldGroupConfigData初始化$group');
+						}
+						
+						/*
 						var $selectable = $group.find('.selectable:checkbox');
 						if($selectable.prop('checked')){
 							group.selectionTemplateId = $group.attr('stmpl-id');
 						}
 						group.compositeId = $group.attr('composite-id');
-						group.relationDetailTemplateId = $group.attr('rdtmpl-id');
 						group.rabcTemplateGroupId = $group.attr('rabc-tmpl-group-id');
 						group.rabcUncreatable = $group.find('.rabc-uncreatable').prop('checked')? 1: null;
 						group.rabcUnupdatable = $group.find('.rabc-unupdatable').prop('checked')? 1: null;
 						if($group.find('.filterable').prop('checked')){
 							group.arrayItemFilterId = $group.attr('array-item-filter-id');
 						}
-						group.unallowedCreate = $group.find('.create-arrayitem-control :checkbox').prop('checked')? 1 : 0;
+						group.unallowedCreate = $group.find('.create-arrayitem-control :checkbox').prop('checked')? 1 : 0;*/
 						$arrayTable.find('.title-row>th[field-id]').each(function(){
 							var $th = $(this);
 							var field = $th.data('field-data');
@@ -779,6 +1130,7 @@ define(function(require, exports, module){
 					var $group = 
 						$tmplFieldGroup
 						.tmpl($.extend({}, {
+							isArray			: null,
 							unallowedCreate	: null,
 							rabcUncreatable	: null,
 							rabcUnupdatable	: null,
@@ -789,6 +1141,7 @@ define(function(require, exports, module){
 						//绑定字段组内字段的拖动动作
 						bindGroupFieldsDraggable(getFieldContainer($group));
 					}
+					bindFieldGroupConfig($group, group.composite, group);
 					//初始化字段组的字段搜索自动完成功能
 					initGroupFieldSearchAutocomplete($group);
 					for(var j in group.fields){

@@ -16,6 +16,11 @@
 				<span class="widget-caption">
 					<span class="group-title">\${title}</span>
 				</span>
+				<div class="widget-buttons field-group-config-buttons" style="display:none">
+					<a href="#" class="field-group-config">
+						<i class="fa fa-cog darkorange"></i>
+					</a>
+             	</div>
 				<div class="widget-buttons create-arrayitem-control" style="display:none">
 					<label>
 						<input type="checkbox" class="colored-blue" \${unallowedCreate==1?'checked="checked"': ''}>

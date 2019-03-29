@@ -9,7 +9,8 @@ define(function(require, exports, module){
 			$page			: null,
 			moduleName		: null,
 			queryKey		: null,
-			defaultNodeTmpl	: null
+			defaultNodeTmpl	: null,
+			menuId			: null
 		};
 		var param = $.extend({}, defParam, _param);
 		
@@ -28,6 +29,8 @@ define(function(require, exports, module){
 			var $ul = $('<ul>').append($lis);
 			$entitiesTreeContainer.append($ul);
 		});
+		bindFooterEvent();
+		
 		
 		
 		
@@ -189,6 +192,47 @@ define(function(require, exports, module){
 				break;
 			}
 		}
+		
+		function bindFooterEvent(){
+			var page = $page.getLocatePage(); 
+			page.bind('footer-submit', function(data){
+				
+				var codes = [];
+				
+				$entitiesTreeContainer
+					.find('li[node-id][entity-code]')
+					.filter(function(){
+						return $(this).children('.node-checked').length === 1;
+					})
+					.each(function(){
+						codes.push($(this).attr('entity-code'));
+				});
+				
+				console.log(codes);
+				var entitiesLoader = function(fields){
+					var deferred = $.Deferred();
+					if($.isArray(fields) && fields.length > 0){
+						var url = 'admin/modules/curd/load_rabc_entities/' 
+								+ param.menuId + '/'
+								+ param.returnCompositeId;
+						require('ajax').ajax(url, {
+							codes	: codes.join(),
+							fields	: fields.join()
+						}, function(data){
+							if(data.status === 'suc'){
+								deferred.resolve(data.entities);
+							}else{
+								$.error('获取数据错误');
+							}
+						});
+					}
+					return deferred.promise();
+				};
+				entitiesLoader.codes = codes;
+				return entitiesLoader;
+			});
+		}
+		
 	}
 	
 	

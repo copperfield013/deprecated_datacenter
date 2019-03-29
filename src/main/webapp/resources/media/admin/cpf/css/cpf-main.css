@@ -1136,3 +1136,36 @@ input[type="checkbox"].checked-false:checked+*.text:before {
     content: "×";
     font-family: unset;
 }
+
+label.tooltip-label{
+	display: inline-flex;
+	align-items: center;
+	justify-content: flex-end;
+}
+
+label.tooltip-label .badge {
+	width: 14px;
+    height: 14px;
+    line-height: 14px;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+
+
+.cpf-choose-table tbody>tr{
+	cursor: pointer;
+}
+.cpf-choose-table .table-hover tbody>tr.selected{
+	background-color: #87CEEB;
+	color: #fff;
+}
+.cpf-choose-table tbody>tr.selected:HOVER td{
+	color: #000;
+	background-color: #BBFFFF !important;
+}
+.cpf-choose-table table.table{
+	margin-bottom: 10px;
+}

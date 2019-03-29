@@ -65,6 +65,7 @@ define(function(require, exports, module){
 			var abcNode = nodeConfig.abcNode;
 			var tmplData = {
 				nodeId		: nodeConfig.id || '',
+				nodeTitle	: nodeConfig.title || abcNode.moduleTitle,
 				nodeName	: abcNode.moduleTitle,
 				nodeModule	: abcNode.moduleName,
 				selector	: nodeConfig.selector || '',
@@ -171,6 +172,7 @@ define(function(require, exports, module){
 			var $nodeConfig = $nodeConfigTmpl.tmpl(tmplData);
 			//将NodeConfig的DOM放到容器中
 			$nodeConfigContainer.append($nodeConfig);
+			bindNodeTitle($nodeConfig);
 			//为NodeConfig的DOM绑定数据和事件
 			bindColorpicker($('.node-color', $nodeConfig));
 			//绑定移除事件
@@ -347,6 +349,7 @@ define(function(require, exports, module){
 				var $nodeConfig = $(this);
 				var node = {
 					id				: $nodeConfig.attr('data-id'),
+					title			: $('.node-title', $nodeConfig).text(),
 					moduleName		: $('.nodeModule', $nodeConfig).val(),
 					nodeColor		: $('.node-color', $nodeConfig).val(),
 					selector		: $('.node-selector', $nodeConfig).val(),
@@ -415,8 +418,8 @@ define(function(require, exports, module){
 					var node = ttmplData.nodes[i];
 					var abcNode = moduleNodeMap[node.moduleName];
 					//构造方法参数
-					var theNode = {
-							abcNode		: abcNode,
+					var theNode = $.extend({
+						abcNode		: abcNode,
 							id			: node.id,
 							selector	: node.selector,
 							nodeText	: node.text,
@@ -429,7 +432,7 @@ define(function(require, exports, module){
 							templateGroupTitle	: node.templateGroupTitle,
 							hideDetailButton	: node.hideDetailButton,
 							hideUpdateButton	: node.hideUpdateButton
-					}
+					}, node);
 					//添加Node
 					addNode(theNode);
 				}
@@ -441,6 +444,12 @@ define(function(require, exports, module){
 		}
 		
 		
+	}
+	
+	function bindNodeTitle($nodeConfig){
+		$('.node-title', $nodeConfig).on('dblclick', function(){
+			require('utils').toEditContent(this);
+		});
 	}
 	
 	function bindColorpicker($texts){
@@ -519,11 +528,7 @@ define(function(require, exports, module){
 		return criteriaHandler;
 	}
 	function bindTooltip($container){
-		if($.fn.tooltip){
-			$('[data-toggle="tooltip"]', $container).each(function(){
-				$(this).tooltip();
-			});
-		}
+		require('dialog').tooltip($('[data-toggle="tooltip"]', $container));
 	}
 	
 	function bindGapEvent($nodeConfig){

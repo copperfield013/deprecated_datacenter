@@ -402,3 +402,96 @@ th.field-unavailable:before {
     margin: 5px 0;
     padding: 0 10px;
 }
+
+
+.field-group-config-dialog a.choose-tmpl.form-control {
+    height: 23px;
+    line-height: 23px;
+    font-size: 14px;
+    padding: 0 10px;
+    margin: 0 0 10px 0;
+}
+
+.field-group-config-dialog>.form-group {
+    margin-bottom: 7px;
+    padding-top: 7px;
+}
+
+.field-group-config-dialog a.dialog-link {
+    width: 28px;
+    height: 28px;
+    line-height: 18px;
+    display: inline-block;
+    cursor: pointer;
+    color: #5db2ff;
+    font-size: 16px;
+}
+
+.field-group-config-dialog .form-group>div {
+    position: relative;
+    display: flex;
+}
+
+.field-group-config-dialog i.unselect-tmpl {
+    width: 23px;
+    text-align: center;
+    cursor: pointer;
+    height: 23px;
+    line-height: 23px;
+    border-radius: 23px;
+}
+
+.field-group-config-dialog i.unselect-tmpl:hover{
+    background-color: #eee;
+}
+.field-group-config-dialog i.unselect-tmpl:before {
+    content: "×";
+}
+
+
+
+.field-group-config-dialog .selectable-nodes {
+    width: 100%;
+    border: 2px solid #ddd;
+    max-height: 6em;
+    overflow-y: auto;
+}
+.field-group-config-dialog .selectable-nodes>div{
+    padding: 3px 5px;
+    display: flex;
+    justify-content: space-between;
+}
+.field-group-config-dialog .selectable-nodes>div:not(:last-child){
+     border-bottom: 1px solid #eee;
+}
+.field-group-config-dialog .selectable-nodes>div:hover{
+    background-color: #eee;
+}
+.field-group-config-dialog .selectable-nodes>div>span{
+    font-size: 13px;
+}
+
+
+.field-group-config-dialog .selectable-nodes>div>i:before {
+    content: "×";
+}
+
+.field-group-config-dialog .selectable-nodes>div>i {
+    width: 20px;
+    text-align: center;
+    cursor: pointer;
+    display: inline-block;
+    height: 20px;
+    border-radius: 20px;
+}
+.field-group-config-dialog .selectable-nodes>div>i:hover{
+    background-color: #ddd;
+}
+
+.field-group-config-dialog .form-group>.selectable-nodes-container {
+    display: block;
+}
+
+.field-group-config-dialog .dialog-select-type {
+    flex-direction: column;
+}

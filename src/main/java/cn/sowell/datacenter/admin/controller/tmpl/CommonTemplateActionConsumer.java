@@ -105,8 +105,8 @@ public class CommonTemplateActionConsumer {
 			return selectedPredicate;
 		} 
 	}
-	public <T extends Cachable> String choose(ChooseRequestParam<T> crp) {
-		List<T> tmplList = crp.getTemplateService().queryAll(crp.getModuleName());
+	
+	public <T extends Cachable> String choose(List<T> tmplList, ChooseRequestParam<T> crp) {
 		if(TextUtils.hasText(crp.getExcept())) {
 			Set<Long> excepts = TextUtils.split(crp.getExcept(), ",", HashSet::new, FormatUtils::toLong);
 			tmplList = tmplList.stream().filter(tmpl->!excepts.contains(tmpl.getId())).collect(Collectors.toList());
@@ -131,5 +131,9 @@ public class CommonTemplateActionConsumer {
 		
 		crp.getModel().addAttribute("tpage", tpage);
 		return AdminConstants.PATH_CHOOSE_TABLE;
+	}
+	
+	public <T extends Cachable> String choose(ChooseRequestParam<T> crp) {
+		return choose(crp.getTemplateService().queryAll(crp.getModuleName()), crp);
 	}
 }

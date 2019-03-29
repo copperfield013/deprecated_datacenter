@@ -269,6 +269,23 @@ define(function(require, exports){
 			}
 		},
 		/**
+		 * 将checkbox数组串联成互斥勾选
+		 */
+		mutexCheckbox	: function($checkboxs){
+			var FLAG = this.uuid(5, 62);
+			$.each($checkboxs, function(){
+				var $this = $(this);
+				$this.change(function(e){
+					var checked = $this.prop('checked');
+					if(checked){
+						$.each($checkboxs, function(){
+							$(this).not($this).filter(':checked').prop('checked', false).trigger('change', [FLAG]);
+						});
+					}
+				});
+			});
+		},
+		/**
 		 * 验证联系号码的格式
 		 */
 		testContactNumber	: function(contact){

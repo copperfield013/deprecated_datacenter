@@ -44,7 +44,10 @@
 	<script type="jquery/text" id="node-config-tmpl" >
 		<div class="widget node-config" data-id="\${nodeId}">
 			<div class="widget-header bordered-bottom bordered-blue">
-				<span class="widget-caption">\${nodeName}</span>
+				<span class="widget-caption">
+					<label class="node-title">\${nodeTitle}</label>
+					<label>（\${nodeName}）</label>
+				</span>
 				<input type="hidden" class="nodeModule" value="\${nodeModule}" />
 				<div class="widget-buttons">
 					<button id="btn-remove-node" class="btn btn-default btn-sm">删除</button>
@@ -85,8 +88,7 @@
 					<div class="form-group">
 						<label class="tooltip-label">
 							关联模板组合
-							<span class="badge badge-orange" data-toggle="tooltip" data-placement="top" 
-								data-original-title="用于打开详情和修改页面">?</span>	
+							<span class="badge badge-orange" data-toggle="tooltip" title="用于打开详情和修改页面">?</span>	
 						</label>
 						<div>
 							<a 
@@ -117,8 +119,8 @@
 					<div class="form-group">
 						<label class="tooltip-label">
 							直接显示子实体
-							<span class="badge badge-orange" data-toggle="tooltip" data-placement="top" 
-								data-original-title="当只有一个可选关系时能够勾选。
+							<span class="badge badge-orange" data-toggle="tooltip"
+								title="当只有一个可选关系时能够勾选。
 								勾选后在树形图上，以当前节点模板显示的实体下，将不显示关系名，直接显示子关系实体">?</span>	
 						</label>
 						<div class="operate-buttons form-value">

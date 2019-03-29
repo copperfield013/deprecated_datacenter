@@ -1,4 +1,4 @@
-package cn.sowell.datacenter.admin.controller;
+package cn.sowell.datacenter;
 
 public interface SessionKey {
 	final String EXPORT_ENTITY_STATUS_UUID = "export_entity_status_uuid";

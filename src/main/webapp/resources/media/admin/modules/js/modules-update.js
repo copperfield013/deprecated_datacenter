@@ -17,6 +17,9 @@ define(function(require, exports, module){
 						stmpl	: function(stmplId){
 							return 'admin/modules/curd/rel_selection/' + menuId + '/' + stmplId;
 						},
+						rel_tree: function(fieldGroupId){
+							return 'admin/modules/curd/rel_tree/' + menuId + '/' + fieldGroupId;
+						},
 						rdtmpl	: function(fieldGroupId){
 							return 'admin/modules/curd/rabc_create/' + menuId + '/' + fieldGroupId;
 						},
@@ -263,6 +266,22 @@ define(function(require, exports, module){
 				}
 			});
 			
+		});
+
+		$('.open-select-dialog[ttmpl-id]', $page).click(function(){
+			var $this = $(this);
+			var fieldGroupId = $this.closest('[field-group-id]').attr('field-group-id');
+			if(fieldGroupId){
+				Dialog.openDialog(uriGenerator.rel_tree(fieldGroupId), undefined, undefined, {
+					width	: 1000,
+					height	: 400,
+					onSubmit: function(entitiesLoader){
+						appendEntityToArrayTable(entitiesLoader, $this.closest('table'));
+					}
+				});
+				
+			}
+
 		});
 		
 		function setFieldValue(entity, $row){
