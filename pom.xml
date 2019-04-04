@@ -10,18 +10,43 @@
 	
 	<properties>
 		<version.kie>7.10.0.Final</version.kie>
-		<version.abcitem>4.2.12.alphal</version.abcitem>
+		<version.abcitem>4.2.17.alphal</version.abcitem>
 		<version.dataserver>1.15</version.dataserver>
 		<version.cpfweb>0.2.12</version.cpfweb>
 		<version.abcbizz>2.1.15</version.abcbizz>
+		<!--
 		<version.authbiz>0.0.21</version.authbiz>
-		<version.jgdj>1.2</version.jgdj>
-		<version.xfjd>0.1.83</version.xfjd>
+		 <version.jgdj>1.2</version.jgdj>
+		<version.xfjd>0.4.57</version.xfjd> -->
+		 <version.threeservices>0.1.81</version.threeservices>
+		 <version.kieutil>0.0.6</version.kieutil>
 		<cxf.version>3.2.2</cxf.version>
 	</properties>
-	
 	  
 	<dependencies>
+	
+		 <!-- <dependency>
+			<groupId>com.abc.biz</groupId>
+			<artifactId>authbiz</artifactId>
+			<version>${version.authbiz}</version>
+		</dependency>  -->
+		 <!-- <dependency>
+			<groupId>com.zhsq.biz</groupId>
+			<artifactId>xfjd</artifactId>
+			<version>${version.xfjd}</version>
+		</dependency>  -->
+		
+		<dependency>
+			<groupId>com.zhsq.biz</groupId>
+			<artifactId>threeservices</artifactId>
+			<version>${version.threeservices}</version>
+		</dependency>  
+		<dependency>
+			<groupId>com.zhsq.util</groupId>
+			<artifactId>kieutil</artifactId>
+			<version>${version.kieutil}</version>
+		</dependency>
+	
 		<dependency>
 			<groupId>cn.sowell.copframe</groupId>
 			<artifactId>cpf-web</artifactId>
