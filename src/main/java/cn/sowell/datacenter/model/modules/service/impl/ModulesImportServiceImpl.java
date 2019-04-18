@@ -54,11 +54,11 @@ import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.excel.CellTypeUtils;
 import cn.sowell.copframe.web.poll.WorkProgress;
+import cn.sowell.datacenter.entityResolver.EntityConstants;
 import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.ImportCompositeField;
 import cn.sowell.datacenter.entityResolver.impl.EntityComponent;
-import cn.sowell.datacenter.entityResolver.impl.RelationEntityProxy;
 import cn.sowell.datacenter.model.modules.dao.ModulesImportDao;
 import cn.sowell.datacenter.model.modules.exception.ImportBreakException;
 import cn.sowell.datacenter.model.modules.pojo.ImportTemplateCriteria;
@@ -418,7 +418,7 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 			}else if(tmplField.getCompositeId() != null && tmplField.getFieldIndex() != null){
 				DictionaryComposite composite = dService.getComposite(tmpl.getModule(), tmplField.getCompositeId());
 				if(composite != null) {
-					tmplField.setTitle(composite.getName() + "[" + tmplField.getFieldIndex() + "]." + RelationEntityProxy.LABEL_KEY);
+					tmplField.setTitle(composite.getName() + "[" + tmplField.getFieldIndex() + "]." + EntityConstants.LABEL_KEY);
 					continue;
 				}
 			}

@@ -102,7 +102,7 @@ public class AdminModulesExportController {
 	public ResponseJSON doImport(
 			@PathVariable Long menuId,
 			@RequestBody JsonRequest jReq, HttpSession session){
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
 		TemplateListTemplate ltmpl = ltmplService.getTemplate(tmplGroup.getListTemplateId());
 		
@@ -209,7 +209,7 @@ public class AdminModulesExportController {
 			@PathVariable Long menuId, 
 			@PathVariable String code,
 			Long historyId) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
 		return aExportDetail(code, tmplGroup, historyId);
 	}
@@ -220,7 +220,7 @@ public class AdminModulesExportController {
 			@PathVariable Long nodeId, 
 			@PathVariable String code,
 			Long historyId) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		TemplateTreeNode node = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(node.getTemplateGroupId());
 		return aExportDetail(code, tmplGroup, historyId);

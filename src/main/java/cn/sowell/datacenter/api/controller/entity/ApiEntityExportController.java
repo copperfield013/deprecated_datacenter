@@ -89,7 +89,7 @@ public class ApiEntityExportController {
 	public ResponseJSON doImport(
 			@PathVariable Long menuId,
 			@RequestBody JsonRequest jReq, ApiUser user){
-		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
+		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
 		TemplateListTemplate ltmpl = ltmplService.getTemplate(tmplGroup.getListTemplateId());
 		
@@ -197,7 +197,7 @@ public class ApiEntityExportController {
 			@PathVariable String code,
 			Long historyId, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
-		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
+		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
 		TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
 		

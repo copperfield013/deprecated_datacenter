@@ -158,7 +158,7 @@ public class AdminModulesController {
 			@PathVariable Long menuId,
 			PageInfo pageInfo,
 			HttpServletRequest request, Model model, HttpSession session) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		//String moduleName = menu.getTemplateModule();
 		EntityViewCriteria criteria = getEntityListCriteria(menu, pageInfo, request);
 		ListTemplateEntityView view = (ListTemplateEntityView) vService.query(criteria);
@@ -206,7 +206,7 @@ public class AdminModulesController {
 			PageInfo pageInfo, 
 			HttpServletRequest request, 
 			Model model, HttpSession session) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
 		TemplateListTemplate ltmpl = ltmplService.getTemplate(tmplGroup.getListTemplateId());
 		ModuleMeta module = mService.getModule(menu.getTemplateModule());
@@ -224,7 +224,7 @@ public class AdminModulesController {
 		query
 			.setModuleName(menu.getTemplateModule())
 			.setPageSize(pageInfo.getPageSize())
-			.setTemplateGroupId(tmplGroup.getId())
+			.setTemplateGroup(tmplGroup)
 			.setNodeTemplate(nodeTemplate)
 			;
 		Map<Long, String> requrestCriteriaMap = lcriteriFacrory.exractTemplateCriteriaMap(request);
@@ -264,7 +264,7 @@ public class AdminModulesController {
 			@PathVariable Long nodeRelationId, 
 			@RequestParam(required=false, defaultValue="10") Integer pageSize, 
 			HttpSession session) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		
 		String moduleName = menu.getTemplateModule();
@@ -336,7 +336,7 @@ public class AdminModulesController {
 			@PathVariable Long menuId,
     		Long historyId,
     		Model model) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
 		model.addAttribute("menu", menu);
 		return toDetail(code, tmplGroup, historyId, model);
@@ -349,7 +349,7 @@ public class AdminModulesController {
 			@PathVariable String code,
 			Long historyId,
 			Model model) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		TemplateTreeNode nodeTemplate = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
 		Long tmplGroupId = nodeTemplate.getTemplateGroupId();
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(tmplGroupId);
@@ -395,7 +395,7 @@ public class AdminModulesController {
 	
 	@RequestMapping("/add/{menuId}")
 	public String add(@PathVariable Long menuId, Model model) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		String moduleName = menu.getTemplateModule();
 		ModuleMeta mMeta = mService.getModule(moduleName);
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
@@ -431,7 +431,7 @@ public class AdminModulesController {
 			@PathVariable String code,
 			Model model
 			) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
 		model.addAttribute("menu", menu);
 		return aUpdate(tmplGroup, code, model);
@@ -444,7 +444,7 @@ public class AdminModulesController {
 			@PathVariable String code,
 			Model model
 			) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		TemplateTreeNode nodeTemplate = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(nodeTemplate.getTemplateGroupId());
 		model.addAttribute("menu", menu);
@@ -495,7 +495,7 @@ public class AdminModulesController {
     		@RequestParam(value=AdminConstants.KEY_ACTION_ID, required=false) Long actionId,
     		RequestParameterMapComposite composite){
 		UserIdentifier user = UserUtils.getCurrentUser();
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		String moduleName = menu.getTemplateModule();
 		Map<String, Object> entityMap = composite.getMap();
 		if(actionId != null) {
@@ -535,7 +535,7 @@ public class AdminModulesController {
     		@RequestParam(value=AdminConstants.KEY_ACTION_ID, required=false) Long actionId,
     		RequestParameterMapComposite composite){
 		UserIdentifier user = UserUtils.getCurrentUser();
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		
 		TemplateTreeNode nodeTemplate = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
 		
@@ -572,7 +572,7 @@ public class AdminModulesController {
     		@PathVariable String code, 
     		@RequestParam Integer pageNo, 
     		@RequestParam(defaultValue="100") Integer pageSize){
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		return aPagingHistory(menu.getTemplateModule(), code, pageNo, pageSize);
     }
 	
@@ -585,7 +585,7 @@ public class AdminModulesController {
     		@PathVariable String code, 
     		@RequestParam Integer pageNo, 
     		@RequestParam(defaultValue="100") Integer pageSize){
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		TemplateTreeNode node = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
     	return aPagingHistory(node.getModuleName(), code, pageSize, pageSize);
     } 
@@ -615,7 +615,7 @@ public class AdminModulesController {
 			@PathVariable Long menuId,
 			@PathVariable String code
 			) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		try {
 			EntityQueryParameter param = new EntityQueryParameter(menu.getTemplateModule(), code, UserUtils.getCurrentUser());
 			entityService.delete(param);
@@ -631,7 +631,7 @@ public class AdminModulesController {
 	public AjaxPageResponse remove(
 			@PathVariable Long menuId,
 			@RequestParam String codes) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		try {
 			EntitiesQueryParameter param = new EntitiesQueryParameter(menu.getTemplateModule(), UserUtils.getCurrentUser());
 			param.setEntityCodes(collectCode(codes));
@@ -651,7 +651,7 @@ public class AdminModulesController {
 			PageInfo pageInfo, 
 			HttpServletRequest request, 
 			Model model) {
-		SideMenuLevel2Menu mainMenu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu mainMenu = authService.validateL2MenuAccessable(menuId);
 		TemplateGroup mainTmplGroup = tmplGroupService.getTemplate(mainMenu.getTemplateGroupId());
 		TemplateDetailTemplate dtmpl = dtmplService.getTemplate(mainTmplGroup.getDetailTemplateId());
 		TemplateDetailFieldGroup fieldGroup = dtmpl.getGroups().stream().filter(group->fieldGroupId.equals(group.getId())).findFirst().get();
@@ -698,7 +698,7 @@ public class AdminModulesController {
 			PageInfo pageInfo,
 			HttpServletRequest request,
 			Model model, HttpSession session) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		model.addAttribute("menu", menu);
 		return aNodeRelationSelection(menu.getTemplateModule(), stmplId, session, exists, pageInfo, model, request);
 	}
@@ -711,7 +711,7 @@ public class AdminModulesController {
 			PageInfo pageInfo,
 			HttpServletRequest request,
 			Model model, HttpSession session) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		TemplateTreeNode nodeTemplate = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
 		model.addAttribute("menu", menu);
 		return aNodeRelationSelection(nodeTemplate.getModuleName(), stmplId, session, exists, pageInfo, model, request);
@@ -795,7 +795,7 @@ public class AdminModulesController {
 	@RequestMapping("/rabc_create/{mainMenuId}/{fieldGroupId}")
 	public String rabcCreate(@PathVariable Long mainMenuId, 
 			@PathVariable Long fieldGroupId, String entityCode, Model model) {
-		SideMenuLevel2Menu mainMenu = authService.vaidateL2MenuAccessable(mainMenuId);
+		SideMenuLevel2Menu mainMenu = authService.validateL2MenuAccessable(mainMenuId);
 		model.addAttribute("mainMenu", mainMenu);
 		TemplateGroup mainTmplGroup = tmplGroupService.getTemplate(mainMenu.getTemplateGroupId());
 		return aRabcCreate(mainTmplGroup, fieldGroupId, entityCode, model);
@@ -806,7 +806,7 @@ public class AdminModulesController {
 			@PathVariable Long fieldGroupId, 
 			@PathVariable Long nodeId,
 			String entityCode, Model model) {
-		SideMenuLevel2Menu mainMenu = authService.vaidateL2MenuAccessable(mainMenuId);
+		SideMenuLevel2Menu mainMenu = authService.validateL2MenuAccessable(mainMenuId);
 		model.addAttribute("mainMenu", mainMenu);
 		TemplateTreeNode nodeTemplate = treeService.getNodeTemplate(mainMenu.getTemplateModule(), nodeId);
 		TemplateGroup mainTmplGroup = tmplGroupService.getTemplate(nodeTemplate.getTemplateGroupId());
@@ -872,7 +872,7 @@ public class AdminModulesController {
 			@RequestParam(value=AdminConstants.KEY_FUSE_MODE, required=false) Boolean fuseMode,
     		RequestParameterMapComposite composite){
 		JSONObjectResponse jRes = new JSONObjectResponse();
-		authService.vaidateL2MenuAccessable(mainMenuId);
+		authService.validateL2MenuAccessable(mainMenuId);
 		TemplateGroup rabcTmplGroup = tmplGroupService.getTemplate(rabcTemplateGroupId);
 		String moduleName = rabcTmplGroup.getModule();
 		Map<String, Object> entityMap = composite.getMap();
@@ -909,7 +909,7 @@ public class AdminModulesController {
 			@RequestParam String codes, 
 			@RequestParam String fields) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
-		authService.vaidateL2MenuAccessable(menuId);
+		authService.validateL2MenuAccessable(menuId);
 		TemplateSelectionTemplate stmpl = stmplService.getTemplate(stmplId);
 		EntitiesQueryParameter param = new EntitiesQueryParameter(stmpl.getModule(), UserUtils.getCurrentUser());
 		param.setEntityCodes(TextUtils.split(codes, ",", HashSet<String>::new, c->c));
@@ -931,7 +931,7 @@ public class AdminModulesController {
 	@RequestMapping("/load_rabc_entities/{menuId}/{relationCompositeId}")
 	public ResponseJSON loadRabcEntities(@PathVariable Long menuId, @PathVariable Long relationCompositeId, 
 			String codes, String fields) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		return aLoadRabcEntities(menu.getTemplateModule(), relationCompositeId, codes, fields); 
 	}
 	
@@ -942,7 +942,7 @@ public class AdminModulesController {
 			@PathVariable Long nodeId,
 			@PathVariable Long relationCompositeId,
 			String codes, String fields) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		TemplateTreeNode nodeTemplate = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
 		return aLoadRabcEntities(nodeTemplate.getModuleName(), relationCompositeId, codes, fields); 
 	}
@@ -982,7 +982,7 @@ public class AdminModulesController {
 	@ResponseBody
 	@RequestMapping("/do_action/{menuId}/{actionId}")
 	public AjaxPageResponse doAction(@PathVariable Long menuId, @PathVariable Long actionId, @RequestParam(name="codes") String codeStr) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		ArrayEntityProxy.setLocalUser(UserUtils.getCurrentUser());
 		TemplateGroupAction groupAction = tmplGroupService.getTempateGroupAction(actionId);
 		Object vRes = validateGroupAction(groupAction, menu, codeStr);

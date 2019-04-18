@@ -22,4 +22,5 @@ public interface SideMenuService {
 	Map<Long, String[]> getMenu2AuthNameMap(Set<Long> level2MenuId);
 
 	void reloadMenuMap();
+
 }

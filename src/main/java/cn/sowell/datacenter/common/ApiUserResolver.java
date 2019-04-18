@@ -1,6 +1,7 @@
 package cn.sowell.datacenter.common;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.springframework.core.MethodParameter;
@@ -10,6 +11,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.datacenter.SessionKey;
 import cn.sowell.datacenter.entityResolver.UserCodeService;
 import cn.sowell.datacenter.model.admin.service.AdminUserService;
 import cn.sowell.datacenter.model.admin.service.impl.AdminUserServiceImpl.Token;
@@ -38,7 +40,19 @@ public class ApiUserResolver implements HandlerMethodArgumentResolver{
 	@Override
 	public ApiUser resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-		String tokenCode = webRequest.getHeader("datamobile-token");
+		String tokenCode = webRequest.getParameter("%token%");
+		if(!TextUtils.hasText(tokenCode)) {
+			tokenCode = webRequest.getHeader("datacenter-token");
+		}
+		if(!TextUtils.hasText(tokenCode)) {
+			tokenCode = webRequest.getHeader("datamobile-token");
+		}
+		if(!TextUtils.hasText(tokenCode)) {
+			if(webRequest.getSessionMutex() instanceof HttpSession) {
+				HttpSession session = (HttpSession) webRequest.getSessionMutex();
+				tokenCode = (String) session.getAttribute(SessionKey.API_USER_TOKEN);
+			}
+		}
 		if(TextUtils.hasText(tokenCode)) {
 			try {
 				Token token = uService.validateToken(tokenCode);

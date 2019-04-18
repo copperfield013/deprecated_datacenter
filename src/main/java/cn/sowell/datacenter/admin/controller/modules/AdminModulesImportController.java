@@ -47,7 +47,7 @@ import cn.sowell.copframe.web.poll.ProgressPollableThread;
 import cn.sowell.copframe.web.poll.ProgressPollableThreadFactory;
 import cn.sowell.copframe.web.poll.WorkProgress;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
-import cn.sowell.datacenter.entityResolver.impl.RelationEntityProxy;
+import cn.sowell.datacenter.entityResolver.EntityConstants;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.modules.exception.ImportBreakException;
@@ -86,7 +86,7 @@ public class AdminModulesImportController {
 	
 	@RequestMapping("/go/{menuId}")
 	public String goImport(@PathVariable Long menuId, Model model) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		ModuleMeta mMeta = mService.getModule(menu.getTemplateModule());
 		model.addAttribute("module", mMeta);
 		model.addAttribute("menu", menu);
@@ -96,7 +96,7 @@ public class AdminModulesImportController {
 	@ResponseBody
 	@RequestMapping("/resolve_file/{menuId}")
 	public ResponseJSON resolveFile(@PathVariable Long menuId, MultipartFile file) {
-		authService.vaidateL2MenuAccessable(menuId);
+		authService.validateL2MenuAccessable(menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		String fileName = file.getOriginalFilename();
 		String suffix = null;
@@ -139,7 +139,7 @@ public class AdminModulesImportController {
 	public ResponseJSON doImport(
 			@RequestParam MultipartFile file,
 			@PathVariable Long menuId) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
         jRes.setStatus("error");
         ModuleMeta mData = mService.getModule(menu.getTemplateModule());
@@ -246,7 +246,7 @@ public class AdminModulesImportController {
 			@PathVariable Long  menuId,
 			Model model
 			) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		UserIdentifier user = UserUtils.getCurrentUser();
 		ModuleMeta mMeta = mService.getModule(menu.getTemplateModule());
 		ImportTemplateCriteria criteria = new ImportTemplateCriteria();
@@ -256,14 +256,14 @@ public class AdminModulesImportController {
 		model.addAttribute("tmpls", tmpls);
 		model.addAttribute("module", mMeta);
 		model.addAttribute("menu", menu);
-		model.addAttribute("relationLabelKey", RelationEntityProxy.LABEL_KEY);
+		model.addAttribute("relationLabelKey", EntityConstants.LABEL_KEY);
 		
 		return AdminConstants.JSP_MODULES + "/modules_import_download.jsp";
 	}
 	
 	@RequestMapping("/tmpl/show/{menuId}/{tmplId}")
 	public String showTemplate(@PathVariable Long menuId, @PathVariable Long tmplId, Model model) {
-		authService.vaidateL2MenuAccessable(menuId);
+		authService.validateL2MenuAccessable(menuId);
 		ModuleImportTemplate tmpl = impService.getImportTempalte(tmplId);
 		model.addAttribute("tmpl", tmpl);
 		model.addAttribute("tmplFieldsJson", JSON.toJSON(tmpl.getFields()));
@@ -274,7 +274,7 @@ public class AdminModulesImportController {
 	@RequestMapping("/submit_field_names/{menuId}")
 	public ResponseJSON submitFieldNames(@PathVariable Long menuId, 
 			@RequestBody JsonRequest jReq, HttpSession session) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		JSONObject reqJson = jReq.getJsonObject();
 		ModuleImportTemplate tmpl = toImportTemplate(menu.getTemplateModule(), reqJson, UserUtils.getCurrentUser());
@@ -312,7 +312,7 @@ public class AdminModulesImportController {
 	public ResponseJSON saveTmpl(
 			@PathVariable Long menuId, 
 			@RequestBody JsonRequest jReq) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		JSONObject reqJson = jReq.getJsonObject();
 		try {

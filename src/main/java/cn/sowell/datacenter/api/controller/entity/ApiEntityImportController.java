@@ -86,7 +86,7 @@ public class ApiEntityImportController {
 	public ResponseJSON startImport(
 			@RequestParam MultipartFile file,
 			@PathVariable Long menuId, ApiUser user) {
-		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
+		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
         jRes.setStatus("error");
         ModuleMeta mData = mService.getModule(menu.getTemplateModule());
@@ -179,7 +179,7 @@ public class ApiEntityImportController {
 	@RequestMapping("/tmpls/{menuId}")
 	public ResponseJSON getImportTemplates(@PathVariable Long menuId, ApiUser user) {
 		JSONObjectResponse res = new JSONObjectResponse();
-		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
+		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
 		ImportTemplateCriteria criteria = new ImportTemplateCriteria();
 		criteria.setModule(menu.getTemplateModule());
 		criteria.setUserId((String) user.getId());
@@ -192,7 +192,7 @@ public class ApiEntityImportController {
 	@RequestMapping("/tmpl/{menuId}/{tmplId}")
 	public ResponseJSON getImportTemplate(@PathVariable Long menuId, @PathVariable Long tmplId, ApiUser user) {
 		JSONObjectResponse res = new JSONObjectResponse();
-		authService.vaidateUserL2MenuAccessable(user, menuId);
+		authService.validateUserL2MenuAccessable(user, menuId);
 		ModuleImportTemplate tmpl = impService.getImportTempalte(tmplId);
 		res.put("tmpl", JSON.toJSON(tmpl));
 		return res;
@@ -202,7 +202,7 @@ public class ApiEntityImportController {
 	@RequestMapping("/save_tmpl/{menuId}")
 	public ResponseJSON saveTemplate(@PathVariable Long menuId, 
 			@RequestBody JsonRequest jReq, ApiUser user) {
-		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
+		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		JSONObject reqJson = jReq.getJsonObject();
 		ModuleImportTemplate tmpl = AdminModulesImportController.toImportTemplate(menu.getTemplateModule(), reqJson, user);

@@ -22,13 +22,13 @@ import cn.sowell.copframe.dto.ajax.AjaxPageResponse;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.JsonRequest;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
+import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.admin.controller.tmpl.CommonTemplateActionConsumer.ChooseRequestParam;
 import cn.sowell.datacenter.admin.controller.tmpl.ListTemplateFormater.Handlers;
 import cn.sowell.datacenter.entityResolver.config.ModuleConfigStructure;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
-import cn.sowell.dataserver.model.tmpl.pojo.SuperTemplateListCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeNode;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeNodeCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeRelation;
@@ -134,10 +134,22 @@ public class AdminTreeTemplateController {
 			ttmpl.setNodes(new ArrayList<>());
 			JSONArray jNodes = jTreeTempalte.getJSONArray("nodes");
 			if(jNodes != null) {
-				Handlers<?, ?, SuperTemplateListCriteria> criteriaHandlers = new Handlers<>();
-				criteriaHandlers.setCriteriaConsumer((criteria, item)->{
+				Handlers<?, ?, TemplateTreeNodeCriteria> nodeCriteriaHandlers = new Handlers<>();
+				nodeCriteriaHandlers.setCriteriaConsumer((criteria, item)->{
 					if(criteria.getFieldAvailable()) {
 						criteria.setCompositeId(item.getLong("compositeId"));
+					}
+				});
+				Handlers<?, ?, TemplateTreeRelationCriteria> relCriteriaHandlers = new Handlers<>();
+				relCriteriaHandlers.setCriteriaConsumer((criteria, item)->{
+					if(criteria.getFieldAvailable()) {
+						criteria.setCompositeId(item.getLong("compositeId"));
+						criteria.setFilterMode(item.getString("filterMode"));
+						if(!TextUtils.hasText(criteria.getFilterMode())) {
+							criteria.setFilterMode("field");
+						}
+						criteria.setFilterLabels(item.getString("filterLabels"));
+						criteria.setIsExcludeLabel(item.getInteger("isExcludeLabel"));
 					}
 				});
 				for (int nodeOrder = 0; nodeOrder < jNodes.size(); nodeOrder++) {
@@ -160,7 +172,7 @@ public class AdminTreeTemplateController {
 					
 					JSONArray jNodeCriterias = jNode.getJSONArray("criterias");
 					if(jNodeCriterias != null) {
-						node.setCriterias(ListTemplateFormater.getCriterias(jNodeCriterias, TemplateTreeNodeCriteria::new, criteriaHandlers));
+						node.setCriterias(ListTemplateFormater.getCriterias(jNodeCriterias, TemplateTreeNodeCriteria::new, nodeCriteriaHandlers));
 					}
 					
 					node.setRelations(new ArrayList<>());
@@ -178,7 +190,7 @@ public class AdminTreeTemplateController {
 							relation.setCriterias(new ArrayList<>());
 							JSONArray jCriterias = jRel.getJSONArray("criterias");
 							if(jCriterias != null) {
-								List<TemplateTreeRelationCriteria> criterias = ListTemplateFormater.getCriterias(jCriterias, TemplateTreeRelationCriteria::new, criteriaHandlers);
+								List<TemplateTreeRelationCriteria> criterias = ListTemplateFormater.getCriterias(jCriterias, TemplateTreeRelationCriteria::new, relCriteriaHandlers);
 								relation.setCriterias(criterias);
 							}
 						}

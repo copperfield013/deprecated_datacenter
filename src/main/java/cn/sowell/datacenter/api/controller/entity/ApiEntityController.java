@@ -34,13 +34,13 @@ import cn.sowell.datacenter.api.controller.APiDataNotFoundException;
 import cn.sowell.datacenter.common.ApiUser;
 import cn.sowell.datacenter.common.RequestParameterMapComposite;
 import cn.sowell.datacenter.entityResolver.CEntityPropertyParser;
+import cn.sowell.datacenter.entityResolver.EntityConstants;
 import cn.sowell.datacenter.entityResolver.FieldParserDescription;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.UserCodeService;
 import cn.sowell.datacenter.entityResolver.impl.ABCNodeProxy;
 import cn.sowell.datacenter.entityResolver.impl.ArrayItemPropertyParser;
 import cn.sowell.datacenter.entityResolver.impl.RelSelectionEntityPropertyParser;
-import cn.sowell.datacenter.entityResolver.impl.RelationEntityProxy;
 import cn.sowell.datacenter.model.admin.service.AdminUserService;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
@@ -135,7 +135,7 @@ public class ApiEntityController {
 	public ResponseJSON list(@PathVariable Long menuId, PageInfo pageInfo,
 			HttpServletRequest request, ApiUser user) {
 		JSONObjectResponse res = new JSONObjectResponse();
-		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
+		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
 		String moduleName = menu.getTemplateModule();
 		ModuleMeta module = mService.getModule(moduleName);
 		
@@ -322,7 +322,7 @@ public class ApiEntityController {
 	public ResponseJSON dtmpl(@PathVariable Long menuId, ApiUser user) {
 		JSONObjectResponse res = new JSONObjectResponse();
 		
-		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
+		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
 		String moduleName = menu.getTemplateModule();
 		
 		ModuleMeta moduleMeta = mService.getModule(moduleName);
@@ -345,7 +345,7 @@ public class ApiEntityController {
 	public ResponseJSON detail(@PathVariable Long menuId, @PathVariable String code, @RequestParam(required=false) Long historyId, ApiUser user) {
 		JSONObjectResponse res = new JSONObjectResponse();
 		
-		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
+		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
 		String moduleName = menu.getTemplateModule();
 		
 		ModuleMeta moduleMeta = mService.getModule(moduleName);
@@ -480,7 +480,7 @@ public class ApiEntityController {
 							aCompositeEntities.add(jCompositeEntity);
 							jCompositeEntity.put("code", compositeEntity.getCode());
 							if(fieldGroup.getRelationSubdomain() != null) {
-								jCompositeEntity.put("relation", compositeEntity.getFormatedProperty(fieldGroup.getComposite().getName() + "." + RelationEntityProxy.LABEL_KEY));
+								jCompositeEntity.put("relation", compositeEntity.getFormatedProperty(fieldGroup.getComposite().getName() + "." + EntityConstants.LABEL_KEY));
 							}
 							JSONArray aFields = new JSONArray();
 							jCompositeEntity.put("fields", aFields);
@@ -524,7 +524,7 @@ public class ApiEntityController {
 			@RequestParam(value=AdminConstants.KEY_ACTION_ID, required=false) Long actionId,
     		RequestParameterMapComposite composite, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
-		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
+		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
 		String moduleName = menu.getTemplateModule();
 		Map<String, Object> entityMap = composite.getMap();
 		if(actionId != null) {
@@ -567,7 +567,7 @@ public class ApiEntityController {
 			@PathVariable Long menuId,
 			@RequestParam String codes, ApiUser user) {
 		JSONObjectResponse res = new JSONObjectResponse();
-		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
+		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
 		try {
 			EntitiesQueryParameter param = new EntitiesQueryParameter(menu.getTemplateModule(), user);
 			param.setEntityCodes(collectCode(codes));
@@ -599,7 +599,7 @@ public class ApiEntityController {
 			String excepts,
 			PageInfo pageInfo, 
 			HttpServletRequest request, ApiUser user) {
-		authService.vaidateUserL2MenuAccessable(user, menuId);
+		authService.validateUserL2MenuAccessable(user, menuId);
 		TemplateSelectionTemplate stmpl = stmplService.getTemplate(stmplId);
 		
 
@@ -644,7 +644,7 @@ public class ApiEntityController {
 			@RequestParam String fields,
 			ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
-		authService.vaidateUserL2MenuAccessable(user, menuId);
+		authService.validateUserL2MenuAccessable(user, menuId);
 		TemplateSelectionTemplate stmpl = stmplService.getTemplate(stmplId);
 		
 		EntitiesQueryParameter param = new EntitiesQueryParameter(stmpl.getModule(), user);
@@ -688,7 +688,7 @@ public class ApiEntityController {
 			@RequestParam(name="codes") String codeStr,
 			ApiUser user) {
 		JSONObjectResponse res = new JSONObjectResponse();
-		SideMenuLevel2Menu menu = authService.vaidateUserL2MenuAccessable(user, menuId);
+		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
 		ArrayEntityProxy.setLocalUser(user);
 		TemplateGroupAction groupAction = tmplGroupService.getTempateGroupAction(actionId);
 		Object vRes = AdminModulesController.validateGroupAction(groupAction, menu, codeStr);

@@ -9,6 +9,7 @@ import cn.sowell.copframe.web.poll.WorkProgress;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.dataserver.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.dataserver.model.modules.pojo.criteria.NormalCriteria;
+import cn.sowell.dataserver.model.modules.service.view.EntityQuery;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 
@@ -23,4 +24,13 @@ public interface ExportService {
 	void startWholeExport(WorkProgress progress, TemplateGroup tmplGroup, boolean withDetail,
 			List<NormalCriteria> criteria, ExportDataPageInfo ePageInfo, UserIdentifier user);
 	String exportDetailExcel(ModuleEntityPropertyParser parser, TemplateDetailTemplate dtmpl) throws Exception;
+	
+	/**
+	 * 开始执行导出线程
+	 * @param progress
+	 * @param query
+	 * @param ePageInfo
+	 * @param withDetail
+	 */
+	void startWholeExport(WorkProgress progress, EntityQuery query, ExportDataPageInfo ePageInfo, Boolean withDetail);
 }

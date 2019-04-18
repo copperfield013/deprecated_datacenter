@@ -49,10 +49,10 @@ public class  AdminMainController {
 		List<SideMenuLevel1Menu> menus = menuService.getSideMenuLevelMenus(user);
 		menus.forEach(l1->{
 			try {
-				authService.vaidateL1MenuAccessable(l1.getId());
+				authService.validateL1MenuAccessable(l1.getId());
 				for(SideMenuLevel2Menu l2 : l1.getLevel2s()) {
 					try {
-						authService.vaidateL2MenuAccessable(l2.getId());
+						authService.validateL2MenuAccessable(l2.getId());
 					} catch (Exception e) {
 						l2disables.put(l2.getId(), true);
 					}

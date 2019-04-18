@@ -23,9 +23,9 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.datacenter.entityResolver.EntityConstants;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.impl.ArrayItemPropertyParser;
-import cn.sowell.datacenter.entityResolver.impl.RelationEntityProxy;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailField;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
@@ -348,7 +348,7 @@ public class EntityExportWriter{
 								if(group.getRelationSubdomain() != null) {
 									//关系列
 									Cell relationValueCell = fieldRow.createCell(FIELD_DATA_COLNUM_START + 1, CellType.STRING);
-									relationValueCell.setCellValue(item.getFormatedProperty(group.getComposite().getName() + "." + RelationEntityProxy.LABEL_KEY));
+									relationValueCell.setCellValue(item.getFormatedProperty(group.getComposite().getName() + "." + EntityConstants.LABEL_KEY));
 									relationValueCell.setCellStyle(arrayFieldValueStyle);
 								}
 								

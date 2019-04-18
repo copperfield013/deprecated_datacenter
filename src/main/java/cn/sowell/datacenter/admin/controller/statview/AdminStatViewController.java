@@ -63,7 +63,7 @@ public class AdminStatViewController {
 			PageInfo pageInfo, 
 			String disabledColIds,
 			HttpServletRequest request) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		model.addAttribute("menu", menu);
 		UserIdentifier user = UserUtils.getCurrentUser();
 		if(menu.getStatViewId() != null) {
@@ -104,7 +104,7 @@ public class AdminStatViewController {
 	@ResponseBody
 	@RequestMapping("/recalc/{menuId}")
 	public AjaxPageResponse recalc(@PathVariable Long menuId) {
-		SideMenuLevel2Menu menu = authService.vaidateL2MenuAccessable(menuId);
+		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		if(menu.getStatViewId() != null) {
 			TemplateStatView vtmpl = statViewService.getTemplate(menu.getStatViewId());
 			if(vtmpl != null) {

@@ -25,6 +25,7 @@ import org.apache.poi.xssf.usermodel.XSSFHyperlink;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,7 @@ import cn.sowell.dataserver.model.modules.bean.EntityPagingIterator;
 import cn.sowell.dataserver.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.dataserver.model.modules.pojo.criteria.NormalCriteria;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
+import cn.sowell.dataserver.model.modules.service.view.EntityQuery;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListColumn;
@@ -96,6 +98,8 @@ public class ExportServiceImpl implements ExportService {
 	@Resource
 	DetailTemplateService dtmplService;
 	
+	@Resource
+	ApplicationContext appContext;
 	
 	private Long exportCacheTimeout = null;
 	
@@ -300,6 +304,7 @@ public class ExportServiceImpl implements ExportService {
 	
 
 	EntityExportWriter entityExportWriter = new EntityExportWriter();
+
 	
 	@Override
 	public String exportDetailExcel(ModuleEntityPropertyParser parser, TemplateDetailTemplate dtmpl) throws Exception {
@@ -337,6 +342,115 @@ public class ExportServiceImpl implements ExportService {
 			os.flush();
 			os.close();
 		}
+	}
+	
+	@Override
+	public void startWholeExport(WorkProgress progress, EntityQuery query, ExportDataPageInfo ePageInfo,
+			Boolean withDetail) {
+		TemplateGroup tmplGroup = query.getTemplateGroup();
+		TemplateListTemplate ltmpl = ltmplService.getTemplate(tmplGroup.getListTemplateId());
+		progress.setTotal(100);
+		progress.setCurrent(0);
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		progress.veni();
+		pFactory.createThread(progress, p->{
+			userCodeService.setUserCode((String) query.getUser().getId());
+			progress.setCurrent(1);
+			XSSFSheet sheet = workbook.createSheet();
+			XSSFRow headerRow = sheet.createRow(1);
+			int colnum = 1;
+			progress.setCurrent(10);
+			CellStyle listHeaderStyle = entityExportWriter.getListHeaderStyle(workbook),
+						listValueStyle = entityExportWriter.getListValueStyle(workbook);
+			for (TemplateListColumn column : ltmpl.getColumns()) {
+				if("number".equals(column.getSpecialField()) || column.getSpecialField() == null){
+					XSSFCell header = headerRow.createCell(colnum++);
+					header.setCellType(CellType.STRING);
+					header.setCellValue(column.getTitle());
+					header.setCellStyle(listHeaderStyle);
+				}
+			}
+			progress.setCurrent(13);
+			progress.appendMessage("开始查询数据...");
+			EntityPagingIterator itr = query.createExportIterator(ePageInfo, appContext);
+			progress.getLogger().success("数据查找完成，共有" + itr.getDataCount() + "条数据。开始处理数据...");
+			progress.setCurrent(20);
+			int entityNumber = 1;
+			progress.setResponseData("totalData", itr.getDataCount());
+			CellStyle linkStyle = entityExportWriter.createLinkStyle(workbook);
+			linkStyle.setAlignment(HorizontalAlignment.CENTER);
+			int lastColnum = 1;
+			while(itr.hasNext()){
+				checkBreaked(progress);
+				ModuleEntityPropertyParser parser = itr.next();
+				XSSFRow row = sheet.createRow(entityNumber + 1);
+				float dataProgress = ((float)entityNumber)/itr.getDataCount();
+				progress.setCurrent(20 + (int)(dataProgress * 50));
+				int j = 1;
+				for (TemplateListColumn column : ltmpl.getColumns()) {
+					if("number".equals(column.getSpecialField()) || column.getSpecialField() == null){
+						XSSFCell cell = row.createCell(j++, CellType.STRING);
+						cell.setCellStyle(listValueStyle);
+						if("number".equals(column.getSpecialField())){
+							cell.setCellValue(entityNumber);
+						}else{
+							cell.setCellValue(FormatUtils.toString(parser.getFormatedProperty(column.getFieldKey())));
+						}
+					}
+				}
+				if(withDetail) {
+					TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
+					String detailSheetName = "entity_" + entityNumber;
+					
+					XSSFCell linkCell = row.createCell(j);
+					XSSFHyperlink link = workbook.getCreationHelper().createHyperlink(HyperlinkType.DOCUMENT);
+					link.setAddress(detailSheetName + "!B2");
+					linkCell.setHyperlink(link);
+					linkCell.setCellValue("详情");
+					linkCell.setCellStyle(linkStyle);
+					
+					
+					XSSFSheet detailSheet = workbook.createSheet(detailSheetName);
+					entityExportWriter.writeDetail(parser, dtmpl, detailSheet, sheet.getSheetName() + "!" + linkCell.getReference());
+				}else {
+					j--;
+				}
+				if(j > lastColnum) {
+					lastColnum = j;
+				}
+				progress.setResponseData("currentData", entityNumber);
+				progress.getLogger().success("已处理数据(" + entityNumber + "/" + itr.getDataCount() + ")，速度" + df.format(itr.getSpeed()) 
+						+ "条/秒，预计还需要" + df.format(itr.getRemainSecond()) + "秒");
+				entityNumber++;
+			}
+			entityExportWriter.wrapBorder(sheet, new CellRangeAddress(1, entityNumber + 1, 1, lastColnum), BorderStyle.MEDIUM);
+			progress.appendMessage("数据处理完成，开始生成文件");
+			writeExportFile(progress.getUUID(), os->{
+				progress.setCurrent(80);
+				workbook.write(os);
+			});
+			progress.getLogger().success("文件生成成功，请点击“下载导出文件”按钮下载导出数据文件");
+			progress.setCurrent(100);
+			progress.setCompleted();
+		}, (p, e)->{
+			if(e instanceof ExportBreakException) {
+				p.getLogger().warn("导出被取消");
+				logger.info("取消导出");
+			}else if(e instanceof IOException) {
+				p.getLogger().error("创建导出文件时发生错误");
+				logger.error("创建导出文件时发生错误", e);
+			}else {
+				p.getLogger().error("导出时发生错误");
+				logger.error("导出时发生错误", e);
+			}
+		}, p->{
+			try {
+				workbook.close();
+			} catch (IOException e) {
+				logger.error("关闭导出工作簿之前发生错误", e);
+			}
+		}).start();
+		
 	}
 
 }
