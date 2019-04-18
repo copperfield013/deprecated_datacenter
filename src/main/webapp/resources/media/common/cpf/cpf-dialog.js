@@ -456,7 +456,9 @@ define(function(require, exports, module){
 				if(page instanceof Page){
 					var result = (callback || $.noop)(isYes, page);
 					if(result !== false){
-						defer.resolve(page);
+						if(isYes){
+							defer.resolve(page);
+						}
 						page.close();
 					}
 				}

@@ -204,6 +204,11 @@ define(function(require, exports, module){
 				if(!$rel.is('.selected')){
 					enableRelation.apply($rel, [$nodeConfig]);
 				}
+			}).on('click', '.btn-remove-relation', function(){
+				var $rel = $(this).closest('.selectable-relations>div');
+				require('dialog').confirm('确认删除该关系节点？').done(function(){
+					$rel.remove();
+				});
 			})
 			//关系名可编辑
 			.on('dblclick', '.selectable-relations>div>.selectable-relation-title', function(){require('utils').toEditContent(this)});
@@ -238,11 +243,11 @@ define(function(require, exports, module){
 				}
 				var $rel = $selectableRelationTmpl.tmpl(tmplData);
 				$rel.data('data-rel', rel);
-				$('.btn-remove-relation', $rel).click(function(){
+				/*$('.btn-remove-relation', $rel).click(function(){
 					require('dialog').confirm('确认删除该关系节点？').done(function(){
 						$rel.remove();
 					});
-				});
+				});*/
 				$('.selectable-relations', $nodeConfig).append($rel);
 			}]);
 		}
@@ -270,9 +275,11 @@ define(function(require, exports, module){
 					$criteriaContainer.empty();
 
 					var $detailArea = $('.relation-criteria-detail', $nodeConfig);
+					var $top = $detailArea.find('>.relation-criteria-detail-top');
+					$top.find('>.criteria-field-search').remove();
 					var $criteriaFieldSearch = 
-							$criteriaFieldSearchTmpl.tmpl()
-									.prependTo($detailArea.children('.criteria-field-search').remove().end());
+							$criteriaFieldSearchTmpl.tmpl().addClass('relation-filter-field-mode')
+									.prependTo($top);
 					var criteriaData = this.data('criteriaData');
 					var initRelConfig = this.data('init-rel-config');
 					if(!criteriaData){
@@ -280,15 +287,19 @@ define(function(require, exports, module){
 							criteriaData = initRelConfig.criterias;
 						}
 					}
+
 					var criteriaHandler = LtmplUpdate.initCriteria({
-						$page					: $page,	
+						$page					: $('.relation-config', $nodeConfig),	
 						$criteriaFieldSearch	: $criteriaFieldSearch,
 						$fieldPickerContainer	: $('#configs-area', $page),
 						moduleName				: relationNode.moduleName,
 						$detailArea				,
 						$criteriaContainer		: $criteriaContainer,
 						$criteriaItemTmpl		: $criteriaItemTmpl,
-						criteriaData			: criteriaData
+						criteriaData			: criteriaData,
+						filterRelLabels			: rel.labels.map(function(item){
+							return {id:item,text:item}
+						})
 					});
 
 					this.data('criteriaHandler', criteriaHandler);
@@ -445,6 +456,25 @@ define(function(require, exports, module){
 		
 		
 	}
+	/*function bindSwitchFilterMode($nodeConfig){
+		$('.relation-filter-mode-switch', $nodeConfig).change(function(){
+			var $criteriaDetail = $('.relation-criteria-detail', $nodeConfig);
+			var checked = $(this).prop('checked');
+			if(checked){
+				$criteriaDetail
+					.addClass('relation-filter-mode-label')
+					.removeClass('relation-filter-mode-field');
+			}else{
+				$criteriaDetail
+					.addClass('relation-filter-mode-field')
+					.removeClass('relation-filter-mode-label');
+			}
+			
+			
+			
+			
+		});
+	}*/
 	
 	function bindNodeTitle($nodeConfig){
 		$('.node-title', $nodeConfig).on('dblclick', function(){

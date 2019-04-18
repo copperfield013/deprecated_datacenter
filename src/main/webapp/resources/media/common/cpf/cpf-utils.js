@@ -1050,6 +1050,66 @@ define(function(require, exports){
 	exports.Subscriber = Subscriber;
 	exports.Subscribers = Subscribers;
 	
+	
+	function Status(_properties){
+		this.properties = $.extend({}, _properties);
+		this.callbacksMap = {}
+	}
+	Status.prototype.getStatus = function(propertyName, defValue){
+		if(this.properties.hasOwnProperty(propertyName)){
+			return this.properties[propertyName];
+		}else{
+			return defValue;
+		}
+	}
+	/**
+	 * 设置状态的字段值
+	 * 第一个参数为字符串时，第二个参数为该字符串对应的字段要设置的值
+	 * 第一个参数为对象时，第二个参数可选为字符串数组，字符串数组表示要覆盖的字段名集合
+	 */
+	Status.prototype.setStatus = function(propertyName, propertyValue){
+		if(typeof propertyName === 'string'){
+			var before = this.properties[propertyName];
+			if(arguments.length == 1){
+				propertyValue = before;
+			}
+			this.properties[propertyName] = propertyValue;
+			this.trigger(propertyName, [{
+				before, after: propertyValue
+			}]);
+		}else if(typeof propertyName === 'object'){
+			if($.isArray(propertyValue)){
+				for(var i = 0; i < propertyValue.length; i++){
+					var pName = propertyValue[i];
+					this.setStatus(pName, propertyName[pName]);
+				}
+			}else{
+				for(var key in propertyName){
+					this.setStatus(key, propertyName[key]);
+				}
+			}
+		}
+		return this;
+	}
+	
+	Status.prototype.bind = function(propertyName, callback){
+		exports.assert(typeof propertyName == 'string' && !!propertyName, '第一个参数必须是不为空的字符串');
+		exports.assert(typeof callback == 'function', '第二个参数必须是函数对象');
+		if(!this.callbacksMap[propertyName]){
+			this.callbacksMap[propertyName] = $.Callbacks('stopOnFalse');
+		}
+		this.callbacksMap[propertyName].add(callback)
+		return this;
+	}
+	
+	Status.prototype.trigger = function(propertyName, parameters){
+		if(this.callbacksMap[propertyName]){
+			this.callbacksMap[propertyName].fireWith(this, parameters);
+		}
+		return this;
+	}
+	exports.createStatus = function(f){return new Status(f)}
+	
 	function returnTrue(){return true;}
 	function returnFalse(){return false;}
 });

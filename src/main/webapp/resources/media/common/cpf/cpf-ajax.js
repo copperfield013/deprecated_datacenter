@@ -5,6 +5,9 @@ define(function(require, exports, module){
 	var $CPF = require('$CPF'),
 		utils = require('utils')
 		;
+	//用于从LocalStorage中获得token，并在ajax请求时传递到后台
+	var AJAX_LOCAL_STORAGE_TOKEN_KEY = 'datacenter-jv-token';
+	var AJAX_HEADER_TOKEN_KEY = 'datacenter-token';
 	
 	$CPF.addDefaultParam({
 		//是否在ajax请求时检测返回session状态
@@ -174,10 +177,18 @@ define(function(require, exports, module){
 			fData = formData;
 		}
 		var method = param.method.toLowerCase();
-		require('console')
-			.debug('发送请求到' + url)
-			.debug(fData)
-			;
+		
+		var headers = {
+		    'request-category'	: 'cpf-ajax'
+	    };
+		var token = localStorage.getItem(AJAX_LOCAL_STORAGE_TOKEN_KEY);
+		if(token){
+			//var isTimeout = new Date().getTime() - tokeObj.time >  $CPF.getParam('ajaxHeaderTokenTimeout');
+			headers[AJAX_HEADER_TOKEN_KEY] = token;
+		}
+		
+		console.debug('发送请求到' + url);
+		console.debug(fData);
 		return $.ajax({
 		    url: 		url,
 		    type: 		method,
@@ -188,9 +199,7 @@ define(function(require, exports, module){
 		    beforeSend	: function(){
 		    	console.log(arguments);
 		    },
-		    headers		: {
-		    	'request-category'	: 'cpf-ajax'
-		    },
+		    headers		: headers,
 		    success		: function(data, status, jqXHR){
 		    	commonHandleSucAjax(data, status, jqXHR);
 		    	var resContentType = utils.trim(jqXHR.getResponseHeader("Content-Type"));

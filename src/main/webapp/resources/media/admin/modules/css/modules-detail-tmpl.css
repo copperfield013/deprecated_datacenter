@@ -741,3 +741,8 @@ div#action-list>a:hover{
 .entity-update-page span.array-item-update.fa.fa-edit:hover {
 	opacity: 0.7;
 }
+.entity-detail-tmpl.entity-update-page .field-input-wrapper>.select2>span.selection>span.select2-selection.select2-selection--multiple {
+    border-radius: 0;
+    margin-top: -2px;
+    
+}

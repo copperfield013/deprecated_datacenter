@@ -170,15 +170,41 @@
 													</div>
 													<div class="criteria-opr-area"><i></i></div>
 			                                	</div>
-												<div class="relation-criteria-detail">
-													<div id="relation-label-row">
+												<div class="relation-criteria-detail relation-filter-mode-field">
+													<div class="relation-criteria-detail-top">
+														<div style="flex:1;">
+															<div style="float:right;position:relative;">
+																<label >          
+																	<input type="checkbox" class="relation-filter-mode-switch checkbox-slider colored-darkorange">
+																	<span class="text">筛选关系名</span>
+																</label>
+															</div>
+														</div>
+													</div>
+													<div class="relation-filter-label-mode">
+														<label>关系名</label>
+														<div id="filter-labels-wrap" style="flex:1;">
+															<select class="input-xs" multiple="multiple">
+															</select>
+														</div>
+													</div>
+													<div class="relation-filter-label-mode">
+														<label>包含关系</label>
+														<div id="filter-labels-exclusion">
+															<select class="input-xs">
+																<option value="0">包含</option>
+																<option value="1">排除</option>
+															</select>
+														</div>
+													</div>
+													<div id="relation-label-row" class="relation-filter-field-mode">
 														<label>关系名</label>
 														<div id="relation-label-value-wrap">
 															<select class="input-xs">
 															</select>
 														</div>
 													</div>
-													<div id="criteria-detail-field-input-type-row">
+													<div id="criteria-detail-field-input-type-row" class="relation-filter-field-mode">
 														<label>控件</label>
 														<div>
 															<select id="field-input-type" class="input-xs">
@@ -187,7 +213,7 @@
 															</select>
 														</div>
 													</div>
-													<div>
+													<div class="relation-filter-field-mode">
 														<label>关系</label>
 														<div>
 															<select id="criteria-detail-comparator" class="input-xs">
@@ -198,7 +224,7 @@
 															</select>
 														</div>
 													</div>
-													<div>
+													<div class="relation-filter-field-mode">
 														<label id="default-value-label">值</label>
 														<div id="criteria-default-value-container">
 														</div>

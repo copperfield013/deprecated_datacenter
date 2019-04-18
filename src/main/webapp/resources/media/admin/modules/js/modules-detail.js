@@ -420,7 +420,7 @@ define(function(require, exports, module){
 		
 		setTimeout(function(){
 			$CPF.showLoading();
-			var Indexer = require('indexer')
+			var Indexer = require('indexer');
 			var indexer = new Indexer({
 				scrollTarget: $page.closest('.main-tab-content')[0],
 				elements	: $('.group-container>.field-group', $page),

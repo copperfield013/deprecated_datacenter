@@ -50,7 +50,7 @@ define(function(require, exports, module){
 		}();
 	}
 	
-	$CPF.putPageInitSequeue(4, function($page){
+	function initFormElement($page){
 		$('form', $page).not('.nform').submit(function(e, handlerFunc){
 			if(typeof CKEDITOR === 'object'){
 				for (var key in CKEDITOR.instances){
@@ -130,6 +130,8 @@ define(function(require, exports, module){
 			//阻止跳转
 			  e.preventDefault();
 		});
+	}
+	function initFormInput($page){
 		//绑定在文本框的回车事件
 		$('form :text', $page).keypress(function(e){
 			if(e.keyCode === 13){
@@ -144,6 +146,12 @@ define(function(require, exports, module){
 		});
 		$('form :text.timepicker', $page).each(function(){
 			require('utils').timepicker(this);
+		});
+		$('form :text.cpf-field-decimal', $page).on('input', function(){
+			this.value = this.value.replace(/[^\d\-\.]/g, '').replace(/^(.+)\-/g, '$1').replace(/(\d+)\.(\d*)\./, '$1.$2');
+		});
+		$('form :text.cpf-field-int', $page).on('input', function(){
+			this.value = this.value.replace(/[^\d\-]/g, '').replace(/(\d+)\-+(\d*)/, '$1$2').replace(/\-+/, '-');
 		});
 		$('form div.cpf-daterangepicker,form span.cpf-daterangepicker,form span.cpf-textrange', $page).each(function(){
 			var $div = $(this);
@@ -162,9 +170,6 @@ define(function(require, exports, module){
 				}
 			}
 		});
-		$('form :text.cpf-field-int', $page).on('input',function(){
-			this.value = this.value.replace(/[^\d\-]/g, '').replace(/(\d+)\-+(\d*)/, '$1$2').replace(/\-+/, '-');
-		})
 		
 		require('select2');
 		if($.fn.select2){
@@ -236,6 +241,11 @@ define(function(require, exports, module){
 			});
 			$this.click(function(){$this.trigger('cpf-toggle-checked')});
 		});
+	}
+	
+	$CPF.putPageInitSequeue(4, function($page){
+		initFormElement($page);
+		initFormInput($page);
 		/**
 		 * 
 		 */
@@ -260,4 +270,6 @@ define(function(require, exports, module){
 	});
 	
 	exports.formatFormData = formatFormData;
+	exports.initFormElement = initFormElement;
+	exports.initFormInput = initFormInput;
 });

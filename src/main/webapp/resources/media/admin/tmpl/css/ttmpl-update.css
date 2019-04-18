@@ -299,3 +299,10 @@ div.relation-criterias>*.criteria-item.criteria-selected:hover {
 
 
 
+.relation-criteria-detail.relation-filter-mode-label .relation-filter-field-mode {
+    display: none !important;
+}
+.relation-criteria-detail.relation-filter-mode-field .relation-filter-label-mode {
+    display: none !important;
+}
+

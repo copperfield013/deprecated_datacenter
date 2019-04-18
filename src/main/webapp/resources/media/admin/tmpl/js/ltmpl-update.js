@@ -118,44 +118,53 @@ define(function(require, exports, module){
 				id				: criteria.getId(),
 				title			: criteria.getTitle(),
 				fieldAvailable	: false,
-				order			: index
+				order			: index,
+				filterMode		: criteria.getFilterMode()
 			};
-			if(criteria.isFieldAvailable()){
-				var composite = criteria.getComposite();
-				if(composite != null){
-					itemData.compositeId = composite.c_id;
-				}else{
-					var field = criteria.getField();
-					if(!field){
-						require('dialog').notice('条件必须选择一个字段', 'error');
-						$.error();
+			if(itemData.filterMode == 'field'){
+				if(criteria.isFieldAvailable()){
+					var composite = criteria.getComposite();
+					if(composite != null){
+						itemData.compositeId = composite.c_id;
 					}else{
-						itemData.fieldId = field.id;
-						itemData.fieldKey = field.name;
+						var field = criteria.getField();
+						if(!field){
+							require('dialog').notice('条件必须选择一个字段', 'error');
+							$.error();
+						}else{
+							itemData.fieldId = field.id;
+							itemData.fieldKey = field.name;
+						}
 					}
+					
+					var relationLabelInput = criteria.getRelationLabelInput();
+					$.extend(itemData, {
+						relation		: 'and',
+						comparator		: criteria.getComparatorName(),
+						inputType		: criteria.getDefaultValueInput().getType(),
+						defVal			: criteria.getDefaultValueInput().getValue(),
+						placeholder		: criteria.getPlaceholder(),
+						partitions		: [],
+						queryShow		: criteria.isQueryShow(),
+						relationLabel 	: relationLabelInput && relationLabelInput.getValue(),
+						fieldAvailable	: true
+					});
 				}
-
-				var relationLabelInput = criteria.getRelationLabelInput();
+				var partitions = criteria.getPartitions();
+				for(var i in partitions){
+					var partition = partitions[i];
+					itemData.push({
+						relation	: partition.getRelation(),
+						comparator	: partition.getComparatorName(),
+						val			: partition.getValue()
+					});
+				}
+			}else if(itemData.filterMode == 'label'){
 				$.extend(itemData, {
-					relation		: 'and',
-					comparator		: criteria.getComparatorName(),
-					inputType		: criteria.getDefaultValueInput().getType(),
-					defVal			: criteria.getDefaultValueInput().getValue(),
-					placeholder		: criteria.getPlaceholder(),
-					partitions		: [],
-					queryShow		: criteria.isQueryShow(),
-					relationLabel 	: relationLabelInput && relationLabelInput.getValue(),
-					fieldAvailable	: true
-				});
-			}
-			var partitions = criteria.getPartitions();
-			for(var i in partitions){
-				var partition = partitions[i];
-				itemData.push({
-					relation	: partition.getRelation(),
-					comparator	: partition.getComparatorName(),
-					val			: partition.getValue()
-				});
+					fieldAvailable	: true,
+					filterLabels	: criteria.getFilterLabels(),
+					isExcludeLabel	: criteria.getFilterExclusion()
+				})
 			}
 			criteriaData.push(itemData);
 		});
@@ -170,15 +179,16 @@ define(function(require, exports, module){
 	
 	function initCriteria($page, criteriaData, module, compositeId){
 		var criteriaParam = {};
+		var filterRelLabels = [];
 		if($page.$page){
 			criteriaParam = $page;
 			$page = criteriaParam.$page;
 			criteriaData = criteriaParam.criteriaData;
 			module = criteriaParam.moduleName;
 			compositeId = criteriaParam.compositeId;
+			filterRelLabels = criteriaParam.filterRelLabels;
 			criteriaParam.$detailArea.hide();
 		}
-		
 		var cField = null,
 			cComposite = null;
 		var $fieldSearch = criteriaParam.$criteriaFieldSearch || $('.criteria-field-search-row .field-search', $page);
@@ -239,6 +249,24 @@ define(function(require, exports, module){
 		
 		;
 		
+		if(filterRelLabels && criteriaParam.$detailArea){
+			$('#filter-labels-wrap>select', criteriaParam.$detailArea).select2({
+				width: '120px',
+				data: filterRelLabels
+			}).change(function(e, isValueSetted){
+				var labels = $(this).val();
+				if(currentCriteria && isValueSetted != true){
+					currentCriteria.setFilterLabels(labels);
+				}
+			});
+
+			$('#filter-labels-exclusion>select', criteriaParam.$detailArea).change(function(e, isValueSetted){
+				if(currentCriteria && isValueSetted != true){
+					currentCriteria.setFilterExclusion($(this).val());
+				}
+			});
+		}
+		
 		/**
 		 * 显示条件详情
 		 */
@@ -281,9 +309,9 @@ define(function(require, exports, module){
 				$('#relation-label-value-wrap', $relationLabelRow)
 					.children().detach()
 					.end().append(labelInput.getDom());
-				$relationLabelRow.show();
+				$relationLabelRow.css('display', 'flex');
 			}else{
-				$relationLabelRow.hide();
+				$relationLabelRow.css('display', 'none');
 			}
 		}
 		
@@ -296,6 +324,17 @@ define(function(require, exports, module){
 				return ;
 			}
 			$criteriaDetailCover.removeClass('cover-active');
+			var isLabelMode = criteria.getFilterMode() == 'label';
+			$('.relation-filter-mode-switch', $page).prop('checked', isLabelMode).trigger('change');
+			if(isLabelMode){
+				$('#filter-labels-wrap>select', $page).val(criteria.getFilterLabels()).trigger('change');
+				$('#filter-labels-exclusion>select', $page).val(criteria.getFilterExclusion()).trigger('change');
+				return;
+			}else{
+				$('#filter-labels-wrap>select', $page).val('').trigger('change');
+				$('#filter-labels-exclusion>select', $page).val('0');
+			}
+
 			var composite = criteria.getComposite();
 			if(composite && composite.__type__ == 'relation'){
 				criteriaSearcher.changeFieldMode('relation');
@@ -320,7 +359,7 @@ define(function(require, exports, module){
 				})
 			}else{
 				var field = criteria.getField();
-				$('#criteria-detail-field-input-type-row', $page).show();
+				$('#criteria-detail-field-input-type-row', $page).css('display', 'flex');
 				if(field){
 					//criteriaSearcher.changeFieldMode('field');
 					$fieldSearchInput.typeahead('val', field.cname);
@@ -372,11 +411,12 @@ define(function(require, exports, module){
 			var $criteria = $criteriaItemTmpl.tmpl({
 				fieldTitle	: '选择字段'
 			});
+			var $criteriaDetail = criteriaParam.$detailArea || $('.criteria-detail-area', $page);
 			var criteria = new Criteria({
 				checkIsCurrent	: function(){
 					return currentCriteria == this;
 				},
-				$detailArea		: criteriaParam.$detailArea || $('.criteria-detail-area', $page),
+				$detailArea		: $criteriaDetail,
 				module			: module
 			}, $page);
 			$criteria.find('.criteria-property-name span').dblclick(function(){
@@ -391,7 +431,7 @@ define(function(require, exports, module){
 				afterSetField		: function(field){
 					$criteria.find('.criteria-property-name span').text(field.cname);
 					criteria.detailHandler(function($$){
-						$$('#criteria-detail-field-input-type-row').show();
+						$$('#criteria-detail-field-input-type-row').css('display', 'flex');
 						filterFieldInputSelectable($$('#field-input-type'), field).done(function(){
 							criteria.setDefaultInputType($$('#field-input-type').val());
 							toggleRelationLabelInput($$('#relation-label-row'), criteria.getRelationLabelInput());
@@ -408,6 +448,24 @@ define(function(require, exports, module){
 							criteria.setDefaultInputType(criteria.getRelationLabelInput());
 						}
 					});
+				},
+				afterSetFilterMode	: function(filterMode){
+					var isFieldMode = filterMode !== 'label';
+					if(isFieldMode){
+						$criteriaDetail
+							.addClass('relation-filter-mode-field')
+							.removeClass('relation-filter-mode-label');
+					}else{
+						$criteriaDetail
+							.addClass('relation-filter-mode-label')
+							.removeClass('relation-filter-mode-field');
+					}
+				},
+				afterSetFilterLabels: function(labels){
+					$('#filter-labels-wrap>select', $page).val(labels).trigger('change', [true]);
+				},
+				afterSetFilterExclusion	: function(isExclude){
+					$('#filter-labels-exclusion>select', $page).val(isExclude == 1? 1: 0);
 				},
 				afterSetPlaceholder	: function(placeholder){
 					$('#criteria-detail-placeholder', $page).val(placeholder);
@@ -533,7 +591,12 @@ define(function(require, exports, module){
 		$('#add-criteria', $page).click(function(){
 			addCriteria();
 		});
-		
+		$('.relation-filter-mode-switch', $page).off('change').change(function(){
+			var filterMode = $(this).prop('checked')? 'label': 'field';
+			handleSelectedItem(function(){
+				this.setFilterMode(filterMode);
+			});
+		});
 		//切换条件显示状态
 		$('#toggle-show-criteria', $page).off('change').change(function(){
 			var toShow = $(this).prop('checked');
@@ -621,6 +684,9 @@ define(function(require, exports, module){
 								}, item), true);
 								addCriteriaItem(index + 1);
 							});
+						}else if(item.filterMode === 'label'){
+							addCriteria(item, true);
+							addCriteriaItem(index + 1);
 						}
 					}
 					$CPF.closeLoading();
@@ -655,13 +721,17 @@ define(function(require, exports, module){
 	 */
 	function Criteria(_param, $page){
 		var defaultParam = {
+			filterMode		: 'field',
+			filterLabels	: '',
+			isExclude		: null,
 			field			: null,
 			composite		: null,
 			queryShow		: true,
 			title			: '',
 			field			: null,
 			module			: null,
-			fieldAvailable	: true
+			fieldAvailable	: true,
+			titleSetted		: false
 		};
 		
 		var param = $.extend({}, defaultParam, _param);
@@ -695,12 +765,58 @@ define(function(require, exports, module){
 					}
 				}else if(data.compositeData){
 					this.setDefaultInputType(this.getRelationLabelInput());
+				}else if(data.filterMode === 'label'){
+					this.setFilterMode('label');
+					this.setFilterLabels(data.filterLabels);
+					this.setFilterExclusion(data.isExcludeLabel);
 				}
 				defaultValueInput.setValue(data.defaultValue || data.defVal);
 			}else{
 				$.error();
 			}
 			
+		}
+		
+		this.setFilterMode = function(filterMode){
+			if(filterMode == 'field' || filterMode == 'label'){
+				if(!param.titleSetted){
+					if(filterMode == 'label'){
+						this.setTitle('筛选关系名', true);
+					}else{
+						this.setTitle('选择字段', true);
+					}
+				}
+				param.filterMode = filterMode;
+				callbackMap.fire('afterSetFilterMode', [filterMode]);
+			}
+		}
+		
+		this.getFilterMode = function(){return param.filterMode}
+		this.getFilterLabels = function(){
+			return param.filterLabels;
+		}
+		this.getFilterExclusion = function(){
+			return param.isExclude;
+		}
+		
+		this.setFilterLabels = function(labels, unrecur){
+			if(param.filterMode === 'label'){
+				if($.isArray(labels)){
+					labels = labels.join();
+				}
+				param.filterLabels = labels;
+				if(!unrecur){
+					callbackMap.fire('afterSetFilterLabels', [labels]);
+				}
+			}
+		}
+		this.setFilterExclusion = function(isExclude, unrecur){
+			if(param.filterMode === 'label'){
+				 param.isExclude = isExclude;
+				 if(!unrecur){
+					callbackMap.fire('afterSetFilterExclusion', [isExclude]);
+				}
+			}
 		}
 		
 		this.addPartition = function(partition){
@@ -767,8 +883,12 @@ define(function(require, exports, module){
 		/**
 		 * 设置条件字段的标题
 		 */
-		this.setTitle = function(_title){
+		this.setTitle = function(_title, ignoreTitleSetted){
 			param.title = _title;
+			if(ignoreTitleSetted != true){
+				param.titleSetted = true;
+			}
+			
 			callbackMap.fire('afterSetTitle', [_title]);
 		}
 		

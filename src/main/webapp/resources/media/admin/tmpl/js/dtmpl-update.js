@@ -387,7 +387,7 @@ define(function(require, exports, module){
 				function loadNodesOptionFromServer(){
 					require('$CPF').showLoading();
 					thisFieldGroupConfigData.rabcTreeNodeOptions = [];
-					require('ajax').ajax('api2/meta/tmpl/tree/ttmpl/' 
+					require('ajax').ajax('api2/meta/tmpl/ttmpl/' 
 							+ thisFieldGroupConfigData.rabcTreeTemplateId).done(function(data){
 						if(data.ttmpl && data.ttmpl){
 							thisFieldGroupConfigData.rabcTreeNodeOptions = convertFromTreeNodes(data.ttmpl.nodes);

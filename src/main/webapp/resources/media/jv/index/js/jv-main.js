@@ -71,14 +71,13 @@ define(function(require){
 		loadingImg			: 'media/admin/cpf/image/loading.gif',
 		innerPageLoadingImg	: 'media/admin/cpf/image/innerpage-loading.gif',
 		maxPageCount		: 8,
-		sessionInvalidURL	: 'admin/login',
-		tabLinkPrefix		: 'admin/',
+		sessionInvalidURL	: 'jv/main/login',
+		tabLinkPrefix		: 'jv/',
 		//加载层最多持续多久后出现关闭加载按钮
 		loadingTimeout		: 7000
 	});
 	$CPF.showLoading();
 	//初始化当前页面
-    $CPF.initPage(document);
     $(document).on('click', function(e){
 		var $this = $(e.target);
 		var $blurHidden = $this.closest('.blur-hidden'); 
@@ -97,8 +96,13 @@ define(function(require){
     	});
     });
     
-    try{
+    /*try{
     	require('main/js/statis-func.js');
-    }catch(e){}
-    $CPF.closeLoading();
+    }catch(e){}*/
+    seajs.use('index/js/index.js', function(Index){
+		Index.init({
+			$page	: document.body
+		});
+		$CPF.closeLoading();
+	});
 });

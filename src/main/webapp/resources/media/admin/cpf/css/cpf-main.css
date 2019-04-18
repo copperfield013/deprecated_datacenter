@@ -160,7 +160,13 @@ li.cpf-paginator-total-count>span {
     border: none;
     color: #555;
     padding: 7px 10px;
-    font-size: 1em;
+    font-size: .9em;
+    text-decoration:underline;
+    cursor: pointer;
+}
+li.cpf-paginator-total-count.counted>span{
+	text-decoration: none;
+	cursor: default;
 }
 li.cpf-paginator-total-count>span:HOVER {
     background-color: inherit;
@@ -807,10 +813,10 @@ span.cpf-select2-sign.cpf-select2-sign-or:after {
 .cpf-field-input-caselectt-sels{
 	display: none;
 	position: absolute;
-    padding: 10px 10px;
-    background-color: #fcfc;
-    border: 3px solid #ccc;
-    white-space: nowrap;
+	padding: 10px 10px;
+	background-color: #bfe399;
+	border: 3px solid #ccc;
+	white-space: nowrap;
 }
 .cpf-field-input-caselect span.cpf-field-input-caselect-input {
     border: 1px solid #ccc;
@@ -1168,4 +1174,8 @@ label.tooltip-label .badge {
 }
 .cpf-choose-table table.table{
 	margin-bottom: 10px;
+}
+
+plh{
+	display: none !important;
 }
