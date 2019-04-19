@@ -4,9 +4,10 @@ define(function(require, exports, module){
 	 * 
 	 */
 	function TextInputTemplateParameter(){
-		this.tmplKey = 'input-text';
 	}
-	$.extend(TextInputTemplateParameter.prototype, new AbstractSingleInputTemplateParameter());
+	$.extend(TextInputTemplateParameter.prototype, new AbstractSingleInputTemplateParameter(), {
+		tmplKey	: 'input-text'
+	});
 	
 	module.exports = TextInputTemplateParameter;
 });

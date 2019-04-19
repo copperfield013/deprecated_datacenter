@@ -4,11 +4,11 @@ define(function(require, exports, module){
 	 * 
 	 */
 	function DecimalInputTemplateParameter(){
-		
+		AbstractSingleInputTemplateParameter.call(this);
+		this.tmplKey = 'input-decimal';
 	}
-	$.extend(DecimalInputTemplateParameter.prototype, new AbstractSingleInputTemplateParameter(), {
-		tmplKey	: 'input-decimal'
-	});
+	
+	require('utils').extendClass(DecimalInputTemplateParameter, AbstractSingleInputTemplateParameter);
 	
 	module.exports = DecimalInputTemplateParameter;
 	

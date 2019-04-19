@@ -3,8 +3,8 @@ define(function(require, exports, module){
 	
 	
 	function SelectInputTemplateParameter(_param){
+		AbstractTemplateParameter.call(this);
 		this.tmplKey = 'input-select';
-		
 		var _this = this;
 		
 		this.param = $.extend({
@@ -19,6 +19,7 @@ define(function(require, exports, module){
 		
 		var fieldOptionsFetcher = this.param.fieldOptionsFetcher;
 		
+		this.setValueChanged(false);
 		
 		this.data = {
 			options			: [],
@@ -44,17 +45,24 @@ define(function(require, exports, module){
 		this.valueGetter = function($dom){
 			return getSelect($dom).val();
 		}
-		this.valueSetter = function($dom, value){
-			return getSelect($dom).val(value);
+		this.valueSetter = function($dom, value, initValueFlag){
+			return getSelect($dom).val(value).trigger('change',  [initValueFlag]);
 		}
 		this.afterRender = function($dom){
 			fieldOptionsFetcher.afterCommit(function(){
-				bindSelect2(getSelect($dom), _this.param);
+				var $select = getSelect($dom);
+				bindSelect2($select, _this.param);
+				$select.change(function(e, initValueFlag){
+					if(initValueFlag !== true){
+						_this.setValueChanged(true);
+					}
+				});
 			});
 		}
 	}
+	require('utils').extendClass(SelectInputTemplateParameter, AbstractTemplateParameter);
 	
-	$.extend(SelectInputTemplateParameter.prototype, new AbstractTemplateParameter());
+	//$.extend(SelectInputTemplateParameter.prototype, new AbstractTemplateParameter());
 	
 	function bindSelect2($select, param){
 		var tags = param.tags, 

@@ -2,7 +2,9 @@ define(function(require, exports, module){
 	var AbstractTemplateParameter = require('entity/js/entity-detail-input').AbstractTemplateParameter;
 	
 	function FileInputTemplateParameter(_param){
-		
+		AbstractTemplateParameter.call(this);
+		this.tmplKey	= 'input-file'
+		var _this = this;
 		var param = $.extend({
 			maxSize		: 4096		//文件不得大于4M
 		}, _param);
@@ -12,7 +14,7 @@ define(function(require, exports, module){
 		//当前通过表单控件选择的系统文件对象
 		var inputFile = null;
 		//文件是否被修改过
-		var fileChanged = false;
+		this.setValueChanged(false);
 		
 		var $thumb = $('<span class="cpf-file-input-thumb">');
 		var $operates = buildOperates();
@@ -64,7 +66,7 @@ define(function(require, exports, module){
 				require('dialog').confirm('是否移除该文件？', function(yes){
 					if(yes){
 						showFileChooser();
-						fileChanged = true;
+						_this.valueChanged = true;
 					}
 				});
 			});
@@ -114,7 +116,7 @@ define(function(require, exports, module){
 				}
 				inputFile = fileData.file;
 				$operates.find('.fa-download').hide();
-				fileChanged = true;
+				_this.valueChanged = true;
 			}else if(fileData.src || fileData.url){
 				var src = fileData.src || fileData.url;
 				var index = src.lastIndexOf('/');
@@ -184,9 +186,7 @@ define(function(require, exports, module){
 		}
 	}
 	
-	$.extend(FileInputTemplateParameter.prototype, new AbstractTemplateParameter(), {
-		tmplKey	: 'input-file'
-	});
+	require('utils').extendClass(FileInputTemplateParameter, AbstractTemplateParameter);
 	
 	module.exports = FileInputTemplateParameter;
 	

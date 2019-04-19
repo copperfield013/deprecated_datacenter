@@ -2,16 +2,17 @@ define(function(require, exports, module){
 	var AbstractTemplateParameter = require('entity/js/entity-detail-input').AbstractTemplateParameter;
 	
 	function CaselectInputTemplateParameter(_param){
+		AbstractTemplateParameter.call(this);
+		this.tmplKey = 'input-caselect';
 		this.param = $.extend({
 			optionsKey	: ''
 		}, _param);
 		
 		var _this = this;
-		
+		this.setValueChanged(false);
 		var value = '';
 		var disabled = false;
 		var CAS_SPLITER = '->';
-		var valueChanged = true;
 		
 		var optionsKey = _param.optionsKey;
 		var fieldGroupId = null;
@@ -26,7 +27,6 @@ define(function(require, exports, module){
 		}
 		
 		var $selectsContainer = buildSelectsContainer();
-		
 		
 		this.valueGetter = function(){
 			return getValue();
@@ -48,7 +48,7 @@ define(function(require, exports, module){
 			return val;
 		}
 		
-		this.valueSetter = function($span, val){
+		this.valueSetter = function($span, val, initValueFlag){
 			var $input = getInput($span);
 			$input.text(val);
 			appendOption($selectsContainer.children('select').eq(0), fieldGroupId, val).done(function(valArr){
@@ -63,6 +63,9 @@ define(function(require, exports, module){
 				}
 				$input.text(valStr);
 			});
+			if(initValueFlag !== true){
+				_this.setValueChanged(true);
+			}
 			
 			value = val;
 		}
@@ -101,6 +104,7 @@ define(function(require, exports, module){
 					var $this = $(this);
 					var groupId = $this.val();
 					appendOption($this.next('select'), groupId);
+					_this.setValueChanged(true);
 				});
 				$span.append($select);
 			}
@@ -173,10 +177,7 @@ define(function(require, exports, module){
 		}
 		
 	}
-	
-	$.extend(CaselectInputTemplateParameter.prototype, new AbstractTemplateParameter(), {
-		tmplKey		: 'input-caselect'
-	});
+	require('utils').extendClass(CaselectInputTemplateParameter, AbstractTemplateParameter);
 	
 	module.exports = CaselectInputTemplateParameter;
 	

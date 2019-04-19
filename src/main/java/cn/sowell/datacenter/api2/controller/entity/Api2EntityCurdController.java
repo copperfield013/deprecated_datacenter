@@ -25,9 +25,11 @@ import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.copframe.dto.page.PageInfo;
 import cn.sowell.copframe.utils.JsonUtils;
 import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.datacenter.admin.controller.modules.AdminModulesController;
 import cn.sowell.datacenter.api2.controller.Api2Constants;
 import cn.sowell.datacenter.common.ApiUser;
 import cn.sowell.datacenter.common.EntityQueryPoolUtils;
+import cn.sowell.datacenter.common.RequestParameterMapComposite;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.api2.service.MetaJsonService;
 import cn.sowell.datacenter.model.api2.service.TemplateJsonParseService;
@@ -291,7 +293,46 @@ public class Api2EntityCurdController {
 		return jRes;
 	}
 	
-	
+	@ResponseBody
+	@RequestMapping("/save/{menuId}")
+	public ResponseJSON save(
+			@PathVariable Long menuId,
+			@RequestParam(value=Api2Constants.KEY_FUSE_MODE, required=false) Boolean fuseMode,
+			@RequestParam(value=Api2Constants.KEY_ACTION_ID, required=false) Long actionId,
+    		RequestParameterMapComposite composite, ApiUser user) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
+		String moduleName = menu.getTemplateModule();
+		Map<String, Object> entityMap = composite.getMap();
+		if(actionId != null) {
+			ArrayEntityProxy.setLocalUser(user);
+			TemplateGroupAction groupAction = tmplGroupService.getTempateGroupAction(actionId);
+			AdminModulesController.validateGroupAction(groupAction, menu, "");
+			entityMap = atmplService.coverActionFields(groupAction, entityMap);
+		}
+    	 try {
+    		 entityMap.remove(Api2Constants.KEY_FUSE_MODE);
+    		 entityMap.remove(Api2Constants.KEY_ACTION_ID);
+    		 String code = null;
+    		 EntityQueryParameter param = new EntityQueryParameter(moduleName, user);
+    		 Long tmplGroupId = menu.getTemplateGroupId();
+    		 TemplateGroup tmplGroup = tmplGroupService.getTemplate(tmplGroupId);
+    		 param.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(tmplGroup.getDetailTemplateId(), user));
+    		 if(Boolean.TRUE.equals(fuseMode)) {
+    			 code = entityService.fuseEntity(param, entityMap);
+    		 }else {
+    			 code = entityService.mergeEntity(param, entityMap);
+    		 }
+    		 if(code != null) {
+    			 jRes.put("code", code);
+    			 jRes.setStatus("suc");
+    		 }
+         } catch (Exception e) {
+        	 logger.error("保存实体时出现异常", e);
+        	 jRes.setStatus("error");
+         }
+		return jRes;
+	}
 	
 	@ResponseBody
 	@RequestMapping("/do_action/{menuId}/{actionId}")

@@ -14,7 +14,7 @@
 		<div id="actions-container" class="init">
 			<div id="action-list">
 				{{each(i, action) innerActions}}
-					<a class="btn btn-azure shiny" href="javascript:;" title="${action.title }" on-click="do:doAction(${action.id})">
+					<a class="btn btn-azure shiny" href="javascript:;" title="${action.title }" on-click="do:doAction(innerActions[${i}])">
 						{{if action.iconClass}}
 							<i class="${action.iconClass }"></i>
 						{{/if}}
@@ -28,7 +28,7 @@
 
 <script id="outgoing-actions">
 	{{each(i, action) outgoingActions}}
-		<a class="btn-action-outgoing" on-click="do:doAction(${action.id})" href="javascript:;" title="${action.title }">
+		<a class="btn-action-outgoing" on-click="do:doAction(outgoingActions[${i})" href="javascript:;" title="${action.title }">
 			<i class="${action.iconClass }"></i>
 		</a>
 	{{/each}}
@@ -130,7 +130,7 @@
 			<td>${j + 1 }</td>
 			{{if group.relationSubdomain}}
 				<td>
-					<select>
+					<select class="array-item-relation-label-select">
 						{{each(k, label) group.relationSubdomain }}
 							<option value="${label}" ${label === arrayItem.relationLabel? 'checked="checked"': ''}>${label}</option>
 						{{/each}}
@@ -145,7 +145,7 @@
 				</td>
 			{{/each}}
 			<td>
-				<span class="array-item-remove" title="移除当前行">×</span>
+				<span class="array-item-remove" title="移除当前行"  on-click="removeRow">×</span>
 			</td>
 		</tr>
 	{{/each}}
@@ -156,7 +156,7 @@
 		<td>${rownum}</td>
 		{{if group.relationSubdomain}}
 			<td>
-				<select>
+				<select class="array-item-relation-label-select">
 					{{each(k, label) group.relationSubdomain }}
 						<option value="${label}">${label}</option>
 					{{/each}}
@@ -171,7 +171,7 @@
 			</td>
 		{{/each}}
 		<td>
-			<span class="array-item-remove" title="移除当前行">×</span>
+			<span class="array-item-remove" title="移除当前行" on-click="removeRow">×</span>
 		</td>
 	</tr>
 </script>

@@ -26,6 +26,7 @@ define(function(require, exports, module){
 		var $CPF = require('$CPF');
 		var DetailInput = require('entity/js/entity-detail-input.js');
 		var Fetcher = require('field/js/field-option-fetcher.js');
+		var Content = require('entity/js/entity-detail-content.js');
 		//覆盖渲染实体的普通字段
 		var fieldOptionsFetcher = new Fetcher();
 		$CPF.showLoading();
@@ -35,6 +36,7 @@ define(function(require, exports, module){
 				.bind('dtmpl', renderFrame)
 				.bind('premises', renderPremises)
 				;
+			status.setStatus('content', new Content());
 			switch(param.mode){
 				case 'add':
 					status
@@ -122,7 +124,14 @@ define(function(require, exports, module){
 						var $fieldGroup = $(this).closest('.field-group');
 						var $tbody = $('tbody', $fieldGroup);
 						var rownum = $('>tr', $tbody).length;
-						var $row = createUpdateArrayItemRow(group, rownum);
+						var content = status.getStatus('content');
+						var contentComposite = content.getArrayComposite(group.composite.name);
+						var contentRow = contentComposite.addRow();
+						var $row = createUpdateArrayItemRow(group, rownum, function(){
+							contentRow.addInput(this);
+						});
+						$row.data('content-row', contentRow);
+						contentRow.setRelationLabelSelect($row.find('select.array-item-relation-label-select'));
 						$tbody.append($row);
 						refreshPagination($tbody, 'last');
 					}
@@ -133,17 +142,22 @@ define(function(require, exports, module){
 			}
 			
 			
-			function createUpdateArrayItemRow(group, rownum){
+			function createUpdateArrayItemRow(group, rownum, inputCallback){
 				var $row = tmplMap['create-array-item-row'].tmpl({
 					group, rownum
+				}, {
+					removeRow	: removeArrayItemRow						
 				});
 				tmplMap['group-field-input'].replaceFor(
 					$('style[target="array-item-field-input"]', $row), {}, {}, 
 					function($span, data, isLast){
 						var field = data.data.field;
-						createFieldInput(field, field.fieldName)
+						var fieldName = toCompositeFieldName(field, group.composite.name);
+						createFieldInput(field, fieldName)
 							.done(function(dom){
 								$span.append(dom);
+								this.enableDefaultValue();
+								(inputCallback || $.noop).apply(this, [dom]);
 							});
 					});
 				return $row;
@@ -186,15 +200,25 @@ define(function(require, exports, module){
 			}
 			
 			function doSave(){
+				var Dialog = require('dialog');
 				validate();
 				var fuseMode = status.getStatus('fuseMode');
 				var msg = '是否保存？';
 				if(fuseMode){
 					msg = '是否保存（当前为融合模式）';
 				}
-				require('dialog').confirm(msg).done(function(){
+				Dialog.confirm(msg).done(function(){
 					var formData = getSubmitData();
-					require('ajax').ajax('api2/entity/curd/save', formData);
+					console.log(formData);
+					require('utils').writeFormData(formData);
+					require('ajax').ajax('api2/entity/curd/save/' + param.menuId, formData, function(data){
+						if(data.status === 'suc'){
+							Dialog.notice('保存成功', 'success');
+							$page.getLocatePage().refresh();
+						}else{
+							Dialog.notice('保存失败', 'error');
+						}
+					});
 				});
 			}
 			
@@ -204,6 +228,44 @@ define(function(require, exports, module){
 			
 			function getSubmitData(){
 				var formData = new FormData();
+				var fuseMode = status.getStatus('fuseMode');
+				
+				//设置实体的code
+				var entity = status.getStatus('entity');
+				if(entity){
+					formData.append('唯一编码', entity.code);
+				}
+				//获得当前实体的内容
+				var content = status.getStatus('content');
+				//普通的字段
+				$.each(content.normalInputs, function(){
+					if(this.isValueChanged()){
+						this.appendToFormData(formData, this.getName());
+					}
+				});
+				//遍历所有数组字段组
+				content.forEachArrayComposites(function(){
+					var compositeName = this.compositeName;
+					//判断是否有相同的compositeName
+					formData.set(compositeName + '.$$flag$$', true);
+					
+					//遍历当前composite内的所有行
+					$.each(this.rows, function(rowIndex){
+						var namePrefix = compositeName + '[' + rowIndex + '].';
+						//设置code
+						if(this.entityCode) formData.set(namePrefix + '唯一编码', this.entityCode);
+						//设置关系名
+						var relationLabel = this.getRelationLabel();
+						if(relationLabel) formData.set(namePrefix + '$$label$$', relationLabel);
+						//遍历当前行的所有表单
+						$.each(this.inputs, function(){
+							if(this.isValueChanged()){
+								var name = namePrefix + this.getName();
+								this.appendToFormData(formData, name);
+							}
+						});
+					});
+				});
 				
 				return formData;
 			}
@@ -236,20 +298,22 @@ define(function(require, exports, module){
 			//根据详情模板来渲染表单
 			function renderDetailInputs(){
 				var dtmpl = this.getStatus('dtmpl');
+				var content = this.getStatus('content');
 				if(dtmpl){
 					tmplMap['group-field-input'].replaceFor(
 							$('style[target="group-field"]', $page), function(field){
 								return {field};
 							}, {}, function($span, data, isLast){
 								var field = data.field;
-								createFieldInput(field, data.field.fieldName)
+								createFieldInput(field, data.field.name)
 									.done(function(dom){
 										$span.append(dom);
 										addInputValueSetSequence(this, field);
+										//将普通表单添加到content
+										content.addNormalInput(this);
 									}).progress(function(progress){
 										if(progress === 'prepared'){
-											if(isLast){
-												console.warn('commit');
+											if(isLast){;
 												fieldOptionsFetcher.commit().done(function(){
 													status.setStatus('normalFieldInputInited', true);
 												});
@@ -272,31 +336,59 @@ define(function(require, exports, module){
 					fieldId				: field.fieldId,
 					optionsKey			: field.optionGroupKey,
 					fieldOptionsFetcher,
-					$container			: $page.find('.field-input-container')
+					$container			: $page.find('.field-input-container'),
+					defaultValue		: field.dv
 				});
 				detailInput.setName(fieldName);
 				return detailInput.renderDOM();
 			}
-
+			/**
+			 * 移除行的回调
+			 */
+			function removeArrayItemRow(){
+				var $row = $(this).closest('tr');
+				var contentRow = $row.data('content-row');
+				if(contentRow){
+					require('dialog').confirm('确定移除该行？').done(function(){
+						var $tbody = $row.closest('tbody');
+						$row.remove();
+						contentRow.remove();
+						refreshPagination($tbody);
+					});
+				}
+			}
+			
 			function renderArrayItems(){
 				var entity = this.getStatus('entity');
+				var content = this.getStatus('content');
 				//覆盖渲染实体的数组字段
 				tmplMap['update-array-item-rows']
 					.replaceFor($('style[target="array-item-rows"]', $page), function(group){
 					return {entity, group}
-				}, {}, function($rows){
+				}, {
+					removeRow	: removeArrayItemRow
+				}, function($rows, fieldGroupData){
+					//添加一个arrayComposite
+					var compositeName = fieldGroupData.group.composite.name;
+					var contentComposite = content.addArrayComposite(compositeName);
 					var $fieldGroup = $rows.closest('.field-group');
 					$rows.filter('tr').each(function(){
 						var $row = $(this);
+						var contentRow = contentComposite.addRow();
+						$row.data('content-row', contentRow);
+						contentRow.setEntityCode($row.attr('data-code'));
+						contentRow.setRelationLabelSelect($row.find('select.array-item-relation-label-select'));
 						tmplMap['group-field-input'].replaceFor(
 								$('style[target="array-item-field-input"]', $row), {}, {}, 
 								function($span, data, isLast){
 									var field = data.data.field;
 									var arrayItem = data.data.arrayItem;
-									createFieldInput(field, field.fieldName)
+									var fieldName = toCompositeFieldName(field, compositeName);
+									createFieldInput(field, fieldName)
 										.done(function(dom){
 											$span.append(dom);
-											this.setValue(arrayItem.fieldMap[field.id]);
+											this.setValue(arrayItem.fieldMap[field.id], true);
+											contentRow.addInput(this);
 										});
 								});
 					});
@@ -304,22 +396,40 @@ define(function(require, exports, module){
 				});
 			}
 			
-			var inputValueSetSequence = [];
+			function toCompositeFieldName(field, compositeName){
+				return field.name.substring(compositeName.length + 1);
+			}
+			
+			//用于延迟设置普通字段值的序列
+			var normalInputValueSetSequence = [];
 			function addInputValueSetSequence(detailInput, field){
-				inputValueSetSequence.push({detailInput, field});
+				normalInputValueSetSequence.push({detailInput, field});
 			}
 
 			function setDetailInputsValue(){
 				var entity = this.getStatus('entity');
 				var normalFieldInputInited = this.getStatus('normalFieldInputInited');
-				if(entity && normalFieldInputInited){
-					while(1){
-						var f = inputValueSetSequence.shift();
-						if(!f) break;
-						var value = entity.fieldMap[f.field.id];
-						f.detailInput.setValue(value);
+				if(param.mode === 'add'){
+					if(normalFieldInputInited){
+						//创建模式下，有默认值的表单设置默认值
+						while(1){
+							var f = normalInputValueSetSequence.shift();
+							if(!f) break;
+							f.detailInput.enableDefaultValue(true);
+						}
+						$CPF.closeLoading();
 					}
-					$CPF.closeLoading();
+				}else if(param.mode === 'update'){
+					//修改模式下，为表单设置实体字段值
+					if(entity && normalFieldInputInited){
+						while(1){
+							var f = normalInputValueSetSequence.shift();
+							if(!f) break;
+							var value = entity.fieldMap[f.field.id];
+							f.detailInput.setValue(value, true);
+						}
+						$CPF.closeLoading();
+					}
 				}
 			}
 			
@@ -538,9 +648,12 @@ define(function(require, exports, module){
 				$paginationContainer.remove();
 				$tbody.children('tr').addClass('show-page-row');
 			}else{
+				var initPageNo = 1; 
 				if($paginationContainer.length == 0){
 					$paginationContainer = buildPaginationContainer();
 					$widgetHeader.append($paginationContainer);
+				}else{
+					initPageNo = parseInt($paginationContainer.find('ul.pagination>li.active').text());
 				}
 				var $paginationList = $paginationContainer.children('ul');
 				var $firstLi = $paginationList.children('li.page-first');
@@ -560,7 +673,7 @@ define(function(require, exports, module){
 				if(goPageNo === 'last'){
 					goPageNo = pageCount;
 				}else{
-					goPageNo = goPageNo || 1;
+					goPageNo = goPageNo || initPageNo;
 				}
 				goPage(goPageNo, $paginationList, $tbody);
 			}

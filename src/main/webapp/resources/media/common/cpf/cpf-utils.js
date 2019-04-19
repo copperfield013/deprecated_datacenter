@@ -840,6 +840,11 @@ define(function(require, exports){
 		    scrollbarWidth = oP.offsetWidth - oP.clientWidth;
 		    oP.remove();
 		    return scrollbarWidth;
+		},
+		writeFormData	: function(formData){
+			formData.forEach(function(value, key){
+				console.log(key, value);
+			});
 		}
 	});
 	

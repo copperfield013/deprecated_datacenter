@@ -12,11 +12,16 @@ define(function(require, exports, module){
 			$page				: null,
 			labelKey			: null,
 			$container			: null,
-			fieldOptionsFetcher	: null
+			fieldOptionsFetcher	: null,
+			defaultValue		: ''
 		}, _param);
 		this.dom = null
 		this.name = null;
 		var _this = this;
+		this.formDataAppender = null;
+		this.valueGetter = null;
+		this.valueSetter = null;
+		this.valueChangedGetter = null;
 		this.ui = {
 			tipError	: function($dom, message){
 				var $dom = $($dom);
@@ -38,17 +43,42 @@ define(function(require, exports, module){
 	
 	
 	$.extend(DetailInput.prototype, {
+		getName		: function(){
+			return this.name;
+		},
 		setName		: function(name){
 			this.name = name;
+		},
+		appendToFormData	: function(formData, formName){
+			if(this.formDataAppender){
+				return this.formDataAppender.apply(this, [this.dom, formData, formName]);
+			}else{
+				var val = this.getValue();
+				if(val !== undefined && val !== null){
+					formData.set(formName, this.getValue());
+				}
+			}
 		},
 		getValue	: function(){
 			if(this.valueGetter){
 				return this.valueGetter.apply(this, [this.dom]);
 			}
 		},
-		setValue	: function(val){
+		setValue	: function(val, initValueFlag){
 			if(this.valueSetter){
-				return this.valueSetter.apply(this, [this.dom, val]);
+				return this.valueSetter.apply(this, [this.dom, val, initValueFlag]);
+			}
+		},
+		enableDefaultValue	: function(initValueFlag){
+			if(this.param.defaultValue){
+				this.setValue(this.param.defaultValue, initValueFlag);
+			}
+		},
+		isValueChanged	: function(){
+			if(this.valueChangedGetter){
+				return this.valueChangedGetter(this, [this.dom]);
+			}else{
+				return true;
 			}
 		},
 		renderDOM	: function(){
@@ -64,6 +94,8 @@ define(function(require, exports, module){
 							}, tmplParam.data), tmplParam.events);
 							_this.valueGetter = tmplParam.valueGetter;
 							_this.valueSetter = tmplParam.valueSetter;
+							_this.valueChangedGetter = tmplParam.isValueChanged;
+							_this.formDataAppender = tmplParam.formDataAppender;
 							tmplParam.afterRender.apply(_this, [_this.dom]);
 							defer.resolveWith(_this, [_this.dom]);
 						});
@@ -73,9 +105,6 @@ define(function(require, exports, module){
 				defer.resolveWith(_this, [_this.dom]);
 			}
 			return defer.promise();
-		},
-		appendToFormData	: function(formData){
-			
 		},
 		_getTemplateParameter	: function(){
 			var defer = $.Deferred();
@@ -94,7 +123,7 @@ define(function(require, exports, module){
 			}
 			switch(this.param.type){
 				case 'text':
-					prepare(require('entity/js/tmpl_param/NormalInputTemplateParameter'));
+					prepare(require('entity/js/tmpl_param/TextInputTemplateParameter'));
 					break
 				case 'int':
 					prepare(require('entity/js/tmpl_param/IntInputTemplateParameter'));
@@ -152,6 +181,14 @@ define(function(require, exports, module){
 		this.tmplKey = 'input-unknown';
 		this.data = {};
 		this.events = {};
+		this.valueChanged = true;
+		var _this = this;
+		this.isValueChanged = function($dom){
+			return _this.valueChanged;
+		}
+		this.setValueChanged = function(valueChanged){
+			_this.valueChanged = valueChanged;
+		}
 	}
 	AbstractTemplateParameter.prototype.prepare = function(resolve){resolve()};
 	AbstractTemplateParameter.prototype.valueGetter = function($dom){};
@@ -159,8 +196,8 @@ define(function(require, exports, module){
 	AbstractTemplateParameter.prototype.afterRender = function($dom){};
 	AbstractTemplateParameter.prototype.setReadonly = function($dom){};
 	AbstractTemplateParameter.prototype.setDisabled = function($dom){};
-	AbstractTemplateParameter.prototype.isValueChanged = function($dom){return true};
 	AbstractTemplateParameter.prototype.validate = function($span, ui){};
+	AbstractTemplateParameter.prototype.formDataAppender = null;
 	
 	DetailInput.AbstractTemplateParameter = AbstractTemplateParameter;
 	

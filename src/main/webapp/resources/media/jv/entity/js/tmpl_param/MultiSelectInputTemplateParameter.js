@@ -3,6 +3,8 @@ define(function(require, exports, module){
 	
 	
 	function MultiSelectInputTemplateParameter(_param){
+		AbstractTemplateParameter.call(this);
+		this.tmplKey = 'input-multiselect';
 		var _this = this;
 		
 		this.param = $.extend({
@@ -13,6 +15,8 @@ define(function(require, exports, module){
 		
 		var fieldOptionsFetcher = this.param.fieldOptionsFetcher;
 		
+		_this.setValueChanged(false);
+		
 		this.data = {
 			options	: []
 		}
@@ -21,7 +25,7 @@ define(function(require, exports, module){
 			return getSelect($dom).val();
 		}
 		
-		this.valueSetter = function($dom, val){
+		this.valueSetter = function($dom, val, initValueFlag){
 			if(val){
 				var value = [];
 				if($.isArray(val)){
@@ -29,7 +33,7 @@ define(function(require, exports, module){
 				}else if(typeof val === 'string'){
 					value = val.split(',');
 				}
-				getSelect($dom).val(value).trigger('change');
+				getSelect($dom).val(value).trigger('change', [initValueFlag]);
 			}
 		}
 		
@@ -51,7 +55,13 @@ define(function(require, exports, module){
 		}
 		this.afterRender = function($dom){
 			fieldOptionsFetcher.afterCommit(function(){
-				bindSelect2(getSelect($dom));
+				var $select = getSelect($dom);
+				bindSelect2($select);
+				$select.change(function(e, initValueFlag){
+					if(initValueFlag !== true){
+						_this.setValueChanged(true);
+					}
+				})
 			});
 		}
 	}
@@ -64,9 +74,7 @@ define(function(require, exports, module){
 		});
 	}
 	
-	$.extend(MultiSelectInputTemplateParameter.prototype, new AbstractTemplateParameter(), {
-		tmplKey	: 'input-multiselect'
-	});
+	require('utils').extendClass(MultiSelectInputTemplateParameter, AbstractTemplateParameter);
 	
 	module.exports = MultiSelectInputTemplateParameter;
 });
