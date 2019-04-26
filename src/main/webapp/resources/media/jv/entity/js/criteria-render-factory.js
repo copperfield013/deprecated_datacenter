@@ -1,5 +1,5 @@
 define(function(require, exports, modules){
-	
+	var FORM_GROUP_VALUE_FUNC_KEY = 'input-value-func';
 	/**
 	 * 
 	 */
@@ -35,7 +35,7 @@ define(function(require, exports, modules){
 			return $formGroup;
 		}
 
-		var FORM_GROUP_VALUE_FUNC_KEY = 'input-value-func';
+		
 		function bindInputValFunction($formGroup, $input){
 			switch(param.tCriteria.inputType){
 				case 'text':
@@ -46,6 +46,18 @@ define(function(require, exports, modules){
 					
 			}
 		}
+	}
+	
+	exports.collectCriterias = function($form){
+		var criterias = {};
+		$('.form-group[criteria-id]', $form).each(function(){
+			var $formGroup = $(this);
+			var inputValueFunc = $formGroup.data(FORM_GROUP_VALUE_FUNC_KEY);
+			if(inputValueFunc){
+				criterias['criteria_' + $formGroup.attr('criteria-id')] = inputValueFunc();
+			}
+		});
+		return criterias;
 	}
 	
 	exports.getRenderer = function(tCriteria, options){
@@ -64,5 +76,43 @@ define(function(require, exports, modules){
 			defer.resolve(renderer);
 		});
 		return defer.promise();
+	}
+	
+	exports.replaceFor = function(criterias, $plh){
+		var fieldIds = [];
+		$.each(criterias, function(){
+			if(['select', 'multiselect'].indexOf(this.inputType) >= 0){
+				fieldIds.push(this.fieldId)
+			}
+		});
+		function doRender(optionsMap){
+			var originArray = $plh.data('plh-dom');
+			if(originArray){
+				originArray.remove();
+			}
+			var $formGroupArray = $();
+			$.each(criterias, function(i){
+				var tCriteria = this;
+				var options = optionsMap && this.fieldId? optionsMap[this.fieldId]: [];
+				exports.getRenderer(tCriteria, options).done(function(criteriaRenderer){
+					var $formgroup = criteriaRenderer.render(tCriteria.defaultValue);
+					if($formgroup){
+						$formGroupArray = $formGroupArray.add($formgroup);
+					}
+					if(i == criterias.length - 1){
+						$plh.after($formGroupArray).data('plh-dom', $formGroupArray);
+						require('form').initFormInput($plh.closest('form'));
+					}
+				});
+			});
+		}
+		if(fieldIds.length > 0){
+			//到后台请求枚举数据
+			require('ajax').ajax('api2/meta/dict/field_options', {fieldIds: fieldIds.join()}, function(data){
+				doRender(data.optionsMap);
+			});
+		}else{
+			doRender();
+		}
 	}
 });

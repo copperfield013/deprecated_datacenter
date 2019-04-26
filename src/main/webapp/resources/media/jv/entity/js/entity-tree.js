@@ -33,7 +33,7 @@ define(function(require, exports, module){
 				$('#entities-tree-container', $page).addClass('cpf-tree-id-' + data.tmplGroup.treeTemplateId);
 			}
 				
-			initPage($.extend({
+			initTree($.extend({
 				queryKey		: data.queryKey,
 				defaultNodeTmpl	: data.nodeTmpl,
 				isRenderButton	: 
@@ -42,21 +42,30 @@ define(function(require, exports, module){
 					&& data.tmplGroup.hideQueryButton != 1
 			}, param))
 		});
-		
-		
 	}
 	
-	function initPage(_param){
+	
+	function initTree(_param){
 		var defParam = {
 			$page			: null,
 			queryKey		: null,
 			defaultNodeTmpl	: null,
-			menuId			: null
+			menuId			: null,
+			renderOperates	: true,
+			checkableNodeIds: []
 		};
 		var param = $.extend({}, defParam, _param);
 		
 		var $page = param.$page;
 		var $criteriaForm = $('#criteria-form', $page);
+		
+		var events = {}; 
+		
+		function getEvent(eventName){
+			var event = events[eventName];
+			if(!events[eventName]){events[eventName] = $.Callbacks('stopOnFalse')}
+			return events[eventName];
+		}
 		
 		require('tmpl').load('media/jv/entity/tmpl/entity-tree.tmpl').done(function(tmplMap){
 			
@@ -66,13 +75,10 @@ define(function(require, exports, module){
 				$loadMoreTmpl = tmplMap['load-more-tmpl'],
 				$relsTmpl = tmplMap['rels-tmpl'];
 			
-			//渲染条件按钮
+			//渲染查询按钮
 			renderButton(param.isRenderButton);
 			//加载根节点的第一页节点
 			renderFirstPage(param.queryKey);
-			
-			bindFooterEvent();
-			
 			
 			function renderFirstPage(queryKey){
 				$entitiesTreeContainer.empty();
@@ -111,7 +117,15 @@ define(function(require, exports, module){
 				var $lis = [];
 				$.each(nodes, function(){
 					uuidMap[this.uuid] = this;
-					var $li = $nodeItemTmpl.tmpl($.extend({hasRelations, nodeTmpl}, this));
+					var $li = $nodeItemTmpl.tmpl($.extend({hasRelations, nodeTmpl, 
+						renderOperates: param.renderOperates,
+						checkableNodeIds: param.checkableNodeIds}, this), {
+						openPage	: function(type, nodeId, code, title){
+							require('tab').openInTab('jv/entity/curd/node_' + type +  '/' + param.menuId + '/' + nodeId + '/' + code, 
+									'entity_' + type + '_' + nodeId + '_' + code, 
+									title);
+						}
+					});
 					$lis.push($li);
 				});
 				//var $ul = $nodesTmpl.tmpl({nodes, hasRelations, isEndList: data.isEndList});
@@ -206,7 +220,16 @@ define(function(require, exports, module){
 				};
 				$.each($lis, function(){
 					$('>a>label', this).click(function(){
-						$(this).closest('a').toggleClass('node-checked');
+						var $label = $(this);
+						var entityCode = $label.closest('[entity-code]').attr('entity-code');
+						var $a = $label.closest('a');
+						var toChecked = !$a.is('.node-checked');
+						var p = {entityCode, checked:toChecked, cancel:false};
+						getEvent('node-check').fireWith($label, [p])
+						if(p.cancel != true){
+							$label.closest('a').toggleClass('node-checked', toChecked);
+						}
+					
 					});
 					$('>a>i', this).click(function(){
 						var $li = $(this).closest('li');
@@ -221,9 +244,9 @@ define(function(require, exports, module){
 							expandChildren();
 						}
 					});
-					$('i[action-type]', this).click(function(){
+					/*$('i[action-type]', this).click(function(){
 						doAction.apply(this, [$(this).attr('action-type')]);
-					});
+					});*/
 				});
 				return result;
 			}
@@ -232,7 +255,7 @@ define(function(require, exports, module){
 				tmplMap['form-buttons']
 					.tmpl({isRenderButton}, {
 						rootQuery	: function(){
-							var criterias = require('entity/js/entity-list.js').collectCriterias($criteriaForm);
+							var criterias = require('entity/js/criteria-render-factory').collectCriterias($criteriaForm);
 							startupQuery(param.menuId, criterias).done(function(data){
 								renderFirstPage(data.queryKey);
 							});
@@ -241,7 +264,7 @@ define(function(require, exports, module){
 					.appendTo($('#form-buttons', $criteriaForm));
 			}
 			
-			function doAction(actionType, actionId){
+			/*function doAction(actionType, actionId){
 				var $li = $(this).closest('li[node-id]');
 				var nodeId = $li.attr('node-id'),
 				code = $li.attr('entity-code');
@@ -255,48 +278,14 @@ define(function(require, exports, module){
 							'node_update_' + nodeId + '_' + code);
 					break;
 				}
-			}
-			
-			function bindFooterEvent(){
-				var page = $page.getLocatePage(); 
-				page.bind('footer-submit', function(data){
-					
-					var codes = [];
-					
-					$entitiesTreeContainer
-						.find('li[node-id][entity-code]')
-						.filter(function(){
-							return $(this).children('.node-checked').length === 1;
-						})
-						.each(function(){
-							codes.push($(this).attr('entity-code'));
-					});
-					
-					console.log(codes);
-					var entitiesLoader = function(fields){
-						var deferred = $.Deferred();
-						if($.isArray(fields) && fields.length > 0){
-							var url = 'admin/modules/curd/load_rabc_entities/' 
-									+ param.menuId + '/'
-									+ param.returnCompositeId;
-							require('ajax').ajax(url, {
-								codes	: codes.join(),
-								fields	: fields.join()
-							}, function(data){
-								if(data.status === 'suc'){
-									deferred.resolve(data.entities);
-								}else{
-									$.error('获取数据错误');
-								}
-							});
-						}
-						return deferred.promise();
-					};
-					entitiesLoader.codes = codes;
-					return entitiesLoader;
-				});
-			}
-			
+			}*/
 		});
+		return {
+			bind	: function(eventName, callback){
+				getEvent(eventName).add(callback);
+			}
+		}
 	}
+	
+	exports.initTree = initTree;
 });

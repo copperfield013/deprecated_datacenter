@@ -2,6 +2,8 @@ package cn.sowell.datacenter.model.modules.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -14,7 +16,9 @@ import com.alibaba.fastjson.JSONObject;
 
 import cn.sowell.datacenter.entityResolver.EntityConstants;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
+import cn.sowell.datacenter.entityResolver.impl.ABCNodeProxy;
 import cn.sowell.datacenter.entityResolver.impl.ArrayItemPropertyParser;
+import cn.sowell.datacenter.entityResolver.impl.RelSelectionEntityPropertyParser;
 import cn.sowell.datacenter.model.modules.bean.EntityArrayItemDetail;
 import cn.sowell.datacenter.model.modules.bean.EntityDetail;
 import cn.sowell.datacenter.model.modules.service.EntityConvertService;
@@ -23,7 +27,6 @@ import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailField;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
-import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
 
 @Service
@@ -33,10 +36,9 @@ public class EntityConvertServiceImpl implements EntityConvertService{
 	DetailTemplateService dtmplService;
 	
 	@Override
-	public EntityDetail convertEntityDetail(ModuleEntityPropertyParser entity, TemplateGroup tmplGroup) {
+	public EntityDetail convertEntityDetail(ModuleEntityPropertyParser entity, TemplateDetailTemplate dtmpl) {
 		Assert.notNull(entity);
 		EntityDetail detail = new EntityDetail(entity.getCode(), entity.getTitle());
-		TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
 		for (TemplateDetailFieldGroup group : dtmpl.getGroups()) {
 			DictionaryComposite composite = group.getComposite();
 			if(composite != null) {
@@ -107,6 +109,41 @@ public class EntityConvertServiceImpl implements EntityConvertService{
 			}
 		}
 		return jArray;
+	}
+
+	@Override
+	public JSONObject toEntitiesJson(Map<String, RelSelectionEntityPropertyParser> entityMap, 
+			Set<String> fieldNames, Map<Long, String> dfieldIdNameMap) {
+		JSONObject json = new JSONObject();
+		if(entityMap != null) {
+			JSONArray jEntites = new JSONArray();
+			json.put("entities", jEntites);
+			if(dfieldIdNameMap != null) {
+				JSONObject jDfieldIdNameMap = new JSONObject();
+				json.put("dFieldIdNameMap", jDfieldIdNameMap);
+				dfieldIdNameMap.forEach((dfieldId, fieldName)->{
+					jDfieldIdNameMap.put(dfieldId.toString(), fieldName);
+				});
+			}
+			entityMap.forEach((code, parser)->{
+				JSONObject jEntity = new JSONObject();
+				jEntity.put(ABCNodeProxy.CODE_PROPERTY_NAME_NORMAL, parser.getCode());
+				jEntites.add(jEntity);
+				JSONObject jFieldContainer = new JSONObject();
+				if(fieldNames != null) {
+					jEntity.put("byNames", jFieldContainer);
+					for (String fieldName : fieldNames) {
+						jFieldContainer.put(fieldName, parser.getFormatedProperty(fieldName));
+					}
+				}else if(dfieldIdNameMap != null) {
+					jEntity.put("byDfieldIds", jFieldContainer);
+					dfieldIdNameMap.forEach((dfieldId, fieldName)->{
+						jFieldContainer.put(dfieldId.toString(), parser.getFormatedProperty(fieldName));
+					});
+				}
+			});
+		}
+		return json;
 	}
 
 }

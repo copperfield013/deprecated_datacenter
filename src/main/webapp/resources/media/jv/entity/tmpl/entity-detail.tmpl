@@ -1,17 +1,17 @@
 <script id="page-title">
-	{{if mode === 'add'}}
-		${menu.title}-创建
-	{{else mode === 'update'}}
-		${menu.title}-${entity.title}-修改
-	{{else mode === 'detail'}}
-		${menu.title}-${entity.title}-详情
+	{{if /.*create/.test(mode)}}
+		${moduleTitle}-创建
+	{{else /.*update/.test(mode)}}
+		${moduleTitle}-${entity.title}-修改
+	{{else /.*detail/.test(mode)}}
+		${moduleTitle}-${entity.title}-详情
 	{{/if}}
 </script>
 
 <script id="inner-actions">
 	{{if innerActions.length > 0}}
-		<a id="actions" title="操作"><i class="fa fa-toggle-left"></i></a>
-		<div id="actions-container" class="init">
+		<a id="actions" title="操作" on-click="toggleInnerActions"><i class="fa fa-toggle-left"></i></a>
+		<div id="actions-container" class="init close">
 			<div id="action-list">
 				{{each(i, action) innerActions}}
 					<a class="btn btn-azure shiny" href="javascript:;" title="${action.title }" on-click="do:doAction(innerActions[${i}])">
@@ -28,10 +28,16 @@
 
 <script id="outgoing-actions">
 	{{each(i, action) outgoingActions}}
-		<a class="btn-action-outgoing" on-click="do:doAction(outgoingActions[${i})" href="javascript:;" title="${action.title }">
+		<a class="btn-action-outgoing" on-click="do:doAction(outgoingActions[${i}])" href="javascript:;" title="${action.title }">
 			<i class="${action.iconClass }"></i>
 		</a>
 	{{/each}}
+</script>
+
+<script id="fusion-toggler">
+	<a class="fusion-mode" title="融合模式：关" id="fusion-toggler" href="javascript:;" on-click="toggleFusionMode">
+		<i class="fa fa-lightbulb-o"></i>
+	</a>
 </script>
 
 <script id="save-button">
@@ -145,6 +151,9 @@
 				</td>
 			{{/each}}
 			<td>
+				{{if group.rabcTemplateGroupId && group.rabcUnupdatable != 1}}
+					<span class="array-item-update fa fa-edit" title="编辑当前行" on-click="do:updateRow(entity.arrayMap[group.id][${j}].code, group)"></span>
+				{{/if}}
 				<span class="array-item-remove" title="移除当前行"  on-click="removeRow">×</span>
 			</td>
 		</tr>
@@ -171,6 +180,7 @@
 			</td>
 		{{/each}}
 		<td>
+			<style target="array-item-update-btn"></style>
 			<span class="array-item-remove" title="移除当前行" on-click="removeRow">×</span>
 		</td>
 	</tr>
@@ -222,11 +232,15 @@
 											title="${field.fieldAvailable? '': '无效字段' }"
 											field-type="${field.type }">${field.title }</th>
 									{{/each}}
-									{{if mode === 'add' || mode === 'update'}}
+									{{if mode === 'create' || mode === 'update'}}
 										<th width="20px">
-											<a title="选择" ttmpl-id="11" href="javascript:;" class="open-select-dialog fa fa-link"></a>
+											{{if group.dialogSelectType == 'stmpl' && group.selectionTemplateId || group.dialogSelectType == 'ttmpl' && group.rabcTreeTemplateId || group.dialogSelectType == 'ltmpl' && group.rabcTemplateGroupId}}
+											<a title="选择" ttmpl-id="11" href="javascript:;" class="open-select-dialog fa fa-link" on-click="do:dialogSelectRow(groups[${i}])"></a>
+											{{/if}}
 											<span class="array-item-add" title="添加一行" on-click="do:addArrayItemRow(groups[${i}])">+</span>
-											<span class="iconfont icon-add-3 rabd-add"></span>
+											{{if group.rabcTemplateGroupId && group.rabcUncreatable != 1}}
+												<span class="iconfont icon-add-3 rabd-add" on-click="do:dialogCreateEntity(groups[${i}])"></span>
+											{{/if}}
 										</th>
 									{{/if}}
 								</tr>

@@ -1,7 +1,6 @@
 define(function(require, exports, module){
 	function defaultStatus(){
 		return require('utils').createStatus({
-			menu		: null,
 			dtmpl		: null,
 			premises	: null,
 			actions		: null,
@@ -11,10 +10,11 @@ define(function(require, exports, module){
 	
 	exports.init = function(_param){
 		var defParam = {
-			$page	: null,
-			menuId	: null,
-			code	: null,
-			mode	: 'detail'
+			$page			: null,
+			menuId			: null,
+			code			: null,
+			mode			: 'detail',
+			fieldGroupId	: null
 		}
 		var param = $.extend({}, defParam, _param);
 		var $page = param.$page;
@@ -29,6 +29,12 @@ define(function(require, exports, module){
 		var Content = require('entity/js/entity-detail-content.js');
 		//覆盖渲染实体的普通字段
 		var fieldOptionsFetcher = new Fetcher();
+		var doWhen = require('utils').DoWhen(function(){return param.mode});
+		doWhen(	/rabc.+/, function(){status.setStatus({contextType:'rabc',contextTypeArg:param.fieldGroupId})},
+				/node.+/, function(){status.setStatus({contextType:'node',contextTypeArg:param.nodeId})},
+				/user.+/, function(){status.setStatus({contextType:'user',contextTypeArg:''})},
+				function(){status.setStatus({contextType:'normal',contextTypeArg:''})});
+		
 		$CPF.showLoading();
 		require('tmpl').load('media/jv/entity/tmpl/entity-detail.tmpl').done(function(tmplMap){
 			
@@ -37,36 +43,32 @@ define(function(require, exports, module){
 				.bind('premises', renderPremises)
 				;
 			status.setStatus('content', new Content());
-			switch(param.mode){
-				case 'add':
-					status
-						.bind('dtmpl', renderTitle)
-						.bind('dtmpl', renderDetailInputs)
-						.bind('actions', renderActions)
-						.bind('buttonStatus', renderSaveButton)
-						.bind('entity', setDetailInputsValue)
-					break;
-				case 'update':
-					status
-						.bind('entity', renderTitle)
-						.bind('dtmpl', renderDetailInputs)
-						.bind('actions', renderActions)
-						.bind('buttonStatus', renderSaveButton)
-						.bind('entity', renderArrayItems)
-						.bind('entity', setDetailInputsValue)
-						.bind('normalFieldInputInited', setDetailInputsValue)
-					break;
-				case 'detail':
-					status
-						.bind('entity', renderTitle)
-						.bind('entity', renderEntityDetail)
-						.bind('entity', bindExport)
-						.bind('history', renderHistory)
-						.bind('historyId', setCurrentHistoryItem)
-						;
-					break;
-			}
-			
+			doWhen(/.*create/, function(){
+				status
+					.bind('dtmpl', renderTitle)
+					.bind('dtmpl', renderDetailInputs)
+					.bind('actions', renderActions)
+					.bind('buttonStatus', renderSaveButton)
+					.bind('normalFieldInputInited', setDetailInputsValue)
+			},/.*update/, function(){
+				status
+				.bind('entity', renderTitle)
+				.bind('dtmpl', renderDetailInputs)
+				.bind('dtmpl', renderFusionToggler)
+				.bind('actions', renderActions)
+				.bind('buttonStatus', renderSaveButton)
+				.bind('entity', renderArrayItems)
+				.bind('entity', setDetailInputsValue)
+				.bind('normalFieldInputInited', setDetailInputsValue)
+			},/.*detail/, function(){
+				status
+					.bind('entity', renderTitle)
+					.bind('entity', renderEntityDetail)
+					.bind('entity', bindExport)
+					.bind('history', renderHistory)
+					.bind('historyId', setCurrentHistoryItem)
+					;
+			});
 			//加载详情模板
 			//渲染premises
 			//渲染actions
@@ -74,26 +76,43 @@ define(function(require, exports, module){
 			
 			//初始化页面，加载模板后加载实体
 			loadDetailTemplate().done(function(){
-				switch(param.mode){
+				doWhen(/user.+/, $.noop, function(){
 					//detail模式下，要加载entity和history
-					case 'detail':
-						loadHistory(1);
+					doWhen(/.*detail/, function(){loadEntity();loadHistory(1)});
 					//update模式下，只要加载entity
-					case 'update':
-						loadEntity();
-				}
+					doWhen(/.*update/, function(){loadEntity()});
+				})
 			})
 			
-			
+			/**
+			 * 从服务器加载详情模板
+			 */
 			function loadDetailTemplate(){
 				$CPF.showLoading();
-				return Ajax.ajax('api2/meta/tmpl/dtmpl/' + param.menuId).done(function(data){
-					status.setStatus(data, ['menu', 'dtmpl', 'premises', 'actions', 'buttonStatus']);
+				return doWhen(/user.+/, function(){
+					return Ajax.ajax('api2/meta/user/detail').done(function(data){
+						status.setStatus('moduleTitle', '用户');
+						status.setStatus(data, ['dtmpl', 'entity', 'historyId']);
+					});
+				}, function(){
+					return Ajax.ajax('api2/meta/tmpl/dtmpl_config/' + status.getStatus('contextType') + '/' + param.menuId + '/' + status.getStatus('contextTypeArg')).done(function(data){
+						var config = data.config;
+						doWhen(/rabc.+|node.+/, function(){
+							status.setStatus('moduleTitle', config.module.title);
+						}, function(){
+							status.setStatus('moduleTitle', data.menu.title);
+						});
+						status.setStatus(config, ['dtmpl', 'premises', 'actions', 'buttonStatus']);
+					});
 				});
 			}
 			
+			/**
+			 * 从服务器加载实体数据
+			 */
 			function loadEntity(historyId){
 				var reqParam = {};
+				doWhen(['node_detail', 'node_update'], function(){reqParam.nodeId = param.nodeId});
 				if(typeof historyId === 'number' || typeof historyId === 'string') reqParam.historyId = historyId;
 				$CPF.showLoading();
 				Ajax.ajax('api2/entity/curd/detail/' + param.menuId + '/' + param.code, reqParam).done(function(data){
@@ -102,46 +121,177 @@ define(function(require, exports, module){
 				
 			}
 			
+			/**
+			 * 加载历史信息，只有详情页会执行
+			 */
 			function loadHistory(hisPageNo){
-				Ajax.ajax('api2/entity/curd/history/' + param.menuId + '/' + param.code + '/1').done(function(data){
+				var reqParam = {};
+				doWhen(['node_detail', 'node_update'], function(){reqParam.nodeId = param.nodeId});
+				Ajax.ajax('api2/entity/curd/history/' + param.menuId + '/' + param.code + '/1', reqParam).done(function(data){
 					status.setStatus(data, ['history']);
 				});
 			}
 			
+			/**
+			 * 渲染页面标题
+			 */
 			function renderTitle(data){
 				tmplMap['page-title']
 					.replaceIn($page, this.properties);
 			}
 			
+			/**
+			 * 根据详情模板渲染页面框架
+			 */
 			function renderFrame(){
-				$groupContainer.children().not('.entity-premises').remove();
-				
-				tmplMap['groups'].tmpl({
-					groups	: status.getStatus('dtmpl').groups,
+				var groups = status.getStatus('dtmpl').groups;
+				tmplMap['groups'].replaceIn($page, {
+					groups	,
 					mode	: param.mode
 				}, {
+					//添加一行
 					addArrayItemRow	: function(group){
 						var $fieldGroup = $(this).closest('.field-group');
 						var $tbody = $('tbody', $fieldGroup);
 						var rownum = $('>tr', $tbody).length;
-						var content = status.getStatus('content');
-						var contentComposite = content.getArrayComposite(group.composite.name);
-						var contentRow = contentComposite.addRow();
-						var $row = createUpdateArrayItemRow(group, rownum, function(){
-							contentRow.addInput(this);
+						addRow(group, $tbody);
+					},
+					//弹出框页面，然后选择一个实体后返回
+					dialogSelectRow	: function(group){
+						var $table = $(this).closest('table');
+						//获得当前
+						var exceptCodes = getExistCodes(group);
+						require('dialog').openDialog('jv/entity/curd/select/' + param.menuId + '/' + group.id, '选择实体', undefined, {
+							reqParam:	{
+								except	: exceptCodes.join()
+							},
+							width	: 1000,
+							height	: 450,
+							onSubmit: function(entitiesLoader){
+								appendEntityToArrayTable(entitiesLoader, group, $table);
+							}
 						});
-						$row.data('content-row', contentRow);
-						contentRow.setRelationLabelSelect($row.find('select.array-item-relation-label-select'));
-						$tbody.append($row);
-						refreshPagination($tbody, 'last');
+					},
+					//弹出框编辑实体页面，创建并保存实体后返回
+					dialogCreateEntity	: function(group){
+						var $table = $(this).closest('table');
+						require('dialog').openDialog('jv/entity/curd/rabc_create/' + param.menuId + '/' + group.id, '创建实体', undefined, {
+							width	: 1000,
+							height	: 450,
+							events:	{
+								afterSave	: function(entitiesLoader){
+									appendEntityToArrayTable(entitiesLoader, group, $table);
+								}
+							}
+						})
+						
 					}
-				}).appendTo($groupContainer);
-				//bindTableEvent($page);
-				//bindArrayItemEvents();
+				});
+				//初始化content的arrayComposite数据
+				var content = this.getStatus('content');
+				$.each(groups, function(){
+					if(this.isArray == 1){
+						content.addArrayComposite(this.composite.name);
+					}
+				});
+				//初始化索引器
 				bindIndexer($page);
 			}
 			
+			/**
+			 * 根据fieldGroup获得在content中对应的的contentComposite
+			 */
+			function getContentComposite(group){
+				var content = status.getStatus('content');
+				return content.getArrayComposite(group.composite.name);
+			}
+			/**
+			 * 获得字段组合中已经插入的行的实体code
+			 */
+			function getExistCodes(group){
+				var codes = [];
+				var contentComposite = getContentComposite(group);
+				$.each(contentComposite.rows, function(){
+					if(this.entityCode){
+						codes.push(this.entityCode);
+					}
+				});
+				return codes;
+			}
 			
+			function collectGroupDfieldIds(group){
+				var fields = [];
+				for(var i in group.fields){
+					var field = group.fields[i];
+					fields.push(field.id);
+				}
+				return fields;
+			}
+			
+			/**
+			 * 将选择的实体插入到对应的arrayItems中
+			 */
+			function appendEntityToArrayTable(entitiesLoader, group, $table){
+				var dfieldIds = collectGroupDfieldIds(group);
+				$CPF.showLoading();
+				entitiesLoader(dfieldIds).done(function(entities){
+					var $tbody = $table.children('tbody');
+					$.each(entities, function(i, entity){
+						var contentRow = addRow(group, $tbody, function(dfieldId){return entity.byDfieldIds[dfieldId]});
+						contentRow.setEntityCode(entity['唯一编码']);
+					}); 
+					$CPF.closeLoading();
+				});
+			}
+			
+			/**
+			 * 将编辑后的实体从后台重新加载后，更新对应的行
+			 */
+			function updateArrayItem(entitiesLoader, group, $row){
+				//获得请求需要的
+				var dfieldIds = collectGroupDfieldIds(group);
+				$CPF.showLoading();
+				entitiesLoader(dfieldIds).done(function(entities){
+					var entity = entities[0];
+					if(entity){
+						var contentRow = $row.data('content-row');
+						$.each(contentRow.inputs, function(){
+							var value = entity.byDfieldIds[this.getDetailFieldId()];
+							if(value) this.setValue(value, true);
+						});
+					}
+					$CPF.closeLoading();
+				});
+				
+			}
+			
+			/**
+			 * 根据ArrayItem的group，在已经存在的tbody里插入一行
+			 * valueGetter是插入行的每个单元格里的表单里要设置的值
+			 * 如果只是要插入空行，那么valueGetter可以不传
+			 */
+			function addRow(group, $tbody, valueGetter){
+				var contentComposite = getContentComposite(group);
+				var contentRow = contentComposite.addRow();
+				//根据模板创建一行
+				var $row = createUpdateArrayItemRow(group, 1, function(){
+					if(valueGetter){
+						var value = valueGetter(this.getDetailFieldId());
+						if(value) this.setValue(value, true);
+					}
+					contentRow.addInput(this);
+				});
+				//将contentRow对象和dom绑定
+				$row.data('content-row', contentRow);
+				contentRow.setRelationLabelSelect($row.find('select.array-item-relation-label-select'));
+				$tbody.append($row);
+				refreshPagination($tbody, 'last');
+				return contentRow;
+			}
+			
+			/**
+			 * 
+			 */
 			function createUpdateArrayItemRow(group, rownum, inputCallback){
 				var $row = tmplMap['create-array-item-row'].tmpl({
 					group, rownum
@@ -163,14 +313,18 @@ define(function(require, exports, module){
 				return $row;
 			}
 			
-			
+			/**
+			 * 渲染前提字段
+			 */
 			function renderPremises(){
-				$groupContainer.children('.entity-premises').remove();
-				tmplMap['premises'].tmpl({
+				tmplMap['premises'].replaceIn($page, {
 					groupPremises	: status.getStatus('premises')
-				}).prependTo($groupContainer);
+				})
 			}
 			
+			/**
+			 * 渲染操作按钮
+			 */
 			function renderActions(){
 				var actions = this.getStatus('actions');
 				var innerActions = [], outgoingActions = [];
@@ -182,11 +336,20 @@ define(function(require, exports, module){
 						innerActions.push(this);
 					}
 				});
-				tmplMap['inner-actions'].replaceIn($page, {innerActions}, {doAction});
+				tmplMap['inner-actions'].replaceIn($page, {innerActions}, {doAction, toggleInnerActions});
 				tmplMap['outgoing-actions'].replaceIn($page, {outgoingActions}, {doAction});
 				tmplMap['save-button'].replaceIn($page, {}, {doSave});
-				
-				
+			}
+			
+			/**
+			 * 切换隐藏的操作按钮
+			 */
+			function toggleInnerActions(){
+				var $actionsContainer = $('#actions-container', $page);
+				require('utils').switchClass($(this).children('i'), 'fa-toggle-left', 'fa-toggle-right', function(isHidden){
+					$actionsContainer.removeClass('init');
+					$actionsContainer.toggleClass('close', isHidden);
+				});
 			}
 			
 			function renderSaveButton(){
@@ -194,41 +357,61 @@ define(function(require, exports, module){
 			}
 			
 			function doAction(action){
-				if(action){
-					
-				}
+				doSave('action', action);
 			}
 			
-			function doSave(){
+			/**
+			 * 执行保存
+			 */
+			function doSave(flag, action){
 				var Dialog = require('dialog');
-				validate();
-				var fuseMode = status.getStatus('fuseMode');
-				var msg = '是否保存？';
-				if(fuseMode){
-					msg = '是否保存（当前为融合模式）';
-				}
-				Dialog.confirm(msg).done(function(){
-					var formData = getSubmitData();
-					console.log(formData);
-					require('utils').writeFormData(formData);
-					require('ajax').ajax('api2/entity/curd/save/' + param.menuId, formData, function(data){
-						if(data.status === 'suc'){
-							Dialog.notice('保存成功', 'success');
-							$page.getLocatePage().refresh();
-						}else{
-							Dialog.notice('保存失败', 'error');
-						}
+				var formData = getSubmitData(2);
+				if(formData instanceof FormData){
+					var fuseMode = status.getStatus('fuseMode');
+					var msg = '是否保存？';
+					if(flag === 'action' && action){
+						msg = '是否执行操作【' + action.title + '】';
+						formData.set('%actionId%', action.id);
+					};
+					if(fuseMode){
+						msg += '（当前为融合模式）';
+					}
+					Dialog.confirm(msg).done(function(){
+						require('utils').writeFormData(formData);
+						var page = $page.getLocatePage();
+						require('ajax').ajax('api2/entity/curd/save/' + status.getStatus('contextType')  + '/'  + param.menuId + '/' + status.getStatus('contextTypeArg'), formData, function(data){
+							if(data.status === 'suc'){
+								Dialog.notice('保存成功', 'success');
+								doWhen(
+									'create', function(){page.loadContent('jv/entity/update/' + param.menuId + '/' + data.code)}, 
+									['update', 'node_update'], function(){page.refresh()},
+									/rabc.+/, function(){
+										var afterSave = page.getPageObj().getEventCallbacks('afterSave');
+										if(afterSave){afterSave.apply(page, [require('entity/js/entity-select').createEntityLoader([data.code], param.menuId, param.fieldGroupId)])}
+										page.close();
+								});
+							}else{
+								Dialog.notice('保存失败', 'error');
+							}
+						});
 					});
-				});
+				}
 			}
 			
-			function validate(){
-				
-			}
-			
-			function getSubmitData(){
+			/**
+			 * 获得表单数据（返回FormData）
+			 * @param validateLevel 校验等级
+			 * 		0或者不传入时不校验；
+			 * 		1时校验所有表单，将错误的表单组装成数组并返回
+			 * 		2时校验所有表单，将错误的表单加注信息，并组装成数组后返回
+			 */
+			function getSubmitData(validateLevel){
 				var formData = new FormData();
+				var errors = [];
 				var fuseMode = status.getStatus('fuseMode');
+				if(fuseMode){
+					formData.set('%fuseMode%', true);
+				}
 				
 				//设置实体的code
 				var entity = status.getStatus('entity');
@@ -239,6 +422,7 @@ define(function(require, exports, module){
 				var content = status.getStatus('content');
 				//普通的字段
 				$.each(content.normalInputs, function(){
+					$.merge(errors, this.validate(validateLevel));
 					if(this.isValueChanged()){
 						this.appendToFormData(formData, this.getName());
 					}
@@ -259,6 +443,7 @@ define(function(require, exports, module){
 						if(relationLabel) formData.set(namePrefix + '$$label$$', relationLabel);
 						//遍历当前行的所有表单
 						$.each(this.inputs, function(){
+							$.merge(errors, this.validate(validateLevel));
 							if(this.isValueChanged()){
 								var name = namePrefix + this.getName();
 								this.appendToFormData(formData, name);
@@ -266,8 +451,11 @@ define(function(require, exports, module){
 						});
 					});
 				});
-				
-				return formData;
+				if(errors.length > 0){
+					return errors;
+				}else{
+					return formData;
+				}
 			}
 			
 			/**
@@ -303,24 +491,22 @@ define(function(require, exports, module){
 					tmplMap['group-field-input'].replaceFor(
 							$('style[target="group-field"]', $page), function(field){
 								return {field};
-							}, {}, function($span, data, isLast){
+							}, {}, function($span, data, isLast, index){
 								var field = data.field;
-								createFieldInput(field, data.field.name)
-									.done(function(dom){
-										$span.append(dom);
-										addInputValueSetSequence(this, field);
-										//将普通表单添加到content
-										content.addNormalInput(this);
-									}).progress(function(progress){
-										if(progress === 'prepared'){
-											if(isLast){;
-												fieldOptionsFetcher.commit().done(function(){
-													status.setStatus('normalFieldInputInited', true);
-												});
-											}
-										}
-									});
-								
+								console.log('create-field-input', field.type, index);
+								createFieldInput(field, data.field.name, function(){
+									console.log('prepared-create-field-input', field.type, index);
+									if(isLast){
+										fieldOptionsFetcher.commit().done(function(){
+											status.setStatus('normalFieldInputInited', true);
+										});
+									}
+								}).done(function(dom){
+									$span.append(dom);
+									addInputValueSetSequence(this, field);
+									//将普通表单添加到content
+									content.addNormalInput(this);
+								});
 							})
 							;
 				}
@@ -328,19 +514,23 @@ define(function(require, exports, module){
 
 			
 
-			
-			function createFieldInput(field, fieldName){
+			/**
+			 * 
+			 */
+			function createFieldInput(field, fieldName, preparedCallback){
 				//构造表单控件对象
 				var detailInput = new DetailInput({
 					type				: field.type,
+					dfieldId			: field.id,
 					fieldId				: field.fieldId,
 					optionsKey			: field.optionGroupKey,
 					fieldOptionsFetcher,
 					$container			: $page.find('.field-input-container'),
-					defaultValue		: field.dv
+					defaultValue		: field.dv,
+					validators			: (field.validators || '').split(','),
 				});
 				detailInput.setName(fieldName);
-				return detailInput.renderDOM();
+				return detailInput.renderDOM(preparedCallback);
 			}
 			/**
 			 * 移除行的回调
@@ -358,6 +548,22 @@ define(function(require, exports, module){
 				}
 			}
 			
+			/**
+			 * 弹出框编辑行的回调
+			 */
+			function dialogUpdateArrayItemRow(arrayItemCode, group){
+				var $row = $(this).closest('tr');
+				require('dialog').openDialog('jv/entity/curd/rabc_update/' + param.menuId + '/' + group.id + '/' + arrayItemCode, '编辑实体', undefined, {
+					width	: 1000,
+					height	: 450,
+					events:	{
+						afterSave	: function(entitiesLoader){
+							updateArrayItem(entitiesLoader, group, $row);
+						}
+					}
+				})
+			}
+			
 			function renderArrayItems(){
 				var entity = this.getStatus('entity');
 				var content = this.getStatus('content');
@@ -366,11 +572,14 @@ define(function(require, exports, module){
 					.replaceFor($('style[target="array-item-rows"]', $page), function(group){
 					return {entity, group}
 				}, {
-					removeRow	: removeArrayItemRow
+					removeRow	: removeArrayItemRow,
+					updateRow	: dialogUpdateArrayItemRow
 				}, function($rows, fieldGroupData){
 					//添加一个arrayComposite
 					var compositeName = fieldGroupData.group.composite.name;
-					var contentComposite = content.addArrayComposite(compositeName);
+					var contentComposite = content.getArrayComposite(compositeName);
+					
+					//var contentComposite = content.addArrayComposite(compositeName);
 					var $fieldGroup = $rows.closest('.field-group');
 					$rows.filter('tr').each(function(){
 						var $row = $(this);
@@ -409,7 +618,7 @@ define(function(require, exports, module){
 			function setDetailInputsValue(){
 				var entity = this.getStatus('entity');
 				var normalFieldInputInited = this.getStatus('normalFieldInputInited');
-				if(param.mode === 'add'){
+				doWhen(/.*create/, function(){
 					if(normalFieldInputInited){
 						//创建模式下，有默认值的表单设置默认值
 						while(1){
@@ -419,7 +628,8 @@ define(function(require, exports, module){
 						}
 						$CPF.closeLoading();
 					}
-				}else if(param.mode === 'update'){
+				});
+				doWhen(/.*update/, function(){
 					//修改模式下，为表单设置实体字段值
 					if(entity && normalFieldInputInited){
 						while(1){
@@ -427,10 +637,34 @@ define(function(require, exports, module){
 							if(!f) break;
 							var value = entity.fieldMap[f.field.id];
 							f.detailInput.setValue(value, true);
+							f.detailInput.setReadonly(getReadonly(f.field, value))
 						}
 						$CPF.closeLoading();
 					}
+				});
+			}
+			
+			function getReadonly(field, value){
+				switch(field.fieldAccess){
+					case '读':
+						return true;
+					case '补':
+						return !value;
 				}
+				
+			}
+			
+			function renderFusionToggler(){
+				tmplMap['fusion-toggler'].replaceIn($page, {}, {
+					toggleFusionMode	: function(){
+						var $toggler = $(this);
+						$toggler.toggleClass('on');
+						var isOn = $toggler.is('.on');
+						$toggler.attr('title', '融合模式：（' + (isOn? '开': '关') + '）');
+						$('#save', $page).toggleClass('fuse-mode', isOn);
+						status.setStatus('fuseMode', isOn);
+					}
+				});
 			}
 			
 			function renderErrors(){
@@ -723,9 +957,13 @@ define(function(require, exports, module){
 		
 		
 		function bindIndexer($page){
-			var Indexer = require('indexer')
+			var Indexer = require('indexer');
+			var $scrollTarget = $page.closest('.main-tab-content')[0];
+			if($page.getLocatePage().getType() === 'dialog'){
+				$scrollTarget = $page.closest('.modal-body-wrapper')[0];
+			}
 			var indexer = new Indexer({
-				scrollTarget: $page.closest('.main-tab-content')[0],
+				scrollTarget: $scrollTarget,
 				elements	: $('.group-container>.field-group', $page),
 				titleGetter	: function(ele){
 					return $(this).find('.group-title').text();

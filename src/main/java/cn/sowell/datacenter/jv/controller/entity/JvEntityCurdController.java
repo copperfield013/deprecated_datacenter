@@ -41,11 +41,11 @@ public class JvEntityCurdController {
 	}
 	
 	
-	@RequestMapping("/add/{menuId}")
+	@RequestMapping("/create/{menuId}")
 	public String add(@PathVariable Long menuId, ApiUser user, Model model) {
 		authService.validateUserL2MenuAccessable(user, menuId);
 		model.addAttribute("menuId", menuId);
-		model.addAttribute("mode", "add");
+		model.addAttribute("mode", "create");
 		return JvConstants.JSP_ENTITY + "/entity_detail.jsp";
 	}
 	
@@ -58,7 +58,63 @@ public class JvEntityCurdController {
 		return JvConstants.JSP_ENTITY + "/entity_detail.jsp";
 	}
 	
+	@RequestMapping("/select/{menuId}/{dtmplFieldGroupId}")
+	public String select(@PathVariable Long menuId, 
+			@PathVariable Long dtmplFieldGroupId,
+			String except,
+			ApiUser user, Model model) {
+		authService.validateUserL2MenuAccessable(user, menuId);
+		model.addAttribute("menuId", menuId);
+		model.addAttribute("groupId", dtmplFieldGroupId);
+		model.addAttribute("except", except);
+		return JvConstants.JSP_ENTITY + "/entity_select.jsp";
+	}
 	
+	@RequestMapping("/rabc_create/{menuId}/{fieldGroupId}")
+	public String rabcCreate(@PathVariable Long menuId, @PathVariable Long fieldGroupId, ApiUser user, Model model) {
+		authService.validateUserL2MenuAccessable(user, menuId);
+		model.addAttribute("menuId", menuId);
+		model.addAttribute("fieldGroupId", fieldGroupId);
+		model.addAttribute("mode", "rabc_create");
+		return JvConstants.JSP_ENTITY + "/entity_detail.jsp";
+	}
 	
+	@RequestMapping("/rabc_update/{menuId}/{fieldGroupId}/{code}")
+	public String rabcUpdate(@PathVariable Long menuId, 
+			@PathVariable Long fieldGroupId, 
+			@PathVariable String code, ApiUser user, Model model) {
+		authService.validateUserL2MenuAccessable(user, menuId);
+		model.addAttribute("menuId", menuId);
+		model.addAttribute("fieldGroupId", fieldGroupId);
+		model.addAttribute("code", code);
+		model.addAttribute("mode", "rabc_update");
+		return JvConstants.JSP_ENTITY + "/entity_detail.jsp";
+	}
+	
+	@RequestMapping("/node_detail/{menuId}/{nodeId}/{code}")
+	public String nodeDetail(@PathVariable Long menuId, 
+			@PathVariable Long nodeId,
+			@PathVariable String code, 
+			ApiUser user, Model model) {
+		authService.validateUserL2MenuAccessable(user, menuId);
+		model.addAttribute("menuId", menuId);
+		model.addAttribute("nodeId", nodeId);
+		model.addAttribute("code", code);
+		model.addAttribute("mode", "node_detail");
+		return JvConstants.JSP_ENTITY + "/entity_detail.jsp";
+	}
+	
+	@RequestMapping("/node_update/{menuId}/{nodeId}/{code}")
+	public String nodeUpdate(@PathVariable Long menuId, 
+			@PathVariable Long nodeId,
+			@PathVariable String code, 
+			ApiUser user, Model model) {
+		authService.validateUserL2MenuAccessable(user, menuId);
+		model.addAttribute("menuId", menuId);
+		model.addAttribute("nodeId", nodeId);
+		model.addAttribute("code", code);
+		model.addAttribute("mode", "node_update");
+		return JvConstants.JSP_ENTITY + "/entity_detail.jsp";
+	}
 	
 }

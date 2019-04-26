@@ -16,6 +16,7 @@ import com.google.common.collect.Lists;
 
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.utils.CollectionUtils;
+import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.model.admin.pojo.ABCUser;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel1Menu;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
@@ -23,6 +24,8 @@ import cn.sowell.datacenter.model.config.pojo.criteria.AuthorityCriteria;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.config.service.NonAuthorityException;
 import cn.sowell.datacenter.model.config.service.SideMenuService;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupAction;
 import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
 
 @Service
@@ -96,6 +99,26 @@ public class AuthorityServiceImpl implements AuthorityService{
 	public List<AuthorityVO> queryAuthorities(AuthorityCriteria criteria) {
 		Assert.notNull(criteria.getUser(), "必须传入当前用户对象");
 		return Lists.newArrayList(ServiceFactory.getRoleAuthorityService().getFunctionAuth(criteria.getUser()));
+	}
+	
+	@Override
+	public void validateGroupAction(TemplateGroupAction groupAction, TemplateGroup tmplGroup, String codes) {
+		if(!groupAction.getGroupId().equals(tmplGroup.getId())) {
+			throw new NonAuthorityException("模板组合[id=" + tmplGroup.getId() + "]与操作[id=" + groupAction.getId() + "]对应的模板组合[id=" + groupAction.getGroupId() + "]不一致");
+		}
+		if(codes != null) {
+			Set<String> codeSet = TextUtils.split(codes, ",");
+			if(!codeSet.isEmpty()) {
+				if(codeSet.size() > 1) {
+					if(TemplateGroupAction.ACTION_MULTIPLE_SINGLE.equals(groupAction.getMultiple())
+						|| TemplateGroupAction.ACTION_FACE_DETAIL.equals(groupAction.getFace())) {
+						//操作要单选，那么不能处理多个code
+						throw new RuntimeException("该操作只能处理一个编码");
+					}
+				}
+				return;
+			}
+		}
 	}
 
 }

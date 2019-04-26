@@ -34,11 +34,11 @@
 	             	</div>
 	             	<div class="account-dropdown-menu">
              			<div class="account-operate-list">
-	             			<a class="tab" href="admin/config/user/detail" target="user_info">
+	             			<a class="tab" href="jv/config/user/detail" target="user_info" title="用户详情">
              					<i class="fa fa-book"></i>
 	             				用户详情
 	             			</a>
-	             			<a class="tab" href="admin/config/user/update" target="user_info">
+	             			<a class="tab" href="jv/config/user/update" target="user_update" title="用户修改">
              					<i class="fa fa-edit"></i>
 	             				用户修改
 	             			</a>
@@ -91,6 +91,8 @@
 	    <script src="media/admin/plugins/beyond/js/bootstrap.js"></script>
 	    <script src="media/admin/plugins/beyond/js/toastr/toastr.js"></script>
 	    <script src="media/admin/plugins/beyond/js/beyond.min.js"></script>
+	    <script src="media/admin/plugins/tooltip/popper.min.js"></script>
+	    
 	    
 	    <script type="text/javascript">
 	    	$(function(){
@@ -119,7 +121,8 @@
 					'innerpage'	: 'COMMON/cpf/cpf-innerpage.js?v=$${cpfVersion}',
 					'tmpl'		: 'COMMON/cpf/cpf-tmpl.js?v=${cpfVersion}',
 					'select2'	: '${basePath}media/admin/plugins/select2/js/select2.full.js',
-					'indexer'	: 'COMMON/cpf/cpf-indexer.js?v=${cpfVersion}'
+					'indexer'	: 'COMMON/cpf/cpf-indexer.js?v=${cpfVersion}',
+					'selectable-table'	: 'COMMON/cpf/cpf-selectable-table.js?v=$${cpfVersion}'
 				}
 	    		});
 	    		

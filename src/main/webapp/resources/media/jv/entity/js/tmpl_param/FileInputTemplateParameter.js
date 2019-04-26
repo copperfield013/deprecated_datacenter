@@ -25,6 +25,8 @@ define(function(require, exports, module){
 		//初始化状态
 		showFileChooser();
 		
+		var changedCallback = $.Callbacks();
+		
 		this.valueGetter = function($dom){
 			if(inputFile){
 				//如果是选择文件后要上传的，则返回文件对象
@@ -36,7 +38,7 @@ define(function(require, exports, module){
 			}
 		}
 		
-		this.valueSetter = function($dom, file){
+		this.valueSetter = function($dom, file, initValueFlag){
 			if(file){
 				//设置值
 				if(file instanceof File){
@@ -49,12 +51,18 @@ define(function(require, exports, module){
 					setFile({
 						url	: file
 					});
+				}else{
+					return;
 				}
 			}
 		}
 		
 		this.afterRender = function($dom){
 			$thumb.appendTo($dom);
+		}
+		
+		this.bindValueChanged = function($dom, callback){
+			$fileInput.change(callback);
 		}
 		
 		function buildOperates(){

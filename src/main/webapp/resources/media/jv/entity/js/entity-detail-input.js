@@ -7,6 +7,7 @@ define(function(require, exports, module){
 		this.param = $.extend({
 			type				: null,
 			options				: null,
+			dfieldId			: null,
 			fieldId				: null,
 			optionsKey			: null,
 			$page				: null,
@@ -18,31 +19,58 @@ define(function(require, exports, module){
 		this.dom = null
 		this.name = null;
 		var _this = this;
-		this.formDataAppender = null;
-		this.valueGetter = null;
-		this.valueSetter = null;
-		this.valueChangedGetter = null;
-		this.ui = {
+		var ui = {
+			builded		: false,
+			isShowing	: false,
+			isHidding	: false,
 			tipError	: function($dom, message){
 				var $dom = $($dom);
-				$dom.tooltip({
-					title		: message,
-					trigger		: 'manual',
-					container	: _this.param.$container,
-					template	: '<div class="tooltip field-input-error-tip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
-				}).tooltip('show');
-				$dom.addClass('field-input-error');
+				function show(){
+					ui.isShowing = true;
+					$dom.one('shown.bs.tooltip', function(){
+						ui.isShowing = false;
+					});
+					$dom.tooltip({
+						title		: message,
+						trigger		: 'manual',
+						container	: _this.param.$container,
+						template	: '<div class="tooltip field-input-error-tip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
+					}).tooltip('show');
+					ui.builded = true;
+					$dom.addClass('field-input-error');
+				}
+				if(ui.isHidding){
+					$dom.one('hidden.bs.tooltip', function(){
+						show();
+					});
+				}else{show()}
 			},
 			removeError	: function($dom){
-				$dom.removeClass('field-input-error');
-				$dom.tooltip('destroy');
+				if(!ui.builded){return}
+				function hide(){
+					ui.isHidding = true;
+					$dom.one('hidden.bs.tooltip', function(){
+						ui.isHidding = false;
+					});
+					$dom.removeClass('field-input-error');
+					$dom.tooltip('hide');
+				}
+				if(ui.isShowing){
+					$dom.one('shown.bs.tooltip', function(){
+						hide();
+					});
+				}else{hide()}
 			}
 		};
+		this.ui = ui;
 		
 	}
 	
 	
 	$.extend(DetailInput.prototype, {
+		getDetailFieldId	: function(){
+			return this.param.dfieldId;
+		},
 		getName		: function(){
 			return this.name;
 		},
@@ -50,8 +78,9 @@ define(function(require, exports, module){
 			this.name = name;
 		},
 		appendToFormData	: function(formData, formName){
-			if(this.formDataAppender){
-				return this.formDataAppender.apply(this, [this.dom, formData, formName]);
+			var tmplParam = this.getInputTemplateParameter();
+			if(tmplParam.formDataAppender){
+				return tmplParam.formDataAppender.apply(this, [this.dom, formData, formName]);
 			}else{
 				var val = this.getValue();
 				if(val !== undefined && val !== null){
@@ -60,14 +89,12 @@ define(function(require, exports, module){
 			}
 		},
 		getValue	: function(){
-			if(this.valueGetter){
-				return this.valueGetter.apply(this, [this.dom]);
-			}
+			var tmplParam = this.getInputTemplateParameter();
+			return tmplParam.valueGetter.apply(this, [this.dom]);
 		},
 		setValue	: function(val, initValueFlag){
-			if(this.valueSetter){
-				return this.valueSetter.apply(this, [this.dom, val, initValueFlag]);
-			}
+			var tmplParam = this.getInputTemplateParameter();
+			return tmplParam.valueSetter.apply(this, [this.dom, val, initValueFlag]);
 		},
 		enableDefaultValue	: function(initValueFlag){
 			if(this.param.defaultValue){
@@ -75,13 +102,75 @@ define(function(require, exports, module){
 			}
 		},
 		isValueChanged	: function(){
-			if(this.valueChangedGetter){
-				return this.valueChangedGetter(this, [this.dom]);
+			var tmplParam = this.getInputTemplateParameter();
+			if(tmplParam.isValueChanged){
+				return tmplParam.isValueChanged(this, [this.dom]);
 			}else{
 				return true;
 			}
 		},
-		renderDOM	: function(){
+		showError		: function(msg, validateLevel, $dom){
+			var tmplParam = this.getInputTemplateParameter();
+			if(validateLevel == 2){
+				this.ui.tipError($dom || tmplParam.getErrorWrapper(this.dom), msg);
+			}
+			return {
+				message		: msg
+			}
+		},
+		removeError		: function($dom){
+			var tmplParam = this.getInputTemplateParameter();
+			this.ui.removeError($dom || tmplParam.getErrorWrapper(this.dom));
+		},
+		/**
+		 * 校验表单数据
+		 * @param validateLevel 校验等级
+		 * 		0或者不传入时校验,但不返回错误信息；
+		 * 		1时校验所有表单，将错误的表单组装成数组并返回
+		 * 		2时校验所有表单，将错误的表单加注信息，并组装成数组后返回
+		 */
+		validate		: function(validateLevel){
+			if(this.dom){
+				var result = [];
+				var validators = this.param.validators;
+				this.removeError();
+				if(validators.indexOf('required') >= 0){
+					//不为空校验
+					if(this.isValueEmpty()){
+						result.push(this.showError('表单不能为空', validateLevel));
+					}
+				}
+				//表单自定义的校验
+				var tmplParam = this.getInputTemplateParameter();
+				if(tmplParam.validate){
+					var customValidate = tmplParam.validate.apply(this, [this.dom]);
+					if(customValidate){
+						$.merge(result, customValidate);
+					}
+				}
+				return result;
+			}
+			throw new Error('还没有初始化dom，不能进行验证');
+		},
+		setReadonly		: function(readonlyStatus){
+			var tmplParam = this.getInputTemplateParameter();
+			tmplParam.setReadonly.apply(this, [this.dom, readonlyStatus]);
+		},
+		isValueEmpty	: function(){
+			var tmplParam = this.getInputTemplateParameter();
+			if(this.tmplParam.isValueEmpty){
+				return this.tmplParam.isValueEmpty.apply(this, [this.dom]);
+			}else{
+				return !this.getValue();
+			}
+		},
+		getInputTemplateParameter	: function(){
+			if(this.tmplParam){
+				return this.tmplParam;
+			}
+			throw new Error('没有初始化表单的TemplateParameter对象，请调用renderDOM方法');
+		},
+		renderDOM	: function(preparedCallback){
 			var defer = $.Deferred();
 			var _this = this;
 			if(!this.dom){
@@ -92,14 +181,16 @@ define(function(require, exports, module){
 							_this.dom = tmplMap[tmplParam.tmplKey].tmpl($.extend({
 								fieldType	: _this.param.type,
 							}, tmplParam.data), tmplParam.events);
-							_this.valueGetter = tmplParam.valueGetter;
-							_this.valueSetter = tmplParam.valueSetter;
-							_this.valueChangedGetter = tmplParam.isValueChanged;
-							_this.formDataAppender = tmplParam.formDataAppender;
+							_this.tmplParam = tmplParam;
+							tmplParam.bindValueChanged(_this.dom, function(e, initValueFlag){
+								if(initValueFlag !== true){
+									_this.validate(2)
+								}
+							});
 							tmplParam.afterRender.apply(_this, [_this.dom]);
 							defer.resolveWith(_this, [_this.dom]);
 						});
-						defer.notify('prepared');
+						(preparedCallback || $.noop)();
 					});
 			}else{
 				defer.resolveWith(_this, [_this.dom]);
@@ -108,6 +199,7 @@ define(function(require, exports, module){
 		},
 		_getTemplateParameter	: function(){
 			var defer = $.Deferred();
+			var _this = this;
 			function prepare(tmplParamFileName, args){
 				var tmplParameter = null;
 				if(typeof tmplParamFileName === 'object'){
@@ -198,6 +290,9 @@ define(function(require, exports, module){
 	AbstractTemplateParameter.prototype.setDisabled = function($dom){};
 	AbstractTemplateParameter.prototype.validate = function($span, ui){};
 	AbstractTemplateParameter.prototype.formDataAppender = null;
+	AbstractTemplateParameter.prototype.bindValueChanged = $.noop;
+	AbstractTemplateParameter.prototype.getErrorWrapper = function($dom){return $dom};
+	AbstractTemplateParameter.prototype.setReadonly = function($dom, readonlyStatus){};
 	
 	DetailInput.AbstractTemplateParameter = AbstractTemplateParameter;
 	

@@ -9,6 +9,8 @@ import com.abc.auth.pojo.AuthorityVO;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel1Menu;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.pojo.criteria.AuthorityCriteria;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupAction;
 
 public interface AuthorityService {
 	SideMenuLevel2Menu validateL2MenuAccessable(Long level2MenuId) throws NonAuthorityException;
@@ -22,5 +24,7 @@ public interface AuthorityService {
 	SideMenuLevel1Menu validateUserL1MenuAccessable(UserDetails user, Long level1MenuId) throws NonAuthorityException;
 
 	SideMenuLevel2Menu validateUserL2MenuAccessable(UserDetails user, Long level2MenuId) throws NonAuthorityException;
+
+	void validateGroupAction(TemplateGroupAction groupAction, TemplateGroup tmplGroup, String codes);
 
 }

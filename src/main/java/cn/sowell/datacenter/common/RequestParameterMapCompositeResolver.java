@@ -41,6 +41,8 @@ public class RequestParameterMapCompositeResolver implements HandlerMethodArgume
 		RequestParameterMapComposite composite = new RequestParameterMapComposite();
 		Map<String, Object> map = new HashMap<String, Object>();
 		Map<String, String[]> pMap = webRequest.getParameterMap();
+		logger.info("提交请求数据");
+		logger.info(pMap);
 		if(pMap != null) {
 			pMap.forEach((name, val)->{
 				if(val != null) {

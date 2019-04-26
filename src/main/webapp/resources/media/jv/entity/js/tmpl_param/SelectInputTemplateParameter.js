@@ -42,6 +42,10 @@ define(function(require, exports, module){
 			 return $('select[input-role="select"]', $dom);
 		}
 		
+		this.getErrorWrapper = function($dom){
+			return $('.select2-selection', $dom);
+		}
+		
 		this.valueGetter = function($dom){
 			return getSelect($dom).val();
 		}
@@ -59,6 +63,10 @@ define(function(require, exports, module){
 				});
 			});
 		}
+		this.bindValueChanged = function($dom, callback){
+			getSelect($dom).change(callback);
+		}
+		
 	}
 	require('utils').extendClass(SelectInputTemplateParameter, AbstractTemplateParameter);
 	

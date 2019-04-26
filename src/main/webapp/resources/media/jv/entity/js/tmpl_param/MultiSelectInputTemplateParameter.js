@@ -64,6 +64,12 @@ define(function(require, exports, module){
 				})
 			});
 		}
+		this.bindValueChanged = function($dom, callback){
+			getSelect($dom).change(callback);
+		}
+		this.getErrorWrapper = function($dom){
+			return $('.select2-selection', $dom);
+		}
 	}
 	
 	function bindSelect2($select, param){

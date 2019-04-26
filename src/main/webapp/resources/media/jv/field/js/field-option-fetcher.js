@@ -51,6 +51,9 @@ define(function(require, exports, module){
 						}
 					});
 				});
+		}else{
+			allDoneDefer.resolve([]);
+			this.afterCommitCallbacks.fire();
 		}
 		return allDoneDefer.promise();
 	}

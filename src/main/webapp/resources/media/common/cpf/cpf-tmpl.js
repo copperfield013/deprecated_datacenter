@@ -121,7 +121,7 @@ define(function(require, exports, module){
 						$result = $clone.clone(true);
 					}
 					$this.after($result).data('plh-dom', $result);
-					callback.apply(_this, [$result, _data, i == $plhs.length - 1]);
+					callback.apply(_this, [$result, _data, i == $plhs.length - 1, i]);
 				});
 			}
 			replace(typeof data === 'function');
@@ -199,6 +199,12 @@ define(function(require, exports, module){
 		}
 		return deferred.promise();
 	};
+	
+	Template.getPlaceholderQuery = function($page){
+		return function(target){
+			return $('style[target="' + target + '"]', $page);
+		}
+	}
 	
 	module.exports = Template;
 });

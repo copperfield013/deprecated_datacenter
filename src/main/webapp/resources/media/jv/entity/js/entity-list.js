@@ -45,19 +45,7 @@ define(function(require, exports, module){
 			doRender();
 		}
 	}
-	function collectCriterias($form){
-		var criterias = {};
-		$('.form-group[criteria-id]', $form).each(function(){
-			var $formGroup = $(this);
-			var inputValueFunc = $formGroup.data('input-value-func');
-			if(inputValueFunc){
-				criterias['criteria_' + $formGroup.attr('criteria-id')] = inputValueFunc();
-			}
-		});
-		return criterias;
-	}
 	exports.renderCriterias = renderCriterias;
-	exports.collectCriterias = collectCriterias;
 	
 	exports.init = function(_param){
 		var defParam = {
@@ -91,7 +79,7 @@ define(function(require, exports, module){
 			
 			$criteriaForm.submit(function(e){
 				e.preventDefault();
-				var criterias = collectCriterias(this);
+				var criterias = CriteriaRenderFactory.collectCriterias(this);
 				queryList(criterias);
 				return false;
 			});

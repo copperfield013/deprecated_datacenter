@@ -4,24 +4,63 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import cn.sowell.datacenter.model.api2.service.MetaJsonService;
 import cn.sowell.datacenter.model.api2.service.TemplateJsonParseService;
+import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
+import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.modules.service.view.EntityView;
 import cn.sowell.dataserver.model.modules.service.view.EntityViewCriteria;
+import cn.sowell.dataserver.model.tmpl.pojo.AbstractListColumn;
 import cn.sowell.dataserver.model.tmpl.pojo.AbstractListCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.AbstractListTemplate;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroupTreeNode;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupAction;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListColumn;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeNode;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeTemplate;
+import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.ListTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.SelectionTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
+import cn.sowell.dataserver.model.tmpl.service.TreeTemplateService;
 
 @Service
 public class TemplateJsonParseServiceImpl implements TemplateJsonParseService{
 
+	@Resource
+	SelectionTemplateService stmplService;
+	
+	@Resource
+	TreeTemplateService treeService;
+	
+	@Resource
+	TemplateGroupService tmplGroupService;
+	
+	@Resource
+	ListTemplateService ltmplService;
+	
+	@Resource
+	DetailTemplateService dtmplService;
+	
+	@Resource
+	MetaJsonService metaService;
+	
+	@Resource
+	ModulesService moduleService;
+	
 	static Pattern operatePattern = Pattern.compile("^operate[(-d)*(-u)*(-r)*]$"); 
 	public JSONObject toListTemplateJson(TemplateListTemplate listTemplate) {
 		JSONObject jDtmpl = new JSONObject();
@@ -61,7 +100,7 @@ public class TemplateJsonParseServiceImpl implements TemplateJsonParseService{
 		return aCriterias;
 	}
 
-	private JSONArray toColumns(List<TemplateListColumn> columns) {
+	private JSONArray toColumns(List<? extends AbstractListColumn> columns) {
 		JSONArray aColumns = new JSONArray();
 		if(columns != null) {
 			columns.forEach(column->{
@@ -96,4 +135,62 @@ public class TemplateJsonParseServiceImpl implements TemplateJsonParseService{
 		return (JSONObject) JSONObject.toJSON(tmplGroup);
 	}
 	
+	@Override
+	public JSONObject toSelectConfig(TemplateDetailFieldGroup fieldGroup) {
+		JSONObject jConfig = new JSONObject();
+		String dialogType = fieldGroup.getDialogSelectType();
+		jConfig.put("type", dialogType);
+		jConfig.put("selectModuleName", fieldGroup.getComposite().getRelModuleName());
+		JSONArray jCriterias = new JSONArray(); 
+		AbstractListTemplate<?,?> ltmpl = null;
+		if(TemplateDetailFieldGroup.DIALOG_SELECT_TYPE_STMPL.equals(dialogType)) {
+			//选择模板
+			ltmpl = stmplService.getTemplate(fieldGroup.getSelectionTemplateId());
+		}else if(TemplateDetailFieldGroup.DIALOG_SELECT_TYPE_LTMPL.equals(dialogType)) {
+			//引用列表模板
+			TemplateGroup tmplGroup = tmplGroupService.getTemplate(fieldGroup.getRabcTemplateGroupId());
+			if(tmplGroup != null) {
+				ltmpl = ltmplService.getTemplate(tmplGroup.getListTemplateId());
+			}
+		}else if(TemplateDetailFieldGroup.DIALOG_SELECT_TYPE_TTMPL.equals(dialogType)) {
+			//树形模板
+			TemplateTreeTemplate ttmpl = treeService.getTemplate(fieldGroup.getRabcTreeTemplateId());
+			jConfig.put("nodeStyle", treeService.getTreeNodeStyle(ttmpl));
+			TemplateTreeNode defaultNodeTempate = treeService.getDefaultNodeTemplate(ttmpl);
+			if(defaultNodeTempate != null) {
+				jConfig.put("nodeTmpl", defaultNodeTempate);
+				jCriterias = toCriterias(defaultNodeTempate.getCriterias());
+				long[] checkableNodeIds = fieldGroup.getRabcTreeNodes().stream().mapToLong(TemplateDetailFieldGroupTreeNode::getNodeTemplateId).toArray();
+				jConfig.put("checkableNodeIds", checkableNodeIds);
+			}
+			jConfig.put("treeId", fieldGroup.getRabcTreeTemplateId());
+		}
+		if(ltmpl != null) {
+			jConfig.put("columns", toColumns(ltmpl.getColumns()));
+			jConfig.put("defaultPageSize", ltmpl.getDefaultPageSize());
+			jCriterias = toCriterias(ltmpl.getCriterias());
+		}
+		jConfig.put("criterias", jCriterias);
+		return jConfig;
+	}
+
+	@Override
+	public JSONObject toDetailTemplateConfig(TemplateGroup tmplGroup) {
+		if(tmplGroup != null) {
+			TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
+			JSONObject jConfig = new JSONObject();
+			ModuleMeta module = moduleService.getModule(tmplGroup.getModule());
+			jConfig.put("module", metaService.toModuleJson(module));
+			jConfig.put("dtmpl", dtmpl);
+			jConfig.put("premises", tmplGroup.getPremises());
+			jConfig.put("buttonStatus", metaService.toButtonStatus(tmplGroup));
+			if(tmplGroup.getActions() != null) {
+				jConfig.put("actions", tmplGroup.getActions().stream()
+						.filter(action->TemplateGroupAction.ACTION_FACE_DETAIL.equals(action.getFace()))
+						.collect(Collectors.toList()));
+			}
+			return jConfig;
+		}
+		return null;
+	}
 }

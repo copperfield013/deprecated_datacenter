@@ -5,20 +5,24 @@
 			{{if hasRelations}}
 				<i></i>
 			{{/if}}
-			<label></label>
+			{{if checkableNodeIds.indexOf(nodeTmpl.id) >= 0}}
+				<label style="display:block"></label>
+			{{/if}}
 			<span>${text }</span>
-			<div class="node-operates">
-				<div class="node-operate-icons">
-					{{if nodeTmpl.templateGroupId}}
-						{{if nodeTmpl.hideDetailButton != 1}}
-							<i title="打开详情页" class="fa fa-book" action-type="detail"></i>
+			{{if renderOperates !== false}}
+				<div class="node-operates">
+					<div class="node-operate-icons">
+						{{if nodeTmpl.templateGroupId}}
+							{{if nodeTmpl.hideDetailButton != 1}}
+								<i title="打开详情页" class="fa fa-book" action-type="detail" on-click="do:openPage('detail', ${nodeTmpl.id}, '${entityCode}', '节点详情-${text}')"></i>
+							{{/if}}
+							{{if nodeTmpl.hideUpdateButton != 1}}
+								<i title="打开修改页" class="fa fa-edit" action-type="update" on-click="do:openPage('update', ${nodeTmpl.id}, '${entityCode}', '节点编辑-${text}')"></i>
+							{{/if}}
 						{{/if}}
-						{{if nodeTmpl.hideUpdateButton != 1}}
-							<i title="打开修改页" class="fa fa-edit" action-type="update"></i>
-						{{/if}}
-					{{/if}}
+					</div>
 				</div>
-			</div>
+			{{/if}}
 		</a>
 	</li>
 </script>

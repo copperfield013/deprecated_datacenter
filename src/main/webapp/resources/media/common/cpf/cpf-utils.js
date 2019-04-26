@@ -1115,6 +1115,37 @@ define(function(require, exports){
 	}
 	exports.createStatus = function(f){return new Status(f)}
 	
+	/**
+	 * 构建一个方法对象，方法对象的原型为(types1, callback1, types2, callback2..., elseCallback)
+	 * 表示用typeGetter方法获得的值在types中的时候，执行对应的callback。如果都不存在，那么执行elseCallback
+	 */
+	exports.DoWhen = function(typeGetter){
+		return function(){
+			var currentType = typeGetter();
+			for(var i = 0; i < arguments.length; i+=2){
+				var types = arguments[i];
+				var callback = arguments[i + 1];
+				
+				if(typeof types === 'string'){
+					types = [types];
+				}else if(typeof types === 'function'){
+					return types(currentType);
+				}else if(types instanceof RegExp){
+					types = new RegExp('^' + types.source + '$');
+					if(types.test(currentType)){
+						return (callback || $.noop)(currentType);
+					}else{
+						continue;
+					}
+				}
+				if($.isArray(types) && types.indexOf(currentType) >= 0){
+					return (callback || $.noop)(currentType);
+				}
+			}
+		}
+		
+	}
+	
 	function returnTrue(){return true;}
 	function returnFalse(){return false;}
 });

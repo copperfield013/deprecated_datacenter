@@ -495,3 +495,9 @@ th.field-unavailable:before {
 .field-group-config-dialog .dialog-select-type {
     flex-direction: column;
 }
+
+.dtmpl-update .field-array-table tr.title-row th>span {
+    min-width: 2em;
+    height: 1em;
+    display: inline-block;
+}

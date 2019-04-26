@@ -68,6 +68,7 @@ import cn.sowell.dataserver.model.modules.service.view.ListTemplateEntityView;
 import cn.sowell.dataserver.model.modules.service.view.ListTemplateEntityViewCriteria;
 import cn.sowell.dataserver.model.modules.service.view.PagedEntityList;
 import cn.sowell.dataserver.model.modules.service.view.TreeNodeContext;
+import cn.sowell.dataserver.model.tmpl.manager.TreeTemplateManager.TreeRelationComposite;
 import cn.sowell.dataserver.model.tmpl.pojo.ArrayEntityProxy;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
@@ -88,7 +89,6 @@ import cn.sowell.dataserver.model.tmpl.service.ListTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.SelectionTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
 import cn.sowell.dataserver.model.tmpl.service.TreeTemplateService;
-import cn.sowell.dataserver.model.tmpl.service.impl.TreeTemplateServiceImpl.TreeRelationComposite;
 
 @Controller
 @RequestMapping(AdminConstants.URI_MODULES + "/curd")
@@ -267,9 +267,7 @@ public class AdminModulesController {
 		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		
-		String moduleName = menu.getTemplateModule();
-		
-		TreeRelationComposite relationComposite = treeService.getNodeRelationTemplate(moduleName, nodeRelationId);
+		TreeRelationComposite relationComposite = treeService.getNodeRelationTemplate(nodeRelationId);
 		if(relationComposite != null) {
 			//TemplateTreeRelation nodeRelationTempalte = relationComposite.getReltionTempalte();
 			//构造查询节点的上下文
@@ -1037,6 +1035,6 @@ public class AdminModulesController {
 		};
 		return codeSet;
 	}
-	
-	
+
+
 }

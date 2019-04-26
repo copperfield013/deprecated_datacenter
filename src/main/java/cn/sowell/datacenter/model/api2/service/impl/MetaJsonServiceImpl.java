@@ -44,4 +44,6 @@ public class MetaJsonServiceImpl implements MetaJsonService{
 	private boolean isTrue(Integer hideSaveButton) {
 		return Integer.valueOf(1).equals(hideSaveButton);
 	}
+
+	
 }

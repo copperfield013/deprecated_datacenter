@@ -15,6 +15,16 @@ define(function(require, exports, module){
 				_this.setValueChanged(true);
 			})
 		}
+		this.bindValueChanged = function($dom, callback){
+			$dom.change(callback);
+		}
+		this.setReadonly = function($dom, readonlyStatus){
+			if(readonlyStatus){
+				$dom.attr('readonly', 'readonly');
+			}else{
+				$dom.removeAttr('readonly');
+			}
+		}
 		
 	}
 	require('utils').extendClass(AbstractSingleInputTemplateParameter, AbstractTemplateParameter);

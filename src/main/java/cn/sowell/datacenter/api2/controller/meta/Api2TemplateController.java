@@ -1,7 +1,5 @@
 package cn.sowell.datacenter.api2.controller.meta;
 
-import java.util.stream.Collectors;
-
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Controller;
@@ -14,13 +12,13 @@ import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.datacenter.api2.controller.Api2Constants;
 import cn.sowell.datacenter.common.ApiUser;
 import cn.sowell.datacenter.model.api2.service.MetaJsonService;
+import cn.sowell.datacenter.model.api2.service.TemplateJsonParseService;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
-import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
-import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
-import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupAction;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeNode;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeTemplate;
 import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
@@ -47,31 +45,54 @@ public class Api2TemplateController {
 	@Resource
 	MetaJsonService metaService;
 	
+	@Resource
+	TemplateJsonParseService tJsonService;
+	
 	@ResponseBody
-	@RequestMapping("/dtmpl/{menuId}")
-	public ResponseJSON detailTemplate(@PathVariable Long menuId, ApiUser user) {
+	@RequestMapping({
+		"/dtmpl_config/{contextType:normal}/{menuId}",
+		"/dtmpl_config/{contextType:rabc}/{menuId}/{fieldGroupId}",
+		"/dtmpl_config/{contextType:node}/{menuId}/{nodeId}"
+	})
+	public ResponseJSON detailTemplateConfig(
+			@PathVariable String contextType,
+			@PathVariable Long menuId,
+			@PathVariable(required=false) Long fieldGroupId,
+			@PathVariable(required=false) Long nodeId,
+			ApiUser user) {
 		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
-		ModuleMeta module = mService.getModule(menu.getTemplateModule());
-		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
-		TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
-		
-		JSONObjectResponse jRes = new JSONObjectResponse();
-		jRes.put("module", metaService.toModuleJson(module));
-		jRes.put("menu", metaService.toMenuJson(menu));
-		jRes.put("dtmpl", dtmpl);
-		jRes.put("premises", tmplGroup.getPremises());
-		jRes.put("buttonStatus", metaService.toButtonStatus(tmplGroup));
-		if(tmplGroup.getActions() != null) {
-			jRes.put("actions", tmplGroup.getActions().stream()
-					.filter(action->TemplateGroupAction.ACTION_FACE_DETAIL.equals(action.getFace()))
-					.collect(Collectors.toList()));
+		TemplateGroup tmplGroup = null;
+		if("normal".equals(contextType)) {
+			tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+		}else if("rabc".equals(contextType)) {
+			TemplateDetailFieldGroup fieldGroup = dtmplService.getFieldGroup(fieldGroupId);
+			tmplGroup = tmplGroupService.getTemplate(fieldGroup.getRabcTemplateGroupId());
+		}else if("node".equals(contextType)) {
+			TemplateTreeNode node = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
+			tmplGroup = tmplGroupService.getTemplate(node.getTemplateGroupId());
 		}
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		jRes.put("config", tJsonService.toDetailTemplateConfig(tmplGroup));
+		jRes.put("menu", metaService.toMenuJson(menu));
 		return jRes;
 	}
 	
 	@ResponseBody
+	@RequestMapping("/select_config/{menuId}/{fieldGroupId}")
+	public ResponseJSON selectConfig(@PathVariable Long menuId, 
+			@PathVariable Long fieldGroupId, ApiUser user) {
+		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		TemplateDetailFieldGroup fieldGroup = dtmplService.getFieldGroup(fieldGroupId);
+		jRes.put("config", tJsonService.toSelectConfig(fieldGroup));
+		jRes.put("menu", metaService.toMenuJson(menu));
+		return jRes;
+	}
+	
+	
+	@ResponseBody
 	@RequestMapping("/ttmpl/{ttmplId}")
-	public ResponseJSON getTreeTemplate(@PathVariable Long ttmplId) {
+	public ResponseJSON getTreeTemplate(@PathVariable Long ttmplId, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		TemplateTreeTemplate ttmpl = treeService.getTemplate(ttmplId);
 		jRes.put("ttmpl", ttmpl);

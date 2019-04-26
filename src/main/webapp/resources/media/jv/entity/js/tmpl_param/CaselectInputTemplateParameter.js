@@ -82,7 +82,7 @@ define(function(require, exports, module){
 						if($(e1.target).closest($selectsContainer).length == 0){
 							$selectsContainer.hide();
 							$input.text(getValue()).css('visibility', 'visible');
-							_this.validate($span, detailInput.ui);
+							_this.validate.apply(detailInput, [$span]);
 							$(document.body).off('click', blur);
 						}
 					}
@@ -157,7 +157,8 @@ define(function(require, exports, module){
 		}
 		
 		
-		this.validate = function($span, ui){
+		this.validate = function($span){
+			var result = []; 
 			var completed = true;
 			var val = getValue();
 			if(val){
@@ -169,10 +170,10 @@ define(function(require, exports, module){
 				});
 			}
 			if(!completed){
-				ui.tipError(getInput($span), '级联属性不完整');
-				return false;
+				result.push(this.showError('级联属性不完整', 2, getInput($span)));
+				return result;
 			}else{
-				ui.removeError(getInput($span));
+				this.ui.removeError(getInput($span));
 			}
 		}
 		

@@ -1,6 +1,7 @@
 package cn.sowell.datacenter.api2.controller.entity;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,14 +24,16 @@ import com.alibaba.fastjson.JSONObject;
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
 import cn.sowell.copframe.dto.page.PageInfo;
+import cn.sowell.copframe.utils.CollectionUtils;
+import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.JsonUtils;
 import cn.sowell.copframe.utils.TextUtils;
-import cn.sowell.datacenter.admin.controller.modules.AdminModulesController;
 import cn.sowell.datacenter.api2.controller.Api2Constants;
 import cn.sowell.datacenter.common.ApiUser;
 import cn.sowell.datacenter.common.EntityQueryPoolUtils;
 import cn.sowell.datacenter.common.RequestParameterMapComposite;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
+import cn.sowell.datacenter.entityResolver.impl.RelSelectionEntityPropertyParser;
 import cn.sowell.datacenter.model.api2.service.MetaJsonService;
 import cn.sowell.datacenter.model.api2.service.TemplateJsonParseService;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
@@ -47,8 +50,11 @@ import cn.sowell.dataserver.model.modules.service.view.EntityQuery;
 import cn.sowell.dataserver.model.modules.service.view.EntityQueryPool;
 import cn.sowell.dataserver.model.modules.service.view.PagedEntityList;
 import cn.sowell.dataserver.model.modules.service.view.TreeNodeContext;
+import cn.sowell.dataserver.model.tmpl.manager.TreeTemplateManager.TreeRelationComposite;
 import cn.sowell.dataserver.model.tmpl.pojo.ArrayEntityProxy;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionTemplate;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailField;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupAction;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
@@ -56,11 +62,11 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeNode;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeTemplate;
 import cn.sowell.dataserver.model.tmpl.service.ActionTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.ArrayItemFilterService;
+import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.ListCriteriaFactory;
 import cn.sowell.dataserver.model.tmpl.service.ListTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
 import cn.sowell.dataserver.model.tmpl.service.TreeTemplateService;
-import cn.sowell.dataserver.model.tmpl.service.impl.TreeTemplateServiceImpl.TreeRelationComposite;
 
 @Controller
 @RequestMapping(Api2Constants.URI_ENTITY + "/curd")
@@ -104,6 +110,12 @@ public class Api2EntityCurdController {
 	
 	@Resource
 	ActionTemplateService atmplService;
+	
+	@Resource
+	DetailTemplateService dtmplService;
+	
+	@Resource
+	MetaJsonService metaService;
 	
 	static Logger logger = Logger.getLogger(Api2EntityCurdController.class);
 	
@@ -171,10 +183,8 @@ public class Api2EntityCurdController {
 		//注册一个查询
 		EntityQuery query = qPool.regist();
 		TemplateTreeTemplate ttmpl = treeService.getTemplate(tmplGroup.getTreeTemplateId());
-		//构造根节点的上下文
-		TreeNodeContext nodeContext = new TreeNodeContext(ttmpl);
 		//根据上下文获得节点模板
-		TemplateTreeNode nodeTemplate = treeService.analyzeNodeTemplate(nodeContext);;
+		TemplateTreeNode nodeTemplate = treeService.getDefaultNodeTemplate(ttmpl);
 		//设置参数
 		query
 			.setModuleName(menu.getTemplateModule())
@@ -200,14 +210,11 @@ public class Api2EntityCurdController {
 			@RequestParam(required=false, defaultValue="10") Integer pageSize, 
 			HttpSession session, 
 			ApiUser user) {
-		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
+		authService.validateUserL2MenuAccessable(user, menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		
-		String moduleName = menu.getTemplateModule();
-		
-		TreeRelationComposite relationComposite = treeService.getNodeRelationTemplate(moduleName, nodeRelationId);
+		TreeRelationComposite relationComposite = treeService.getNodeRelationTemplate(nodeRelationId);
 		if(relationComposite != null) {
-			//TemplateTreeRelation nodeRelationTempalte = relationComposite.getReltionTempalte();
 			//构造查询节点的上下文
 			TreeNodeContext nodeContext = new TreeNodeContext(relationComposite);
 			//设置当前节点路径
@@ -221,7 +228,7 @@ public class Api2EntityCurdController {
 			//在模板中匹配查询结果的Node模板
 			//设置参数
 			query
-				.setModuleName(menu.getTemplateModule())
+				.setModuleName(relationComposite.getTreeTemplate().getModule())
 				.setParentEntityCode(parentEntityCode)
 				.setRelationTemplate(relationComposite.getRelationTempalte())
 				.setPageSize(pageSize)
@@ -294,29 +301,44 @@ public class Api2EntityCurdController {
 	}
 	
 	@ResponseBody
-	@RequestMapping("/save/{menuId}")
+	@RequestMapping({
+		"/save/{contextType:normal}/{menuId}",
+		"/save/{contextType:normal}/{menuId}/",
+		"/save/{contextType:rabc}/{menuId}/{fieldGroupId}",
+		"/save/{contextType:node}/{menuId}/{nodeId}"
+	})
 	public ResponseJSON save(
+			@PathVariable String contextType,
 			@PathVariable Long menuId,
+			@PathVariable(required=false) Long fieldGroupId,
+			@PathVariable(required=false) Long nodeId,
 			@RequestParam(value=Api2Constants.KEY_FUSE_MODE, required=false) Boolean fuseMode,
 			@RequestParam(value=Api2Constants.KEY_ACTION_ID, required=false) Long actionId,
     		RequestParameterMapComposite composite, ApiUser user) {
-		JSONObjectResponse jRes = new JSONObjectResponse();
 		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
-		String moduleName = menu.getTemplateModule();
+		TemplateGroup tmplGroup = null;
+		if("normal".equals(contextType)) {
+			tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+		}else if("rabc".equals(contextType)) {
+			TemplateDetailFieldGroup fieldGroup = dtmplService.getFieldGroup(fieldGroupId);
+			tmplGroup = tmplGroupService.getTemplate(fieldGroup.getRabcTemplateGroupId());
+		}else if("node".equals(contextType)) {
+			TemplateTreeNode nodeTemplate = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
+			tmplGroup = tmplGroupService.getTemplate(nodeTemplate.getTemplateGroupId());
+		}
+		JSONObjectResponse jRes = new JSONObjectResponse();
 		Map<String, Object> entityMap = composite.getMap();
 		if(actionId != null) {
 			ArrayEntityProxy.setLocalUser(user);
 			TemplateGroupAction groupAction = tmplGroupService.getTempateGroupAction(actionId);
-			AdminModulesController.validateGroupAction(groupAction, menu, "");
+			authService.validateGroupAction(groupAction, tmplGroup, "");
 			entityMap = atmplService.coverActionFields(groupAction, entityMap);
 		}
     	 try {
     		 entityMap.remove(Api2Constants.KEY_FUSE_MODE);
     		 entityMap.remove(Api2Constants.KEY_ACTION_ID);
     		 String code = null;
-    		 EntityQueryParameter param = new EntityQueryParameter(moduleName, user);
-    		 Long tmplGroupId = menu.getTemplateGroupId();
-    		 TemplateGroup tmplGroup = tmplGroupService.getTemplate(tmplGroupId);
+    		 EntityQueryParameter param = new EntityQueryParameter(tmplGroup.getModule(), user);
     		 param.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(tmplGroup.getDetailTemplateId(), user));
     		 if(Boolean.TRUE.equals(fuseMode)) {
     			 code = entityService.fuseEntity(param, entityMap);
@@ -334,6 +356,9 @@ public class Api2EntityCurdController {
 		return jRes;
 	}
 	
+	
+
+
 	@ResponseBody
 	@RequestMapping("/do_action/{menuId}/{actionId}")
 	public ResponseJSON doAction(@PathVariable Long menuId, @PathVariable Long actionId, String codes, ApiUser user) {
@@ -379,12 +404,18 @@ public class Api2EntityCurdController {
 	public ResponseJSON detail(@PathVariable Long menuId, 
 			@PathVariable String code, 
 			Long historyId,
+			Long nodeId,
 			ApiUser user) {
-		JSONObjectResponse jRes = new JSONObjectResponse();
 		//检测用户的权限
 		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
-		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
-		
+		TemplateGroup tmplGroup = null;
+		if(nodeId == null) {
+			tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+		}else {
+			TemplateTreeNode nodeTmpl = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
+			tmplGroup = tmplGroupService.getTemplate(nodeTmpl.getTemplateGroupId());
+		}
+		JSONObjectResponse jRes = new JSONObjectResponse();
 		//获得实体对象
 		EntityQueryParameter queryParam = new EntityQueryParameter(tmplGroup.getModule(), code, user);
 		queryParam.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(tmplGroup.getDetailTemplateId(), user));
@@ -403,7 +434,7 @@ public class Api2EntityCurdController {
 			jRes.put("message", "没有找到实体");
 		}else {
 			//用模板组合解析，并返回可以解析为json的对象
-			EntityDetail detail = entityConvertService.convertEntityDetail(entity, tmplGroup);
+			EntityDetail detail = entityConvertService.convertEntityDetail(entity, dtmplService.getTemplate(tmplGroup.getDetailTemplateId()));
 			
 			jRes.put("entity", detail);
 			jRes.put("errors", entityConvertService.toErrorItems(entity.getErrors()));
@@ -413,15 +444,23 @@ public class Api2EntityCurdController {
 		return jRes;
 	}
 	
+	
 	@ResponseBody
 	@RequestMapping("/history/{menuId}/{code}/{pageNo}")
 	public ResponseJSON entityHistory(@PathVariable Long menuId, 
 			@PathVariable String code, 
+			Long nodeId,
 			@PathVariable Integer pageNo, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		//检测用户的权限
 		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
-		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+		TemplateGroup tmplGroup = null;
+		if(nodeId == null) {
+			tmplGroup  = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+		}else {
+			TemplateTreeNode nodeTmpl = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
+			tmplGroup = tmplGroupService.getTemplate(nodeTmpl.getTemplateGroupId());
+		}
 		EntityQueryParameter queryParam = new EntityQueryParameter(tmplGroup.getModule(), code, user);
 		List<EntityHistoryItem> historyItems = entityService.queryHistory(queryParam, pageNo, 100);
 		JSONArray aHistoryItems = entityConvertService.toHistoryItems(historyItems, null);
@@ -429,5 +468,69 @@ public class Api2EntityCurdController {
 		return jRes;
 	}
 	
+	
+	@ResponseBody
+	@RequestMapping("/query_select_entities/{menuId}/{groupId}")
+	public ResponseJSON querySelectEntities(@PathVariable Long menuId, 
+			@PathVariable Long groupId,
+			String excepts, 
+			HttpServletRequest request,
+			ApiUser user, HttpSession session) {
+		authService.validateUserL2MenuAccessable(user, menuId);
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		TemplateDetailFieldGroup fieldGroup = dtmplService.getFieldGroup(groupId);
+		EntityQueryPool qPool = EntityQueryPoolUtils.getEntityQueryPool(session, user);
+		EntityQuery query = qPool.regist();
+		query.addExcludeEntityCodes(TextUtils.split(excepts, ","));
+		entityService.wrapSelectEntityQuery(query, fieldGroup, lcriteriFacrory.exractTemplateCriteriaMap(request));
+		jRes.put("queryKey", query.getKey());
+		return jRes;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/load_entities/{menuId}/{groupId}")
+	public ResponseJSON loadSelectedEntities(@PathVariable Long menuId, 
+			@PathVariable Long groupId, 
+			@RequestParam String codes, 
+			String fieldNames, 
+			String dfieldIds, ApiUser user) {
+		authService.validateUserL2MenuAccessable(user, menuId);
+		Set<String> codeSet = TextUtils.split(codes, ",");
+		codeSet.remove("");
+		
+		
+		Set<String> fieldNameSet = null;
+		Map<Long, String> dfieldIdNameMap = null;
+		
+		TemplateDetailFieldGroup fieldGroup = dtmplService.getFieldGroup(groupId);
+		if(fieldNames != null && fieldNames.isEmpty()) {
+			fieldNameSet = TextUtils.split(fieldNames, ",");
+			fieldNameSet.remove("");
+		}else {
+			if(dfieldIds != null && !dfieldIds.isEmpty()) {
+				dfieldIdNameMap = new HashMap<>();
+				Set<Long> dfieldIdSet = TextUtils.split(dfieldIds, ",", HashSet::new, FormatUtils::toLong);
+				Map<Long, TemplateDetailField> dfieldMap = CollectionUtils.toMap(fieldGroup.getFields(), TemplateDetailField::getId);
+				for (Long dfieldId : dfieldIdSet) {
+					TemplateDetailField dfield = dfieldMap.get(dfieldId);
+					if(dfield != null) {
+						dfieldIdNameMap.put(dfieldId, dfield.getFieldName());
+					}
+				}
+			}
+		}
+		
+		if(fieldNameSet != null && fieldNameSet.isEmpty() || dfieldIdNameMap != null && !dfieldIdNameMap.isEmpty()) {
+			Map<String, RelSelectionEntityPropertyParser> entityMap = entityService.loadEntities(codeSet, fieldGroup, user);
+			JSONObject jEntities = entityConvertService.toEntitiesJson(entityMap, fieldNameSet, dfieldIdNameMap);
+			JSONObjectResponse jRes = new JSONObjectResponse();
+			jRes.setJsonObject(jEntities);
+			jRes.setStatus("suc");
+			return jRes;
+		}else {
+			throw new RuntimeException("Must set unempty parameter one of \"fieldNames\" or \"dfieldIds\"");
+		}
+		
+	}
 	
 }
