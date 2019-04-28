@@ -11,7 +11,7 @@ define(function(require, exports, module){
 	exports.init = function(_param){
 		var defParam = {
 			$page			: null,
-			menuId			: null,
+			validateSign			: null,
 			code			: null,
 			mode			: 'detail',
 			fieldGroupId	: null
@@ -32,9 +32,8 @@ define(function(require, exports, module){
 		var doWhen = require('utils').DoWhen(function(){return param.mode});
 		doWhen(	/rabc.+/, function(){status.setStatus({contextType:'rabc',contextTypeArg:param.fieldGroupId})},
 				/node.+/, function(){status.setStatus({contextType:'node',contextTypeArg:param.nodeId})},
-				/user.+/, function(){status.setStatus({contextType:'user',contextTypeArg:''})},
+				/user.+/, function(){param.validateSign = 'user';status.setStatus({contextType:'normal',contextTypeArg:''})},
 				function(){status.setStatus({contextType:'normal',contextTypeArg:''})});
-		
 		$CPF.showLoading();
 		require('tmpl').load('media/jv/entity/tmpl/entity-detail.tmpl').done(function(tmplMap){
 			
@@ -52,14 +51,15 @@ define(function(require, exports, module){
 					.bind('normalFieldInputInited', setDetailInputsValue)
 			},/.*update/, function(){
 				status
-				.bind('entity', renderTitle)
-				.bind('dtmpl', renderDetailInputs)
-				.bind('dtmpl', renderFusionToggler)
-				.bind('actions', renderActions)
-				.bind('buttonStatus', renderSaveButton)
-				.bind('entity', renderArrayItems)
-				.bind('entity', setDetailInputsValue)
-				.bind('normalFieldInputInited', setDetailInputsValue)
+					.bind('entity', renderTitle)
+					.bind('dtmpl', renderDetailInputs)
+					.bind('dtmpl', renderFusionToggler)
+					.bind('actions', renderActions)
+					.bind('buttonStatus', renderSaveButton)
+					.bind('entity', renderArrayItems)
+					.bind('entity', setDetailInputsValue)
+					.bind('normalFieldInputInited', setDetailInputsValue)
+					;
 			},/.*detail/, function(){
 				status
 					.bind('entity', renderTitle)
@@ -76,12 +76,10 @@ define(function(require, exports, module){
 			
 			//初始化页面，加载模板后加载实体
 			loadDetailTemplate().done(function(){
-				doWhen(/user.+/, $.noop, function(){
-					//detail模式下，要加载entity和history
-					doWhen(/.*detail/, function(){loadEntity();loadHistory(1)});
-					//update模式下，只要加载entity
-					doWhen(/.*update/, function(){loadEntity()});
-				})
+				//detail模式下，要加载entity和history
+				doWhen(/.*detail/, function(){loadEntity();loadHistory(1)});
+				//update模式下，只要加载entity
+				doWhen(/.*update/, function(){loadEntity()});
 			})
 			
 			/**
@@ -89,21 +87,17 @@ define(function(require, exports, module){
 			 */
 			function loadDetailTemplate(){
 				$CPF.showLoading();
-				return doWhen(/user.+/, function(){
-					return Ajax.ajax('api2/meta/user/detail').done(function(data){
+				var uri = 'api2/meta/tmpl/dtmpl_config/' + status.getStatus('contextType') + '/' + param.validateSign + '/' + status.getStatus('contextTypeArg');
+				return Ajax.ajax(uri).done(function(data){
+					var config = data.config;
+					doWhen(/rabc.+|node.+/, function(){
+						status.setStatus('moduleTitle', config.module.title);
+					}, /user.+/, function(){
 						status.setStatus('moduleTitle', '用户');
-						status.setStatus(data, ['dtmpl', 'entity', 'historyId']);
+					}, function(){
+						status.setStatus('moduleTitle', data.menu.title);
 					});
-				}, function(){
-					return Ajax.ajax('api2/meta/tmpl/dtmpl_config/' + status.getStatus('contextType') + '/' + param.menuId + '/' + status.getStatus('contextTypeArg')).done(function(data){
-						var config = data.config;
-						doWhen(/rabc.+|node.+/, function(){
-							status.setStatus('moduleTitle', config.module.title);
-						}, function(){
-							status.setStatus('moduleTitle', data.menu.title);
-						});
-						status.setStatus(config, ['dtmpl', 'premises', 'actions', 'buttonStatus']);
-					});
+					status.setStatus(config, ['dtmpl', 'premises', 'actions', 'buttonStatus']);
 				});
 			}
 			
@@ -112,10 +106,12 @@ define(function(require, exports, module){
 			 */
 			function loadEntity(historyId){
 				var reqParam = {};
-				doWhen(['node_detail', 'node_update'], function(){reqParam.nodeId = param.nodeId});
+				doWhen(/node.+/, function(){reqParam.nodeId = param.nodeId},
+						/user.+/, function(){if(param.dtmplId) reqParam.dtmplId = param.dtmplId});
 				if(typeof historyId === 'number' || typeof historyId === 'string') reqParam.historyId = historyId;
 				$CPF.showLoading();
-				Ajax.ajax('api2/entity/curd/detail/' + param.menuId + '/' + param.code, reqParam).done(function(data){
+				var uri = 'api2/entity/curd/detail/' + param.validateSign + '/' + param.code;
+				Ajax.ajax(uri, reqParam).done(function(data){
 					status.setStatus(data, ['entity', 'historyId']);
 				});
 				
@@ -127,7 +123,8 @@ define(function(require, exports, module){
 			function loadHistory(hisPageNo){
 				var reqParam = {};
 				doWhen(['node_detail', 'node_update'], function(){reqParam.nodeId = param.nodeId});
-				Ajax.ajax('api2/entity/curd/history/' + param.menuId + '/' + param.code + '/1', reqParam).done(function(data){
+				var uri = 'api2/entity/curd/history/' + param.validateSign + '/' + param.code + '/1';
+				Ajax.ajax(uri, reqParam).done(function(data){
 					status.setStatus(data, ['history']);
 				});
 			}
@@ -161,7 +158,7 @@ define(function(require, exports, module){
 						var $table = $(this).closest('table');
 						//获得当前
 						var exceptCodes = getExistCodes(group);
-						require('dialog').openDialog('jv/entity/curd/select/' + param.menuId + '/' + group.id, '选择实体', undefined, {
+						require('dialog').openDialog('jv/entity/curd/select/' + param.validateSign + '/' + group.id, '选择实体', undefined, {
 							reqParam:	{
 								except	: exceptCodes.join()
 							},
@@ -175,7 +172,7 @@ define(function(require, exports, module){
 					//弹出框编辑实体页面，创建并保存实体后返回
 					dialogCreateEntity	: function(group){
 						var $table = $(this).closest('table');
-						require('dialog').openDialog('jv/entity/curd/rabc_create/' + param.menuId + '/' + group.id, '创建实体', undefined, {
+						require('dialog').openDialog('jv/entity/curd/rabc_create/' + param.validateSign + '/' + group.id, '创建实体', undefined, {
 							width	: 1000,
 							height	: 450,
 							events:	{
@@ -329,13 +326,15 @@ define(function(require, exports, module){
 				var actions = this.getStatus('actions');
 				var innerActions = [], outgoingActions = [];
 				
-				$.each(actions, function(){
-					if(this.outgoing === 1){
-						outgoingActions.push(this)
-					}else{
-						innerActions.push(this);
-					}
-				});
+				if(actions){
+					$.each(actions, function(){
+						if(this.outgoing === 1){
+							outgoingActions.push(this)
+						}else{
+							innerActions.push(this);
+						}
+					});
+				}
 				tmplMap['inner-actions'].replaceIn($page, {innerActions}, {doAction, toggleInnerActions});
 				tmplMap['outgoing-actions'].replaceIn($page, {outgoingActions}, {doAction});
 				tmplMap['save-button'].replaceIn($page, {}, {doSave});
@@ -379,15 +378,16 @@ define(function(require, exports, module){
 					Dialog.confirm(msg).done(function(){
 						require('utils').writeFormData(formData);
 						var page = $page.getLocatePage();
-						require('ajax').ajax('api2/entity/curd/save/' + status.getStatus('contextType')  + '/'  + param.menuId + '/' + status.getStatus('contextTypeArg'), formData, function(data){
+						var uri = 'api2/entity/curd/save/' + status.getStatus('contextType')  + '/'  + param.validateSign + '/' + status.getStatus('contextTypeArg');
+						require('ajax').ajax(uri, formData, function(data){
 							if(data.status === 'suc'){
 								Dialog.notice('保存成功', 'success');
 								doWhen(
-									'create', function(){page.loadContent('jv/entity/update/' + param.menuId + '/' + data.code)}, 
-									['update', 'node_update'], function(){page.refresh()},
+									'create', function(){page.loadContent('jv/entity/curd/update/' + param.validateSign + '/' + data.code)}, 
+									['update', 'node_update', 'user_update'], function(){page.refresh()},
 									/rabc.+/, function(){
 										var afterSave = page.getPageObj().getEventCallbacks('afterSave');
-										if(afterSave){afterSave.apply(page, [require('entity/js/entity-select').createEntityLoader([data.code], param.menuId, param.fieldGroupId)])}
+										if(afterSave){afterSave.apply(page, [require('entity/js/entity-select').createEntityLoader([data.code], param.validateSign, param.fieldGroupId)])}
 										page.close();
 								});
 							}else{
@@ -553,7 +553,7 @@ define(function(require, exports, module){
 			 */
 			function dialogUpdateArrayItemRow(arrayItemCode, group){
 				var $row = $(this).closest('tr');
-				require('dialog').openDialog('jv/entity/curd/rabc_update/' + param.menuId + '/' + group.id + '/' + arrayItemCode, '编辑实体', undefined, {
+				require('dialog').openDialog('jv/entity/curd/rabc_update/' + param.validateSign + '/' + group.id + '/' + arrayItemCode, '编辑实体', undefined, {
 					width	: 1000,
 					height	: 450,
 					events:	{
@@ -725,10 +725,12 @@ define(function(require, exports, module){
 						if(historyId){
 							reqParam.historyId = historyId;
 						}
+						doWhen(/node.+/, function(){reqParam.nodeId = param.nodeId},
+								/user.+/, function(){if(param.dtmplId) reqParam.dtmplId = param.dtmplId});
 						if(entity.code){
 							require('dialog').confirm('确认导出当前详情页？').done(function(){
 								$CPF.showLoading();
-								Ajax.ajax('api2/entity/export/detail/' + param.menuId + '/' + entity.code, reqParam, function(data){
+								Ajax.ajax('api2/entity/export/detail/' + param.validateSign + '/' + entity.code, reqParam, function(data){
 									if(data.status === 'suc'){
 										if(data.uuid){
 											Ajax.download('api2/entity/export/download/' + data.uuid);

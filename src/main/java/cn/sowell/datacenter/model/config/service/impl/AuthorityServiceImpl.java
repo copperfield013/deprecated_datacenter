@@ -17,16 +17,25 @@ import com.google.common.collect.Lists;
 import cn.sowell.copframe.dao.utils.UserUtils;
 import cn.sowell.copframe.utils.CollectionUtils;
 import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.datacenter.common.ApiUser;
 import cn.sowell.datacenter.model.admin.pojo.ABCUser;
+import cn.sowell.datacenter.model.config.bean.ValidateDetailParamter;
+import cn.sowell.datacenter.model.config.bean.ValidateDetailResult;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel1Menu;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.pojo.criteria.AuthorityCriteria;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
+import cn.sowell.datacenter.model.config.service.ConfigUserService;
 import cn.sowell.datacenter.model.config.service.NonAuthorityException;
 import cn.sowell.datacenter.model.config.service.SideMenuService;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupAction;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeNode;
+import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
+import cn.sowell.dataserver.model.tmpl.service.TreeTemplateService;
 
 @Service
 public class AuthorityServiceImpl implements AuthorityService{
@@ -36,6 +45,16 @@ public class AuthorityServiceImpl implements AuthorityService{
 	
 	@Resource
 	TemplateGroupService tmplGroupService;
+	
+	
+	@Resource
+	DetailTemplateService dtmplService;
+	
+	@Resource
+	TreeTemplateService treeService;
+	
+	@Resource
+	ConfigUserService userService;
 	
 	@Override
 	public SideMenuLevel2Menu validateL2MenuAccessable(Long level2MenuId) throws NonAuthorityException{
@@ -67,6 +86,18 @@ public class AuthorityServiceImpl implements AuthorityService{
 		}else {
 			throw new NonAuthorityException("根据id[" + level2MenuId + "]获得不到对应二级菜单");
 		}
+	}
+	
+	@Override
+	public void validateUserAccessable(UserDetails user, String validateSign) {
+		if(validateSign.matches("\\d+")) {
+			validateUserL2MenuAccessable(user, Long.valueOf(validateSign));
+		}else if("user".equals(validateSign)) {
+			
+		}else {
+			throw new NonAuthorityException("无法识别vaidateSign[" + validateSign + "]");
+		}
+		
 	}
 	
 	@Override
@@ -120,5 +151,60 @@ public class AuthorityServiceImpl implements AuthorityService{
 			}
 		}
 	}
+
+	
+	@Override
+	public TemplateDetailFieldGroup validateSelectionAuth(String validateSign, Long fieldGroupId, ApiUser user) {
+		if(validateSign.matches("\\d+")) {
+			Long menuId = Long.valueOf(validateSign);
+			validateUserL2MenuAccessable(user, menuId);
+			return dtmplService.getFieldGroup(fieldGroupId);
+		}else{
+			TemplateDetailFieldGroup fieldGroup = dtmplService.getFieldGroup(fieldGroupId);
+			TemplateDetailTemplate dtmpl = dtmplService.getTemplate(fieldGroup.getTmplId());
+			userService.validateUserAuthentication(dtmpl.getModule());
+			return fieldGroup;
+		}
+	}
+
+	
+	
+	
+	@Override
+	public ValidateDetailResult validateDetailAuth(ValidateDetailParamter param) {
+		ValidateDetailResult result = new ValidateDetailResult();
+		if(param.getValidateSign().matches("\\d+")) {
+			Long menuId = Long.valueOf(param.getValidateSign());
+			SideMenuLevel2Menu menu = validateUserL2MenuAccessable(param.getUser(), menuId);
+			TemplateGroup tmplGroup = null;
+			if(param.getNodeId() == null) {
+				tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+			}else if(param.getFieldGroupId() != null){
+				TemplateDetailFieldGroup fieldGroup = dtmplService.getFieldGroup(param.getFieldGroupId());
+				tmplGroup = tmplGroupService.getTemplate(fieldGroup.getRabcTemplateGroupId());
+			}else {
+				TemplateTreeNode nodeTmpl = treeService.getNodeTemplate(menu.getTemplateModule(), param.getNodeId());
+				tmplGroup = tmplGroupService.getTemplate(nodeTmpl.getTemplateGroupId());
+			}
+			result.setTmplGroup(tmplGroup);
+			result.setDetailTemplate(dtmplService.getTemplate(tmplGroup.getDetailTemplateId()));
+			result.setMenu(menu);
+			result.setEntityCode(param.getCode());
+		}else{
+			TemplateDetailTemplate dtmpl = null;
+			if("user".equals(param.getValidateSign())) {
+				if(param.getUser() instanceof ABCUser) {
+					ABCUser user = (ABCUser) param.getUser();
+					dtmpl = userService.getUserDetailTemplate(param.getDetailTemplateId());
+					result.setEntityCode(user.getCode());
+				}
+			}else {
+				throw new RuntimeException("validateSign[" + param.getValidateSign() + "]无法识别");
+			}
+			result.setDetailTemplate(dtmpl);
+		}
+		return result;
+	}
+
 
 }

@@ -15,6 +15,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import cn.sowell.datacenter.model.api2.service.MetaJsonService;
 import cn.sowell.datacenter.model.api2.service.TemplateJsonParseService;
+import cn.sowell.datacenter.model.config.bean.ValidateDetailResult;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.modules.service.view.EntityView;
@@ -24,7 +25,6 @@ import cn.sowell.dataserver.model.tmpl.pojo.AbstractListCriteria;
 import cn.sowell.dataserver.model.tmpl.pojo.AbstractListTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroupTreeNode;
-import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupAction;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListColumn;
@@ -175,19 +175,23 @@ public class TemplateJsonParseServiceImpl implements TemplateJsonParseService{
 	}
 
 	@Override
-	public JSONObject toDetailTemplateConfig(TemplateGroup tmplGroup) {
-		if(tmplGroup != null) {
-			TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
+	public JSONObject toDetailTemplateConfig(ValidateDetailResult validateResult) {
+		if(validateResult != null) {
 			JSONObject jConfig = new JSONObject();
-			ModuleMeta module = moduleService.getModule(tmplGroup.getModule());
-			jConfig.put("module", metaService.toModuleJson(module));
-			jConfig.put("dtmpl", dtmpl);
-			jConfig.put("premises", tmplGroup.getPremises());
-			jConfig.put("buttonStatus", metaService.toButtonStatus(tmplGroup));
-			if(tmplGroup.getActions() != null) {
-				jConfig.put("actions", tmplGroup.getActions().stream()
-						.filter(action->TemplateGroupAction.ACTION_FACE_DETAIL.equals(action.getFace()))
-						.collect(Collectors.toList()));
+			TemplateGroup tmplGroup = validateResult.getTmplGroup();
+			if(validateResult.getDetailTemplate() != null) {
+				jConfig.put("dtmpl", validateResult.getDetailTemplate());
+			}
+			if(tmplGroup != null) {
+				ModuleMeta module = moduleService.getModule(tmplGroup.getModule());
+				jConfig.put("module", metaService.toModuleJson(module));
+				jConfig.put("premises", tmplGroup.getPremises());
+				jConfig.put("buttonStatus", metaService.toButtonStatus(tmplGroup));
+				if(tmplGroup.getActions() != null) {
+					jConfig.put("actions", tmplGroup.getActions().stream()
+							.filter(action->TemplateGroupAction.ACTION_FACE_DETAIL.equals(action.getFace()))
+							.collect(Collectors.toList()));
+				}
 			}
 			return jConfig;
 		}

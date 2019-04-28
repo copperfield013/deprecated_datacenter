@@ -7,10 +7,10 @@ define(function(require, exports, module){
 	var CriteriaRendererFactory = require('entity/js/criteria-render-factory');
 	exports.init = function(_param){
 		var defParam = {
-			$page	: null,
-			menuId	: null,
-			except	: '',
-			groupId	: null,
+			$page			: null,
+			validateSign	: null,
+			except			: '',
+			groupId			: null,
 			$submitButton	: null
 		};
 		
@@ -49,7 +49,7 @@ define(function(require, exports, module){
 			$page.getLocatePage().bind('footer-submit', function(data){
 				var selectedCodes = status.getStatus('selectedCodes');
 				if(selectedCodes && selectedCodes.length > 0){
-					return createEntityLoader(selectedCodes, param.menuId, param.groupId);
+					return createEntityLoader(selectedCodes, param.validateSign, param.groupId);
 				}
 			});
 			
@@ -57,7 +57,7 @@ define(function(require, exports, module){
 			 * 从后台加载配置数据
 			 */
 			function loadConfig(){
-				Ajax.ajax('api2/meta/tmpl/select_config/' + param.menuId + '/' + param.groupId).done(function(data){
+				Ajax.ajax('api2/meta/tmpl/select_config/' + param.validateSign + '/' + param.groupId).done(function(data){
 					status.setStatus('dialogType', data.config.type);
 					status.setStatus(data, ['menu', 'config']);
 				});
@@ -70,7 +70,7 @@ define(function(require, exports, module){
 				var excepts = {
 					excepts	: param.except
 				}; 
-				Ajax.ajax('api2/entity/curd/query_select_entities/' + param.menuId + '/' + param.groupId, $.extend({}, criterias, excepts)).done(function(data){
+				Ajax.ajax('api2/entity/curd/query_select_entities/' + param.validateSign + '/' + param.groupId, $.extend({}, criterias, excepts)).done(function(data){
 					if(data.queryKey){
 						status.setStatus('queryKey', data.queryKey);
 						$CPF.closeLoading();
@@ -96,7 +96,7 @@ define(function(require, exports, module){
 							$page,
 							queryKey,
 							defaultNodeTmpl	: config.nodeTmpl,
-							menuId			: param.menuId,
+							validateSign			: param.validateSign,
 							renderOperates	: false,
 							checkableNodeIds: config.checkableNodeIds
 						}).bind('node-check', function(data){
@@ -210,11 +210,11 @@ define(function(require, exports, module){
 	/**
 	 * 
 	 */
-	function createEntityLoader(codes, menuId, groupId){
+	function createEntityLoader(codes, validateSign, groupId){
 		var entitiesLoader = function(dfieldIds){
 			var deferred = $.Deferred();
 			if($.isArray(dfieldIds) && dfieldIds.length > 0){
-				Ajax.ajax('api2/entity/curd/load_entities/' + menuId + '/' + groupId, {
+				Ajax.ajax('api2/entity/curd/load_entities/' + validateSign + '/' + groupId, {
 					codes		: codes.join(),
 					dfieldIds	: dfieldIds.join()
 				}, function(data){

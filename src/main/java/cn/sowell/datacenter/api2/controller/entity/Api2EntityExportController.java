@@ -30,6 +30,8 @@ import cn.sowell.datacenter.api2.controller.Api2Constants;
 import cn.sowell.datacenter.common.ApiUser;
 import cn.sowell.datacenter.common.EntityQueryPoolUtils;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
+import cn.sowell.datacenter.model.config.bean.ValidateDetailParamter;
+import cn.sowell.datacenter.model.config.bean.ValidateDetailResult;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.modules.service.ExportService;
@@ -40,7 +42,6 @@ import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
 import cn.sowell.dataserver.model.modules.service.view.EntityQuery;
 import cn.sowell.dataserver.model.modules.service.view.EntityQueryPool;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
-import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.service.ArrayItemFilterService;
 import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
@@ -89,18 +90,29 @@ public class Api2EntityExportController {
 	ArrayItemFilterService arrayItemFilterService;
 	
 	@ResponseBody
-	@RequestMapping("/detail/{menuId}/{entityCode}")
+	@RequestMapping({"/detail/{validateSign:\\d+}/{entityCode}",
+						"/detail/{validateSign:user}",
+						"/detail/{validateSign:user}/*"})
 	public ResponseJSON detail(
-				@PathVariable Long menuId, 
-				@PathVariable String entityCode,
+				@PathVariable String validateSign, 
+				@PathVariable(required=false) String entityCode,
 				Long historyId,
+				Long nodeId,
+				Long dtmplId,
 				ApiUser user) {
-		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
+		ValidateDetailParamter vparam = new ValidateDetailParamter(validateSign, user);
+		vparam
+			.setCode(entityCode)
+			.setNodeId(nodeId)
+			.setDetailTemplateId(dtmplId)
+			;
+		//检测用户的权限
+		ValidateDetailResult vResult = authService.validateDetailAuth(vparam);
+		TemplateDetailTemplate dtmpl = vResult.getDetailTemplate();
 		JSONObjectResponse jRes = new JSONObjectResponse();
-		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
 		//获得实体对象
-		EntityQueryParameter queryParam = new EntityQueryParameter(tmplGroup.getModule(), entityCode, user);
-		queryParam.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(tmplGroup.getDetailTemplateId(), user));
+		EntityQueryParameter queryParam = new EntityQueryParameter(dtmpl.getModule(), vResult.getEntityCode(), user);
+		queryParam.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(dtmpl.getId(), user));
 		ModuleEntityPropertyParser entity = entityService.getEntityParser(queryParam);
 		
 		EntityHistoryItem lastHistory = entityService.getLastHistoryItem(queryParam);
@@ -112,7 +124,6 @@ public class Api2EntityExportController {
         }
 		
 		try {
-			TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
 			String uuid = eService.exportDetailExcel(entity, dtmpl);
 			if(uuid != null) {
 				jRes.put("uuid", uuid);

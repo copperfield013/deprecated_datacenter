@@ -18,14 +18,14 @@
 </div>
 <script>
 	console.warn('entity-select');
-	seajs.use(['entity/js/entity-select.js?2'], function(EntitySelect){
+	seajs.use(['entity/js/entity-select.js?3'], function(EntitySelect){
 		var $page = $('#list-tmpl-${RES_STAMP}');
 		console.log(EntitySelect);
 		EntitySelect.init({
-			$page	: $page,
-			menuId	: '${menuId}',
-			except	: '${except}',
-			groupId	: '${groupId}',
+			$page			: $page,
+			validateSign	: '${validateSign}',
+			except			: '${except}',
+			groupId			: '${groupId}',
 			$submitButton	: $('#submit-btn-${RES_STAMP}')
 		})
 	});

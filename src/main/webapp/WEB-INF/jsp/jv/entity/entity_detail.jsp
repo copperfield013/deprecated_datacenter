@@ -52,7 +52,7 @@
 		var $page = $('#entity-detail-${RES_STAMP}');
 		EntityDetail.init({
 			$page		: $page,
-			menuId		: '${menuId}',
+			validateSign: '${validateSign}',
 			code		: '${code}',
 			mode		: '${mode}',
 			fieldGroupId: '${fieldGroupId}',

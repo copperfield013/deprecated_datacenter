@@ -232,12 +232,14 @@
 											title="${field.fieldAvailable? '': '无效字段' }"
 											field-type="${field.type }">${field.title }</th>
 									{{/each}}
-									{{if mode === 'create' || mode === 'update'}}
+									{{if mode === 'create' || mode === 'update' || mode === 'user_update'}}
 										<th width="20px">
-											{{if group.dialogSelectType == 'stmpl' && group.selectionTemplateId || group.dialogSelectType == 'ttmpl' && group.rabcTreeTemplateId || group.dialogSelectType == 'ltmpl' && group.rabcTemplateGroupId}}
-											<a title="选择" ttmpl-id="11" href="javascript:;" class="open-select-dialog fa fa-link" on-click="do:dialogSelectRow(groups[${i}])"></a>
+											{{if group.unallowedCreate != 1}}
+												<span class="array-item-add" title="添加一行" on-click="do:addArrayItemRow(groups[${i}])">+</span>
 											{{/if}}
-											<span class="array-item-add" title="添加一行" on-click="do:addArrayItemRow(groups[${i}])">+</span>
+											{{if group.dialogSelectType == 'stmpl' && group.selectionTemplateId || group.dialogSelectType == 'ttmpl' && group.rabcTreeTemplateId || group.dialogSelectType == 'ltmpl' && group.rabcTemplateGroupId}}
+												<a title="选择" ttmpl-id="11" href="javascript:;" class="open-select-dialog fa fa-link" on-click="do:dialogSelectRow(groups[${i}])"></a>
+											{{/if}}
 											{{if group.rabcTemplateGroupId && group.rabcUncreatable != 1}}
 												<span class="iconfont icon-add-3 rabd-add" on-click="do:dialogCreateEntity(groups[${i}])"></span>
 											{{/if}}

@@ -14,30 +14,39 @@ public class MetaJsonServiceImpl implements MetaJsonService{
 
 	@Override
 	public JSONObject toMenuJson(SideMenuLevel2Menu menu) {
-		JSONObject jMenu = new JSONObject();
-		jMenu.put("id", menu.getId());
-		jMenu.put("title", menu.getTitle());
-		return jMenu;
+		if(menu != null) {
+			JSONObject jMenu = new JSONObject();
+			jMenu.put("id", menu.getId());
+			jMenu.put("title", menu.getTitle());
+			return jMenu;
+		}
+		return null;
 	}
 
 	@Override
 	public JSONObject toModuleJson(ModuleMeta module) {
-		JSONObject jModule = new JSONObject();
-		jModule.put("name", module.getName());
-		jModule.put("title", module.getTitle());
-		return jModule;
+		if(module != null) {
+			JSONObject jModule = new JSONObject();
+			jModule.put("name", module.getName());
+			jModule.put("title", module.getTitle());
+			return jModule;
+		}
+		return null;
 	}
 
 	@Override
 	public JSONObject toButtonStatus(TemplateGroup tmplGroup) {
-		JSONObject jStatus = new JSONObject();
-		jStatus.put("saveButton", !isTrue(tmplGroup.getHideSaveButton()));
-		jStatus.put("createButton", !isTrue(tmplGroup.getHideCreateButton()));
-		jStatus.put("deleteButton", !isTrue(tmplGroup.getHideDeleteButton()));
-		jStatus.put("exportButton", !isTrue(tmplGroup.getHideExportButton()));
-		jStatus.put("importButton", !isTrue(tmplGroup.getHideImportButton()));
-		jStatus.put("queryButton", !isTrue(tmplGroup.getHideQueryButton()));
-		jStatus.put("treeToggleButton", !isTrue(tmplGroup.getHideTreeToggleButton()));
+		if(tmplGroup != null) {
+			JSONObject jStatus = new JSONObject();
+			jStatus.put("saveButton", !isTrue(tmplGroup.getHideSaveButton()));
+			jStatus.put("createButton", !isTrue(tmplGroup.getHideCreateButton()));
+			jStatus.put("deleteButton", !isTrue(tmplGroup.getHideDeleteButton()));
+			jStatus.put("exportButton", !isTrue(tmplGroup.getHideExportButton()));
+			jStatus.put("importButton", !isTrue(tmplGroup.getHideImportButton()));
+			jStatus.put("queryButton", !isTrue(tmplGroup.getHideQueryButton()));
+			jStatus.put("treeToggleButton", !isTrue(tmplGroup.getHideTreeToggleButton()));
+			return jStatus;
+		}
 		return null;
 	}
 
