@@ -180,7 +180,7 @@ public class Api2EntityCurdController {
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
 		TemplateListTemplate ltmpl = ltmplService.getTemplate(tmplGroup.getListTemplateId());
 		//获得查询池
-		EntityQueryPool qPool = EntityQueryPoolUtils.getEntityQueryPool(session, user);
+		EntityQueryPool qPool = EntityQueryPoolUtils.getEntityQueryPool(user);
 		//注册一个查询
 		EntityQuery query = qPool.regist();
 		TemplateTreeTemplate ttmpl = treeService.getTemplate(tmplGroup.getTreeTemplateId());

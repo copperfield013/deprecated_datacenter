@@ -9,4 +9,4 @@
 
 <fmt:setBundle basename="jspPage" var="logo"/>
 
-<c:set var="ajaxHost" value="http://192.168.1.156:7080/datacenter/" />
+<c:set var="ajaxHost" value="${basePath }" />

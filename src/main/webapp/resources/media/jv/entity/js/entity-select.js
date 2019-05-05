@@ -96,7 +96,7 @@ define(function(require, exports, module){
 							$page,
 							queryKey,
 							defaultNodeTmpl	: config.nodeTmpl,
-							validateSign			: param.validateSign,
+							menuId			: param.validateSign,
 							renderOperates	: false,
 							checkableNodeIds: config.checkableNodeIds
 						}).bind('node-check', function(data){
