@@ -3,7 +3,6 @@ package cn.sowell.datacenter.api2.controller.entity;
 import java.util.Date;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -12,11 +11,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.PollStatusResponse;
@@ -46,7 +44,7 @@ import cn.sowell.dataserver.model.tmpl.service.ArrayItemFilterService;
 import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
 
-@Controller
+@RestController
 @RequestMapping(Api2Constants.URI_ENTITY + "/export")
 public class Api2EntityExportController {
 	
@@ -64,12 +62,11 @@ public class Api2EntityExportController {
 	static Logger logger = Logger.getLogger(Api2EntityExportController.class);
 	
 	
-	@ResponseBody
 	@RequestMapping("/session_progress")
-	public ResponseJSON getExportProgress(HttpSession session) {
+	public ResponseJSON getExportProgress(ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		//导出状态获取
-		String uuid = (String) session.getAttribute(SessionKey.EXPORT_ENTITY_STATUS_UUID);
+		String uuid = (String) user.getCache(SessionKey.EXPORT_ENTITY_STATUS_UUID);
 		if(uuid != null){
 			WorkProgress progress = eService.getExportProgress(uuid);
 			if(progress != null && !progress.isBreaked()){
@@ -89,7 +86,6 @@ public class Api2EntityExportController {
 	@Resource
 	ArrayItemFilterService arrayItemFilterService;
 	
-	@ResponseBody
 	@RequestMapping({"/detail/{validateSign:\\d+}/{entityCode}",
 						"/detail/{validateSign:user}",
 						"/detail/{validateSign:user}/*"})
@@ -98,12 +94,14 @@ public class Api2EntityExportController {
 				@PathVariable(required=false) String entityCode,
 				Long historyId,
 				Long nodeId,
+				Long fieldGroupId,
 				Long dtmplId,
 				ApiUser user) {
 		ValidateDetailParamter vparam = new ValidateDetailParamter(validateSign, user);
 		vparam
 			.setCode(entityCode)
 			.setNodeId(nodeId)
+			.setFieldGroupId(fieldGroupId)
 			.setDetailTemplateId(dtmplId)
 			;
 		//检测用户的权限
@@ -147,20 +145,18 @@ public class Api2EntityExportController {
 	 * @param user 
 	 * @return
 	 */
-	@ResponseBody
-	@RequestMapping("/start/{queryKey}")
+	@RequestMapping("/start/{menuId}/{queryKey}")
 	public ResponseJSON startExport(
 			@PathVariable String queryKey,
-			Long sourceMenuId,
+			@PathVariable Long menuId,
 			ExportDataPageInfo ePageInfo,
 			Boolean withDetail,
-			HttpSession session, 
 			ApiUser user
 			) {
-		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, sourceMenuId);
+		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		//导出状态获取
-		String uuid = (String) session.getAttribute(SessionKey.EXPORT_ENTITY_STATUS_UUID);
+		String uuid = (String) user.getCache(SessionKey.EXPORT_ENTITY_STATUS_UUID);
 		if(uuid != null){
 			WorkProgress progress = eService.getExportProgress(uuid);
 			if(progress != null && !progress.isBreaked()){
@@ -169,7 +165,7 @@ public class Api2EntityExportController {
 			}
 		}
 		
-		EntityQueryPool pool = EntityQueryPoolUtils.getEntityQueryPool(session, user);
+		EntityQueryPool pool = EntityQueryPoolUtils.getEntityQueryPool(user);
 		EntityQuery query = pool.getQuery(queryKey);
 		if(query != null) {
 			WorkProgress progress = new WorkProgress();
@@ -184,14 +180,13 @@ public class Api2EntityExportController {
 			progress.getDataMap().put("menuTitle", menu.getTitle());
 			progress.getDataMap().put("exportPageInfo", ePageInfo);
 			progress.getDataMap().put("withDetail", withDetail);
-			session.setAttribute(SessionKey.EXPORT_ENTITY_STATUS_UUID, progress.getUUID());
+			user.setCache(SessionKey.EXPORT_ENTITY_STATUS_UUID, progress.getUUID());
 		}
 		return jRes;
 	}
 	
-	@ResponseBody
 	@RequestMapping("/status")
-	public PollStatusResponse statusOfExport(@RequestParam String uuid, Boolean interrupted){
+	public PollStatusResponse statusOfExport(@RequestParam String uuid, Boolean interrupted, ApiUser user){
 		PollStatusResponse status = new PollStatusResponse();
 		status.setStatus("error");
 		status.put("uuid", uuid);
@@ -222,7 +217,7 @@ public class Api2EntityExportController {
 	}
 	
 	@RequestMapping("/download/{uuid}")
-	public ResponseEntity<byte[]> download(@PathVariable String uuid){
+	public ResponseEntity<byte[]> download(@PathVariable String uuid, ApiUser user){
 		AbstractResource resource = eService.getDownloadResource(uuid);
 		if(resource != null) {
 			try {
@@ -239,7 +234,6 @@ public class Api2EntityExportController {
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 	
-	@ResponseBody
 	@RequestMapping("/work/{uuid}")
 	public ResponseJSON loadWork(@PathVariable String uuid, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();

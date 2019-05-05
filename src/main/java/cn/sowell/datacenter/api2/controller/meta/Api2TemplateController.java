@@ -2,10 +2,9 @@ package cn.sowell.datacenter.api2.controller.meta;
 
 import javax.annotation.Resource;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
 import cn.sowell.copframe.dto.ajax.ResponseJSON;
@@ -23,7 +22,7 @@ import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
 import cn.sowell.dataserver.model.tmpl.service.TreeTemplateService;
 
-@Controller
+@RestController
 @RequestMapping(Api2Constants.URI_TMPL)
 public class Api2TemplateController {
 	@Resource
@@ -47,7 +46,7 @@ public class Api2TemplateController {
 	@Resource
 	TemplateJsonParseService tJsonService;
 	
-	@ResponseBody
+	
 	@RequestMapping({
 		"/dtmpl_config/{contextType:normal}/{validateSign:user|\\d+}/*",
 		"/dtmpl_config/{contextType:rabc}/{validateSign:user|\\d+}/{fieldGroupId}",
@@ -73,7 +72,6 @@ public class Api2TemplateController {
 		return jRes;
 	}
 	
-	@ResponseBody
 	@RequestMapping("/select_config/{validateSign:user|\\d+}/{fieldGroupId}")
 	public ResponseJSON selectConfig(@PathVariable String validateSign, 
 			@PathVariable Long fieldGroupId, ApiUser user) {
@@ -84,7 +82,6 @@ public class Api2TemplateController {
 	}
 	
 	
-	@ResponseBody
 	@RequestMapping("/ttmpl/{ttmplId}")
 	public ResponseJSON getTreeTemplate(@PathVariable Long ttmplId, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();

@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import javax.annotation.Resource;
 
+import org.apache.log4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,8 @@ public class AdminUserServiceImpl implements AdminUserService, UserCodeService, 
 
 	@Resource
 	AdminUserDao userDao;
+	
+	static Logger logger = Logger.getLogger(AdminUserServiceImpl.class);
 	
 	private ThreadLocal<String> threadUserCode = new ThreadLocal<>();
 	
@@ -141,6 +144,7 @@ public class AdminUserServiceImpl implements AdminUserService, UserCodeService, 
 				Token token = entry.getValue();
 				if(token.isExpired()) {
 					//如果过期了，就将其删除
+					logger.debug("token[" + token.getCode() + "]已过期，被移除");
 					itr.remove();
 				}
 			}
@@ -165,7 +169,7 @@ public class AdminUserServiceImpl implements AdminUserService, UserCodeService, 
 		
 		public Token(UserInfo user, long timeout) {
 			Assert.notNull(user);
-			this.code = TextUtils.uuid(10, 62);
+			this.code = TextUtils.uuid(32, 62);
 			this.user = new UserWithToken(this.code, user);
 			this.deadline = System.currentTimeMillis() + timeout;
 			this.timeout = timeout;

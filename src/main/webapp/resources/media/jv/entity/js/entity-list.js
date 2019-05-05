@@ -385,7 +385,7 @@ define(function(require, exports, module){
 					var subscriber = exportHandler.addSubscriber({
 						key					: param.menuId,
 						startupReqMethod	: 'ajax',
-						startupURL			: 'api2/entity/export/start/' + queryKey,
+						startupURL			: 'api2/entity/export/start/' + param.menuId + '/' + queryKey,
 						progressURL			: 'api2/entity/export/status',
 						whenStartupResponse	: function(data, uuid){
 							$msg.text('开始导出');

@@ -107,6 +107,7 @@ define(function(require, exports, module){
 			function loadEntity(historyId){
 				var reqParam = {};
 				doWhen(/node.+/, function(){reqParam.nodeId = param.nodeId},
+						/rabc.+/, function(){reqParam.fieldGroupId = param.fieldGroupId},
 						/user.+/, function(){if(param.dtmplId) reqParam.dtmplId = param.dtmplId});
 				if(typeof historyId === 'number' || typeof historyId === 'string') reqParam.historyId = historyId;
 				$CPF.showLoading();

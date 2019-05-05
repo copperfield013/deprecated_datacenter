@@ -74,7 +74,10 @@ define(function(require){
 		sessionInvalidURL	: 'admin/login',
 		tabLinkPrefix		: 'admin/',
 		//加载层最多持续多久后出现关闭加载按钮
-		loadingTimeout		: 7000
+		loadingTimeout		: 7000,
+		handlersHeader		: function(headers){
+			 headers['request-category'] = 'cpf-ajax';
+		}
 	});
 	$CPF.showLoading();
 	//初始化当前页面

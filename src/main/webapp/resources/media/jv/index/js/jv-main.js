@@ -45,7 +45,9 @@ define(function(require){
 		sessionInvalidURL	: 'jv/main/login',
 		tabLinkPrefix		: 'jv/',
 		//加载层最多持续多久后出现关闭加载按钮
-		loadingTimeout		: 7000
+		loadingTimeout		: 7000,
+		ajaxHost			: 'http://192.168.1.156:7080/datacenter/',
+		CORS				: true
 	});
 	$CPF.showLoading();
 	//初始化当前页面

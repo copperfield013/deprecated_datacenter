@@ -109,6 +109,10 @@
 			class="cn.sowell.datacenter.common.interceptor.CommonRequestAttributeSetInterceptor" />
 	</mvc:interceptors>
 	
+	<mvc:cors>
+		<mvc:mapping path="/api2/**" allowed-headers="datacenter-token" />
+	</mvc:cors>
+	
 	<bean class="cn.sowell.datacenter.resource.ResourceController" >
 		<property name="fileLocation">
 			<map>

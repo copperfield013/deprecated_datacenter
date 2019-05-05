@@ -12,11 +12,11 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -71,7 +71,7 @@ import cn.sowell.dataserver.model.tmpl.service.ListTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
 import cn.sowell.dataserver.model.tmpl.service.TreeTemplateService;
 
-@Controller
+@RestController
 @RequestMapping(Api2Constants.URI_ENTITY + "/curd")
 public class Api2EntityCurdController {
 	
@@ -123,11 +123,10 @@ public class Api2EntityCurdController {
 	static Logger logger = Logger.getLogger(Api2EntityCurdController.class);
 	
 	
-	@ResponseBody
 	@RequestMapping("/start_query/{menuId}")
 	public ResponseJSON startQuery(@PathVariable Long menuId, 
 			PageInfo pageInfo,
-			HttpServletRequest request, ApiUser user, HttpSession session) {
+			HttpServletRequest request, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		
 		
@@ -135,7 +134,7 @@ public class Api2EntityCurdController {
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
 		TemplateListTemplate ltmpl = ltmplService.getTemplate(tmplGroup.getListTemplateId());
 		//获得查询池
-		EntityQueryPool qPool = EntityQueryPoolUtils.getEntityQueryPool(session, user);
+		EntityQueryPool qPool = EntityQueryPoolUtils.getEntityQueryPool(user);
 		//注册一个查询
 		EntityQuery query = qPool.regist();
 		//根据上下文获得节点模板
@@ -169,7 +168,6 @@ public class Api2EntityCurdController {
 	}
 
 
-	@ResponseBody
 	@RequestMapping("/tree/{menuId}")
 	public ResponseJSON tree(@PathVariable Long menuId, 
 			HttpSession session, 
@@ -201,17 +199,16 @@ public class Api2EntityCurdController {
 		String nodesCSS = treeService.generateNodesCSS(ttmpl);
 		jRes.put("nodeCSS", nodesCSS);
 		jRes.put("nodeTmpl", query.getNodeTemplate());
+		jRes.put("nodeStyle", treeService.getTreeNodeStyle(ttmpl));
 		writeListPageAttributes(jRes, query, menu, ltmpl);
 		return jRes;
 	}
 	
-	@ResponseBody
 	@RequestMapping("/start_query_rel/{menuId}/{parentEntityCode}/{nodeRelationId}")
 	public ResponseJSON treeNode(@PathVariable Long menuId,
 			@PathVariable String parentEntityCode, 
 			@PathVariable Long nodeRelationId, 
 			@RequestParam(required=false, defaultValue="10") Integer pageSize, 
-			HttpSession session, 
 			ApiUser user) {
 		authService.validateUserL2MenuAccessable(user, menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
@@ -225,7 +222,7 @@ public class Api2EntityCurdController {
 			//根据上下文获得节点模板
 			TemplateTreeNode itemNodeTemplate = treeService.analyzeNodeTemplate(nodeContext);
 			//获得查询池
-			EntityQueryPool qPool = EntityQueryPoolUtils.getEntityQueryPool(session, user);
+			EntityQueryPool qPool = EntityQueryPoolUtils.getEntityQueryPool(user);
 			//注册一个查询
 			EntityQuery query = qPool.regist();
 			//在模板中匹配查询结果的Node模板
@@ -248,12 +245,11 @@ public class Api2EntityCurdController {
 		return jRes;
 	}
 	
-	@ResponseBody
 	@RequestMapping("/ask_for/{queryKey}")
 	public ResponseJSON askFor(@PathVariable String queryKey,
-			PageInfo pageInfo, HttpSession session, ApiUser user) {
+			PageInfo pageInfo, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
-		EntityQueryPool pool = EntityQueryPoolUtils.getEntityQueryPool(session, user);
+		EntityQueryPool pool = EntityQueryPoolUtils.getEntityQueryPool(user);
 		EntityQuery query = pool.getQuery(queryKey);
 		query.setPageSize(pageInfo.getPageSize());
 		PagedEntityList el = query.pageList(pageInfo.getPageNo());
@@ -276,16 +272,15 @@ public class Api2EntityCurdController {
 	
 	@ResponseBody
 	@RequestMapping("/get_entities_count/{queryKey}")
-	public ResponseJSON getEntitiesCount(@PathVariable String queryKey, ApiUser user, HttpSession session) {
+	public ResponseJSON getEntitiesCount(@PathVariable String queryKey, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
-		EntityQueryPool pool = EntityQueryPoolUtils.getEntityQueryPool(session, user);
+		EntityQueryPool pool = EntityQueryPoolUtils.getEntityQueryPool(user);
 		EntityQuery query = pool.getQuery(queryKey);
 		jRes.put("count", query.getCount());
 		jRes.setStatus("suc");
 		return jRes;
 	}
 	
-	@ResponseBody
 	@RequestMapping("/remove/{menuId}")
 	public ResponseJSON remove(@PathVariable Long menuId, String codes, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
@@ -303,7 +298,6 @@ public class Api2EntityCurdController {
 		return jRes;
 	}
 	
-	@ResponseBody
 	@RequestMapping({
 		"/save/{contextType:normal}/{validateSign:user|\\d+}",
 		"/save/{contextType:normal}/{validateSign:user|\\d+}/*",
@@ -360,7 +354,6 @@ public class Api2EntityCurdController {
 	
 
 
-	@ResponseBody
 	@RequestMapping("/do_action/{menuId}/{actionId}")
 	public ResponseJSON doAction(@PathVariable Long menuId, @PathVariable Long actionId, String codes, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
@@ -400,19 +393,20 @@ public class Api2EntityCurdController {
 		return jRes;
 	}
 	
-	@ResponseBody
 	@RequestMapping({"/detail/{validateSign:\\d+}/{code}",
 						"/detail/{validateSign:user}/*"})
 	public ResponseJSON detail(@PathVariable String validateSign, 
 			@PathVariable(required=false) String code, 
 			Long historyId,
 			Long nodeId,
+			Long fieldGroupId,
 			Long dtmplId,
 			ApiUser user) {
 		ValidateDetailParamter vparam = new ValidateDetailParamter(validateSign, user);
 		vparam
 			.setCode(code)
 			.setNodeId(nodeId)
+			.setFieldGroupId(fieldGroupId)
 			.setDetailTemplateId(dtmplId)
 			;
 		//检测用户的权限
@@ -447,18 +441,19 @@ public class Api2EntityCurdController {
 	}
 	
 	
-	@ResponseBody
 	@RequestMapping({"/history/{validateSign:\\d+}/{code}/{pageNo}",
 						"/history/{validateSign:user}/*/{pageNo}",
 						"/history/{validateSign:user}/{pageNo}"})
 	public ResponseJSON entityHistory(@PathVariable String validateSign,
 			@PathVariable(required=false) String code, 
+			Long fieldGroupId,
 			Long nodeId,
 			@PathVariable Integer pageNo, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		ValidateDetailParamter vParam = new ValidateDetailParamter(validateSign, user);
 		vParam
 			.setNodeId(nodeId)
+			.setFieldGroupId(fieldGroupId)
 			.setCode(code);
 		//检测用户的权限
 		ValidateDetailResult vResult = authService.validateDetailAuth(vParam);
@@ -470,17 +465,16 @@ public class Api2EntityCurdController {
 		return jRes;
 	}
 	
-	@ResponseBody
 	@RequestMapping({"/query_select_entities/{validateSign:user|\\d+}/{groupId}"})
 	public ResponseJSON querySelectEntities(
 			@PathVariable String validateSign,
 			@PathVariable Long groupId,
 			String excepts, 
 			HttpServletRequest request,
-			ApiUser user, HttpSession session) {
+			ApiUser user) {
 		TemplateDetailFieldGroup fieldGroup = authService.validateSelectionAuth(validateSign, groupId, user);
 		JSONObjectResponse jRes = new JSONObjectResponse();
-		EntityQueryPool qPool = EntityQueryPoolUtils.getEntityQueryPool(session, user);
+		EntityQueryPool qPool = EntityQueryPoolUtils.getEntityQueryPool(user);
 		EntityQuery query = qPool.regist();
 		query.addExcludeEntityCodes(TextUtils.split(excepts, ","));
 		entityService.wrapSelectEntityQuery(query, fieldGroup, lcriteriFacrory.exractTemplateCriteriaMap(request));
@@ -488,7 +482,6 @@ public class Api2EntityCurdController {
 		return jRes;
 	}
 	
-	@ResponseBody
 	@RequestMapping({"/load_entities/{validateSign:user|\\d+}/{groupId}"})
 	public ResponseJSON loadSelectedEntities(
 			@PathVariable String validateSign,

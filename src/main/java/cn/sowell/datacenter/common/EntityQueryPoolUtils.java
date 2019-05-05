@@ -20,4 +20,18 @@ public class EntityQueryPoolUtils {
 		}
 		return pool;
 	}
+	
+	public static EntityQueryPool getEntityQueryPool(ApiUser user) {
+		EntityQueryPool pool = (EntityQueryPool) user.getCache(SessionKey.ENTITY_QUERY_POOL);
+		if(pool == null) {
+			synchronized (user) {
+				pool = (EntityQueryPool) user.getCache(SessionKey.ENTITY_QUERY_POOL);
+				if(pool == null) {
+					pool = new EntityQueryPool(user);
+					user.setCache(SessionKey.ENTITY_QUERY_POOL, pool);
+				}
+			}
+		}
+		return pool;
+	}
 }

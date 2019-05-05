@@ -177,14 +177,14 @@ public class AuthorityServiceImpl implements AuthorityService{
 			Long menuId = Long.valueOf(param.getValidateSign());
 			SideMenuLevel2Menu menu = validateUserL2MenuAccessable(param.getUser(), menuId);
 			TemplateGroup tmplGroup = null;
-			if(param.getNodeId() == null) {
-				tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+			if(param.getNodeId() != null) {
+				TemplateTreeNode nodeTmpl = treeService.getNodeTemplate(menu.getTemplateModule(), param.getNodeId());
+				tmplGroup = tmplGroupService.getTemplate(nodeTmpl.getTemplateGroupId());
 			}else if(param.getFieldGroupId() != null){
 				TemplateDetailFieldGroup fieldGroup = dtmplService.getFieldGroup(param.getFieldGroupId());
 				tmplGroup = tmplGroupService.getTemplate(fieldGroup.getRabcTemplateGroupId());
 			}else {
-				TemplateTreeNode nodeTmpl = treeService.getNodeTemplate(menu.getTemplateModule(), param.getNodeId());
-				tmplGroup = tmplGroupService.getTemplate(nodeTmpl.getTemplateGroupId());
+				tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
 			}
 			result.setTmplGroup(tmplGroup);
 			result.setDetailTemplate(dtmplService.getTemplate(tmplGroup.getDetailTemplateId()));

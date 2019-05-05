@@ -6,11 +6,10 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -24,7 +23,7 @@ import cn.sowell.dataserver.model.dict.pojo.DictionaryOption;
 import cn.sowell.dataserver.model.dict.pojo.OptionItem;
 import cn.sowell.dataserver.model.dict.service.DictionaryService;
 
-@Controller
+@RestController
 @RequestMapping(Api2Constants.URI_META + "/dict")
 public class Api2DictionaryController {
 	@Resource
@@ -33,7 +32,6 @@ public class Api2DictionaryController {
 	@Resource
 	AuthorityService authService;
 	
-	@ResponseBody
 	@RequestMapping("/field_options")
 	public ResponseJSON getOptions(@RequestParam String fieldIds, ApiUser user) {
 		JSONObjectResponse res = new JSONObjectResponse();
@@ -47,7 +45,6 @@ public class Api2DictionaryController {
 		return res;
 	}
 	
-	@ResponseBody
 	@RequestMapping("/cas_ops/{optGroupId}")
 	public ResponseJSON casOptions(@PathVariable Long optGroupId, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();

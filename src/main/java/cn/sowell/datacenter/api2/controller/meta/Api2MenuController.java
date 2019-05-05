@@ -5,9 +5,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
 
@@ -20,7 +19,7 @@ import cn.sowell.datacenter.model.config.service.AuthorityService;
 import cn.sowell.datacenter.model.config.service.NonAuthorityException;
 import cn.sowell.datacenter.model.config.service.SideMenuService;
 
-@Controller
+@RestController
 @RequestMapping(Api2Constants.URI_META + "/menu")
 public class Api2MenuController {
 	
@@ -31,7 +30,6 @@ public class Api2MenuController {
 	AuthorityService authService;
 	
 	
-	@ResponseBody
 	@RequestMapping("/get_menu")
 	public ResponseJSON all(ApiUser user) {
 		JSONObjectResponse res = new JSONObjectResponse();

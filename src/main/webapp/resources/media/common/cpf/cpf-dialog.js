@@ -144,7 +144,8 @@ define(function(require, exports, module){
 					},
 					afterLoad: function(){
 						$CPF.closeLoading();
-					}
+					},
+					setHost		: false
 				});
 			}else if(content instanceof $){
 				if(_contentType === 'dom'){

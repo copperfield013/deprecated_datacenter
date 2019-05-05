@@ -13,8 +13,11 @@ define(function(require, exports, module){
 		//是否在ajax请求时检测返回session状态
 		ajaxSessionValid	: true,
 		//当session无效的时候，ajax请求返回后需要跳转的地址
-		sessionInvalidURL	: ''
+		sessionInvalidURL	: '',
+		ajaxHost			: '',
+		handlersHeader		: $.noop
 	});
+	
 	
 	/**
 	 * 返回json数据时，将其转换成AjaxPageResponse类对象
@@ -139,7 +142,8 @@ define(function(require, exports, module){
 			page		: undefined,
 			//
 			interval	: 0,
-			cache		: false
+			cache		: false,
+			setHost		: true
 		};
 		if(typeof formData === 'function'){
 			if($.isPlainObject(whenSuc)){
@@ -178,19 +182,28 @@ define(function(require, exports, module){
 		}
 		var method = param.method.toLowerCase();
 		
-		var headers = {
-		    'request-category'	: 'cpf-ajax'
-	    };
+		var headers = {};
+		($CPF.getParam('handlersHeader') || $.noop)(headers);
 		var token = localStorage.getItem(AJAX_LOCAL_STORAGE_TOKEN_KEY);
 		if(token){
 			//var isTimeout = new Date().getTime() - tokeObj.time >  $CPF.getParam('ajaxHeaderTokenTimeout');
 			headers[AJAX_HEADER_TOKEN_KEY] = token;
 		}
 		
+		if(param.setHost){
+			url = $CPF.getParam('ajaxHost') + url
+		}
 		console.debug('发送请求到' + url);
 		console.debug(fData);
-		return $.ajax({
-		    url: 		url,
+		var reqArgs = {};
+		if($CPF.getParam('CORS')){
+			reqArgs.crossDomain = true;
+			reqArgsxhrFields = {
+		        withCredentials: true
+		    };
+		}
+		reqArgs = {
+			url: 		url,
 		    type: 		method,
 		    cache: 		param.cache,
 		    data: 		method == 'post'? fData: null,
@@ -245,8 +258,9 @@ define(function(require, exports, module){
 		    			console.error('请求时发生错误');
 		    		}
 		    	}
-		    }
-		}).always(function(res) {
+		    }	
+		};
+		return $.ajax(reqArgs).always(function(res) {
 			param.afterLoad(res);
 		});
 	}
@@ -300,7 +314,7 @@ define(function(require, exports, module){
 				}catch(e){}
 				deferred.resolve(data);
 			}
-		}, ajaxParam));
+		}, $.extend(ajaxParam, {setHost: false})));
 		return deferred.promise();
 	}
 	
