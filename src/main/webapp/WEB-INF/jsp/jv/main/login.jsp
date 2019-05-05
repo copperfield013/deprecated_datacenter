@@ -9,7 +9,7 @@
 		<meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
 		<script type="text/javascript">
 			if(window.ADMIN_LOADED === true){
-				location.href = '${basePath }/admin/login';
+				location.href = '${basePath }/jv/login';
 			}
 		</script>
 		<link href="media/admin/plugins/beyond/css/bootstrap.min.css" rel="stylesheet" />
@@ -163,7 +163,7 @@
 				});
 				$('form').submit(function(e){
 					e.preventDefault();
-					$.post('api2/auth/token', {
+					$.post('${ajaxHost}/api2/auth/token', {
 						username	: $('#username').val(),
 						password	: $('#password').val()
 					}, function(data){

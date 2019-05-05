@@ -101,6 +101,9 @@
 				paths	: {
 					  COMMON	: '${basePath}media/common/',
 				},
+				vars	: {
+					ajaxHost	: '${ajaxHost}'
+				},
 				alias	: {
 					'jquery'	: 'COMMON/cpf/cpf-jquery.js?v=${cpfVersion}',
 					'$CPF'		: 'COMMON/cpf/cpf-core.js?v=${cpfVersion}',

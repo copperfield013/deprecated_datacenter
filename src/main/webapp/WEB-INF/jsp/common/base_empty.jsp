@@ -8,3 +8,5 @@
 <c:set var="cpfVersion" value="1.2" />
 
 <fmt:setBundle basename="jspPage" var="logo"/>
+
+<c:set var="ajaxHost" value="http://192.168.1.156:7080/datacenter/" />

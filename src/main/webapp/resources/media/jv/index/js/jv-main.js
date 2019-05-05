@@ -46,7 +46,7 @@ define(function(require){
 		tabLinkPrefix		: 'jv/',
 		//加载层最多持续多久后出现关闭加载按钮
 		loadingTimeout		: 7000,
-		ajaxHost			: 'http://192.168.1.156:7080/datacenter/',
+		ajaxHost			: seajs.data.vars.ajaxHost || '',
 		CORS				: true
 	});
 	$CPF.showLoading();
