@@ -66,7 +66,7 @@ define(function(require, exports, module){
 					.bind('entity', renderEntityDetail)
 					.bind('entity', bindExport)
 					.bind('history', renderHistory)
-					.bind('historyId', setCurrentHistoryItem)
+					.bind('versionCode', setCurrentHistoryItem)
 					;
 			});
 			//加载详情模板
@@ -104,16 +104,16 @@ define(function(require, exports, module){
 			/**
 			 * 从服务器加载实体数据
 			 */
-			function loadEntity(historyId){
+			function loadEntity(versionCode){
 				var reqParam = {};
 				doWhen(/node.+/, function(){reqParam.nodeId = param.nodeId},
 						/rabc.+/, function(){reqParam.fieldGroupId = param.fieldGroupId},
 						/user.+/, function(){if(param.dtmplId) reqParam.dtmplId = param.dtmplId});
-				if(typeof historyId === 'number' || typeof historyId === 'string') reqParam.historyId = historyId;
+				if(typeof versionCode === 'string' && versionCode) reqParam.versionCode = versionCode;
 				$CPF.showLoading();
 				var uri = 'api2/entity/curd/detail/' + param.validateSign + '/' + param.code;
 				Ajax.ajax(uri, reqParam).done(function(data){
-					status.setStatus(data, ['entity', 'historyId']);
+					status.setStatus(data, ['entity', 'versionCode']);
 				});
 				
 			}
@@ -685,29 +685,29 @@ define(function(require, exports, module){
 								historyItems,
 								hasMore	: false
 							}, {
-								goHistory:	function(historyId){
+								goHistory:	function(versionCode){
 									var $dd = $(this).closest('dd');
 									if(!$dd.is('.current')){
 										$CPF.showLoading();
-										loadEntity(historyId);
+										loadEntity(versionCode);
 									}
 								}
 							});
-					status.setStatus('historyId');
+					status.setStatus('versionCode');
 				}
 			}
 			
 			/**
-			 * 根据当前的historyId设置历史时间轴中当前的节点
+			 * 根据当前的versionCode设置历史时间轴中当前的节点
 			 */
 			function setCurrentHistoryItem(){
-				var historyId = status.getStatus('historyId');
-				if(historyId){
+				var versionCode = status.getStatus('versionCode');
+				if(versionCode){
 					$('#timeline-area .VivaTimeline>dl>dd', $page)
 						.filter('.current')
 						.removeClass('current')
 						.end()
-						.filter('dd[data-id="' + historyId + '"]')
+						.filter('dd[data-id="' + versionCode + '"]')
 						.addClass('current');
 						
 				}
@@ -721,10 +721,10 @@ define(function(require, exports, module){
 				tmplMap['btn-export'].replaceIn($page, this.properties, {
 					doExport	: function(){
 						var entity = _this.getStatus('entity');
-						var historyId = _this.getStatus('historyId');
+						var versionCode = _this.getStatus('versionCode');
 						var reqParam = {};
-						if(historyId){
-							reqParam.historyId = historyId;
+						if(versionCode){
+							reqParam.versionCode = versionCode;
 						}
 						doWhen(/node.+/, function(){reqParam.nodeId = param.nodeId},
 								/user.+/, function(){if(param.dtmplId) reqParam.dtmplId = param.dtmplId});

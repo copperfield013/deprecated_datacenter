@@ -41,7 +41,7 @@ import cn.sowell.datacenter.model.modules.service.ExportService;
 import cn.sowell.dataserver.model.abc.service.EntityQueryParameter;
 import cn.sowell.dataserver.model.abc.service.ModuleEntityService;
 import cn.sowell.dataserver.model.modules.bean.ExportDataPageInfo;
-import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
+import cn.sowell.dataserver.model.modules.pojo.EntityVersionItem;
 import cn.sowell.dataserver.model.modules.pojo.criteria.NormalCriteria;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
@@ -195,7 +195,7 @@ public class ApiEntityExportController {
 	public ResponseJSON exportDetail(
 			@PathVariable Long menuId, 
 			@PathVariable String code,
-			Long historyId, ApiUser user) {
+			String versionCode, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
@@ -204,11 +204,11 @@ public class ApiEntityExportController {
 		String moduleName = tmplGroup.getModule();
 		ModuleEntityPropertyParser entity = null;
 		EntityQueryParameter param = new EntityQueryParameter(moduleName, code, user);
-		EntityHistoryItem lastHistory = entityService.getLastHistoryItem(param);
+		EntityVersionItem lastHistory = entityService.getLastHistoryItem(param);
 		//EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, code, user);
-		if(historyId != null) {
-			if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
-				entity = entityService.getHistoryEntityParser(param, historyId, null);
+		if(versionCode != null) {
+			if(lastHistory != null && !versionCode.equals(lastHistory.getCode())) {
+				entity = entityService.getHistoryEntityParser(param, versionCode, null);
 				//entity = mService.getHistoryEntityParser(moduleName, code, historyId, user);
 			}
         }

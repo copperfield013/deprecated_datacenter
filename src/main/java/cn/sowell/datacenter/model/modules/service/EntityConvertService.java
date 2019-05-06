@@ -11,13 +11,13 @@ import com.alibaba.fastjson.JSONObject;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.impl.RelSelectionEntityPropertyParser;
 import cn.sowell.datacenter.model.modules.bean.EntityDetail;
-import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
+import cn.sowell.dataserver.model.modules.pojo.EntityVersionItem;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 
 public interface EntityConvertService {
 	EntityDetail convertEntityDetail(ModuleEntityPropertyParser entity, TemplateDetailTemplate dtmpl); 
 
-	JSONArray toHistoryItems(List<EntityHistoryItem> historyItems, Long currentId);
+	JSONArray toHistoryItems(List<EntityVersionItem> historyItems, String currentCode);
 
 	JSONArray toErrorItems(List<ErrorInfomation> errors);
 

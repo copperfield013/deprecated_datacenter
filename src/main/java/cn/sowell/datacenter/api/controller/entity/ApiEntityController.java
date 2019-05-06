@@ -50,7 +50,7 @@ import cn.sowell.dataserver.model.abc.service.EntityQueryParameter;
 import cn.sowell.dataserver.model.abc.service.ModuleEntityService;
 import cn.sowell.dataserver.model.dict.pojo.DictionaryComposite;
 import cn.sowell.dataserver.model.modules.bean.ExportDataPageInfo;
-import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
+import cn.sowell.dataserver.model.modules.pojo.EntityVersionItem;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.modules.service.ViewDataService;
@@ -342,7 +342,7 @@ public class ApiEntityController {
 	
 	@ResponseBody
 	@RequestMapping("/detail/{menuId}/{code}")
-	public ResponseJSON detail(@PathVariable Long menuId, @PathVariable String code, @RequestParam(required=false) Long historyId, ApiUser user) {
+	public ResponseJSON detail(@PathVariable Long menuId, @PathVariable String code, @RequestParam(required=false) String versionCode, ApiUser user) {
 		JSONObjectResponse res = new JSONObjectResponse();
 		
 		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
@@ -357,11 +357,11 @@ public class ApiEntityController {
         EntityQueryParameter param = new EntityQueryParameter(moduleName, code, user);
         param.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(dtmpl.getId(), user));
         //param.setCriteriasMap(arrayItemFilterService.getArrayItemFilterCriteriasMap(dtmpl.getId(), user));
-		EntityHistoryItem lastHistory = entityService.getLastHistoryItem(param);
+		EntityVersionItem lastHistory = entityService.getLastHistoryItem(param);
         //EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, code, user);
-		if(historyId != null) {
-			if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
-				entity = entityService.getHistoryEntityParser(param, historyId, null);
+		if(versionCode != null) {
+			if(lastHistory != null && !versionCode.equals(lastHistory.getCode())) {
+				entity = entityService.getHistoryEntityParser(param, versionCode, null);
 				//entity = mService.getHistoryEntityParser(moduleName, code, historyId, user);
 			}
         }
@@ -377,13 +377,13 @@ public class ApiEntityController {
         if(entity != null) {
         	JSONObject jEntity = toEntityJson(entity, dtmpl);
         	
-        	List<EntityHistoryItem> historyItems = entityService.queryHistory(param, 1, 100);
+        	List<EntityVersionItem> historyItems = entityService.queryHistory(param, 1, 100);
         	//List<EntityHistoryItem> historyItems = mService.queryHistory(menu.getTemplateModule(), code, 1, 100, user);
         	
         	
         	res.put("module", toModule(moduleMeta));
         	res.put("entity", jEntity);
-        	JSONArray aHistoryItems = toHistoryItems(historyItems, historyId);
+        	JSONArray aHistoryItems = toHistoryItems(historyItems, versionCode);
         	res.put("history", aHistoryItems);
         }else {
         	throw new APiDataNotFoundException();
@@ -394,18 +394,18 @@ public class ApiEntityController {
 	
 
 
-	private JSONArray toHistoryItems(List<EntityHistoryItem> historyItems, Long currentId) {
+	private JSONArray toHistoryItems(List<EntityVersionItem> historyItems, String versionCode) {
 		JSONArray aHistoryItems = new JSONArray();
 		if(historyItems != null) {
-			boolean hasCurrentId = currentId != null;
-			for (EntityHistoryItem historyItem : historyItems) {
+			boolean hasCurrentId = TextUtils.hasText(versionCode);
+			for (EntityVersionItem historyItem : historyItems) {
 				JSONObject jHistoryItem = new JSONObject();
 				aHistoryItems.add(jHistoryItem);
-				jHistoryItem.put("id", historyItem.getId());
+				jHistoryItem.put("id", historyItem.getCode());
 				jHistoryItem.put("userName", historyItem.getUserName());
 				jHistoryItem.put("time", historyItem.getTime());
 				jHistoryItem.put("monthKey", historyItem.getMonthKey());
-				if(hasCurrentId && historyItem.getId().equals(currentId)) {
+				if(hasCurrentId && historyItem.getCode().equals(versionCode)) {
 					jHistoryItem.put("current", true);
 				}
 			}

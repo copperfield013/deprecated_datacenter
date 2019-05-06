@@ -41,7 +41,7 @@ import cn.sowell.datacenter.model.modules.service.ExportService;
 import cn.sowell.dataserver.model.abc.service.EntitiesQueryParameter;
 import cn.sowell.dataserver.model.abc.service.EntityQueryParameter;
 import cn.sowell.dataserver.model.abc.service.ModuleEntityService;
-import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
+import cn.sowell.dataserver.model.modules.pojo.EntityVersionItem;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.modules.service.ViewDataService;
 import cn.sowell.dataserver.model.modules.service.view.SelectionTemplateEntityView;
@@ -87,7 +87,7 @@ public class AdminConfigUserController {
 	
 	@RequestMapping({"/detail", "/detail/"})
 	public String detail(Long dtmplId, 
-			Long historyId, Model model) {
+			String versionCode, Model model) {
 		ABCUser user = UserUtils.getCurrentUser(ABCUser.class);
 		if(user != null) {
 			TemplateDetailTemplate dtmpl = userService.getUserDetailTemplate(dtmplId);
@@ -100,11 +100,11 @@ public class AdminConfigUserController {
 				ModuleEntityPropertyParser entity = null;
 				EntityQueryParameter param = new EntityQueryParameter(moduleName, code, user);
 				param.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(dtmpl.getId(), user));
-				EntityHistoryItem lastHistory = entityService.getLastHistoryItem(param );
+				EntityVersionItem lastHistory = entityService.getLastHistoryItem(param);
 				//EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, code, user);
-				if(historyId != null) {
-					if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
-						entity = entityService.getHistoryEntityParser(param, historyId, null);
+				if(versionCode != null) {
+					if(versionCode != null && !versionCode.equals(lastHistory.getCode())) {
+						entity = entityService.getHistoryEntityParser(param, versionCode, null);
 					}
 		        }
 		        if(entity == null) {
@@ -115,7 +115,7 @@ public class AdminConfigUserController {
 		        if(lastHistory != null) {
 		        	model.addAttribute("hasHistory", true);
 		        }
-		        model.addAttribute("historyId", historyId);
+		        model.addAttribute("versionCode", versionCode);
 				model.addAttribute("dtmpl", dtmpl);
 				model.addAttribute("user", user);
 				model.addAttribute("entity", entity);
@@ -256,7 +256,7 @@ public class AdminConfigUserController {
     	JSONObjectResponse response = new JSONObjectResponse();
     	try {
     		EntityQueryParameter param = new EntityQueryParameter(userService.getUserModuleName(), user.getCode(), user);
-    		List<EntityHistoryItem> historyItems = entityService.queryHistory(param , pageNo, pageSize);
+    		List<EntityVersionItem> historyItems = entityService.queryHistory(param , pageNo, pageSize);
 			//List<EntityHistoryItem> historyItems = mService.queryHistory(userService.getUserModuleName(), user.getCode(), pageNo, pageSize, user);
 			response.put("history", JSON.toJSON(historyItems));
 			response.setStatus("suc");
@@ -274,18 +274,18 @@ public class AdminConfigUserController {
 	@RequestMapping("/export_detail/{dtmplId}")
 	public ResponseJSON exportDetail(
 			@PathVariable Long dtmplId,
-			Long historyId) {
+			String versionCode) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		TemplateDetailTemplate dtmpl = userService.getUserDetailTemplate(dtmplId);
 		ABCUser user = UserUtils.getCurrentUser(ABCUser.class);
 		String moduleName = dtmpl.getModule();
 		ModuleEntityPropertyParser entity = null;
 		EntityQueryParameter param = new EntityQueryParameter(moduleName, user.getCode(), user);
-		EntityHistoryItem lastHistory = entityService.getLastHistoryItem(param);
+		EntityVersionItem lastHistory = entityService.getLastHistoryItem(param);
 		//EntityHistoryItem lastHistory = mService.getLastHistoryItem(moduleName, user.getCode(), user);
-		if(historyId != null) {
-			if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
-				entity = entityService.getHistoryEntityParser(param, historyId, null);
+		if(versionCode != null) {
+			if(lastHistory != null && !versionCode.equals(lastHistory.getCode())) {
+				entity = entityService.getHistoryEntityParser(param, versionCode, null);
 				//entity = mService.getHistoryEntityParser(moduleName, user.getCode(), historyId, user);
 			}
         }

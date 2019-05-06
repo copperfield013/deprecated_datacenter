@@ -14,6 +14,7 @@ import com.abc.dto.ErrorInfomation;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.datacenter.entityResolver.EntityConstants;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.impl.ABCNodeProxy;
@@ -23,7 +24,7 @@ import cn.sowell.datacenter.model.modules.bean.EntityArrayItemDetail;
 import cn.sowell.datacenter.model.modules.bean.EntityDetail;
 import cn.sowell.datacenter.model.modules.service.EntityConvertService;
 import cn.sowell.dataserver.model.dict.pojo.DictionaryComposite;
-import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
+import cn.sowell.dataserver.model.modules.pojo.EntityVersionItem;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailField;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
@@ -73,18 +74,18 @@ public class EntityConvertServiceImpl implements EntityConvertService{
 	}
 
 	@Override
-	public JSONArray toHistoryItems(List<EntityHistoryItem> historyItems, Long currentId) {
+	public JSONArray toHistoryItems(List<EntityVersionItem> historyItems, String currentCode) {
 		JSONArray aHistoryItems = new JSONArray();
 		if(historyItems != null) {
-			boolean hasCurrentId = currentId != null;
-			for (EntityHistoryItem historyItem : historyItems) {
+			boolean hasCurrentId = TextUtils.hasText(currentCode);
+			for (EntityVersionItem historyItem : historyItems) {
 				JSONObject jHistoryItem = new JSONObject();
 				aHistoryItems.add(jHistoryItem);
-				jHistoryItem.put("id", historyItem.getId());
+				jHistoryItem.put("code", historyItem.getCode());
 				jHistoryItem.put("userName", historyItem.getUserName());
 				jHistoryItem.put("time", historyItem.getTime());
 				jHistoryItem.put("monthKey", historyItem.getMonthKey());
-				if(hasCurrentId && historyItem.getId().equals(currentId)) {
+				if(hasCurrentId && historyItem.getCode().equals(currentCode)) {
 					jHistoryItem.put("current", true);
 				}
 			}

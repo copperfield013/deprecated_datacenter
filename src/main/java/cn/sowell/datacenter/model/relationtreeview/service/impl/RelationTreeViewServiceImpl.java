@@ -98,7 +98,7 @@ public class RelationTreeViewServiceImpl implements RelationTreeViewService {
 
 	@Override
 	public boolean deleteTree(String code) {
-		RemovedFusionContext entityInfo = new RemovedFusionContext(code, null, null);
+		RemovedFusionContext entityInfo = new RemovedFusionContext(null, code, null, null);
 		Integration integration=PanelFactory.getIntegration();
 		boolean bool = integration.remove(entityInfo).success();
 		return bool;

@@ -44,6 +44,7 @@ import org.springframework.util.Assert;
 
 import com.abc.application.BizFusionContext;
 import com.abc.application.FusionContext;
+import com.abc.mapping.entity.Entity;
 import com.abc.panel.Integration;
 import com.abc.panel.IntegrationMsg;
 import com.abc.panel.PanelFactory;
@@ -134,7 +135,7 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 				progress.appendMessage("解析数据：\r\n" + displayRow(map));
 				EntityComponent entityC = config.getConfigResolver().createEntityIgnoreUnsupportedElement(map);
 				Assert.isTrue(entityC != null && entityC.getEntity() != null, "创建的实体为null");
-				IntegrationMsg msg = integration.integrate(context, entityC.getEntity());
+				IntegrationMsg msg = integration.integrate(context, (Entity) entityC.getEntity());
 				logger.debug("修改记录" + msg.getCode());
 				if(msg.success()) {
 					progress.endItemTimer().getLogger().success("第" + progress.getCurrent() + "条数据导入完成，用时" + numberFormat.format(progress.getLastItemInterval() / 1000f) + "秒");

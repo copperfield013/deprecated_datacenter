@@ -56,7 +56,7 @@ import cn.sowell.dataserver.model.abc.service.EntityQueryParameter;
 import cn.sowell.dataserver.model.abc.service.ModuleEntityService;
 import cn.sowell.dataserver.model.dict.pojo.DictionaryComposite;
 import cn.sowell.dataserver.model.dict.service.DictionaryService;
-import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
+import cn.sowell.dataserver.model.modules.pojo.EntityVersionItem;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.modules.service.ViewDataService;
@@ -332,12 +332,12 @@ public class AdminModulesController {
 	@RequestMapping("/detail/{menuId}/{code}")
 	public String detail(@PathVariable String code, 
 			@PathVariable Long menuId,
-    		Long historyId,
+    		String versionCode,
     		Model model) {
 		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
 		model.addAttribute("menu", menu);
-		return toDetail(code, tmplGroup, historyId, model);
+		return toDetail(code, tmplGroup, versionCode, model);
 	}
 	
 	@RequestMapping("/node_detail/{menuId}/{nodeId}/{code}")
@@ -345,7 +345,7 @@ public class AdminModulesController {
 			@PathVariable Long menuId,
 			@PathVariable Long nodeId, 
 			@PathVariable String code,
-			Long historyId,
+			String versionCode,
 			Model model) {
 		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		TemplateTreeNode nodeTemplate = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
@@ -353,11 +353,11 @@ public class AdminModulesController {
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(tmplGroupId);
 		model.addAttribute("menu", menu);
 		model.addAttribute("nodeTemplate", nodeTemplate);
-		return toDetail(code, tmplGroup, historyId, model);
+		return toDetail(code, tmplGroup, versionCode, model);
 	}
 	
 	
-	private String toDetail(String code, TemplateGroup tmplGroup, Long historyId, Model model) {
+	private String toDetail(String code, TemplateGroup tmplGroup, String versionCode, Model model) {
 		
         String moduleName = tmplGroup.getModule();
         ModuleMeta moduleMeta = mService.getModule(moduleName);
@@ -368,10 +368,10 @@ public class AdminModulesController {
         EntityQueryParameter queryParam = new EntityQueryParameter(moduleName, code, user);
         queryParam.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(dtmpl.getId(), user));
         
-        EntityHistoryItem lastHistory = entityService.getLastHistoryItem(queryParam);
-		if(historyId != null) {
-			if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
-				entity = entityService.getHistoryEntityParser(queryParam, historyId, null);
+        EntityVersionItem lastHistory = entityService.getLastHistoryItem(queryParam);
+		if(versionCode != null) {
+			if(lastHistory != null && !versionCode.equals(lastHistory.getCode())) {
+				entity = entityService.getHistoryEntityParser(queryParam, versionCode, null);
 				//entity = mService.getHistoryEntityParser(moduleName, code, historyId, user);
 			}
         }
@@ -383,7 +383,7 @@ public class AdminModulesController {
         	model.addAttribute("hasHistory", true);
         }
         
-        model.addAttribute("historyId", historyId);
+        model.addAttribute("versionCode", versionCode);
         model.addAttribute("entity", entity);
         model.addAttribute("dtmpl", dtmpl);
         model.addAttribute("groupPremises", tmplGroup.getPremises());
@@ -592,7 +592,7 @@ public class AdminModulesController {
 		JSONObjectResponse response = new JSONObjectResponse();
     	try {
 			EntityQueryParameter param = new EntityQueryParameter(moduleName, code, UserUtils.getCurrentUser());
-			List<EntityHistoryItem> historyItems = entityService.queryHistory(param , pageNo, pageSize);
+			List<EntityVersionItem> historyItems = entityService.queryHistory(param , pageNo, pageSize);
 			response.put("history", JSON.toJSON(historyItems));
 			response.setStatus("suc");
 			if(historyItems.size() < pageSize){

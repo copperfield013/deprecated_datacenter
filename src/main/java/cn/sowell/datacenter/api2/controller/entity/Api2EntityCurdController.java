@@ -45,7 +45,7 @@ import cn.sowell.datacenter.model.modules.service.EntityConvertService;
 import cn.sowell.dataserver.model.abc.service.EntitiesQueryParameter;
 import cn.sowell.dataserver.model.abc.service.EntityQueryParameter;
 import cn.sowell.dataserver.model.abc.service.ModuleEntityService;
-import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
+import cn.sowell.dataserver.model.modules.pojo.EntityVersionItem;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.modules.service.view.EntityItem;
 import cn.sowell.dataserver.model.modules.service.view.EntityQuery;
@@ -397,7 +397,7 @@ public class Api2EntityCurdController {
 						"/detail/{validateSign:user}/*"})
 	public ResponseJSON detail(@PathVariable String validateSign, 
 			@PathVariable(required=false) String code, 
-			Long historyId,
+			String versionCode,
 			Long nodeId,
 			Long fieldGroupId,
 			Long dtmplId,
@@ -418,9 +418,9 @@ public class Api2EntityCurdController {
 		queryParam.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(dtmpl.getId(), user));
 		ModuleEntityPropertyParser entity = entityService.getEntityParser(queryParam);
 		
-		EntityHistoryItem lastHistory = entityService.getLastHistoryItem(queryParam);
-		if(historyId != null && lastHistory != null && !historyId.equals(lastHistory.getId())) {
-			entity = entityService.getHistoryEntityParser(queryParam, historyId, null);
+		EntityVersionItem lastHistory = entityService.getLastHistoryItem(queryParam);
+		if(versionCode != null && lastHistory != null && !versionCode.equals(lastHistory.getCode())) {
+			entity = entityService.getHistoryEntityParser(queryParam, versionCode, null);
         }
         if(entity == null) {
         	entity = entityService.getEntityParser(queryParam);
@@ -434,7 +434,7 @@ public class Api2EntityCurdController {
 			EntityDetail detail = entityConvertService.convertEntityDetail(entity, dtmplService.getTemplate(dtmpl.getId()));
 			jRes.put("entity", detail);
 			jRes.put("errors", entityConvertService.toErrorItems(entity.getErrors()));
-			jRes.put("historyId", historyId);
+			jRes.put("versionCode", versionCode);
 			jRes.setStatus("suc");
 		}
 		return jRes;
@@ -459,7 +459,7 @@ public class Api2EntityCurdController {
 		ValidateDetailResult vResult = authService.validateDetailAuth(vParam);
 		
 		EntityQueryParameter queryParam = new EntityQueryParameter(vResult.getDetailTemplate().getModule(), vResult.getEntityCode(), user);
-		List<EntityHistoryItem> historyItems = entityService.queryHistory(queryParam, pageNo, 100);
+		List<EntityVersionItem> historyItems = entityService.queryHistory(queryParam, pageNo, 100);
 		JSONArray aHistoryItems = entityConvertService.toHistoryItems(historyItems, null);
 		jRes.put("history", aHistoryItems);
 		return jRes;

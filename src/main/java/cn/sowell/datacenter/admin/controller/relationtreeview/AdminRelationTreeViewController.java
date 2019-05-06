@@ -22,6 +22,7 @@ import com.abc.application.BizFusionContext;
 import com.abc.application.FusionContext;
 import com.abc.mapping.entity.Entity;
 import com.abc.mapping.entity.EntityRelationParser;
+import com.abc.mapping.entity.RecordEntity;
 import com.abc.mapping.entity.RelationEntity;
 import com.abc.mapping.node.ABCNode;
 import com.abc.mapping.node.AttributeNode;
@@ -29,7 +30,7 @@ import com.abc.panel.Discoverer;
 import com.abc.panel.PanelFactory;
 import com.abc.rrc.query.criteria.CommonSymbol;
 import com.abc.rrc.query.criteria.EntityCriteriaFactory;
-import com.abc.rrc.query.entity.EntitySortedPagedQuery;
+import com.abc.rrc.query.entity.SortedPagedQuery;
 import com.abc.rrc.query.queryrecord.criteria.Criteria;
 import com.abc.service.RelationTreeServiceFactory;
 import com.abc.vo.RelationVO;
@@ -370,12 +371,12 @@ public class AdminRelationTreeViewController {
 		
 		Discoverer discoverer = PanelFactory.getDiscoverer(context);
 		//EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(criterias, null);
-		 EntitySortedPagedQuery sortedPagedQuery = null;// discoverer.discover(criterias, null);
+		SortedPagedQuery<RecordEntity> sortedPagedQuery = null;// discoverer.discover(criterias, null);
 		Integer pageNo = pageInfo.getPageNo();
 		sortedPagedQuery.setPageSize(pageInfo.getPageSize());
 		pageInfo.setCount(sortedPagedQuery.getAllCount());
 		
-		for (Entity entity : sortedPagedQuery.visitEntity(pageNo)) {
+		for (RecordEntity entity : sortedPagedQuery.visitEntity(pageNo)) {
 			String json = entity.toJson();
 			JSONObject parse = (JSONObject)JSONObject.parse(json);
 			Map<String, Object> map = new TreeMap<String, Object>();

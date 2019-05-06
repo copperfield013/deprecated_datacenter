@@ -44,7 +44,7 @@ import cn.sowell.datacenter.model.modules.service.ExportService;
 import cn.sowell.dataserver.model.abc.service.EntityQueryParameter;
 import cn.sowell.dataserver.model.abc.service.ModuleEntityService;
 import cn.sowell.dataserver.model.modules.bean.ExportDataPageInfo;
-import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
+import cn.sowell.dataserver.model.modules.pojo.EntityVersionItem;
 import cn.sowell.dataserver.model.modules.pojo.criteria.NormalCriteria;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
@@ -208,10 +208,10 @@ public class AdminModulesExportController {
 	public ResponseJSON exportDetail(
 			@PathVariable Long menuId, 
 			@PathVariable String code,
-			Long historyId) {
+			String versionCode) {
 		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
-		return aExportDetail(code, tmplGroup, historyId);
+		return aExportDetail(code, tmplGroup, versionCode);
 	}
 	@ResponseBody
 	@RequestMapping("/node_export_detail/{menuId}/{nodeId}/{code}")
@@ -219,14 +219,14 @@ public class AdminModulesExportController {
 			@PathVariable Long menuId, 
 			@PathVariable Long nodeId, 
 			@PathVariable String code,
-			Long historyId) {
+			String versionCode) {
 		SideMenuLevel2Menu menu = authService.validateL2MenuAccessable(menuId);
 		TemplateTreeNode node = treeService.getNodeTemplate(menu.getTemplateModule(), nodeId);
 		TemplateGroup tmplGroup = tmplGroupService.getTemplate(node.getTemplateGroupId());
-		return aExportDetail(code, tmplGroup, historyId);
+		return aExportDetail(code, tmplGroup, versionCode);
 	}
 	
-	private ResponseJSON aExportDetail(String code, TemplateGroup tmplGroup, Long historyId) {
+	private ResponseJSON aExportDetail(String code, TemplateGroup tmplGroup, String versionCode) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
 		UserIdentifier user = UserUtils.getCurrentUser();
@@ -236,10 +236,10 @@ public class AdminModulesExportController {
 		EntityQueryParameter queryParam = new EntityQueryParameter(moduleName, code, user);
 		queryParam.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(dtmpl.getId(), user));
 		
-		EntityHistoryItem lastHistory = entityService.getLastHistoryItem(queryParam);
-		if(historyId != null) {
-			if(lastHistory != null && !historyId.equals(lastHistory.getId())) {
-				entity = entityService.getHistoryEntityParser(queryParam, historyId, null);
+		EntityVersionItem lastHistory = entityService.getLastHistoryItem(queryParam);
+		if(versionCode != null) {
+			if(lastHistory != null && !versionCode.equals(lastHistory.getCode())) {
+				entity = entityService.getHistoryEntityParser(queryParam, versionCode, null);
 			}
 		}
 		if(entity == null) {

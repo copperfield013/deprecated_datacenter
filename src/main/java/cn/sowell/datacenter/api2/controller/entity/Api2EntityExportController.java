@@ -36,7 +36,7 @@ import cn.sowell.datacenter.model.modules.service.ExportService;
 import cn.sowell.dataserver.model.abc.service.EntityQueryParameter;
 import cn.sowell.dataserver.model.abc.service.ModuleEntityService;
 import cn.sowell.dataserver.model.modules.bean.ExportDataPageInfo;
-import cn.sowell.dataserver.model.modules.pojo.EntityHistoryItem;
+import cn.sowell.dataserver.model.modules.pojo.EntityVersionItem;
 import cn.sowell.dataserver.model.modules.service.view.EntityQuery;
 import cn.sowell.dataserver.model.modules.service.view.EntityQueryPool;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
@@ -92,7 +92,7 @@ public class Api2EntityExportController {
 	public ResponseJSON detail(
 				@PathVariable String validateSign, 
 				@PathVariable(required=false) String entityCode,
-				Long historyId,
+				String versionCode,
 				Long nodeId,
 				Long fieldGroupId,
 				Long dtmplId,
@@ -113,9 +113,9 @@ public class Api2EntityExportController {
 		queryParam.setArrayItemCriterias(arrayItemFilterService.getArrayItemFilterCriterias(dtmpl.getId(), user));
 		ModuleEntityPropertyParser entity = entityService.getEntityParser(queryParam);
 		
-		EntityHistoryItem lastHistory = entityService.getLastHistoryItem(queryParam);
-		if(historyId != null && lastHistory != null && !historyId.equals(lastHistory.getId())) {
-			entity = entityService.getHistoryEntityParser(queryParam, historyId, null);
+		EntityVersionItem lastHistory = entityService.getLastHistoryItem(queryParam);
+		if(versionCode != null && lastHistory != null && !versionCode.equals(lastHistory.getCode())) {
+			entity = entityService.getHistoryEntityParser(queryParam, versionCode, null);
         }
         if(entity == null) {
         	entity = entityService.getEntityParser(queryParam);
