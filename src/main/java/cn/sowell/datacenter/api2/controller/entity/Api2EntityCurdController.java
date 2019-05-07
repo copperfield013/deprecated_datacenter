@@ -52,7 +52,9 @@ import cn.sowell.dataserver.model.modules.service.view.EntityQuery;
 import cn.sowell.dataserver.model.modules.service.view.EntityQueryPool;
 import cn.sowell.dataserver.model.modules.service.view.PagedEntityList;
 import cn.sowell.dataserver.model.modules.service.view.TreeNodeContext;
+import cn.sowell.dataserver.model.statview.service.StatViewService;
 import cn.sowell.dataserver.model.tmpl.manager.TreeTemplateManager.TreeRelationComposite;
+import cn.sowell.dataserver.model.tmpl.pojo.AbstractListTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.ArrayEntityProxy;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateActionTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailField;
@@ -61,6 +63,7 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupAction;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateStatView;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeNode;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeTemplate;
 import cn.sowell.dataserver.model.tmpl.service.ActionTemplateService;
@@ -68,6 +71,7 @@ import cn.sowell.dataserver.model.tmpl.service.ArrayItemFilterService;
 import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.ListCriteriaFactory;
 import cn.sowell.dataserver.model.tmpl.service.ListTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.StatListTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.TemplateGroupService;
 import cn.sowell.dataserver.model.tmpl.service.TreeTemplateService;
 
@@ -120,36 +124,52 @@ public class Api2EntityCurdController {
 	@Resource
 	MetaJsonService metaService;
 	
+	@Resource
+	StatViewService statViewService;
+	
+	@Resource
+	StatListTemplateService statListService;
+	
 	static Logger logger = Logger.getLogger(Api2EntityCurdController.class);
 	
 	
 	@RequestMapping("/start_query/{menuId}")
 	public ResponseJSON startQuery(@PathVariable Long menuId, 
 			PageInfo pageInfo,
-			HttpServletRequest request, ApiUser user) {
+			HttpServletRequest request, 
+			String disabledColIds,
+			ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
-		
-		
 		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
-		TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
-		TemplateListTemplate ltmpl = ltmplService.getTemplate(tmplGroup.getListTemplateId());
-		//获得查询池
-		EntityQueryPool qPool = EntityQueryPoolUtils.getEntityQueryPool(user);
-		//注册一个查询
-		EntityQuery query = qPool.regist();
-		//根据上下文获得节点模板
-		//设置参数
-		query
-			.setModuleName(menu.getTemplateModule())
-			.setPageSize(pageInfo.getPageSize())
-			.setTemplateGroup(tmplGroup)
-			;
-		Map<Long, String> requrestCriteriaMap = lcriteriFacrory.exractTemplateCriteriaMap(request);
-		//根据传入的条件和约束开始初始化查询对象，但还不获取实体数据
-		query.prepare(requrestCriteriaMap, applicationContext);
-		//传递参数到页面
-		writeListPageAttributes(jRes, query, menu, ltmpl);
 		
+		if(menu.getStatViewId() != null || menu.getTemplateGroupId() != null) {
+			Map<Long, String> requrestCriteriaMap = lcriteriFacrory.exractTemplateCriteriaMap(request);
+			AbstractListTemplate<?, ?> ltmpl = null;
+			//获得查询池
+			EntityQueryPool qPool = EntityQueryPoolUtils.getEntityQueryPool(user);
+			//注册一个查询
+			EntityQuery query = qPool.regist();
+			query.setModuleName(menu.getTemplateModule());
+			query.setPageSize(pageInfo.getPageSize());
+			if(menu.getStatViewId() != null) {
+				TemplateStatView statViewTmpl = statViewService.getTemplate(menu.getStatViewId());
+				ltmpl = statListService.getTemplate(statViewTmpl.getStatListTemplateId());
+				Set<Long> disabledColumnIds = TextUtils.splitToLongSet(disabledColIds, ",");
+				query
+					.setStatViewTemplate(statViewTmpl)
+					.setStatDisabledColumnIds(disabledColumnIds);
+			}else if(menu.getTemplateGroupId() != null){
+				TemplateGroup tmplGroup = tmplGroupService.getTemplate(menu.getTemplateGroupId());
+				ltmpl = ltmplService.getTemplate(tmplGroup.getListTemplateId());
+				//根据上下文获得节点模板
+				//设置参数
+				query.setTemplateGroup(tmplGroup);
+			}
+			//根据传入的条件和约束开始初始化查询对象，但还不获取实体数据
+			query.prepare(requrestCriteriaMap, applicationContext);
+			//传递参数到页面
+			writeListPageAttributes(jRes, query, menu, ltmpl);
+		}
 		return jRes;
 	}
 	
@@ -157,14 +177,16 @@ public class Api2EntityCurdController {
 	private void writeListPageAttributes(JSONObjectResponse jRes, 
 			EntityQuery query, 
 			SideMenuLevel2Menu menu, 
-			TemplateListTemplate ltmpl) {
+			AbstractListTemplate<?, ?> ltmpl) {
 		jRes.put("queryKey", query.getKey());
 		jRes.put("menu", mJsonService.toMenuJson(menu));
 		
 		jRes.put("ltmpl", tJsonService.toListTemplateJson(ltmpl));
 		jRes.put("criteriaValueMap",  JsonUtils.convertToStringKeyMap(query.getCriteriaValueMap()));
-		jRes.put("tmplGroup", tJsonService.toTemplateGroupJson(query.getTemplateGroup()));
 		jRes.put("moduleWritable", mService.getModuleEntityWritable(menu.getTemplateModule()));
+		jRes.put("tmplGroup", tJsonService.toTemplateGroupJson(query.getTemplateGroup()));
+		jRes.put("statView", tJsonService.toStatViewJson(query.getStatViewTemplate()));
+		jRes.put("disabledColIds", query.getStatDisabledColumnIds());
 	}
 
 
@@ -448,6 +470,7 @@ public class Api2EntityCurdController {
 			@PathVariable(required=false) String code, 
 			Long fieldGroupId,
 			Long nodeId,
+			String versionCode,
 			@PathVariable Integer pageNo, ApiUser user) {
 		JSONObjectResponse jRes = new JSONObjectResponse();
 		ValidateDetailParamter vParam = new ValidateDetailParamter(validateSign, user);
@@ -460,7 +483,7 @@ public class Api2EntityCurdController {
 		
 		EntityQueryParameter queryParam = new EntityQueryParameter(vResult.getDetailTemplate().getModule(), vResult.getEntityCode(), user);
 		List<EntityVersionItem> historyItems = entityService.queryHistory(queryParam, pageNo, 100);
-		JSONArray aHistoryItems = entityConvertService.toHistoryItems(historyItems, null);
+		JSONArray aHistoryItems = entityConvertService.toHistoryItems(historyItems, versionCode);
 		jRes.put("history", aHistoryItems);
 		return jRes;
 	}
@@ -525,6 +548,23 @@ public class Api2EntityCurdController {
 			throw new RuntimeException("Must set unempty parameter one of \"fieldNames\" or \"dfieldIds\"");
 		}
 		
+	}
+	
+	@RequestMapping("/recalc/{menuId}")
+	public ResponseJSON recalc(@PathVariable Long menuId, ApiUser user) {
+		JSONObjectResponse jRes = new JSONObjectResponse();
+		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
+		if(menu.getStatViewId() != null) {
+			try {
+				statViewService.recalc(menu.getTemplateModule(), user);
+				jRes.setStatus("suc");
+			} catch (Exception e) {
+				jRes.setStatus("error");
+				jRes.put("errorMsg", e.getMessage());
+				logger.error("统计数据时发生错误", e);
+			}
+		}
+		return jRes;
 	}
 	
 }

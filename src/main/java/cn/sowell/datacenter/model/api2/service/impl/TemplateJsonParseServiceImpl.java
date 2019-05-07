@@ -27,8 +27,7 @@ import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailFieldGroupTreeNode;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroupAction;
-import cn.sowell.dataserver.model.tmpl.pojo.TemplateListColumn;
-import cn.sowell.dataserver.model.tmpl.pojo.TemplateListTemplate;
+import cn.sowell.dataserver.model.tmpl.pojo.TemplateStatView;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeNode;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateTreeTemplate;
 import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
@@ -62,7 +61,7 @@ public class TemplateJsonParseServiceImpl implements TemplateJsonParseService{
 	ModulesService moduleService;
 	
 	static Pattern operatePattern = Pattern.compile("^operate[(-d)*(-u)*(-r)*]$"); 
-	public JSONObject toListTemplateJson(TemplateListTemplate listTemplate) {
+	public JSONObject toListTemplateJson(AbstractListTemplate<? extends AbstractListColumn, ? extends AbstractListCriteria> listTemplate) {
 		JSONObject jDtmpl = new JSONObject();
 		jDtmpl.put("id", listTemplate.getId());
 		jDtmpl.put("title", listTemplate.getTitle());
@@ -70,8 +69,8 @@ public class TemplateJsonParseServiceImpl implements TemplateJsonParseService{
 		jDtmpl.put("criterias", toCriterias(listTemplate.getCriterias()));
 		jDtmpl.put("columns", toColumns(listTemplate.getColumns()));
 		Set<String> operates = null;
-		List<TemplateListColumn> columns = listTemplate.getColumns();
-		for (TemplateListColumn column : columns) {
+		List<? extends AbstractListColumn> columns = listTemplate.getColumns();
+		for (AbstractListColumn column : columns) {
 			if(column.getSpecialField() != null && operates == null && column.getSpecialField().startsWith("operate")) {
 				operates = new LinkedHashSet<>();
 				String specialField = column.getSpecialField();
@@ -133,6 +132,11 @@ public class TemplateJsonParseServiceImpl implements TemplateJsonParseService{
 	@Override
 	public JSONObject toTemplateGroupJson(TemplateGroup tmplGroup) {
 		return (JSONObject) JSONObject.toJSON(tmplGroup);
+	}
+	
+	@Override
+	public JSONObject toStatViewJson(TemplateStatView statViewTemplate) {
+		return (JSONObject) JSONObject.toJSON(statViewTemplate);
 	}
 	
 	@Override

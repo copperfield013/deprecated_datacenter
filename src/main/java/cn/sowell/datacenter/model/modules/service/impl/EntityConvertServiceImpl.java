@@ -77,6 +77,7 @@ public class EntityConvertServiceImpl implements EntityConvertService{
 	public JSONArray toHistoryItems(List<EntityVersionItem> historyItems, String currentCode) {
 		JSONArray aHistoryItems = new JSONArray();
 		if(historyItems != null) {
+			historyItems.sort((a,b)->Long.compare(a.getTimeKey(), b.getTimeKey()));
 			boolean hasCurrentId = TextUtils.hasText(currentCode);
 			for (EntityVersionItem historyItem : historyItems) {
 				JSONObject jHistoryItem = new JSONObject();

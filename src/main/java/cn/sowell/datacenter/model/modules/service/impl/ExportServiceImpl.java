@@ -51,6 +51,8 @@ import cn.sowell.dataserver.model.modules.bean.ExportDataPageInfo;
 import cn.sowell.dataserver.model.modules.pojo.criteria.NormalCriteria;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 import cn.sowell.dataserver.model.modules.service.view.EntityQuery;
+import cn.sowell.dataserver.model.tmpl.pojo.AbstractListColumn;
+import cn.sowell.dataserver.model.tmpl.pojo.AbstractListTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateDetailTemplate;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateGroup;
 import cn.sowell.dataserver.model.tmpl.pojo.TemplateListColumn;
@@ -59,6 +61,7 @@ import cn.sowell.dataserver.model.tmpl.service.ArrayItemFilterService;
 import cn.sowell.dataserver.model.tmpl.service.DetailTemplateService;
 import cn.sowell.dataserver.model.tmpl.service.ListCriteriaFactory;
 import cn.sowell.dataserver.model.tmpl.service.ListTemplateService;
+import cn.sowell.dataserver.model.tmpl.service.StatListTemplateService;
 
 @Service
 public class ExportServiceImpl implements ExportService {
@@ -344,16 +347,27 @@ public class ExportServiceImpl implements ExportService {
 		}
 	}
 	
+	@Resource
+	StatListTemplateService statListService;
+	
 	@Override
 	public void startWholeExport(WorkProgress progress, EntityQuery query, ExportDataPageInfo ePageInfo,
 			Boolean withDetail) {
-		TemplateGroup tmplGroup = query.getTemplateGroup();
-		TemplateListTemplate ltmpl = ltmplService.getTemplate(tmplGroup.getListTemplateId());
 		progress.setTotal(100);
 		progress.setCurrent(0);
 		XSSFWorkbook workbook = new XSSFWorkbook();
 		progress.veni();
 		pFactory.createThread(progress, p->{
+			AbstractListTemplate<? extends AbstractListColumn, ?> ltmpl = null;
+			TemplateDetailTemplate dtmpl = null;
+			if(query.getTemplateGroup() != null) {
+				ltmpl = ltmplService.getTemplate(query.getTemplateGroup().getListTemplateId());
+				dtmpl = dtmplService.getTemplate(query.getTemplateGroup().getDetailTemplateId());
+			}else if(query.getStatViewTemplate() != null) {
+				ltmpl = statListService.getTemplate(query.getStatViewTemplate().getStatListTemplateId());
+			}else {
+				throw new RuntimeException();
+			}
 			userCodeService.setUserCode((String) query.getUser().getId());
 			progress.setCurrent(1);
 			XSSFSheet sheet = workbook.createSheet();
@@ -362,7 +376,7 @@ public class ExportServiceImpl implements ExportService {
 			progress.setCurrent(10);
 			CellStyle listHeaderStyle = entityExportWriter.getListHeaderStyle(workbook),
 						listValueStyle = entityExportWriter.getListValueStyle(workbook);
-			for (TemplateListColumn column : ltmpl.getColumns()) {
+			for (AbstractListColumn column : ltmpl.getColumns()) {
 				if("number".equals(column.getSpecialField()) || column.getSpecialField() == null){
 					XSSFCell header = headerRow.createCell(colnum++);
 					header.setCellType(CellType.STRING);
@@ -387,7 +401,7 @@ public class ExportServiceImpl implements ExportService {
 				float dataProgress = ((float)entityNumber)/itr.getDataCount();
 				progress.setCurrent(20 + (int)(dataProgress * 50));
 				int j = 1;
-				for (TemplateListColumn column : ltmpl.getColumns()) {
+				for (AbstractListColumn column : ltmpl.getColumns()) {
 					if("number".equals(column.getSpecialField()) || column.getSpecialField() == null){
 						XSSFCell cell = row.createCell(j++, CellType.STRING);
 						cell.setCellStyle(listValueStyle);
@@ -398,8 +412,7 @@ public class ExportServiceImpl implements ExportService {
 						}
 					}
 				}
-				if(withDetail) {
-					TemplateDetailTemplate dtmpl = dtmplService.getTemplate(tmplGroup.getDetailTemplateId());
+				if(withDetail && dtmpl != null) {
 					String detailSheetName = "entity_" + entityNumber;
 					
 					XSSFCell linkCell = row.createCell(j);

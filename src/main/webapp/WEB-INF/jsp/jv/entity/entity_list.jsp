@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/jsp/common/base_empty.jsp"%>
-<div id="list-tmpl-${RES_STAMP}" class="detail module-list-tmpl">
+<div id="list-tmpl-${RES_STAMP}" class="detail module-list-tmpl statview-list">
 	<div class="page-header">
 		<div class="header-title">
 			<h1>${menu.title }-列表</h1>
@@ -76,6 +76,7 @@
 			</div>
 		</div>
 	</div>
+	<style target="viewcols-window"></style>
 </div>
 <script>
 	seajs.use(['entity/js/entity-list.js'], function(EntityList){

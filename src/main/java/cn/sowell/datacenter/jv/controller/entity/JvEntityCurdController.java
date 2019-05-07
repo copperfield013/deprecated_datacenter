@@ -117,4 +117,12 @@ public class JvEntityCurdController {
 		return JvConstants.JSP_ENTITY + "/entity_detail.jsp";
 	}
 	
+	
+	@RequestMapping("/import/{menuId}")
+	public String entityImport(@PathVariable Long menuId, ApiUser user, Model model) {
+		authService.validateUserL2MenuAccessable(user, menuId);
+		model.addAttribute("menuId", menuId);
+		return JvConstants.JSP_ENTITY + "/entity_import.jsp";
+	}
+	
 }

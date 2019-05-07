@@ -68,10 +68,21 @@ define(function(require, exports, module){
 			var ltmpl = null
 			var entities = null;
 			var tmplGroup = null;
+			var statView = null;
 			var pageNo = 1;
 			var pageSize = 10;
 			var totalCount = null;
 			var pageInfo = null;
+			
+			var context = require('utils').createContext({
+				statView		: null,
+				columns			: [],
+				oDisabledColIds	: [],
+				disabledColIds	: []
+			});
+			
+			context
+				.bind('statView', renderViewColsWindow);
 			
 			//执行加载页面后的第一次查询
 			queryList();
@@ -80,29 +91,37 @@ define(function(require, exports, module){
 			$criteriaForm.submit(function(e){
 				e.preventDefault();
 				var criterias = CriteriaRenderFactory.collectCriterias(this);
-				queryList(criterias);
+				queryList(criterias, context.getStatus('oDisabledColIds'));
 				return false;
 			});
 			
 			/**
 			 * 根据条件查询数据
 			 */
-			function queryList(criterias){
+			function queryList(criterias, disabledColIds){
 				var $CPF = require('$CPF');
 				$CPF.showLoading();
 				//发起数据请求
-				Ajax.ajax('api2/entity/curd/start_query/' + param.menuId, $.extend({}, criterias), function(data){
+				Ajax.ajax('api2/entity/curd/start_query/' + param.menuId, $.extend({
+					disabledColIds	: disabledColIds && disabledColIds.join() || ''
+				}, criterias), function(data){
 					if(!criterias && data.ltmpl){
 						menu = data.menu;
 						tmplGroup = data.tmplGroup;
+						statView = data.statView;
 						renderTitle(data);
 						//获得列表模板
 						ltmpl = data.ltmpl;
 						console.log(ltmpl);
 						renderCriterias(ltmpl.criterias, data.criteriaValueMap, $criteriaForm);
 						renderButtons();
-						renderTableHeader();
 					}
+					var disabledColIds = data.disabledColIds || [];
+					context.setStatus('disabledColIds', disabledColIds);
+					context.setStatus('oDisabledColIds', disabledColIds);
+					context.setStatus(ltmpl, ['columns', 'criterias']);
+					context.setStatus(data, ['criteriaValueMap', 'statView']);
+					renderTableHeader();
 					//获得queryKey，查询实体
 					if(data.queryKey){
 						queryKey = data.queryKey;
@@ -142,11 +161,29 @@ define(function(require, exports, module){
 					.end().append(tmplMap['header-buttons'].tmpl({
 						moduleWritable	: data.moduleWritable,
 						tmplGroup		: tmplGroup,
+						statView		: statView,
 						menuId			: menu.id,
 						menuTitle		: menu.title
 					}, {
 						toggle	: function(eleSel){
 							$(eleSel, $page).toggle();
+						},
+						recalc	: function(){
+							var Dialog = require('dialog');
+							Dialog.confirm('确认重新统计？').done(function(){
+								var $CPF = require('$CPF');
+								$CPF.showLoading();
+								Ajax.ajax('api2/entity/curd/recalc/' + param.menuId).done(function(data){
+									if(data.status === 'suc'){
+										Dialog.notice('操作成功', 'success');
+										$page.getLocatePage().refresh();
+									}else{
+										Dialog.notice('操作失败', 'error');
+									}
+								}).always(function(){
+									$CPF.closeLoading();
+								});
+							});
 						}
 					}));
 
@@ -155,6 +192,7 @@ define(function(require, exports, module){
 			function renderButtons(){
 				$formButtons.empty().append(tmplMap['form-buttons'].tmpl({
 					tmplGroup	: tmplGroup,
+					statView	: statView,
 					hasCriterias: ltmpl.criterias && ltmpl.criterias.length > 0
 				}, {
 					doAction		: function(actionId, actionTitle){
@@ -226,7 +264,11 @@ define(function(require, exports, module){
 				//加载表头
 				if(ltmpl && ltmpl.columns){
 					var $thead = $('thead>tr', $table).empty();
-					$thead.append(tmplMap['th'].tmpl({columns:ltmpl.columns, operates:ltmpl.operates}));
+					$thead.append(tmplMap['th'].tmpl({
+						columns			: ltmpl.columns, 
+						operates		: ltmpl.operates,
+						disabledColIds	: context.getStatus('disabledColIds')
+					}));
 				}
 			}
 			
@@ -237,13 +279,49 @@ define(function(require, exports, module){
 				var $tbody = $('tbody', $table).empty();
 				$.each(entities, function(i){
 					var $row = tmplMap['entity-row'].tmpl({
-						index	: i,
-						columns	: ltmpl.columns,
-						entity	: this,
-						operates: ltmpl.operates,
-						menu	: menu
+						index			: i,
+						columns			: ltmpl.columns,
+						entity			: this,
+						operates		: ltmpl.operates,
+						menu			: menu,
+						disabledColIds	: context.getStatus('disabledColIds')
 					}).appendTo($tbody);
 				});
+			}
+			
+			function renderViewColsWindow(){
+				var statView = context.getStatus('statView');
+				if(statView){
+					tmplMap['viewcols-window'].replaceIn($page, {
+						columns			: context.getStatus('columns'),
+						disabledColIds	: context.getStatus('disabledColIds')
+					}, {
+						toggleSelect: function(col){
+							var $span = $(this);
+							var disabledColIds = context.getStatus('disabledColIds');
+							var disabled = $span.is('.disabled');
+							if(disabled){
+								$span.removeClass('disabled');
+								disabledColIds.splice(disabledColIds.indexOf(col.id), 1);
+							}else{
+								$span.addClass('disabled');
+								disabledColIds.push(col.id)
+							}
+							console.log(disabledColIds);
+						},
+						changeCols	: function(){
+							var disabledColIds = context.getStatus('disabledColIds');
+							var criteriaValueMap = context.getStatus('criteriaValueMap');
+							var originCriterias = {};
+							for(var criteriaId in criteriaValueMap){
+								originCriterias['criteria_' + criteriaId] = criteriaValueMap[criteriaId];
+							}
+							queryList(originCriterias, disabledColIds);
+							
+						}
+					})
+					
+				}
 			}
 			
 			/**

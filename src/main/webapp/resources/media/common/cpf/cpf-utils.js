@@ -1113,7 +1113,7 @@ define(function(require, exports){
 		}
 		return this;
 	}
-	exports.createStatus = function(f){return new Status(f)}
+	exports.createContext = exports.createStatus = function(f){return new Status(f)}
 	
 	/**
 	 * 构建一个方法对象，方法对象的原型为(types1, callback1, types2, callback2..., elseCallback)
