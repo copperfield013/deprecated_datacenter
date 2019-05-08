@@ -1,4 +1,5 @@
 define(function(require, exports, module){
+	"use strict";
 	var Ajax = require('ajax');
 	var Utils = require('utils');
 	var Tmpl = require('tmpl');

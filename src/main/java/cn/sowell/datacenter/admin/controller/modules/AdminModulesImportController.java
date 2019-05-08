@@ -166,7 +166,7 @@ public class AdminModulesImportController {
         			WorkProgress progress = new WorkProgress();
                 	jRes.put("uuid", progress.getUUID());
                 	ProgressPollableThread thread = pFactory.createThread(progress, p->{
-                		impService.importData(sheet, p, menu.getTemplateModule(), user);
+                		impService.importData(sheet, p, menu.getTemplateModule(), user, true);
                 	}, (p,e)->{
                 		if(e instanceof ImportBreakException) {
 							logger.error("导入被用户停止", e);

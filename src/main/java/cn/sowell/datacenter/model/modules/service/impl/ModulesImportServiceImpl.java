@@ -94,37 +94,36 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 	
 	
 	@Override
-	public void importData(Sheet sheet, WorkProgress progress, String module, UserIdentifier user)
+	public void importData(Sheet sheet, WorkProgress progress, String module, UserIdentifier user, boolean doFuse)
 			throws ImportBreakException {
 		Row headerRow = sheet.getRow(1);
 		if(module != null){
 			FusionContextConfig config = fFactory.getModuleConfig(module);
 			if(config != null) {
-				execute(sheet, headerRow, config, progress, user);
+				execute(sheet, headerRow, config, progress, user, doFuse);
 			}
 		}
 	}
 	
-	private void execute(Sheet sheet, Row headerRow, FusionContextConfig config, WorkProgress progress, UserIdentifier user) throws ImportBreakException {
+	private void execute(Sheet sheet, Row headerRow, FusionContextConfig config, WorkProgress progress, UserIdentifier user, boolean doFuse) throws ImportBreakException {
 		logger.debug("导入表格【" + sheet.getSheetName() + "】");
 		progress.appendMessage("正在计算总行数");
 		progress.setTotal(colculateRowCount(sheet));
-		int rownum = 2;
+		int rowIndex = 2;
 		progress.appendMessage("开始导入");
 		Integration integration = PanelFactory.getIntegration();
 		BizFusionContext context = config.getCurrentContext(user);
 		context.setSource(FusionContext.SOURCE_COMMON);
-		int failed = 0;
 		while(true){
 			if(progress.isBreaked()){
 				progress.getLogger().warn("导入中断");
 				throw new ImportBreakException();
 			}
-			Row row = sheet.getRow(rownum++);
+			Row row = sheet.getRow(rowIndex);
 			if(row == null || row.getCell(0) == null || !TextUtils.hasText(getStringWithBlank(row.getCell(0)))){
 				break;
 			}
-			progress.setCurrent(rownum - 2);
+			progress.setCurrent(rowIndex - 1);
 			progress.startItemTimer().appendMessage("导入第" + progress.getCurrent() + "条数据");
 			try {
 				Map<String, Object> map = createImportData(headerRow, row);
@@ -135,20 +134,30 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 				progress.appendMessage("解析数据：\r\n" + displayRow(map));
 				EntityComponent entityC = config.getConfigResolver().createEntityIgnoreUnsupportedElement(map);
 				Assert.isTrue(entityC != null && entityC.getEntity() != null, "创建的实体为null");
-				IntegrationMsg msg = integration.integrate(context, (Entity) entityC.getEntity());
-				logger.debug("修改记录" + msg.getCode());
-				if(msg.success()) {
-					progress.endItemTimer().getLogger().success("第" + progress.getCurrent() + "条数据导入完成，用时" + numberFormat.format(progress.getLastItemInterval() / 1000f) + "秒");
+				IntegrationMsg msg = null;
+				if(doFuse) {
+					msg = integration.integrate(context, (Entity) entityC.getEntity());
+					logger.debug("导入EntityCode：" + msg.getCode());
+				}
+				if(!doFuse || msg.success()) {
+					progress.endItemTimer()
+						.getLogger().success("第" + progress.getCurrent() + "条数据导入完成，用时" + numberFormat.format(progress.getLastItemInterval() / 1000f) + "秒");
 				}else {
+					progress.getFailedIndexs().add(rowIndex);
+					progress.endItemTimer().getLogger().error("第" + progress.getCurrent() + "条数据导入出错，用时" + numberFormat.format(progress.getLastItemInterval() / 1000f) + "秒)");
+					progress.getLogger().error("错误信息：" + String.valueOf(msg.getError()));
 					logger.debug("导入记录时出错");
 				}
 			} catch (Exception e) {
-				failed++;
-				logger.error("导入第" + rownum + "行时发生异常", e);
-				progress.endItemTimer().getLogger().error("第" + progress.getCurrent() + "条数据导入异常，用时" + numberFormat.format(progress.getLastItemInterval() / 1000f) + "秒");
+				progress.getFailedIndexs().add(rowIndex);
+				logger.error("导入第" + progress.getCurrent() + "行时发生异常", e);
+				progress.endItemTimer()
+					.getLogger().error("第" + progress.getCurrent() + "条数据导入异常，用时" + numberFormat.format(progress.getLastItemInterval() / 1000f) + "秒)");
+				progress.getLogger().error("系统错误信息：" + e.getMessage());
 			}
+			rowIndex++;
 		}
-		progress.getLogger().success("导入完成,共导入" + (progress.getTotal() - failed) + "/" + progress.getTotal() + "条");
+		progress.getLogger().success("导入完成,共导入" + (progress.getTotal() - progress.getFailedIndexs().size()) + "/" + progress.getTotal() + "条");
 		progress.setCompleted();
 		
 		

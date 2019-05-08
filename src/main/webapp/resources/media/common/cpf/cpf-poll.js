@@ -27,6 +27,8 @@ define(function(require, exports, module){
 				},
 				//进度值的最大值
 				progressMax				: 1,
+				//每次请求消息的最多条数,默认不限制
+				maxMsgCount				: '',
 				checkCompleted			: function(res, progress){
 					return res.completed ==  true;
 				},
@@ -90,7 +92,7 @@ define(function(require, exports, module){
 			status		 		: 'inited',
 			disconnected 		: false,
 			pollDataContext	 	: null,
-			currentMessageIndex	: 0
+			currentMessageIndex	: -1
 		}
 		this.breakedCallbacks = $.Callbacks();
 		
@@ -101,7 +103,7 @@ define(function(require, exports, module){
 		this.data.status = 'start';
 		this.data.disconnected = false;
 		this.data.pollDataContext = null;
-		this.data.currentMessageIndex = 0;
+		this.data.currentMessageIndex = -1;
 		var _this = this;
 		
 		Ajax[_this.param.startupReqMethod](this.param.startupURL, $.extend({}, this.param.startupReqParameters, reqParam), function(data){
@@ -180,10 +182,13 @@ define(function(require, exports, module){
 			parameters[_this.param.uuidRequestName] = uuid;
 			parameters.interrupted = _this.data.status != 'polling';
 			if(_this.param.msgIndexRequestName){
-				parameters[_this.param.msgIndexRequestName] = _this.data.currentMessageIndex;
+				parameters[_this.param.msgIndexRequestName] = _this.data.currentMessageIndex + 1;
 			}
 			if(typeof _this.param.progressReqParameters === 'function'){
 				$.extend(parameters, _this.param.progressReqParameters.apply(_this.param, [data, uuid]));
+			}
+			if(_this.param.maxMsgCount){
+				parameters['maxMsgCount'] = _this.param.maxMsgCount;
 			}
 			Ajax.ajax(_this.param.progressURL, parameters, function(res){
 				_this.checkBreaked();

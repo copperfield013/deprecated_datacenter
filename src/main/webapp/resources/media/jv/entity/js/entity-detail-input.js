@@ -1,4 +1,5 @@
 define(function(require, exports, module){
+	"use strict";
 	
 	function requireTemplateMap(){
 		return require('tmpl').load('media/jv/entity/tmpl/entity-detail-input.tmpl');

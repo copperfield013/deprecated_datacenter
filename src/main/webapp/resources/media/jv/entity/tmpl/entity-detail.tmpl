@@ -66,7 +66,7 @@
 						<dt data-month="${item.monthTime}">${item.monthStr}</dt>
 					{{else}}
 						<dd class="${i % 2 == 0? 'pos-right': 'pos-left'} clearfix ${item.current? 'current': ''}" data-id="${item.code}" data-time="${item.time}">
-							<div class="circ" on-click="do:goHistory(${item.code})"></div>
+							<div class="circ" on-click="do:goHistory('${item.code}')"></div>
 							<div class="time">${item.timeStr}</div>
 							<div class="events">
 								<div class="events-header">操作人：${item.userName}</div>

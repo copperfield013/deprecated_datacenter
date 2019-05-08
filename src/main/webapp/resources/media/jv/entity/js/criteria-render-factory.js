@@ -1,4 +1,5 @@
 define(function(require, exports, modules){
+	"use strict";
 	var FORM_GROUP_VALUE_FUNC_KEY = 'input-value-func';
 	/**
 	 * 

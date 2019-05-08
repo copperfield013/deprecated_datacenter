@@ -1,4 +1,4 @@
-package cn.sowell.datacenter.api.controller.entity;
+package cn.sowell.datacenter.api2.controller.entity;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,12 +18,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson.JSON;
@@ -52,9 +51,9 @@ import cn.sowell.datacenter.model.modules.service.ModulesImportService;
 import cn.sowell.dataserver.model.modules.pojo.ModuleMeta;
 import cn.sowell.dataserver.model.modules.service.ModulesService;
 
-@Controller
-@RequestMapping("/api/entity/import")
-public class ApiEntityImportController {
+@RestController
+@RequestMapping("/api2/entity/import")
+public class Api2EntityImportController {
 
 	@Resource
 	ModulesImportService impService;
@@ -81,11 +80,12 @@ public class ApiEntityImportController {
 	};
 	
 	
-	@ResponseBody
     @RequestMapping("/start/{menuId}")
 	public ResponseJSON startImport(
 			@RequestParam MultipartFile file,
-			@PathVariable Long menuId, ApiUser user) {
+			@PathVariable Long menuId,
+			Integer fake,
+			ApiUser user) {
 		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
         jRes.setStatus("error");
@@ -112,7 +112,7 @@ public class ApiEntityImportController {
         			WorkProgress progress = new WorkProgress();
                 	jRes.put("uuid", progress.getUUID());
                 	ProgressPollableThread thread = pFactory.createThread(progress, p->{
-                		impService.importData(sheet, p, menu.getTemplateModule(), user, true);
+                		impService.importData(sheet, p, menu.getTemplateModule(), user, !Integer.valueOf(1).equals(fake));
                 	}, (p,e)->{
                 		if(e instanceof ImportBreakException) {
 							logger.error("导入被用户停止", e);
@@ -139,12 +139,13 @@ public class ApiEntityImportController {
         return jRes;
 	}
 	
-	@ResponseBody
-    @RequestMapping("/status/{uuid}")
+    @RequestMapping("/status")
     public PollStatusResponse statusOfImport(HttpSession session,
-    		@PathVariable String uuid, 
+    		@RequestParam String uuid, 
     		Boolean interrupted, 
-    		Integer msgIndex, ApiUser user){
+    		Integer msgIndex, 
+    		Integer maxMsgCount, 
+    		ApiUser user){
 		PollStatusResponse status = new PollStatusResponse();
 		WorkProgress progress = pFactory.getProgress(uuid);
         if(progress != null){
@@ -163,7 +164,7 @@ public class ApiEntityImportController {
             status.setCurrent(progress.getCurrent());
         	status.setTotalCount(progress.getTotal());
         	if(msgIndex != null) {
-        		status.setMessageSequeue(progress.getLogger().getMessagesFrom(msgIndex));
+        		status.setMessageSequeue(progress.getLogger().getMessagesFrom(msgIndex, maxMsgCount));
         	}
         	status.put("message", progress.getLastMessage());
         	status.put("lastInterval", progress.getLastItemInterval());
@@ -175,7 +176,6 @@ public class ApiEntityImportController {
         return status;
     }
 	
-	@ResponseBody
 	@RequestMapping("/tmpls/{menuId}")
 	public ResponseJSON getImportTemplates(@PathVariable Long menuId, ApiUser user) {
 		JSONObjectResponse res = new JSONObjectResponse();
@@ -188,7 +188,6 @@ public class ApiEntityImportController {
 		return res;
 	}
 	
-	@ResponseBody
 	@RequestMapping("/tmpl/{menuId}/{tmplId}")
 	public ResponseJSON getImportTemplate(@PathVariable Long menuId, @PathVariable Long tmplId, ApiUser user) {
 		JSONObjectResponse res = new JSONObjectResponse();
@@ -198,7 +197,6 @@ public class ApiEntityImportController {
 		return res;
 	}
 	
-	@ResponseBody
 	@RequestMapping("/save_tmpl/{menuId}")
 	public ResponseJSON saveTemplate(@PathVariable Long menuId, 
 			@RequestBody JsonRequest jReq, ApiUser user) {

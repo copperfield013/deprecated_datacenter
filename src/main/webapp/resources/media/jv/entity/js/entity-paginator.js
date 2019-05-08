@@ -1,4 +1,5 @@
 define(function(require, exports, module){
+	"use strict";
 	
 	/**
 	 * pageInfo包含以下字段

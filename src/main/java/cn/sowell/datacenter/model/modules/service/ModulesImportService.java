@@ -20,7 +20,7 @@ public interface ModulesImportService {
 
 	ModuleImportTemplate getImportTempalte(Long tmplId);
 
-	void importData(Sheet sheet, WorkProgress progress, String module, UserIdentifier user)
+	void importData(Sheet sheet, WorkProgress progress, String module, UserIdentifier user, boolean doFuse)
 			throws ImportBreakException;
 
 }

@@ -1,4 +1,6 @@
 define(function(require, exports, module){
+	"use strict";
+	
 	function defaultStatus(){
 		return require('utils').createStatus({
 			dtmpl		: null,
@@ -1026,7 +1028,7 @@ define(function(require, exports, module){
 				}
 			}
 			thisMonthArray.splice(index, 0,{
-				id		: this.id,
+				code	: this.code,
 				time	: this.time,
 				timeStr	: Utils.formatDate(new Date(this.time), 'yyyy-MM-dd hh:mm:ss'),
 				userName: this.userName,

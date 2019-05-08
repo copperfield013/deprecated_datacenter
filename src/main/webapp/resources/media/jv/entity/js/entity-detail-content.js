@@ -1,4 +1,5 @@
 define(function(require, exports, module){
+	"use strict";
 	function DetailContent(){
 		this.normalInputs = [];
 		this.arrayComposites = {};

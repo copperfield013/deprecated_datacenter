@@ -361,7 +361,7 @@ define(function(require, exports, module){
 		var interrupted = false;
 		var disconnected = false;
 		var pollUUID = null, pollDataContext = null;
-		var currentMessageIndex = 0;
+		var currentMessageIndex = -1;
 		var polling = false;
 		var handler = {
 			getId		: function(){
@@ -373,7 +373,7 @@ define(function(require, exports, module){
 				pId = utils.uuid();
 				pollUUID = null;
 				pollDataContext = null;
-				currentMessageIndex = 0;
+				currentMessageIndex = -1;
 				polling = false;
 				console.log('开始轮询[pId=' + pId + ']');
 				startPoll(reqParam);
@@ -392,7 +392,10 @@ define(function(require, exports, module){
 					parameters[param.uuidRequestName] = uuid;
 					parameters.interrupted = interrupted;
 					if(param.msgIndexRequestName){
-						parameters[param.msgIndexRequestName] = currentMessageIndex;
+						parameters[param.msgIndexRequestName] = currentMessageIndex + 1;
+					}
+					if(param.maxMsgCount){
+						parameters['maxMsgCount'] = param.maxMsgCount
 					}
 					if(typeof param.progressReqParameters === 'function'){
 						$.extend(parameters, param.progressReqParameters.apply(param, [data, uuid]));

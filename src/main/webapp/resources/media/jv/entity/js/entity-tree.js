@@ -2,6 +2,8 @@
  * 
  */
 define(function(require, exports, module){
+	"use strict";
+	
 	var Utils = require('utils');
 	
 	function startupQuery(menuId, criterias){
