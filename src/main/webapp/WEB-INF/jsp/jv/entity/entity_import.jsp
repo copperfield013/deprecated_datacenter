@@ -71,7 +71,12 @@
 										</label>
 									</div>
 									<div class="widget-buttons buttons-bordered">
-                                        <button class="btn btn-blue btn-xs" id="btn-copy-feedback-msg" >复制</button>
+										<a href="#" id="import-log-download" title="导入日志下载" style="display: none">
+											<i class="fa fa-download azure"></i>
+										</a>
+										<a href="#" id="import-log-setting" title="导入日志设置">
+											<i class="fa fa-cog darkorange"></i>
+										</a>
                                     </div>
 								</div>
 								<div class="widget-body" id="feedback-msg">

@@ -72,7 +72,7 @@ define(function(require, exports, momdules){
 					$('#feedback-instance', $page).text('请求导入状态时发生错误');
 				}
 			},
-			handleWithMessageSequeue	: function(msgSequeue){
+			handleWithMessageSequence	: function(msgSequeue){
 				var begin = msgSequeue.beginIndex;
 				var Utils = require('utils');
 				var filterMap = {};

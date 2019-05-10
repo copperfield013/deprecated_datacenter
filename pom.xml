@@ -12,7 +12,7 @@
 		<version.kie>7.10.0.Final</version.kie>
 		<version.abcitem>4.2.41.alphal</version.abcitem>
 		<version.dataserver>1.22</version.dataserver>
-		<version.cpfweb>0.2.13</version.cpfweb>
+		<version.cpfweb>0.2.14</version.cpfweb>
 		<version.abcbizz>2.1.15</version.abcbizz>
 		<version.authbiz>0.0.21</version.authbiz>
 		<version.jgdj>1.2</version.jgdj>
@@ -40,7 +40,7 @@
 		<dependency>
 			<groupId>cn.sowell.copframe</groupId>
 			<artifactId>cpf-spring</artifactId>
-			<version>0.3.17</version>
+			<version>0.3.18</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.sowell.copframe</groupId>

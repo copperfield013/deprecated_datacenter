@@ -147,10 +147,10 @@ define(function(require, exports, module){
 		$('form :text.timepicker', $page).each(function(){
 			require('utils').timepicker(this);
 		});
-		$('form :text.cpf-field-decimal', $page).on('input', function(){
+		$(':text.cpf-field-decimal,input[type="number"].cpf-field-decimal', $page).on('input', function(){
 			this.value = this.value.replace(/[^\d\-\.]/g, '').replace(/^(.+)\-/g, '$1').replace(/(\d+)\.(\d*)\./, '$1.$2');
 		});
-		$('form :text.cpf-field-int', $page).on('input', function(){
+		$(':text.cpf-field-int,input[type="number"].cpf-field-int', $page).on('input', function(){
 			this.value = this.value.replace(/[^\d\-]/g, '').replace(/(\d+)\-+(\d*)/, '$1$2').replace(/\-+/, '-');
 		});
 		$('form div.cpf-daterangepicker,form span.cpf-daterangepicker,form span.cpf-textrange', $page).each(function(){

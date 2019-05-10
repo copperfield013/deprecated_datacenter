@@ -32,7 +32,7 @@ define(function(require, exports, module){
 				checkCompleted			: function(res, progress){
 					return res.completed ==  true;
 				},
-				messageSequeueGetter	: function(res){return res['messageSequeue']},	
+				messageSequenceGetter	: function(res){return res['messageSequence']},	
 				//存放数据
 				data					: {},
 				
@@ -52,7 +52,7 @@ define(function(require, exports, module){
 				//当轮询失败时的回调
 				whenRequestError	: function(){},
 				//处理消息队列
-				handleWithMessageSequeue: function(msgSequeue){},
+				handleWithMessageSequence: function(msgSequence){},
 				subscribeFunctions	: {
 					//当其他线程成功发起了轮询，当前订阅者被通知到时的回调
 					whenSubscribed		: function(){},
@@ -65,7 +65,7 @@ define(function(require, exports, module){
 					//当轮询失败时的回调
 					whenRequestError	: function(){},
 					//处理消息队列
-					handleWithMessageSequeue: function(msgSequeue){},
+					handleWithMessageSequence: function(msgSequence){},
 				}
 		};
 		
@@ -122,7 +122,7 @@ define(function(require, exports, module){
 				r = _this.param.whenStartupResponse.apply(_this, [data, uuid]);
 			}catch(e){console.error(e)}
 			if(r !== false && uuid){
-				_this.checkBreaked();
+				//_this.checkBreaked();
 				try{
 					_this.data.status = 'started';
 					_this.param.whenStarted.apply(_this, [data, uuid]);
@@ -177,7 +177,7 @@ define(function(require, exports, module){
 			if(_this.data.disconnected){
 				return;
 			}
-			_this.checkBreaked();
+			//_this.checkBreaked();
 			var parameters = {};
 			parameters[_this.param.uuidRequestName] = uuid;
 			parameters.interrupted = _this.data.status != 'polling';
@@ -191,15 +191,15 @@ define(function(require, exports, module){
 				parameters['maxMsgCount'] = _this.param.maxMsgCount;
 			}
 			Ajax.ajax(_this.param.progressURL, parameters, function(res){
-				_this.checkBreaked();
+				//_this.checkBreaked();
 				//如果需要消息队列，那么需要返回一个对象，
 				//对象内包含消息队列数组，以及这些消息的起始和终止消息的index
-				var msgSequeue = _this.param.messageSequeueGetter.apply(_this.param, [res]);
-				if(msgSequeue && $.isArray(msgSequeue.messages) && msgSequeue.endIndex){
-					_this.data.currentMessageIndex = msgSequeue.endIndex;
+				var msgSequence = _this.param.messageSequenceGetter.apply(_this.param, [res]);
+				if(msgSequence && $.isArray(msgSequence.messages) && msgSequence.endIndex){
+					_this.data.currentMessageIndex = msgSequence.endIndex;
 					try{
-						_this.param.handleWithMessageSequeue.apply(_this, [megSequeue]);
-						_this.getSubscribers().invoke('handleWithMessageSequeue', _this, [megSequeue], [_this], _this);
+						_this.param.handleWithMessageSequence.apply(_this, [msgSequence]);
+						_this.getSubscribers().invoke('handleWithMessageSequence', _this, [msgSequence], [_this], _this);
 					}catch(e1){console.error(e1)}
 				}
 				//轮询请求获得回复
@@ -222,8 +222,8 @@ define(function(require, exports, module){
 						if(res.breaked === true){
 							_this.breaks();
 							_this.checkBreaked();
-							_this.param.whenBreaked.apply(_this, [res]);
-							_this.getSubscribers().invoke('whenBreaked', _this, [res], [_this], _this);
+							//_this.param.whenBreaked.apply(_this, [res]);
+							//_this.getSubscribers().invoke('whenBreaked', _this, [res], [_this], _this);
 						}else{
 							//如果工作没有完成，并且没有被中断，就再次发起轮询请求
 							setTimeout(_, 1000);
@@ -257,6 +257,10 @@ define(function(require, exports, module){
 			});
 		}
 		_();
+	}
+	
+	PollSubscriber.prototype.setMaxMsgCount = function(maxMsgCount){
+		this.param.maxMsgCount = maxMsgCount;
 	}
 	
 	

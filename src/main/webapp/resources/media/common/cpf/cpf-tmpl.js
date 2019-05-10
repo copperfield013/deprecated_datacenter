@@ -3,7 +3,8 @@ define(function(require, exports, module){
 	var MAX_REQUIRE_TIME_MILL = 30000;
 	var EVENT_MAP = {
 		'on-click' 	: 'click',
-		'on-change'	: 'change'
+		'on-change'	: 'change',
+		'on-input'	: 'input'
 	}
 	function Template(_param){
 		var defaultParam = {

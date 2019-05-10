@@ -14,11 +14,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.annotation.Resource;
 
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -29,6 +31,7 @@ import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
@@ -52,8 +55,11 @@ import com.abc.panel.PanelFactory;
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.dao.utils.NormalOperateDao;
 import cn.sowell.copframe.utils.FormatUtils;
+import cn.sowell.copframe.utils.PoiUtils;
 import cn.sowell.copframe.utils.TextUtils;
 import cn.sowell.copframe.utils.excel.CellTypeUtils;
+import cn.sowell.copframe.web.poll.Message;
+import cn.sowell.copframe.web.poll.MessagesSequence;
 import cn.sowell.copframe.web.poll.WorkProgress;
 import cn.sowell.datacenter.entityResolver.EntityConstants;
 import cn.sowell.datacenter.entityResolver.FusionContextConfig;
@@ -65,6 +71,7 @@ import cn.sowell.datacenter.model.modules.exception.ImportBreakException;
 import cn.sowell.datacenter.model.modules.pojo.ImportTemplateCriteria;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplate;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplateField;
+import cn.sowell.datacenter.model.modules.service.ExportService;
 import cn.sowell.datacenter.model.modules.service.ModulesImportService;
 import cn.sowell.dataserver.model.dict.pojo.DictionaryComposite;
 import cn.sowell.dataserver.model.dict.pojo.DictionaryField;
@@ -94,18 +101,18 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 	
 	
 	@Override
-	public void importData(Sheet sheet, WorkProgress progress, String module, UserIdentifier user, boolean doFuse)
+	public void importData(Sheet sheet, WorkProgress progress, String module, UserIdentifier user, boolean doFuse, Workbook copyWorkbook)
 			throws ImportBreakException {
 		Row headerRow = sheet.getRow(1);
 		if(module != null){
 			FusionContextConfig config = fFactory.getModuleConfig(module);
 			if(config != null) {
-				execute(sheet, headerRow, config, progress, user, doFuse);
+				execute(sheet, headerRow, config, progress, user, doFuse, copyWorkbook);
 			}
 		}
 	}
 	
-	private void execute(Sheet sheet, Row headerRow, FusionContextConfig config, WorkProgress progress, UserIdentifier user, boolean doFuse) throws ImportBreakException {
+	private void execute(Sheet sheet, Row headerRow, FusionContextConfig config, WorkProgress progress, UserIdentifier user, boolean doFuse, Workbook copyWorkbook) throws ImportBreakException {
 		logger.debug("导入表格【" + sheet.getSheetName() + "】");
 		progress.appendMessage("正在计算总行数");
 		progress.setTotal(colculateRowCount(sheet));
@@ -132,12 +139,16 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 					continue;
 				}
 				progress.appendMessage("解析数据：\r\n" + displayRow(map));
+				String error = (String) FormatUtils.coalesce(map.get("$ERROR$"), null);
+				Assert.isTrue(!TextUtils.hasText(error), "$ERROR$字段不为空“" + error + "”");;
 				EntityComponent entityC = config.getConfigResolver().createEntityIgnoreUnsupportedElement(map);
 				Assert.isTrue(entityC != null && entityC.getEntity() != null, "创建的实体为null");
 				IntegrationMsg msg = null;
 				if(doFuse) {
 					msg = integration.integrate(context, (Entity) entityC.getEntity());
 					logger.debug("导入EntityCode：" + msg.getCode());
+				}else {
+					Thread.sleep(1);
 				}
 				if(!doFuse || msg.success()) {
 					progress.endItemTimer()
@@ -158,9 +169,22 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 			rowIndex++;
 		}
 		progress.getLogger().success("导入完成,共导入" + (progress.getTotal() - progress.getFailedIndexs().size()) + "/" + progress.getTotal() + "条");
+		if(copyWorkbook != null && progress.getFailedIndexs().size() > 0) {
+			progress.appendMessage("开始生成导入失败行文件======");
+			writeFailedRows(copyWorkbook, progress);
+		}
 		progress.setCompleted();
 		
 		
+	}
+
+	private String getExcelSuffix(Workbook workbook) {
+		if(workbook instanceof XSSFWorkbook) {
+			return ".xlsx";
+		}else if(workbook instanceof HSSFWorkbook) {
+			return ".xls";
+		}
+		throw new RuntimeException("无法识别的Workbook类:" + workbook.getClass());
 	}
 
 	private String displayRow(Map<String, Object> map) {
@@ -438,5 +462,47 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 		return tmpl;
 	}
 	
+	@Resource
+	ExportService exportService;
 	
+	private void writeFailedRows(Workbook workbook, WorkProgress progress) {
+		Assert.notNull(workbook);
+		Assert.notNull(progress);
+		try {
+			Sheet sheet = workbook.getSheetAt(0);
+			Workbook newWorkbook = workbook.getClass().newInstance();
+			Sheet newSheet = newWorkbook.createSheet();
+			TreeSet<Integer> copyRownums = new TreeSet<>();
+			copyRownums.add(0);
+			copyRownums.add(1);
+			copyRownums.addAll(progress.getFailedIndexs());
+			PoiUtils.copySheets(sheet, newSheet, copyRownums, false, true);
+			
+			int index = 0;
+			final int MAX_ROW_NUM = 65535;
+			MessagesSequence messages = progress.getLogger().getMessagesFrom(0);
+			Sheet logSheet = null;
+			for (Message msg : messages.getMessages()) {
+				int rownum = index % MAX_ROW_NUM;
+				if(rownum == 0) {
+					logSheet = newWorkbook.createSheet("导入日志(" + (index / MAX_ROW_NUM + 1) + ")");
+				}
+				Cell logCell = logSheet.createRow(rownum).createCell(0);
+				logCell.setCellValue(msg.getText());
+				index++;
+			}
+			
+			String suffix = getExcelSuffix(workbook);
+			exportService.registCustomExportFile(progress.getUuid(), "导入失败行" + suffix);
+			exportService.writeExportFile(progress.getUUID(), "", os->{
+				newWorkbook.write(os);
+			});
+			progress.appendMessage("生成失败行文件成功");
+			progress.getDataMap().put("failedRowsFileUUID", progress.getUuid());
+		} catch (Exception e) {
+			logger.error("创建导入失败行文件时发生错误", e);
+			progress.appendMessage("创建导入失败行文件时发生错误");
+		}
+	}
+
 }

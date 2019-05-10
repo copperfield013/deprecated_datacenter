@@ -3,6 +3,7 @@ package cn.sowell.datacenter.model.modules.service;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import cn.sowell.copframe.common.UserIdentifier;
 import cn.sowell.copframe.web.poll.WorkProgress;
@@ -20,7 +21,6 @@ public interface ModulesImportService {
 
 	ModuleImportTemplate getImportTempalte(Long tmplId);
 
-	void importData(Sheet sheet, WorkProgress progress, String module, UserIdentifier user, boolean doFuse)
+	void importData(Sheet sheet, WorkProgress progress, String module, UserIdentifier user, boolean doFuse, Workbook copyWorkbook)
 			throws ImportBreakException;
-
 }

@@ -1,12 +1,9 @@
 package cn.sowell.datacenter.api2.controller.entity;
 
-import java.util.Date;
-
 import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.springframework.core.io.AbstractResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,6 +29,7 @@ import cn.sowell.datacenter.model.config.bean.ValidateDetailParamter;
 import cn.sowell.datacenter.model.config.bean.ValidateDetailResult;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
+import cn.sowell.datacenter.model.modules.bean.ExportFileResource;
 import cn.sowell.datacenter.model.modules.service.ExportService;
 import cn.sowell.dataserver.model.abc.service.EntityQueryParameter;
 import cn.sowell.dataserver.model.abc.service.ModuleEntityService;
@@ -188,7 +186,6 @@ public class Api2EntityExportController {
 	@RequestMapping("/status")
 	public PollStatusResponse statusOfExport(@RequestParam String uuid, Boolean interrupted, ApiUser user){
 		PollStatusResponse status = new PollStatusResponse();
-		status.setStatus("error");
 		status.put("uuid", uuid);
 		WorkProgress progress = eService.getExportProgress(uuid);
 		if(progress != null){
@@ -206,11 +203,10 @@ public class Api2EntityExportController {
 				}
 				status.setStatusMessage(progress.getLastMessage());
 				status.putData(progress.getResponseData());
-				
-				
-				status.setSuccessStatus();
 			}
+			status.setSuccessStatus();
 		}else{
+			status.setStatus("error");
 			status.setStatusMessage("导出已超时，请重新导出");
 		}
 		return status;
@@ -218,15 +214,15 @@ public class Api2EntityExportController {
 	
 	@RequestMapping("/download/{uuid}")
 	public ResponseEntity<byte[]> download(@PathVariable String uuid, ApiUser user){
-		AbstractResource resource = eService.getDownloadResource(uuid);
+		ExportFileResource resource = eService.getDownloadResource(uuid);
 		if(resource != null) {
 			try {
 				HttpHeaders headers = new HttpHeaders();
 				headers.setContentDispositionFormData("attachment", new String(
-						("导出数据-" + dateFormat.format(new Date(), "yyyyMMddHHmmss") + ".xlsx").getBytes("UTF-8"),
+						resource.getExportName().getBytes("UTF-8"),
 						"iso-8859-1"));
 				headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-				return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(resource.getFile()), headers, HttpStatus.CREATED);
+				return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(resource.getFile().getFile()), headers, HttpStatus.CREATED);
 			} catch (Exception e) {
 				logger.error("下载导出文件时发生错误", e);
 			}

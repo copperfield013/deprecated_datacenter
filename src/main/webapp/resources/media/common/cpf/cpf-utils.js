@@ -1073,10 +1073,18 @@ define(function(require, exports){
 	 * 第一个参数为对象时，第二个参数可选为字符串数组，字符串数组表示要覆盖的字段名集合
 	 */
 	Status.prototype.setStatus = function(propertyName, propertyValue){
+		return this.changeStatus(propertyName, propertyValue, true);
+	}
+	
+	Status.prototype.changeStatus = function(propertyName, propertyValue, forceTrigger){
 		if(typeof propertyName === 'string'){
 			var before = this.properties[propertyName];
 			if(arguments.length == 1){
 				propertyValue = before;
+				forceTrigger = true;
+			}
+			if(forceTrigger && before === propertyValue) {
+				return this;
 			}
 			this.properties[propertyName] = propertyValue;
 			this.trigger(propertyName, [{
@@ -1086,11 +1094,11 @@ define(function(require, exports){
 			if($.isArray(propertyValue)){
 				for(var i = 0; i < propertyValue.length; i++){
 					var pName = propertyValue[i];
-					this.setStatus(pName, propertyName[pName]);
+					this.setStatus(pName, propertyName[pName], forceTrigger);
 				}
 			}else{
 				for(var key in propertyName){
-					this.setStatus(key, propertyName[key]);
+					this.setStatus(key, propertyName[key], forceTrigger);
 				}
 			}
 		}

@@ -85,6 +85,7 @@ public class Api2EntityImportController {
 			@RequestParam MultipartFile file,
 			@PathVariable Long menuId,
 			Integer fake,
+			Integer exportFaildFile,
 			ApiUser user) {
 		SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
 		JSONObjectResponse jRes = new JSONObjectResponse();
@@ -93,18 +94,23 @@ public class Api2EntityImportController {
         if(mData != null) {
         	
         	Workbook wk = null;
+        	Workbook copiedWorkbook = null;
         	try {
         		String fileName = file.getOriginalFilename();
+        		boolean needExportFaildFile = Integer.valueOf(1).equals(exportFaildFile);
 				if(fileName.endsWith(".xls")){
 					wk = new HSSFWorkbook(file.getInputStream());
+					copiedWorkbook = needExportFaildFile? new HSSFWorkbook(file.getInputStream()) : null;
         		}if(fileName.endsWith("xlsx")){
         			wk = new XSSFWorkbook(file.getInputStream());
+        			copiedWorkbook = needExportFaildFile? new XSSFWorkbook(file.getInputStream()) : null;
         		}else{
         			jRes.put("msg", "文件格式错误，只支持xls和xlsx格式的文件。");
         		}
         	} catch (IOException e1) {
         		jRes.put("msg", "读取文件时发生错误");
         	}
+        	Workbook copyWorkbook = copiedWorkbook;
         	if(wk != null){
         		Sheet sheet = wk.getSheetAt(0);
         		if(sheet != null){
@@ -112,7 +118,9 @@ public class Api2EntityImportController {
         			WorkProgress progress = new WorkProgress();
                 	jRes.put("uuid", progress.getUUID());
                 	ProgressPollableThread thread = pFactory.createThread(progress, p->{
-                		impService.importData(sheet, p, menu.getTemplateModule(), user, !Integer.valueOf(1).equals(fake));
+                		impService.importData(sheet, p, menu.getTemplateModule(), user, 
+                				!Integer.valueOf(1).equals(fake),
+                				copyWorkbook);
                 	}, (p,e)->{
                 		if(e instanceof ImportBreakException) {
 							logger.error("导入被用户停止", e);
@@ -151,6 +159,7 @@ public class Api2EntityImportController {
         if(progress != null){
             if(progress.isCompleted()){
             	status.setCompleted();
+            	status.put("failedRowsFileUUID", progress.getDataMap().get("failedRowsFileUUID"));
             	pFactory.removeProgress(uuid);
             }else {
             	if(interrupted == true) {
@@ -164,7 +173,7 @@ public class Api2EntityImportController {
             status.setCurrent(progress.getCurrent());
         	status.setTotalCount(progress.getTotal());
         	if(msgIndex != null) {
-        		status.setMessageSequeue(progress.getLogger().getMessagesFrom(msgIndex, maxMsgCount));
+        		status.setMessageSequence(progress.getLogger().getMessagesFrom(msgIndex, maxMsgCount));
         	}
         	status.put("message", progress.getLastMessage());
         	status.put("lastInterval", progress.getLastItemInterval());

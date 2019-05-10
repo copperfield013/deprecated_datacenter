@@ -4,9 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
-import java.util.HashSet;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +27,6 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +35,7 @@ import cn.sowell.copframe.spring.properties.PropertyPlaceholder;
 import cn.sowell.copframe.utils.Assert;
 import cn.sowell.copframe.utils.FormatUtils;
 import cn.sowell.copframe.utils.TextUtils;
+import cn.sowell.copframe.utils.date.FrameDateFormat;
 import cn.sowell.copframe.web.poll.ConsumerThrowException;
 import cn.sowell.copframe.web.poll.ProgressPollableThreadFactory;
 import cn.sowell.copframe.web.poll.WorkProgress;
@@ -42,6 +43,8 @@ import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.entityResolver.UserCodeService;
 import cn.sowell.datacenter.model.modules.bean.EntityExportWriter;
+import cn.sowell.datacenter.model.modules.bean.ExportFileResource;
+import cn.sowell.datacenter.model.modules.bean.ExportResource;
 import cn.sowell.datacenter.model.modules.exception.ExportBreakException;
 import cn.sowell.datacenter.model.modules.service.ExportService;
 import cn.sowell.dataserver.model.abc.service.EntitiesQueryParameter;
@@ -106,6 +109,9 @@ public class ExportServiceImpl implements ExportService {
 	
 	private Long exportCacheTimeout = null;
 	
+	//自定义的导出文件的Map，key是唯一编码，value是下载时的文件名
+	private Map<String, ExportResource> customExportResourceMap = new HashMap<>();
+	
 	@Override
 	public void clearExportCache(){
 		if(exportCacheTimeout == null){
@@ -120,12 +126,25 @@ public class ExportServiceImpl implements ExportService {
 		if(fs != null){
 			for (File file : fs) {
 				String uuid = file.getName().split("\\.")[0];
-				WorkProgress progress = pFactory.getProgress(uuid);
-				if(progress == null || System.currentTimeMillis() - progress.getLastVeniTime() > exportCacheTimeout) {
-					if(file.exists()) {
-						try {
-							file.delete();
-						} catch (Exception e) {
+				if(customExportResourceMap.containsKey(uuid)) {
+					ExportResource exportResource = customExportResourceMap.get(uuid);
+					if(System.currentTimeMillis() > exportResource.getTimeout()) {
+						if(file.exists()) {
+							try {
+								file.delete();
+								customExportResourceMap.remove(uuid);
+							} catch (Exception e) {
+							}
+						}
+					}
+				}else {
+					WorkProgress progress = pFactory.getProgress(uuid);
+					if(progress == null || System.currentTimeMillis() - progress.getLastVeniTime() > exportCacheTimeout) {
+						if(file.exists()) {
+							try {
+								file.delete();
+							} catch (Exception e) {
+							}
 						}
 					}
 				}
@@ -155,13 +174,20 @@ public class ExportServiceImpl implements ExportService {
 	}
 	
 	
-	Set<String> exportUUIDs = new HashSet<>();
+	@Resource
+	FrameDateFormat dateFormat;
 	@Override
-	public AbstractResource getDownloadResource(String uuid) {
+	public ExportFileResource getDownloadResource(String uuid) {
 		WorkProgress progress = pFactory.getProgress(uuid);
 		if(progress != null && progress.isCompleted()
-			|| exportUUIDs.contains(uuid)){
-			return new FileSystemResource(PropertyPlaceholder.getProperty("export_cache_path") + uuid + ".xlsx");
+			){
+			FileSystemResource f = new FileSystemResource(PropertyPlaceholder.getProperty("export_cache_path") + uuid + ".xlsx");
+			return new ExportFileResource("导出数据-" + dateFormat.format(new Date(), "yyyyMMddHHmmss") + ".xlsx", f);
+		}else if(customExportResourceMap.containsKey(uuid)) {
+			ExportResource resource = customExportResourceMap.get(uuid);
+
+			FileSystemResource f = new FileSystemResource(PropertyPlaceholder.getProperty("export_cache_path") + uuid);
+			return new ExportFileResource(resource.getExportFileName(), f);
 		}
 		return null;
 	}
@@ -325,11 +351,11 @@ public class ExportServiceImpl implements ExportService {
 			workbook.close();
 		}
 	}
-
-	private void writeExportFile(String uuid, ConsumerThrowException<OutputStream> consumer) throws Exception {
+	@Override
+	public void writeExportFile(String uuid, String suffix, ConsumerThrowException<OutputStream> consumer) throws Exception {
 		Assert.notNull(uuid);
 		Assert.notNull(consumer);
-		FileSystemResource resource = new FileSystemResource(PropertyPlaceholder.getProperty("export_cache_path") + uuid + ".xlsx");
+		FileSystemResource resource = new FileSystemResource(PropertyPlaceholder.getProperty("export_cache_path") + uuid + suffix);
 		File file = resource.getFile();
 		if(!file.getParentFile().exists()){
 			file.getParentFile().mkdirs();
@@ -338,13 +364,18 @@ public class ExportServiceImpl implements ExportService {
 		OutputStream os = resource.getOutputStream();
 		try {
 			consumer.accept(os);
-			exportUUIDs.add(uuid);
+			logger.info("创建文件成功[" + file.getAbsolutePath() + "]");
 		} catch (Exception e) {
+			logger.info("创建文件失败[" + file.getAbsolutePath() + "]");
 			throw e;
 		}finally {
 			os.flush();
 			os.close();
 		}
+	}
+	
+	private void writeExportFile(String uuid, ConsumerThrowException<OutputStream> consumer) throws Exception {
+		writeExportFile(uuid, ".xlsx", consumer);
 	}
 	
 	@Resource
@@ -464,6 +495,12 @@ public class ExportServiceImpl implements ExportService {
 			}
 		}).start();
 		
+	}
+
+	@Override
+	public void registCustomExportFile(String uuid, String exportFileName) {
+		ExportResource resource = new ExportResource(exportFileName, System.currentTimeMillis() + 30 * 60 * 1000);
+		customExportResourceMap.put(uuid, resource);
 	}
 
 }

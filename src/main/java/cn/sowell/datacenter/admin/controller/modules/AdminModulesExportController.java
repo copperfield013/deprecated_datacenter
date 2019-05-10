@@ -1,7 +1,6 @@
 package cn.sowell.datacenter.admin.controller.modules;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -10,7 +9,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.MutablePropertyValues;
-import org.springframework.core.io.AbstractResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,6 +38,7 @@ import cn.sowell.datacenter.admin.controller.AdminConstants;
 import cn.sowell.datacenter.entityResolver.ModuleEntityPropertyParser;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
+import cn.sowell.datacenter.model.modules.bean.ExportFileResource;
 import cn.sowell.datacenter.model.modules.service.ExportService;
 import cn.sowell.dataserver.model.abc.service.EntityQueryParameter;
 import cn.sowell.dataserver.model.abc.service.ModuleEntityService;
@@ -186,15 +185,15 @@ public class AdminModulesExportController {
 	
 	@RequestMapping("/download/{uuid}")
 	public ResponseEntity<byte[]> download(@PathVariable String uuid){
-		AbstractResource resource = eService.getDownloadResource(uuid);
+		ExportFileResource resource = eService.getDownloadResource(uuid);
 		if(resource != null) {
 			try {
 				HttpHeaders headers = new HttpHeaders();
 				headers.setContentDispositionFormData("attachment", new String(
-						("导出数据-" + dateFormat.format(new Date(), "yyyyMMddHHmmss") + ".xlsx").getBytes("UTF-8"),
+						resource.getExportName().getBytes("UTF-8"),
 						"iso-8859-1"));
 				headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-				return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(resource.getFile()), headers, HttpStatus.CREATED);
+				return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(resource.getFile().getFile()), headers, HttpStatus.CREATED);
 			} catch (Exception e) {
 				logger.error("下载导出文件时发生错误", e);
 			}

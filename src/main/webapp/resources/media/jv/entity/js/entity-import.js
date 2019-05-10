@@ -25,7 +25,8 @@ define(function(require, exports, module){
 			;
 		var context = Utils.createContext({
 			maxShowMsgCount		: 100,
-			showMessages		: []
+			showMessages		: [],
+			failedRowsFileUUID	: null
 		});
 		var $page = param.$page;
 		
@@ -38,12 +39,16 @@ define(function(require, exports, module){
 			
 			context
 				.bind('showMessages', renderMessages)
+				.bind('maxShowMsgCount', changeMaxShowMsgCount)
+				.bind('failedRowsFileUUID', toggleDownloadLogBtn)
 				;
 			
-			//轮询处理对象
-			var handler = Ajax.poll({
+			var importHandler = require('poll').global('entity-import');
+			
+			var importSubscriber = importHandler.addSubscriber({
+				key					: param.menuId,
 				startupReqMethod	: 'ajax',
-				startupURL			: 'api2/entity/import/start/' + param.menuId + '?fake=1',
+				startupURL			: 'api2/entity/import/start/' + param.menuId + '?fake=1&exportFaildFile=1',
 				progressURL			: 'api2/entity/import/status',
 				msgIndexRequestName	: 'msgIndex',
 				maxMsgCount			: context.getStatus('maxShowMsgCount'),
@@ -72,12 +77,15 @@ define(function(require, exports, module){
 					}
 					$('#feedback-instance', $page).text(msg);
 				},
-				whenComplete		: function(res){
+				whenCompleted		: function(res){
 					Dialog.notice('导入完成', 'success');
 					$('#progress span', $page).text('导入完成');
 					$('#submit', $page).removeAttr('disabled').text('重新导入');
 					$('#break', $page).hide();
 					$('#feedback-instance', $page).text('导入完成');
+					if(res.failedRowsFileUUID){
+						context.setStatus('failedRowsFileUUID', res.failedRowsFileUUID);
+					}
 				},
 				whenBreaked			: function(res){
 					Dialog.notice('导入被中断', 'warning');
@@ -91,7 +99,7 @@ define(function(require, exports, module){
 						$('#feedback-instance', $page).text('请求导入状态时发生错误');
 					}
 				},
-				handleWithMessageSequeue	: function(msgSequence){
+				handleWithMessageSequence	: function(msgSequence){
 					var begin = msgSequence.beginIndex;
 					
 					var maxShowMsgCount = context.getStatus('maxShowMsgCount');
@@ -150,15 +158,12 @@ define(function(require, exports, module){
 			}
 			
 			
-			
-			
-			
 			$('#submit', $page).click(function(){
 				var file = $('#file', $page)[0].files[0];
 				if(file){
 					Dialog.confirm('确认导入？', function(yes){
 						if(yes){
-							handler.start({
+							importSubscriber.starts({
 								file	: file 
 							});
 						}
@@ -168,11 +173,9 @@ define(function(require, exports, module){
 				}
 			});
 			$('#break', $page).click(function(){
-				if(handler.isPolling()){
-					Dialog.confirm('确认停止当前的导入任务？', function(){
-						handler.breaks();
-					});
-				}
+				Dialog.confirm('确认停止当前的导入任务？', function(){
+					importSubscriber.breaks();
+				});
 			});
 			$('#link-import-tmpl', $page).click(function(){
 				Dialog.openDialog('admin/modules/import/tmpl/' + param.menuId, '字段', undefined, {
@@ -187,20 +190,40 @@ define(function(require, exports, module){
 				$feedback.find('p.' + msgType).toggle($this.prop('checked'));
 			});
 			
-			+function(){
-				var clipboard = new ClipboardJS($('#btn-copy-feedback-msg', $page)[0], {
-					target		: function(){return $('#feedback-msg', $page)[0]}
-				});
-				clipboard.on('success', function(e) {
-					if(e.text){
-						Dialog.notice('已将内容复制到粘贴板中', 'success');
+			$('#import-log-setting', $page).click(function(){
+				var dialogLogSetting = require('dialog').openDialog(tmplMap['log-setting'].tmpl({
+					maxShowMsgCount	: context.getStatus('maxShowMsgCount')
+				}, {
+					limitMax	: function(){
+						this.value=parseInt(this.value)>5000?5000:this.value;
+					}
+				}), '导出日志设置', undefined, {
+					width		: 400,
+					height		: 300,
+					contentType	: 'dom',
+					onSubmit	: function(){
+						var $DialogLogSetting = dialogLogSetting.getDom();
+						var maxMsgCount = $('#maxShowMsgCount', $DialogLogSetting).val();
+						context.changeStatus('maxShowMsgCount', parseInt(maxMsgCount));
 					}
 				});
-				
-				clipboard.on('error', function(e) {
-					Dialog.notice('复制失败', 'error');
-				});
-			}();
+			});
+			
+			function changeMaxShowMsgCount(){
+				var maxShowMsgCount = context.getStatus('maxShowMsgCount');
+				importSubscriber.setMaxMsgCount(maxShowMsgCount);
+			}
+			
+			function toggleDownloadLogBtn(){
+				var failedRowsFileUUID = context.getStatus('failedRowsFileUUID');
+				$('#import-log-download', $page).toggle(!!failedRowsFileUUID);
+			}
+			$('#import-log-download', $page).click(function(){
+				var failedRowsFileUUID = context.getStatus('failedRowsFileUUID');
+				if(failedRowsFileUUID){
+					Ajax.download('api2/entity/export/download/' + failedRowsFileUUID);
+				}
+			});
 		});
 		
 		
