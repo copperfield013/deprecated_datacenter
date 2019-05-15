@@ -44,6 +44,7 @@ import cn.sowell.datacenter.model.admin.service.AdminUserService;
 import cn.sowell.datacenter.model.admin.service.impl.AdminUserServiceImpl.Token;
 import cn.sowell.datacenter.model.config.pojo.SideMenuLevel2Menu;
 import cn.sowell.datacenter.model.config.service.AuthorityService;
+import cn.sowell.datacenter.model.modules.bean.EntityImportDictionary;
 import cn.sowell.datacenter.model.modules.exception.ImportBreakException;
 import cn.sowell.datacenter.model.modules.pojo.ImportTemplateCriteria;
 import cn.sowell.datacenter.model.modules.pojo.ModuleImportTemplate;
@@ -184,6 +185,17 @@ public class Api2EntityImportController {
         }
         return status;
     }
+    
+    
+    @RequestMapping("/dict/{menuId}")
+    public ResponseJSON dictionary(@PathVariable Long menuId, ApiUser user) {
+    	SideMenuLevel2Menu menu = authService.validateUserL2MenuAccessable(user, menuId);
+    	JSONObjectResponse jRes = new JSONObjectResponse();
+    	EntityImportDictionary dict = impService.getDictionary(menu.getTemplateModule(), user);
+    	jRes.put("fieldDictionary", dict);
+    	return jRes;
+    }
+    
 	
 	@RequestMapping("/tmpls/{menuId}")
 	public ResponseJSON getImportTemplates(@PathVariable Long menuId, ApiUser user) {

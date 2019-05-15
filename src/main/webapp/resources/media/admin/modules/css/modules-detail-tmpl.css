@@ -749,9 +749,6 @@ div#action-list>a:hover{
 
 
 .module-import-tmpl-dialog div.fields-container {
-    width: 40%;
-    position: absolute;
-    right: 5px;
     border: 1px solid #ccc;
 }
 

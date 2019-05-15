@@ -16,44 +16,48 @@ define(function(require, exports, module){
 		
 		var context = Utils.createContext({
 			fieldDictionary	: [],
-			tmpl			: null
+			tmpl			: {
+				fields	: []
+			}
 		});
 		
 		require('tmpl').load('media/jv/entity/tmpl/entity-import-tmpl.tmpl').done(function(tmplMap){
 			context
 				.bind('fieldDictionary', renderFieldSelector)
-				.bind('tmplFields', renderShownTemplateFields)
+				.bind('tmpl', renderShownTemplateFields)
 				;
-			context.setStatus('fieldDictionary', null);
+			loadFields();
+			
 			function loadFields(){
-				Ajax.ajax('api2/entity/import/fields/' + param.menuId).done(function(data){
-					if(data.status === 'suc'){
+				Ajax.ajax('api2/entity/import/dict/' + param.menuId).done(function(data){
+					if(data.fieldDictionary){
 						context.setStatus('fieldDictionary', data.fieldDictionary);
-						context.setStatus('tmpl', null);
+						context.setStatus('tmpl', {fields:[]});
 					}
 				});
 			}
 			
 			function renderFieldSelector(){
+				var fieldDictionary = context.getStatus('fieldDictionary');
 				var FieldPicker = require('entity/js/entity-field-picker');
 				var fieldPicker = new FieldPicker({
 					$page, plhTarget: 'fields-container'
 				});
-				fieldPicker.composites = composites;
+				fieldPicker.composites = fieldDictionary.composites;
 				fieldPicker.bindSelected(whenFieldSelected);
 				fieldPicker.render();
 			}
 			
 			function whenFieldSelected(field, $field){
-				var tmplFields = context.getStatus('tmplFields');
-				tmplFields.push(field);
-				context.setStatus('tmplFields');
+				var impTmpl = context.getStatus('tmpl');
+				impTmpl.fields.push(field);
+				context.setStatus('tmpl');
 			}
 			
 			
 			function renderShownTemplateFields(){
-				var tmplFields = context.getStatus('tmplFields');
-				
+				var impTmpl = context.getStatus('tmpl');
+				console.log(impTmpl);
 				
 				
 			}

@@ -11,7 +11,7 @@
 	<properties>
 		<version.kie>7.10.0.Final</version.kie>
 		<version.abcitem>4.2.49.alphal</version.abcitem>
-		<version.dataserver>1.23</version.dataserver>
+		<version.dataserver>1.24</version.dataserver>
 		<version.cpfweb>0.2.14</version.cpfweb>
 		<version.abcbizz>2.1.15</version.abcbizz>
 		<version.authbiz>0.0.21</version.authbiz>
@@ -41,7 +41,7 @@
 		<dependency>
 			<groupId>cn.sowell.copframe</groupId>
 			<artifactId>cpf-spring</artifactId>
-			<version>0.3.18</version>
+			<version>0.3.19</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.sowell.copframe</groupId>

@@ -7,6 +7,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -66,6 +67,9 @@ import cn.sowell.datacenter.entityResolver.FusionContextConfig;
 import cn.sowell.datacenter.entityResolver.FusionContextConfigFactory;
 import cn.sowell.datacenter.entityResolver.ImportCompositeField;
 import cn.sowell.datacenter.entityResolver.impl.EntityComponent;
+import cn.sowell.datacenter.model.modules.bean.EntityImportDictionary;
+import cn.sowell.datacenter.model.modules.bean.EntityImportDictionaryComposite;
+import cn.sowell.datacenter.model.modules.bean.EntityImportDictionaryField;
 import cn.sowell.datacenter.model.modules.dao.ModulesImportDao;
 import cn.sowell.datacenter.model.modules.exception.ImportBreakException;
 import cn.sowell.datacenter.model.modules.pojo.ImportTemplateCriteria;
@@ -503,6 +507,36 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 			logger.error("创建导入失败行文件时发生错误", e);
 			progress.appendMessage("创建导入失败行文件时发生错误");
 		}
+	}
+
+	@Resource
+	DictionaryService dictService;
+	
+	@Override
+	public EntityImportDictionary getDictionary(String moduleName, UserIdentifier user) {
+		List<DictionaryComposite> composites = dictService.getAllComposites(moduleName);
+		if(composites != null) {
+			EntityImportDictionary impDict = new EntityImportDictionary();
+			List<EntityImportDictionaryComposite> impCompostes = new ArrayList<>();
+			for (DictionaryComposite dictionaryComposite : composites) {
+				EntityImportDictionaryComposite impComposite = new EntityImportDictionaryComposite();
+				impComposite.setId(dictionaryComposite.getId());
+				impComposite.setTitle(dictionaryComposite.getTitle());
+				impComposite.setType(dictionaryComposite.getCompositeType());
+				List<EntityImportDictionaryField> impFields = new ArrayList<>(); 
+				impComposite.setFields(impFields);
+				for (DictionaryField field : dictionaryComposite.getFields()) {
+					EntityImportDictionaryField impField = new EntityImportDictionaryField();
+					impField.setId(field.getId());
+					impField.setTitle(field.getTitle());
+					impFields.add(impField);
+				}
+				impCompostes.add(impComposite);
+			}
+			impDict.setComposites(impCompostes);
+			return impDict;
+		}
+		return null;
 	}
 
 }

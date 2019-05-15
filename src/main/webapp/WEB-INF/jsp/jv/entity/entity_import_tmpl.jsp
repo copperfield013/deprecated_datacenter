@@ -52,6 +52,7 @@
 						<i class="glyphicon glyphicon-search blue"></i>
 						<i title="选择字段" class="glyphicon glyphicon-th blue field-picker-button"></i>
 					</div>
+					<style target="fields-container"></style>
 				</div>
 			</div>	
 		</form>
@@ -69,7 +70,6 @@
 			</c:forEach>
 		</div>
 	</div>
-	<style target="fields-container"></style>
 	<script type="jquery/tmpl" id="tmpl-col-row-tmpl">
 		<tr field-index="\${fieldIndex}" 
 			data-id="\${tmplFieldId}" 
@@ -94,7 +94,8 @@
 		var $page = $('#entity-import-tmpl-${RES_STAMP }');
 		
 		EntityImportTmpl.initPage({
-			$page	: $page
+			$page	: $page,
+			menuId	: '${menuId}'
 		})
 	});
 

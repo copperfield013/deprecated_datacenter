@@ -594,7 +594,7 @@ input.search-input:hover {
 
 .module-import-tmpl-dialog .fields-l h4,
 .module-import-tmpl-dialog .fields-r h4{
-	text-align: center;
+	text-align: left;
 }
 
 .module-import-tmpl-dialog .fields-l{
