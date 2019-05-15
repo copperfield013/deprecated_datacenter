@@ -1,6 +1,6 @@
 package cn.sowell.datacenter.model.relationtreeview.service;
 
-import com.abc.application.BizFusionContext;
+import com.abc.hc.HCFusionContext;
 import com.abc.mapping.entity.Entity;
 import com.abc.mapping.node.ABCNode;
 
@@ -31,5 +31,5 @@ public interface RelationTreeViewService {
 			String relationName, String labelsetmap,
 			String labelsetvalue);
 	
-	public BizFusionContext getBizFusionContext(String mappingName);
+	public HCFusionContext getHCFusionContext(String mappingName);
 }

@@ -2,9 +2,9 @@ package cn.sowell.datacenter.model.treeview.service.impl;
 
 import org.springframework.stereotype.Service;
 
-import com.abc.application.BizFusionContext;
-import com.abc.application.FusionContext;
-import com.abc.application.RemovedFusionContext;
+import com.abc.hc.FusionContext;
+import com.abc.hc.HCFusionContext;
+import com.abc.hc.RemovedFusionContext;
 import com.abc.mapping.conf.MappingContainer;
 import com.abc.mapping.entity.Entity;
 import com.abc.mapping.node.ABCNode;
@@ -25,7 +25,7 @@ public class TreeViewServiceImpl implements TreeViewService {
 		String mappingName = paramJsonObj.getString("parentMappingName");	
 		paramJsonObj.remove("parentMappingName");
 		String[] mappingNameList = mappingName.split("\\.");
-		BizFusionContext context = new BizFusionContext();
+		HCFusionContext context = new HCFusionContext();
 		context.setMappingName(mappingNameList[0]);
 		context.setSource(FusionContext.SOURCE_COMMON);
 		context.setUserCode("u5");
@@ -61,7 +61,7 @@ public class TreeViewServiceImpl implements TreeViewService {
 	@Override
 	public String getData(String mappingName, String code) {
 		if(code != null && !code.equals("")) {
-			BizFusionContext context = new BizFusionContext();
+			HCFusionContext context = new HCFusionContext();
 			context.setMappingName(mappingName);
 			context.setSource(FusionContext.SOURCE_COMMON);
 			context.setUserCode("e10adc3949ba59abbe56e057f28888u5");
@@ -81,7 +81,7 @@ public class TreeViewServiceImpl implements TreeViewService {
 	@Override
 	public Entity getEntity(String mappingName, String code) {
 		if(code != null && !code.equals("")) {
-			BizFusionContext context = new BizFusionContext();
+			HCFusionContext context = new HCFusionContext();
 			context.setMappingName(mappingName);
 			context.setSource(FusionContext.SOURCE_COMMON);
 			context.setUserCode("u5");

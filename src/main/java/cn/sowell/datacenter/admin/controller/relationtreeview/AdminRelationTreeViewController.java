@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.abc.application.BizFusionContext;
-import com.abc.application.FusionContext;
+import com.abc.hc.FusionContext;
+import com.abc.hc.HCFusionContext;
 import com.abc.mapping.entity.Entity;
 import com.abc.mapping.entity.EntityRelationParser;
 import com.abc.mapping.entity.RecordEntity;
@@ -27,7 +27,6 @@ import com.abc.mapping.entity.RelationEntity;
 import com.abc.mapping.node.ABCNode;
 import com.abc.mapping.node.AttributeNode;
 import com.abc.panel.Discoverer;
-import com.abc.panel.PanelFactory;
 import com.abc.rrc.query.criteria.CommonSymbol;
 import com.abc.rrc.query.criteria.EntityCriteriaFactory;
 import com.abc.rrc.query.entity.SortedPagedQuery;
@@ -343,7 +342,7 @@ public class AdminRelationTreeViewController {
 	@RequestMapping("/openSelection")
 	public ModelAndView openSelection(String mappingName,String relationName, PageInfo pageInfo,@RequestParam(defaultValue="1") Integer attrCount, HttpServletRequest request) {
 		String mapperName = mappingName+"."+relationName;
-		BizFusionContext context = relationTreeViewService.getBizFusionContext(mapperName);
+		HCFusionContext context = relationTreeViewService.getHCFusionContext(mapperName);
 		context.setToEntityRange(FusionContext.ENTITY_CONTENT_RANGE_INTERSECTION);
 		
 		Map<String, Map<String, Object>> reulstMap = new HashMap<String, Map<String, Object>>();
@@ -369,7 +368,7 @@ public class AdminRelationTreeViewController {
 		
 		//end
 		
-		Discoverer discoverer = PanelFactory.getDiscoverer(context);
+		Discoverer discoverer = null;//PanelFactory.getDiscoverer(context);
 		//EntitySortedPagedQuery sortedPagedQuery = discoverer.discover(criterias, null);
 		SortedPagedQuery<RecordEntity> sortedPagedQuery = null;// discoverer.discover(criterias, null);
 		Integer pageNo = pageInfo.getPageNo();

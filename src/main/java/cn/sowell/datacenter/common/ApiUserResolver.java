@@ -40,7 +40,7 @@ public class ApiUserResolver implements HandlerMethodArgumentResolver{
 	@Override
 	public ApiUser resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-		String tokenCode = webRequest.getParameter("%token%");
+		String tokenCode = webRequest.getParameter("@token");
 		if(!TextUtils.hasText(tokenCode)) {
 			tokenCode = webRequest.getHeader("datacenter-token");
 		}

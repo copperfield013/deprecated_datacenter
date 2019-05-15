@@ -45,8 +45,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import com.abc.application.BizFusionContext;
-import com.abc.application.FusionContext;
+import com.abc.hc.FusionContext;
+import com.abc.hc.HCFusionContext;
 import com.abc.mapping.entity.Entity;
 import com.abc.panel.Integration;
 import com.abc.panel.IntegrationMsg;
@@ -119,7 +119,7 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 		int rowIndex = 2;
 		progress.appendMessage("开始导入");
 		Integration integration = PanelFactory.getIntegration();
-		BizFusionContext context = config.getCurrentContext(user);
+		HCFusionContext context = config.getCurrentContext(user);
 		context.setSource(FusionContext.SOURCE_COMMON);
 		while(true){
 			if(progress.isBreaked()){

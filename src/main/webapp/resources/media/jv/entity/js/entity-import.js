@@ -178,7 +178,7 @@ define(function(require, exports, module){
 				});
 			});
 			$('#link-import-tmpl', $page).click(function(){
-				Dialog.openDialog('admin/modules/import/tmpl/' + param.menuId, '字段', undefined, {
+				Dialog.openDialog('jv/entity/curd/import_tmpl/' + param.menuId, '字段', undefined, {
 					width	: 1000,
 					height	: 500
 				});

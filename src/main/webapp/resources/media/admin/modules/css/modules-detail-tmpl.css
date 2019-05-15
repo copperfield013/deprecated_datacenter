@@ -746,3 +746,27 @@ div#action-list>a:hover{
     margin-top: -2px;
     
 }
+
+
+.module-import-tmpl-dialog div.fields-container {
+    width: 40%;
+    position: absolute;
+    right: 5px;
+    border: 1px solid #ccc;
+}
+
+.module-import-tmpl-dialog .fields-container .panel-body label {
+    border: 1px solid #999;
+    padding: 1px 7px;
+    margin: 3px 2px;
+    color: #999;
+    cursor: pointer;
+}
+.module-import-tmpl-dialog .fields-container .panel-body label:hover{
+    border-color: #bbb;
+    color: #bbb;
+}
+.module-import-tmpl-dialog .fields-container .panel-body label:selected{
+    border-color: #bbb;
+    color: #bbb;
+}

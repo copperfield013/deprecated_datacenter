@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -36,9 +37,13 @@ public class EntityConvertServiceImpl implements EntityConvertService{
 	@Resource
 	DetailTemplateService dtmplService;
 	
+	static Logger logger = Logger.getLogger(EntityConvertServiceImpl.class);
+	
+	
 	@Override
 	public EntityDetail convertEntityDetail(ModuleEntityPropertyParser entity, TemplateDetailTemplate dtmpl) {
 		Assert.notNull(entity);
+		long start = System.currentTimeMillis();
 		EntityDetail detail = new EntityDetail(entity.getCode(), entity.getTitle());
 		for (TemplateDetailFieldGroup group : dtmpl.getGroups()) {
 			DictionaryComposite composite = group.getComposite();
@@ -56,8 +61,10 @@ public class EntityConvertServiceImpl implements EntityConvertService{
 								arrayItemDetail.setRelationlabel(arrayItem.getFormatedProperty(composite.getName() + "." + EntityConstants.LABEL_KEY));
 							}
 							for (TemplateDetailField field : group.getFields()) {
+								long arrayitemFieldStart = System.currentTimeMillis();
 								String fieldValue = arrayItem.getFormatedProperty(field.getFieldName());
 								arrayItemDetail.getFieldMap().put(field.getId().toString(), fieldValue);
+								logger.debug("转换ArrayItem字段(" + composite.getName() + "[" + arrayItem.getItemIndex() + "]." + field.getFieldName() + ")使用时间：" + (System.currentTimeMillis() - arrayitemFieldStart));
 							}
 							arrayItemDetails.add(arrayItemDetail);
 						}
@@ -65,11 +72,14 @@ public class EntityConvertServiceImpl implements EntityConvertService{
 				}
 			}else {
 				for (TemplateDetailField field : group.getFields()) {
+					long fieldStart = System.currentTimeMillis();
 					String fieldValue = entity.getFormatedProperty(field.getFieldName());
 					detail.getFieldMap().put(field.getId().toString(), fieldValue);
+					logger.debug("转换字段[" + field.getFieldName() + "]使用时间：" + (System.currentTimeMillis() - fieldStart));
 				}
 			}
 		}
+		logger.debug("parser转换json使用时间:" + (System.currentTimeMillis() - start) + "ms");
 		return detail;
 	}
 
