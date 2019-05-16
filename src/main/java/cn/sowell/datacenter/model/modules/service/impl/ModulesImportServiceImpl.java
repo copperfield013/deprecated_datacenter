@@ -497,8 +497,8 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 			}
 			
 			String suffix = getExcelSuffix(workbook);
-			exportService.registCustomExportFile(progress.getUuid(), "导入失败行" + suffix);
-			exportService.writeExportFile(progress.getUUID(), "", os->{
+			exportService.registCustomExportFile(progress.getUuid(), progress.getUUID() + suffix, "导入失败行" + suffix);
+			exportService.writeExportFile(progress.getUUID(), suffix, os->{
 				newWorkbook.write(os);
 			});
 			progress.appendMessage("生成失败行文件成功");
@@ -521,14 +521,17 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 			for (DictionaryComposite dictionaryComposite : composites) {
 				EntityImportDictionaryComposite impComposite = new EntityImportDictionaryComposite();
 				impComposite.setId(dictionaryComposite.getId());
-				impComposite.setTitle(dictionaryComposite.getTitle());
+				impComposite.setName(dictionaryComposite.getTitle());
 				impComposite.setType(dictionaryComposite.getCompositeType());
 				List<EntityImportDictionaryField> impFields = new ArrayList<>(); 
 				impComposite.setFields(impFields);
 				for (DictionaryField field : dictionaryComposite.getFields()) {
 					EntityImportDictionaryField impField = new EntityImportDictionaryField();
 					impField.setId(field.getId());
-					impField.setTitle(field.getTitle());
+					impField.setName(field.getTitle());
+					impField.setPattern(field.getFieldPattern());
+					impField.setType(field.getType());
+					impField.setCasLevel(field.getCasLevel());
 					impFields.add(impField);
 				}
 				impCompostes.add(impComposite);

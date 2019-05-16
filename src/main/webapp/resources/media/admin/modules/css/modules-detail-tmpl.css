@@ -767,3 +767,12 @@ div#action-list>a:hover{
     border-color: #bbb;
     color: #bbb;
 }
+
+.module-import-tmpl-dialog .fields-container .panel-body label.disabled {
+    color: #ccc;
+    cursor: default;
+}
+.module-import-tmpl-dialog .fields-container .panel-body label.disabled:hover{
+    border-color: #888;
+    color: #ccc;    
+}

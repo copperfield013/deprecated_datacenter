@@ -35,5 +35,5 @@ public interface ExportService {
 	 */
 	void startWholeExport(WorkProgress progress, EntityQuery query, ExportDataPageInfo ePageInfo, Boolean withDetail);
 	void writeExportFile(String uuid, String suffix, ConsumerThrowException<OutputStream> consumer) throws Exception;
-	void registCustomExportFile(String uuid, String exportFileName);
+	void registCustomExportFile(String uuid, String diskFileName, String exportFileName);
 }

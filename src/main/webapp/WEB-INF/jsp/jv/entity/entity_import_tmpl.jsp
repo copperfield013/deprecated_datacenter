@@ -40,6 +40,7 @@
 							</tr>
 						</thead>
 						<tbody>
+							<style target="tmpl-field-rows"></style>
 						</tbody>
 					</table>
 				</div>
@@ -70,24 +71,6 @@
 			</c:forEach>
 		</div>
 	</div>
-	<script type="jquery/tmpl" id="tmpl-col-row-tmpl">
-		<tr field-index="\${fieldIndex}" 
-			data-id="\${tmplFieldId}" 
-			field-id="\${fieldId}"
-			composite-id="\${compositeId}">
-			<td>
-				<span class="field-title">\${title}</span>
-			</td>
-			<td class="field-name">\${fieldName}</td>
-			<td>
-				{{if removable != false }}
-					<a class="btn btn-xs remove-col">
-						<i class="fa fa-trash-o"></i>
-					</a>
-				{{/if}}
-			</td>
-		</tr>
-	</script>
 </div>
 <script>
 	seajs.use(['entity/js/entity-import-tmpl.js'], function(EntityImportTmpl){
@@ -98,20 +81,4 @@
 			menuId	: '${menuId}'
 		})
 	});
-
-	/* seajs.use(['modules/js/modules-import-download.js'], function(ModulesImportDownload){
-		var $page = $('#module-import-tmpl-dialog-${RES_STAMP }');
-		var tmplFieldsJson = {};
-		try{
-			tmplFieldsJson = $.parseJSON('${tmplFieldsJson}');
-		}catch(e){}
-		
-		ModulesImportDownload.initPage($page, {
-			relationLabelKey	: '${relationLabelKey}',
-			tmplFieldsJson		: tmplFieldsJson,
-			tmplId				: '${tmpl.id}',
-			moduleName			: '${module.name}',
-			menuId				: '${menu.id}'
-		});
-	}); */
 </script>

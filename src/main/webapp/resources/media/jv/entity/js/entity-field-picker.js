@@ -18,6 +18,16 @@ define(function(require, exports, module){
 		this.selectFieldCallbacks.add(callback);
 	}
 	
+	EntityFieldPicker.prototype.setComposites = function(composites){
+		$.each(composites, function(){
+			if(this.fields){
+				var composite = this;
+				$.each(this.fields, function(){this.composite = composite});
+			}
+		});
+		this.composites = composites;
+	}
+	
 	EntityFieldPicker.prototype.render = function(){
 		var defer = $.Deferred();
 		var that = this;
@@ -27,7 +37,13 @@ define(function(require, exports, module){
 				uuid		: that.uuid
 			}, {
 				selectField	: function(field){
-					that.selectFieldCallbacks.fireWith(that, [field, this]);
+					var $fieldLabel = $(this);
+					if(!$fieldLabel.is('.disabled')){
+						var toggleDisabled = function(disabled){
+							$fieldLabel.toggleClass('disabled', disabled);
+						}
+						that.selectFieldCallbacks.fireWith(that, [field, this, toggleDisabled]);
+					}
 				}
 			});
 			defer.resolve($fieldPicker);

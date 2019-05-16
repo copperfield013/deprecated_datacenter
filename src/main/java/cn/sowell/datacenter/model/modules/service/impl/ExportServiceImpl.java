@@ -186,7 +186,7 @@ public class ExportServiceImpl implements ExportService {
 		}else if(customExportResourceMap.containsKey(uuid)) {
 			ExportResource resource = customExportResourceMap.get(uuid);
 
-			FileSystemResource f = new FileSystemResource(PropertyPlaceholder.getProperty("export_cache_path") + uuid);
+			FileSystemResource f = new FileSystemResource(PropertyPlaceholder.getProperty("export_cache_path") + resource.getDiskFileName());
 			return new ExportFileResource(resource.getExportFileName(), f);
 		}
 		return null;
@@ -343,7 +343,8 @@ public class ExportServiceImpl implements ExportService {
 			entityExportWriter.writeDetail(parser, dtmpl, sheet);
 			String uuid = TextUtils.uuid();
 			
-			writeExportFile(uuid, os->workbook.write(os));
+			writeExportFile(uuid, ".xlsx", os->workbook.write(os));
+			registCustomExportFile(uuid, uuid + ".xlsx", "导出实体详情（" + parser.getTitle() + "）.xlsx");
 			return uuid;
 		} catch (Exception e) {
 			throw e;
@@ -498,8 +499,9 @@ public class ExportServiceImpl implements ExportService {
 	}
 
 	@Override
-	public void registCustomExportFile(String uuid, String exportFileName) {
+	public void registCustomExportFile(String uuid, String diskFileName, String exportFileName) {
 		ExportResource resource = new ExportResource(exportFileName, System.currentTimeMillis() + 30 * 60 * 1000);
+		resource.setDiskFileName(diskFileName);
 		customExportResourceMap.put(uuid, resource);
 	}
 

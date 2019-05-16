@@ -1,6 +1,5 @@
 define(function(require, exports, module){
-	
-	var composites = [{id:1,title:'基本信息',fields:[{id:1001,title:'姓名'},{id:1002,title:'性别'},{id:1003,title:'生日'},{id:1004,title:'标签'}]},{id:2,title:'就业信息',fields:[{id:1003,title:'工作单位'},{id:1004,title:'单位地址'},{id:1005,title:'入职时间'}]},{id:3,title:'家庭信息',fields:[{id:1006,title:'姓名'},{id:1007,title:'性别'},{id:1008,title:'生日'}]}];
+	"use strict";
 	exports.initPage = function(_param){
 		var defParam = {
 			$page	: null,
@@ -15,24 +14,33 @@ define(function(require, exports, module){
 		var $page = param.$page;
 		
 		var context = Utils.createContext({
-			fieldDictionary	: [],
-			tmpl			: {
-				fields	: []
-			}
+			fieldDictionary			: [],
+			tmplFields				: [],
+			fieldIndexMap			: {},
+			relationLabelIndexMap	: {}
+			
+		});
+		var $tbody = $('.fields-l tbody', $page);
+		$tbody.sortable({
+			helper 		: "clone",
+			cursor 		: "move",// 移动时候鼠标样式
+			opacity		: 0.5, // 拖拽过程中透明度
+			tolerance 	: 'pointer'
 		});
 		
 		require('tmpl').load('media/jv/entity/tmpl/entity-import-tmpl.tmpl').done(function(tmplMap){
 			context
 				.bind('fieldDictionary', renderFieldSelector)
-				.bind('tmpl', renderShownTemplateFields)
+				.bind('appendFields', renderShownTemplateFields)
 				;
 			loadFields();
+			
 			
 			function loadFields(){
 				Ajax.ajax('api2/entity/import/dict/' + param.menuId).done(function(data){
 					if(data.fieldDictionary){
 						context.setStatus('fieldDictionary', data.fieldDictionary);
-						context.setStatus('tmpl', {fields:[]});
+						context.setStatus('appendFields', []);
 					}
 				});
 			}
@@ -43,23 +51,69 @@ define(function(require, exports, module){
 				var fieldPicker = new FieldPicker({
 					$page, plhTarget: 'fields-container'
 				});
-				fieldPicker.composites = fieldDictionary.composites;
+				fieldPicker.setComposites(fieldDictionary.composites);
 				fieldPicker.bindSelected(whenFieldSelected);
 				fieldPicker.render();
 			}
 			
-			function whenFieldSelected(field, $field){
-				var impTmpl = context.getStatus('tmpl');
-				impTmpl.fields.push(field);
-				context.setStatus('tmpl');
+			function whenFieldSelected(field, $field, toggleDisabled){
+				var fields = [];
+				fields.push($.extend({uuid: Utils.uuid(5,62)}, field));
+				if(field.composite.type === 'normal'){
+					toggleDisabled(true);
+				}
+				context.setStatus('appendFields', fields);
 			}
 			
 			
 			function renderShownTemplateFields(){
-				var impTmpl = context.getStatus('tmpl');
-				console.log(impTmpl);
-				
-				
+				var appendFields = context.getStatus('appendFields');
+				context.properties.appendFields = [];
+				var rows = [];
+				//关系和多值属性字段的当前最大索引值Map
+				var fieldIndexMap = context.getStatus('fieldIndexMap');
+				//关系当前最大索引值Map
+				var relationLabelIndexMap = context.getStatus('relationLabelIndexMap');
+				$.each(appendFields, function(){
+					var title = this.name;
+					var tmplField = {fieldId: this.id, compositeId: this.composite.id};
+					if(this.composite.type === 'relation' || this.composite.type === 'multiattr'){
+						//为关系和多值属性添加索引
+						if(fieldIndexMap[this.id] === undefined){
+							fieldIndexMap[this.id] = -1;
+						}
+						var fieldIndex = ++fieldIndexMap[this.id];
+						title = this.composite.name + '[' + fieldIndex + ']' + this.name;
+						tmplField['fieldIndex'] = fieldIndex;
+						if(this.composite.type === 'relation'){
+							//添加label字段
+							if(relationLabelIndexMap[this.composite.id] === undefined){
+								relationLabelIndexMap[this.composite.id] = -1;
+							}
+							if(relationLabelIndexMap[this.composite.id] < fieldIndexMap[this.id]){
+								rows.push({
+									title		: this.composite.name + '[' + ++relationLabelIndexMap[this.composite.id] + '].$label$',
+									fieldName	: '',
+									removable	: false
+								});
+							}
+						}
+					}
+					
+					var removable = true;
+					rows.push($.extend({}, this, {
+						title,
+						removable,
+						fieldName	: this.name,
+					}));
+					context.getStatus('tmplFields').push(tmplField);
+				});
+				console.log(context.getStatus('tmplFields'));
+				$tbody.append(tmplMap['tmpl-field-rows'].tmpl({rows}, {
+					removeRow	: function(field){
+						
+					}
+				}));
 			}
 		});
 		

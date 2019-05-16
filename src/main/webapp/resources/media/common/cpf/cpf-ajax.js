@@ -377,29 +377,6 @@ define(function(require, exports, module){
         oPop.document.execCommand("SaveAs");
         oPop.close();
 	    return true;
-		
-		/*
-		if(utils.isPhoto(url) || /.*\.pdf$/i.test(url)){
-			var a = document.createElement('a');
-			if(a.download !== undefined){
-				a.download = fileName || url.substring(url.lastIndexOf('/') + 1);
-				a.href = url;
-				a.click();
-				return;
-			}
-		}
-		var $downloadFrame = $('#cpf-download-frame');
-		if($downloadFrame.length === 0){
-			$downloadFrame = $('<iframe>');
-			$downloadFrame.attr('width', 0).attr('height', 0).css('display', 'none');
-			$downloadFrame.attr('src', url);
-			$downloadFrame.appendTo(document.body);
-			$downloadFrame.on('load', function(e){
-				console.log(e);
-			});
-		}else{
-			$downloadFrame[0].contentWindow.location.href = url;
-		}*/
 	}
 	
 
@@ -411,4 +388,207 @@ define(function(require, exports, module){
 	exports.AjaxPageResponse = AjaxPageResponse;
 	exports.download = download;
 	exports.loadResource = loadResource;
+	
+	/**
+	 * 轮询查询当前进度
+	 * @return 返回一个操作对象
+	 */
+	exports.poll = function(_param){
+		var defaultParam = {
+			startupURL				: '',
+			progressURL				: '',
+			startupReqParameters	: {},
+			startupReqMethod		: 'postJson',
+			uuidResponseName		: 'uuid',
+			uuidRequestName			: 'uuid',
+			msgIndexRequestName		: '',
+			//构造进度获取值参数的方法
+			progressReqParameters	: function(startupRes, uuid){},
+			//进度值的获取方法
+			progressGetter			: function(res){
+				return res.current/res.totalCount;
+			},
+			//进度值的最大值
+			progressMax				: 1,
+			whenStartupResponse		: function(dara, uuid){},
+			progressHandler			: function(progress, res){},
+			//进度完成时调用
+			whenComplete			: function(res){},
+			//当
+			whenUnsuccess			: function(res){},
+			//当轮询被主动中断的时候
+			whenBreaked				: function(res){},
+			checkCompleted			: function(res, progress){
+				return res.completed ==  true;
+			},
+			messageSequeueGetter	: function(res){return res['messageSequeue']},
+			handleWithMessageSequeue: function(msgSequeue){}
+		};
+		var param = $.extend({}, defaultParam , _param);
+		var pId = null;
+		var callbacksMap = utils.CallbacksMap();
+		var interrupted = false;
+		var disconnected = false;
+		var pollUUID = null, pollDataContext = null;
+		var currentMessageIndex = 0;
+		var polling = false;
+		var handler = {
+			getId		: function(){
+				return pId;
+			},
+			start		: function(reqParam){
+				interrupted = false;
+				disconnected = false;
+				pId = utils.uuid();
+				pollUUID = null;
+				pollDataContext = null;
+				currentMessageIndex = 0;
+				polling = false;
+				console.log('开始轮询[pId=' + pId + ']');
+				startPoll(reqParam);
+			},
+			pollWith	: function(uuid, data){
+				pollUUID = uuid;
+				pollDataContext = data;
+				data = data || {};
+				function _(){
+					polling = true;
+					if(disconnected){
+						return;
+					}
+					checkIntrupt();
+					var parameters = {};
+					parameters[param.uuidRequestName] = uuid;
+					parameters.interrupted = interrupted;
+					if(param.msgIndexRequestName){
+						parameters[param.msgIndexRequestName] = currentMessageIndex;
+					}
+					if(typeof param.progressReqParameters === 'function'){
+						$.extend(parameters, param.progressReqParameters.apply(param, [data, uuid]));
+					}
+					ajax(param.progressURL, parameters, function(res){
+						checkIntrupt();
+						//如果需要消息队列，那么需要返回一个对象，
+						//对象内包含消息队列数组，以及这些消息的起始和终止消息的index
+						var msgSequeue = param.messageSequeueGetter.apply(param, [res]);
+						if(msgSequeue && $.isArray(msgSequeue.messages) && msgSequeue.endIndex){
+							currentMessageIndex = msgSequeue.endIndex;
+							try{
+								param.handleWithMessageSequeue.apply(param, [msgSequeue]);
+							}catch(e1){console.error(e1)}
+						}
+						//轮询请求获得回复
+						if(res.status === 'suc'){
+							//获得进度
+							var progress = param.progressGetter.apply(param, [res]);
+							progress = progress > param.progressMax? param.progressMax: progress;
+							try{
+								param.progressHandler.apply(param, [progress, res]);
+							}catch(e){console.error(e)}
+							
+							//如果工作已经完成，那么执行操作
+							if(param.checkCompleted.apply(param, [res, progress])){
+								param.whenComplete.apply(param, [res, data]);
+							}else{
+								//如果工作已经被中断，那么执行操作
+								if(res.breaked === true){
+									interrupted = true;
+									checkIntrupt();
+									param.whenBreaked.apply(param, [res]);
+								}else{
+									//如果工作没有完成，并且没有被中断，就再次发起轮询请求
+									setTimeout(_, 1000);
+									return;
+								}
+							}
+						}else{
+							//轮询请求发生可知异常，根据策略是否再次发起轮询状态请求
+							try{
+								if(param.whenUnsuccess.apply(param, [res]) === true){
+									setTimeout(_, 1000);
+									return;
+								}
+							}catch(e){}
+						}
+						pollUUID = null;
+						pollDataContext = null;
+						polling = false;
+					}, {
+						whenErr		: function(){
+							//轮询请求后台发生未知异常，此时的执行方式
+							try{
+								param.whenRequestError.apply(param, arrguments);
+								if(param.whenUnsuccess.apply(param, [res]) === true){
+									setTimeout(_, 1000);
+									return;
+								}
+							}catch(e){}
+							polling = false;
+							
+						}
+					});
+				}
+				_();
+			},
+			isPolling	: function(){
+				return polling;
+			},
+			//暂停轮询
+			pause 		: function(){
+				
+			},
+			//继续轮询
+			continues	: function(){
+				
+			},
+			//中断轮询
+			breaks		: function(){
+				var hasInterrupt = interrupted;
+				interrupted = true;
+				return {
+					done	: function(callback){
+						if(typeof callback === 'function'){
+							if(hasInterrupt){
+								callback();
+							}else{
+								callbacksMap.put('break', callback);
+							}
+						}
+					}
+				};
+			},
+			//断开轮询，但不会结束后台的导出线程
+			disconnect	: function(){
+				disconnected = true;
+			},
+			//重新连接
+			reconnect	: function(){
+				disconnected = false;
+				handler.pollWith(pollUUID, pollDataContext);
+			}
+		};
+		function checkIntrupt(){
+			if(interrupted === true){
+				try{
+					callbacksMap.fire('break', []);
+					callbacksMap.empty('break');
+				}catch(e){}
+			}
+		}
+		function startPoll(reqParam){
+			exports[param.startupReqMethod](param.startupURL, $.extend({}, param.startupReqParameters, reqParam), function(data){
+				var uuid = data[param.uuidResponseName];
+				var r = null;
+				try{
+					r = param.whenStartupResponse.apply(param, [data, uuid]);
+				}catch(e){console.error(e)}
+				if(r !== false && uuid){
+					checkIntrupt();
+					handler.pollWith(uuid, data);
+				}
+			});
+		}
+		return handler;
+		
+	}
 });

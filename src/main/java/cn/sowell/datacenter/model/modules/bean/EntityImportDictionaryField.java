@@ -2,17 +2,38 @@ package cn.sowell.datacenter.model.modules.bean;
 
 public class EntityImportDictionaryField {
 	private Long id;
-	private String title;
+	private String name;
+	private String pattern;
+	private String type;
+	private Integer casLevel;
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public String getTitle() {
-		return title;
+	public String getName() {
+		return name;
 	}
-	public void setTitle(String title) {
-		this.title = title;
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getPattern() {
+		return pattern;
+	}
+	public void setPattern(String pattern) {
+		this.pattern = pattern;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+	public Integer getCasLevel() {
+		return casLevel;
+	}
+	public void setCasLevel(Integer casLevel) {
+		this.casLevel = casLevel;
 	}
 }
