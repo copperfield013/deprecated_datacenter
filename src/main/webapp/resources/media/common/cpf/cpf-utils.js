@@ -92,6 +92,17 @@ define(function(require, exports){
 				height	: page.offsetHeight
 			};
 		},
+		setProperties	: function(source, target, propertyNames){
+			if(arguments.length === 2 && $.isArray(target)){
+				propertyNames = target;
+				target = {};
+			}
+			for(var i in propertyNames){
+				var propertyName = propertyNames[i];
+				target[propertyName] = source[propertyName];
+			}
+			return target;
+		},
 		/**
 		 * 获得随机字符串
 		 * @param len 随机字符串长度，默认32

@@ -398,7 +398,7 @@ public class ModulesImportServiceImpl implements ModulesImportService {
 			origin.setTitle(template.getTitle());
 			
 			Date now = new Date();
-			
+			origin.setUpdateTime(now);
 			NormalDaoSetUpdateStrategy.build(
 					ModuleImportTemplateField.class, nDao,
 					field->field.getId(),

@@ -126,9 +126,10 @@ public class JvEntityCurdController {
 	}
 	
 	
-	@RequestMapping("/import_tmpl/{menuId}")
-	public String entityImportTmpl(@PathVariable Long menuId, ApiUser user, Model model) {
+	@RequestMapping({"/import_tmpl/{menuId}", "/import_tmpl/{menuId}/{tmplId}"})
+	public String entityImportTmpl(@PathVariable Long menuId, @PathVariable(required=false) Long tmplId, ApiUser user, Model model) {
 		model.addAttribute("menuId", menuId);
+		model.addAttribute("tmplId", tmplId);
 		return JvConstants.JSP_ENTITY + "/entity_import_tmpl.jsp";
 	}
 	

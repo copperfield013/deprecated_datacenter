@@ -24,7 +24,7 @@ public class ModulesImportDaoImpl implements ModulesImportDao{
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<ModuleImportTemplate> getImportTemplates(ImportTemplateCriteria criteria) {
-		DeferedParamQuery dQuery = new DeferedParamQuery("from ModuleImportTemplate t where t.module = :module and t.createUserCode = :createUserCode");
+		DeferedParamQuery dQuery = new DeferedParamQuery("from ModuleImportTemplate t where t.module = :module and t.createUserCode = :createUserCode order by t.updateTime desc");
 		dQuery
 			.setParam("module", criteria.getModule())
 			.setParam("createUserCode", criteria.getUserCode());

@@ -116,6 +116,7 @@
 					'tab' 		: 'COMMON/cpf/cpf-tab.js?v=${cpfVersion}',
 					'ajax'		: 'COMMON/cpf/cpf-ajax.js?v=${cpfVersion}',
 					'poll'		: 'COMMON/cpf/cpf-poll.js?v=${cpfVersion}',
+					'event'		: 'COMMON/cpf/cpf-event.js?v=${cpfVersion}',
 					'css'		: 'COMMON/cpf/cpf-css.js?v=${cpfVersion}',
 					'timer'		: 'COMMON/cpf/cpf-timer.js?v=${cpfVersion}',
 					'console'	: 'COMMON/cpf/cpf-console.js?v=${cpfVersion}',
@@ -125,7 +126,7 @@
 					'tmpl'		: 'COMMON/cpf/cpf-tmpl.js?v=${cpfVersion}',
 					'select2'	: '${basePath}media/admin/plugins/select2/js/select2.full.js',
 					'indexer'	: 'COMMON/cpf/cpf-indexer.js?v=${cpfVersion}',
-					'selectable-table'	: 'COMMON/cpf/cpf-selectable-table.js?v=$${cpfVersion}'
+					'selectable-table'	: 'COMMON/cpf/cpf-selectable-table.js?v=$${cpfVersion}',
 				}
 	    		});
 	    		

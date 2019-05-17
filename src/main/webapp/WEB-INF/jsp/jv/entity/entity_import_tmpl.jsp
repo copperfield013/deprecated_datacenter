@@ -6,10 +6,10 @@
 			<h1>导入模板配置</h1>
 		</div>
 		<div class="header-buttons">
-			<a title="切换模板" class="btn-toggle" href="page:#tmpl-list.toggle">
+			<a title="切换模板" class="btn-toggle" href="javascript:;" on-click="toggleTemplates">
 				<i class="iconfont icon-template"></i>
 			</a>
-			<a class="export btn-toggle" title="保存导入模板" id="btn-save" href="javascript:;">
+			<a class="export btn-toggle" title="保存导入模板" id="btn-save" href="javascript:;" on-click="saveTmpl">
 				<i class="fa fa-save"></i>
 			</a>
 			<a class="btn-toggle" title="下载导入模板" id="btn-download" href="javascript:;">
@@ -46,31 +46,12 @@
 				</div>
 				<div class="fields-r col-lg-4">
 					<h4>可选字段</h4>
-					<div class="input-icon field-search" style="width: 100%">
-						<span class="search-input-wrapper">
-							<input type="text" class="search-text-input form-control input-xs glyphicon-search-input" autocomplete="off" placeholder="输入添加的字段名">
-						</span>
-						<i class="glyphicon glyphicon-search blue"></i>
-						<i title="选择字段" class="glyphicon glyphicon-th blue field-picker-button"></i>
-					</div>
 					<style target="fields-container"></style>
 				</div>
 			</div>	
 		</form>
 	</div>
-	<div id="tmpl-list" class="detail-toggle-sublist blur-hidden" style="display: none;">
-		<div class="detail-toggle-sublist-wrapper">
-			<c:forEach items="${tmpls }" var="tmplItem">
-				<a href="admin/modules/import/tmpl/show/${menu.id }/${tmplItem.id}" data-id="${tmplItem.id }" class="${tmplItem.id == tmpl.id? 'active': '' }">
-					<span class="detail-toggle-sublist-icon"><i class="fa fa-lightbulb-o"></i></span>
-					<span class="detail-toggle-sublist-item-body">
-						<span class="detail-toggle-sublist-item-name">${tmplItem.title }</span>
-						<span class="detail-toggle-sublist-item-date"><fmt:formatDate value="${tmplItem.updateTime }" pattern="yyyy-MM-dd HH:mm:ss" /> </span>
-					</span>
-				</a>
-			</c:forEach>
-		</div>
-	</div>
+	<style target="tmpl-list"></style>
 </div>
 <script>
 	seajs.use(['entity/js/entity-import-tmpl.js'], function(EntityImportTmpl){
@@ -78,7 +59,8 @@
 		
 		EntityImportTmpl.initPage({
 			$page	: $page,
-			menuId	: '${menuId}'
+			menuId	: '${menuId}',
+			tmplId	: '${tmplId}'
 		})
 	});
 </script>

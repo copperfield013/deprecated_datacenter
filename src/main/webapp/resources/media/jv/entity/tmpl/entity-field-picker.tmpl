@@ -13,7 +13,7 @@
 					<div id="collapse-${uuid}-${composite.id}" class="panel-collapse collapse" style="height: 0px;"> 
 						<div class="panel-body border-red">
 							{{each(j, field) composite.fields}}
-								<label on-click="do:selectField(composites[${i}].fields[${j}])">${field.name}</label>
+								<label field-id="${field.id}" on-click="do:selectField(composites[${i}].fields[${j}])">${field.name}</label>
 							{{/each}}
 						</div> 
 					</div> 
@@ -22,3 +22,5 @@
 		{{/each}}
 	</div> 
 </script>
+
+

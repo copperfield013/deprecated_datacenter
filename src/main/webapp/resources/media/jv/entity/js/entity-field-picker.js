@@ -8,14 +8,28 @@ define(function(require, exports, module){
 		this.param = $.extend({}, defParam, _param);
 		this.uuid = Utils.uuid(10, 62);
 		this.selectFieldCallbacks = $.Callbacks();
+		this.resetFieldCallbacks = $.Callbacks();
 		this.composites = [];
-		this.context = Utils.createContext({
-			selectedFields		: []
-		});
+	}
+	
+	
+	EntityFieldPicker.prototype.select = function(fieldId, data){
+		if(this.$fieldPicker){
+			this.$fieldPicker.find('label[field-id="' + fieldId + '"]').trigger('click', [data]);
+		}
+	}
+	EntityFieldPicker.prototype.reset = function(){
+		if(this.$fieldPicker){
+			this.$fieldPicker.find('label[field-id].disabled').removeClass('disabled');
+			this.resetFieldCallbacks.fireWith(this)
+		}
 	}
 	
 	EntityFieldPicker.prototype.bindSelected = function(callback){
 		this.selectFieldCallbacks.add(callback);
+	}
+	EntityFieldPicker.prototype.bindReseted  = function(callback){
+		this.resetFieldCallbacks.add(callback);
 	}
 	
 	EntityFieldPicker.prototype.setComposites = function(composites){
@@ -36,16 +50,17 @@ define(function(require, exports, module){
 				composites	: that.composites,
 				uuid		: that.uuid
 			}, {
-				selectField	: function(field){
+				selectField	: function(field, data){
 					var $fieldLabel = $(this);
 					if(!$fieldLabel.is('.disabled')){
 						var toggleDisabled = function(disabled){
 							$fieldLabel.toggleClass('disabled', disabled);
 						}
-						that.selectFieldCallbacks.fireWith(that, [field, this, toggleDisabled]);
+						that.selectFieldCallbacks.fireWith(that, [field, this, toggleDisabled, data]);
 					}
 				}
 			});
+			that.$fieldPicker = $fieldPicker;
 			defer.resolve($fieldPicker);
 		});
 		

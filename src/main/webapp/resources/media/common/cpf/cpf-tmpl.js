@@ -1,11 +1,6 @@
 define(function(require, exports, module){
 	//设置重新获取模板的超时时间，当为0或者null时不会重新获取
 	var MAX_REQUIRE_TIME_MILL = 30000;
-	var EVENT_MAP = {
-		'on-click' 	: 'click',
-		'on-change'	: 'change',
-		'on-input'	: 'input'
-	}
 	function Template(_param){
 		var defaultParam = {
 			source	: '',
@@ -34,41 +29,7 @@ define(function(require, exports, module){
 						var data = eval('with(obj){r=' + dataStr + '}');
 						$(this).data('plh-data', data);
 					});
-				
-				for(var eventName in EVENT_MAP){
-					$result
-						.filter('[' + eventName + ']')
-						.add($result.find('[' + eventName + ']'))
-						.each(function(){
-							var $this = $(this);
-							var callbackName = $this.attr(eventName);
-							var callbackParam = undefined;
-							var args = [];
-							if(events && callbackName){
-								var matcher = /^do:(.+)\((.+)\)$/.exec(callbackName);
-								if(matcher){
-									callbackName = matcher[1];
-									callbackParam = matcher[2];
-									var exp = 'with(obj){[' + callbackParam + ']}';
-									try{
-										args = eval(exp);
-									}catch(e){
-										console.error($this[0]);
-										$.error(_this.getPath() + '模板中无法解析的表达式' + exp);
-									}
-									
-								}
-								
-								if(events[callbackName]){
-									$this.on(EVENT_MAP[eventName], callbackParam? function(e){
-										e.preventDefault();
-										events[callbackName].apply(this, args);
-									}: events[callbackName]);
-								}
-							}
-							$this.removeAttr(eventName);
-						});
-				}
+				require('event').bindScopeEvent($result, events, obj, false);
 				return $result;
 			}
 		};
@@ -100,7 +61,7 @@ define(function(require, exports, module){
 			
 			var _this = this;
 			$plhs = $plhs.filter('style');
-			
+			var $results = $();
 			function replace(rebuild){
 				$plhs.each(function(){
 					var $plhDom = $(this).data('plh-dom');
@@ -122,10 +83,12 @@ define(function(require, exports, module){
 						$result = $clone.clone(true);
 					}
 					$this.after($result).data('plh-dom', $result);
+					$results = $results.add($result);
 					callback.apply(_this, [$result, _data, i == $plhs.length - 1, i]);
 				});
 			}
 			replace(typeof data === 'function');
+			return $results;
 		}
 		
 		/**

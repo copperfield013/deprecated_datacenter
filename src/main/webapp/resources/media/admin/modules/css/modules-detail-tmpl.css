@@ -753,10 +753,10 @@ div#action-list>a:hover{
 }
 
 .module-import-tmpl-dialog .fields-container .panel-body label {
-    border: 1px solid #999;
+    border: 1px solid #c2c2c2;
     padding: 1px 7px;
     margin: 3px 2px;
-    color: #999;
+    color: #00C5CD;
     cursor: pointer;
 }
 .module-import-tmpl-dialog .fields-container .panel-body label:hover{
@@ -775,4 +775,9 @@ div#action-list>a:hover{
 .module-import-tmpl-dialog .fields-container .panel-body label.disabled:hover{
     border-color: #888;
     color: #ccc;    
+}
+
+
+.module-import-tmpl-dialog .fields-container .panel-heading+.panel-collapse .panel-body {
+    background-color: #fff;
 }

@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import cn.sowell.copframe.dto.ajax.JSONObjectResponse;
@@ -205,6 +206,14 @@ public class Api2EntityImportController {
 		criteria.setModule(menu.getTemplateModule());
 		criteria.setUserId((String) user.getId());
 		List<ModuleImportTemplate> tmpls = impService.getImportTemplates(criteria);
+		JSONArray jTmpls = new JSONArray();
+		for (ModuleImportTemplate tmpl : tmpls) {
+			JSONObject jTmpl = new JSONObject();
+			jTmpl.put("id", tmpl.getId());
+			jTmpl.put("title", tmpl.getTitle());
+			jTmpl.put("updateTime", tmpl.getUpdateTime() != null? tmpl.getUpdateTime().getTime(): null);
+			jTmpls.add(jTmpl);
+		}
 		res.put("tmpls", JSON.toJSON(tmpls));
 		return res;
 	}
